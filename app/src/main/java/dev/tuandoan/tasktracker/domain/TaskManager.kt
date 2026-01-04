@@ -3,8 +3,15 @@ package dev.tuandoan.tasktracker.domain
 import dev.tuandoan.tasktracker.data.database.Task
 import dev.tuandoan.tasktracker.domain.repository.ITaskRepository
 import kotlinx.coroutines.flow.Flow
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class TaskManager(
+/**
+ * Implementation of ITaskManager that provides business logic for task operations.
+ * Uses @Inject constructor for Hilt dependency injection.
+ * @Singleton ensures single instance across the app lifecycle.
+ */
+class TaskManager @Inject constructor(
     private val repository: ITaskRepository
 ) : ITaskManager {
 

@@ -7,15 +7,20 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.hilt.navigation.compose.hiltViewModel
+import dagger.hilt.android.AndroidEntryPoint
 import dev.tuandoan.tasktracker.ui.screens.TaskListScreen
 import dev.tuandoan.tasktracker.ui.theme.TaskTrackerTheme
 import dev.tuandoan.tasktracker.ui.viewmodel.TaskViewModel
 
+/**
+ * Main activity for the Task Tracker app.
+ * Uses @AndroidEntryPoint to enable Hilt dependency injection.
+ */
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,12 +33,14 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+/**
+ * Main composable for the Task Tracker app.
+ * Uses hiltViewModel() to get ViewModel instance with proper dependency injection.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TaskTrackerApp() {
-    val context = LocalContext.current
-    val application = context.applicationContext as TaskTrackerApplication
-    val viewModel: TaskViewModel = remember { TaskViewModel(application.taskManager) }
+    val viewModel: TaskViewModel = hiltViewModel()
 
     Scaffold(
         topBar = {

@@ -6,6 +6,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.ksp)
+    alias(libs.plugins.dagger.hilt.android)
 }
 
 android {
@@ -23,43 +24,43 @@ android {
     }
 
     buildTypes {
-        fun getSecretPropertyFile(rootProject: Project): Properties {
-            val signingKeyAlias = "SIGNING_KEY_ALIAS"
-            val signingKeystorePassword = "SIGNING_KEYSTORE_PASSWORD"
-            val signingKeyPassword = "SIGNING_KEY_PASSWORD"
-
-            val secretPropertiesFile: File = rootProject.file("secret.properties")
-            val secretProperties = Properties()
-            if (secretPropertiesFile.exists()) {
-                secretProperties.load(FileInputStream(secretPropertiesFile))
-            }
-            System.getenv(signingKeyAlias)?.let {
-                secretProperties.setProperty(signingKeyAlias, it)
-            }
-            System.getenv(signingKeystorePassword)?.let {
-                secretProperties.setProperty(signingKeystorePassword, it)
-            }
-            System.getenv(signingKeyPassword)?.let {
-                secretProperties.setProperty(signingKeyPassword, it)
-            }
-            return secretProperties
-        }
-
-        val secretProperties = getSecretPropertyFile(rootProject)
-        signingConfigs {
-            create("release") {
-                keyAlias = "${secretProperties["SIGNING_KEY_ALIAS"]}"
-                keyPassword = "${secretProperties["SIGNING_KEY_PASSWORD"]}"
-                storePassword = "${secretProperties["SIGNING_KEYSTORE_PASSWORD"]}"
-                storeFile = File("$rootDir/keystore.jks")
-            }
-        }
-
         debug {
             isDebuggable = true
             isMinifyEnabled = false
         }
         release {
+            fun getSecretPropertyFile(rootProject: Project): Properties {
+                val signingKeyAlias = "SIGNING_KEY_ALIAS"
+                val signingKeystorePassword = "SIGNING_KEYSTORE_PASSWORD"
+                val signingKeyPassword = "SIGNING_KEY_PASSWORD"
+
+                val secretPropertiesFile: File = rootProject.file("secret.properties")
+                val secretProperties = Properties()
+                if (secretPropertiesFile.exists()) {
+                    secretProperties.load(FileInputStream(secretPropertiesFile))
+                }
+                System.getenv(signingKeyAlias)?.let {
+                    secretProperties.setProperty(signingKeyAlias, it)
+                }
+                System.getenv(signingKeystorePassword)?.let {
+                    secretProperties.setProperty(signingKeystorePassword, it)
+                }
+                System.getenv(signingKeyPassword)?.let {
+                    secretProperties.setProperty(signingKeyPassword, it)
+                }
+                return secretProperties
+            }
+
+            val secretProperties = getSecretPropertyFile(rootProject)
+            signingConfigs {
+                create("release") {
+                    keyAlias = "${secretProperties["SIGNING_KEY_ALIAS"]}"
+                    keyPassword = "${secretProperties["SIGNING_KEY_PASSWORD"]}"
+                    storePassword = "${secretProperties["SIGNING_KEYSTORE_PASSWORD"]}"
+                    storeFile = File("$rootDir/keystore.jks")
+                }
+            }
+
             isDebuggable = false
             isMinifyEnabled = true
             isShrinkResources = true
@@ -71,11 +72,13 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
     }
-    kotlinOptions {
-        jvmTarget = "11"
+    kotlin {
+        compilerOptions {
+            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_1_8)
+        }
     }
     buildFeatures {
         compose = true
@@ -92,8 +95,8 @@ dependencies {
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.compose.material3.adaptive.navigation.suite)
-    implementation("androidx.compose.material:material-icons-core")
-    implementation("androidx.compose.material:material-icons-extended")
+    implementation(libs.androidx.compose.material.icons.core)
+    implementation(libs.androidx.compose.material.icons.extended)
 
     // Room dependencies
     implementation(libs.androidx.room.runtime)
@@ -102,6 +105,11 @@ dependencies {
 
     // ViewModel dependency
     implementation(libs.androidx.lifecycle.viewmodel.compose)
+
+    // Hilt dependencies
+    implementation(libs.dagger.hilt.android)
+    implementation(libs.androidx.hilt.navigation.compose)
+    ksp(libs.dagger.hilt.compiler)
 
 
     testImplementation(libs.junit)

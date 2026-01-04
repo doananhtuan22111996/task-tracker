@@ -2,12 +2,20 @@ package dev.tuandoan.tasktracker.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
 import dev.tuandoan.tasktracker.data.database.Task
 import dev.tuandoan.tasktracker.domain.ITaskManager
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class TaskViewModel(
+/**
+ * ViewModel for task-related UI operations.
+ * Uses @HiltViewModel for Hilt dependency injection in ViewModels.
+ * Automatically scoped to ViewModelComponent lifecycle.
+ */
+@HiltViewModel
+class TaskViewModel @Inject constructor(
     private val taskManager: ITaskManager
 ) : ViewModel() {
 
