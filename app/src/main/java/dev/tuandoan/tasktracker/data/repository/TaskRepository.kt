@@ -4,8 +4,17 @@ import dev.tuandoan.tasktracker.data.database.Task
 import dev.tuandoan.tasktracker.data.database.TaskDao
 import dev.tuandoan.tasktracker.domain.repository.ITaskRepository
 import kotlinx.coroutines.flow.Flow
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class TaskRepository(private val taskDao: TaskDao) : ITaskRepository {
+/**
+ * Implementation of ITaskRepository that handles task data operations.
+ * Uses @Inject constructor for Hilt dependency injection.
+ * @Singleton ensures single instance across the app lifecycle.
+ */
+class TaskRepository @Inject constructor(
+    private val taskDao: TaskDao
+) : ITaskRepository {
 
     override fun getAllTasks(): Flow<List<Task>> = taskDao.getAllTasks()
 
