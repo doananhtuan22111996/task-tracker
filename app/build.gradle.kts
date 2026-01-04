@@ -5,13 +5,12 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.ksp)
 }
 
 android {
     namespace = "dev.tuandoan.tasktracker"
-    compileSdk {
-        version = release(36)
-    }
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "dev.tuandoan.tasktracker"
@@ -24,6 +23,38 @@ android {
     }
 
     buildTypes {
+        fun getSecretPropertyFile(rootProject: Project): Properties {
+            val signingKeyAlias = "SIGNING_KEY_ALIAS"
+            val signingKeystorePassword = "SIGNING_KEYSTORE_PASSWORD"
+            val signingKeyPassword = "SIGNING_KEY_PASSWORD"
+
+            val secretPropertiesFile: File = rootProject.file("secret.properties")
+            val secretProperties = Properties()
+            if (secretPropertiesFile.exists()) {
+                secretProperties.load(FileInputStream(secretPropertiesFile))
+            }
+            System.getenv(signingKeyAlias)?.let {
+                secretProperties.setProperty(signingKeyAlias, it)
+            }
+            System.getenv(signingKeystorePassword)?.let {
+                secretProperties.setProperty(signingKeystorePassword, it)
+            }
+            System.getenv(signingKeyPassword)?.let {
+                secretProperties.setProperty(signingKeyPassword, it)
+            }
+            return secretProperties
+        }
+
+        val secretProperties = getSecretPropertyFile(rootProject)
+        signingConfigs {
+            create("release") {
+                keyAlias = "${secretProperties["SIGNING_KEY_ALIAS"]}"
+                keyPassword = "${secretProperties["SIGNING_KEY_PASSWORD"]}"
+                storePassword = "${secretProperties["SIGNING_KEYSTORE_PASSWORD"]}"
+                storeFile = File("$rootDir/keystore.jks")
+            }
+        }
+
         debug {
             isDebuggable = true
             isMinifyEnabled = false
@@ -36,7 +67,7 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-//            signingConfig = signingConfigs.getByName("release")
+            signingConfig = signingConfigs.getByName("release")
         }
     }
     compileOptions {
@@ -49,38 +80,6 @@ android {
     buildFeatures {
         compose = true
     }
-
-//    val secretProperties = getSecretPropertyFile(rootProject)
-//    signingConfigs {
-//        create(Configs.Mode.RELEASE) {
-//            keyAlias = "${secretProperties["SIGNING_KEY_ALIAS"]}"
-//            keyPassword = "${secretProperties["SIGNING_KEY_PASSWORD"]}"
-//            storePassword = "${secretProperties["SIGNING_KEYSTORE_PASSWORD"]}"
-//            storeFile = File("$rootDir/keystore.jks")
-//        }
-//    }
-
-//    fun getSecretPropertyFile(rootProject: Project): Properties {
-//        val signingKeyAlias = "SIGNING_KEY_ALIAS"
-//        val signingKeystorePassword = "SIGNING_KEYSTORE_PASSWORD"
-//        val signingKeyPassword = "SIGNING_KEY_PASSWORD"
-//
-//        val secretPropertiesFile: File = rootProject.file("secret.properties")
-//        val secretProperties = Properties()
-//        if (secretPropertiesFile.exists()) {
-//            secretProperties.load(FileInputStream(secretPropertiesFile))
-//        }
-//        System.getenv(signingKeyAlias)?.let {
-//            secretProperties.setProperty(signingKeyAlias, it)
-//        }
-//        System.getenv(signingKeystorePassword)?.let {
-//            secretProperties.setProperty(signingKeystorePassword, it)
-//        }
-//        System.getenv(signingKeyPassword)?.let {
-//            secretProperties.setProperty(signingKeyPassword, it)
-//        }
-//        return secretProperties
-//    }
 }
 
 dependencies {
@@ -93,6 +92,18 @@ dependencies {
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.compose.material3.adaptive.navigation.suite)
+    implementation("androidx.compose.material:material-icons-core")
+    implementation("androidx.compose.material:material-icons-extended")
+
+    // Room dependencies
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.room.ktx)
+    ksp(libs.androidx.room.compiler)
+
+    // ViewModel dependency
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
+
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
