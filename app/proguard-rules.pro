@@ -19,3 +19,11 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+# Room and Kotlin
+-keep class * extends androidx.room.RoomDatabase
+-keep @androidx.room.Entity class *
+-keep class kotlin.coroutines.Continuation
+
+-dontwarn dev.tuandoan.tasktracker.Hilt_MainActivity
+-dontwarn dev.tuandoan.tasktracker.Hilt_TaskTrackerApplication
