@@ -20,132 +20,115 @@
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
 
-# Room and Kotlin
+# ===== HILT / DAGGER RULES =====
+# Keep Hilt generated classes
+-keep class dagger.** { *; }
+-keep class javax.inject.** { *; }
+-keep class **_HiltModules* { *; }
+-keep class **_Provide* { *; }
+-keep class **_Factory* { *; }
+-keep class **_MembersInjector* { *; }
+-keep class **_HiltWrapper* { *; }
+-keep class *_GeneratedInjector { *; }
+
+# Keep Hilt entry points and components
+-keep @dagger.hilt.android.HiltAndroidApp class *
+-keep @dagger.hilt.android.AndroidEntryPoint class *
+-keep @dagger.Module class *
+-keep @dagger.Provides class *
+-keep @javax.inject.Inject class *
+
+# Keep Hilt View Model
+-keep class * extends androidx.lifecycle.ViewModel {
+    <init>(...);
+}
+-keep class **_HiltModules$**
+
+# Prevent obfuscation of Hilt annotations and generated code
+-keepattributes *Annotation*
+-keepattributes Signature
+-keepattributes Exceptions
+
+# Keep all classes referenced by Hilt generated code
+-keep class **.*_Factory { *; }
+-keep class **.*_MembersInjector { *; }
+
+# ===== ROOM DATABASE RULES =====
 -keep class * extends androidx.room.RoomDatabase
 -keep @androidx.room.Entity class *
+-keep @androidx.room.Dao class *
 -keep class kotlin.coroutines.Continuation
 
-# Hilt ProGuard Rules
-# Keep all Hilt-generated classes
-#-keep class dagger.hilt.** { *; }
-#-keep class * extends dagger.hilt.android.internal.managers.ApplicationComponentManager
-#-keep class * extends dagger.hilt.android.internal.managers.ActivityComponentManager
-#-keep class * extends dagger.hilt.android.internal.managers.FragmentComponentManager
-#-keep class * extends dagger.hilt.android.internal.managers.ViewComponentManager
-#-keep class * extends dagger.hilt.android.internal.managers.ServiceComponentManager
-#
-## CRITICAL: Force keep Application class (referenced in AndroidManifest.xml)
-#-keep,allowshrinking,allowobfuscation class dev.tuandoan.tasktracker.TaskTrackerApplication
-#-keep class dev.tuandoan.tasktracker.TaskTrackerApplication {
-#    <init>();
-#    <methods>;
-#    <fields>;
-#}
-#
-## CRITICAL: Force keep MainActivity class (referenced in AndroidManifest.xml)
-#-keep,allowshrinking,allowobfuscation class dev.tuandoan.tasktracker.MainActivity
-#-keep class dev.tuandoan.tasktracker.MainActivity {
-#    <init>();
-#    <methods>;
-#    <fields>;
-#}
-#
-## CRITICAL: Keep all Hilt-generated versions unconditionally
-#-keep class dev.tuandoan.tasktracker.Hilt_TaskTrackerApplication {
-#    <init>();
-#    <methods>;
-#    <fields>;
-#}
-#-keep class dev.tuandoan.tasktracker.Hilt_MainActivity {
-#    <init>();
-#    <methods>;
-#    <fields>;
-#}
-#
-## Suppress warnings for Hilt-generated classes
-#-dontwarn dev.tuandoan.tasktracker.Hilt_MainActivity
-#-dontwarn dev.tuandoan.tasktracker.Hilt_TaskTrackerApplication
-#
-## Keep all classes annotated with Hilt annotations
-#-keep @dagger.hilt.android.HiltAndroidApp class * { *; }
-#-keep @dagger.hilt.android.AndroidEntryPoint class * { *; }
-#-keep @dagger.hilt.android.lifecycle.HiltViewModel class * { *; }
-#
-## Keep all Hilt modules and their methods
-#-keep @dagger.Module class * { *; }
-#-keep @dagger.hilt.InstallIn class * { *; }
-#-keepclassmembers class * {
-#    @dagger.Provides *;
-#    @dagger.Binds *;
-#    @javax.inject.Inject <init>(...);
-#}
-#
-## Keep ViewModels with @HiltViewModel
-#-keep class * extends androidx.lifecycle.ViewModel {
-#    <init>(...);
-#}
-#-keep class * {
-#    @dagger.hilt.android.lifecycle.HiltViewModel <init>(...);
-#}
-#
-## Keep dependency injection related classes
-#-keep class javax.inject.** { *; }
-#-keep class javax.annotation.** { *; }
-#-keep class dagger.** { *; }
-#
-## Prevent obfuscation of classes that use field injection
-#-keepclassmembers class * {
-#    @javax.inject.Inject <fields>;
-#    @javax.inject.Inject <init>(...);
-#}
-#
-## Keep all generated Hilt components and classes
-#-keep class **_HiltComponents$* { *; }
-#-keep class **_Factory { *; }
-#-keep class **_MembersInjector { *; }
-#-keep class **Hilt_* { *; }
-#
-## Keep all classes that extend generated Hilt classes
-#-keep class * extends **Hilt_* { *; }
-#
-## Additional conditional keeps for Hilt-generated classes
-#-if class * {
-#    @dagger.hilt.android.HiltAndroidApp <methods>;
-#}
-#-keep,allowshrinking,allowobfuscation class <1>_** { *; }
-#
-#-if class * {
-#    @dagger.hilt.android.AndroidEntryPoint <methods>;
-#}
-#-keep,allowshrinking,allowobfuscation class <1>_** { *; }
-#
-## DEBUGGING: Print what's happening to Application classes
-## -printseeds
-## -verbose
-#
-## CRITICAL: Keep all classes in our main package (this should fix everything)
-#-keep class dev.tuandoan.tasktracker.** { *; }
-#
-## CRITICAL: Additional explicit keeps for troubleshooting
-#-keepattributes *Annotation*
-#-keepattributes Signature
-#-keepattributes InnerClasses
-#-keepattributes EnclosingMethod
-#
-## CRITICAL: Ensure Android system can find our Application
-#-keepnames class dev.tuandoan.tasktracker.TaskTrackerApplication
-#-keepnames class dev.tuandoan.tasktracker.MainActivity
-#
-## CRITICAL: Keep everything needed for Application instantiation
-#-keep class android.app.Application
-#-keep class * extends android.app.Application {
-#    <init>();
-#    void attachBaseContext(android.content.Context);
-#    void onCreate();
-#}
-#
-## CRITICAL: Keep everything needed for Activity instantiation
-#-keep class * extends androidx.activity.ComponentActivity {
-#    <init>();
-#    void onCreate(android.os.Bundle);
-#}
+# Keep Room generated classes
+-keep class **_Impl { *; }
+
+# ===== COMPOSE RULES =====
+# Keep Composable functions
+-keep class androidx.compose.** { *; }
+-keep @androidx.compose.runtime.Composable class *
+
+# Keep Compose runtime
+-keep class androidx.compose.runtime.** { *; }
+-keep interface androidx.compose.runtime.** { *; }
+
+# ===== KOTLIN COROUTINES RULES =====
+# ServiceLoader support
+-keepnames class kotlinx.coroutines.internal.MainDispatcherFactory {}
+-keepnames class kotlinx.coroutines.CoroutineExceptionHandler {}
+
+# Most of volatile fields are updated with AFU and should not be mangled
+-keepclassmembernames class kotlinx.** {
+    volatile <fields>;
+}
+
+# Same story for the standard library's SafeContinuation that also uses AtomicReferenceFieldUpdater
+-keepclassmembernames class kotlin.coroutines.SafeContinuation {
+    volatile <fields>;
+}
+
+# These classes are only required by kotlinx.coroutines.debug.AgentKt ← DebugProbesKt.bin
+# which itself is only loaded when kotlinx-coroutines-core is used as a Java agent, so these are
+# not needed in contexts where ProGuard is used.
+-dontwarn java.lang.instrument.ClassFileTransformer
+-dontwarn sun.misc.SignalHandler
+-dontwarn java.lang.instrument.Instrumentation
+-dontwarn sun.misc.Signal
+
+# Only used in `kotlinx.coroutines.internal.ExceptionsConstructor`.
+# The case when it is not available is hidden in a `try`-`catch`, as well as a check for Android.
+-dontwarn java.lang.ClassValue
+
+# An annotation used for build tooling, won't be directly accessed.
+-dontwarn org.codehaus.mojo.animal_sniffer.IgnoreJRERequirement
+
+# ===== GENERAL ANDROID RULES =====
+# Keep line numbers and source file names for better crash reports
+-keepattributes SourceFile,LineNumberTable
+-renamesourcefileattribute SourceFile
+
+# Keep native methods
+-keepclasseswithmembers class * {
+    native <methods>;
+}
+
+# Keep classes that are referenced only in AndroidManifest.xml
+-keep public class * extends android.app.Activity
+-keep public class * extends android.app.Application
+-keep public class * extends android.app.Service
+-keep public class * extends android.content.BroadcastReceiver
+-keep public class * extends android.content.ContentProvider
+
+# Keep Parcelable implementations
+-keep class * implements android.os.Parcelable {
+  public static final android.os.Parcelable$Creator *;
+}
+
+# Keep Serializable classes
+-keep class * implements java.io.Serializable {
+    static final long serialVersionUID;
+    private static final java.io.ObjectStreamField[] serialPersistentFields;
+    private void writeObject(java.io.ObjectOutputStream);
+    private void readObject(java.io.ObjectInputStream);
+    java.lang.Object writeReplace();
+    java.lang.Object readResolve();
+}
