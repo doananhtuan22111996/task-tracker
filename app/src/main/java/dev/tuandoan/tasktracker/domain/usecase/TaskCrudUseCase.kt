@@ -126,6 +126,58 @@ class TaskCrudUseCase @Inject constructor(
     }
 
     /**
+     * Bulk set completion status for multiple tasks
+     */
+    suspend fun bulkSetCompleted(taskIds: List<Long>, completed: Boolean): Result<Unit> {
+        return try {
+            _isLoading.value = true
+            _errorMessage.value = null
+
+            taskManager.setCompletedBulk(taskIds, completed)
+
+            val action = if (completed) "completed" else "marked as active"
+            _lastOperationSuccess.value = "${taskIds.size} tasks $action"
+            Result.success(Unit)
+        } catch (e: Exception) {
+            val errorMsg = e.message ?: "Failed to update tasks"
+            _errorMessage.value = errorMsg
+            Result.failure(e)
+        } finally {
+            _isLoading.value = false
+        }
+    }
+
+    /**
+     * Bulk delete tasks by IDs
+     */
+    suspend fun bulkDeleteTasks(taskIds: List<Long>): Result<Unit> {
+        return try {
+            _errorMessage.value = null
+            taskManager.deleteTasksByIds(taskIds)
+            _lastOperationSuccess.value = "${taskIds.size} tasks deleted successfully"
+            Result.success(Unit)
+        } catch (e: Exception) {
+            _errorMessage.value = e.message ?: "Failed to delete tasks"
+            Result.failure(e)
+        }
+    }
+
+    /**
+     * Restore multiple deleted tasks
+     */
+    suspend fun restoreTasks(tasks: List<Task>): Result<Unit> {
+        return try {
+            _errorMessage.value = null
+            taskManager.restoreTasks(tasks)
+            _lastOperationSuccess.value = "${tasks.size} tasks restored successfully"
+            Result.success(Unit)
+        } catch (e: Exception) {
+            _errorMessage.value = e.message ?: "Failed to restore tasks"
+            Result.failure(e)
+        }
+    }
+
+    /**
      * Clear success message
      */
     fun clearSuccess() {

@@ -36,4 +36,15 @@ class TaskRepository @Inject constructor(
         val updatedTask = task.copy(isCompleted = !task.isCompleted)
         updateTask(updatedTask)
     }
+
+    // Bulk operations
+    override suspend fun markCompleted(ids: List<Long>) = taskDao.markCompleted(ids)
+
+    override suspend fun markActive(ids: List<Long>) = taskDao.markActive(ids)
+
+    override suspend fun deleteByIds(ids: List<Long>) = taskDao.deleteByIds(ids)
+
+    override suspend fun getTasksByIds(ids: List<Long>): List<Task> = taskDao.getTasksByIds(ids)
+
+    override suspend fun upsertAll(tasks: List<Task>) = taskDao.upsertAll(tasks)
 }

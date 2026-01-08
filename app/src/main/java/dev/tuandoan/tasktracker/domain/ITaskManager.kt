@@ -18,6 +18,11 @@ interface ITaskManager {
     suspend fun markTaskComplete(task: Task)
     suspend fun markTaskIncomplete(task: Task)
 
+    // Bulk operations
+    suspend fun setCompletedBulk(ids: List<Long>, completed: Boolean)
+    suspend fun deleteTasksByIds(ids: List<Long>)
+    suspend fun restoreTasks(tasks: List<Task>): Result<Unit>
+
     // Filtered data access
     fun getActiveTasks(): Flow<List<Task>>
     fun getCompletedTasks(): Flow<List<Task>>

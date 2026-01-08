@@ -32,6 +32,12 @@ fun TaskListScreen(
     val showAddTaskDialog by viewModel.showAddTaskDialog.collectAsStateWithLifecycle()
     val pendingDeleteTask by viewModel.pendingDeleteTask.collectAsStateWithLifecycle()
 
+    // Selection state
+    val selectedIds by viewModel.selectedIds.collectAsStateWithLifecycle()
+    val isSelectionMode by viewModel.isSelectionMode.collectAsStateWithLifecycle()
+    val selectedCount by viewModel.selectedCount.collectAsStateWithLifecycle()
+    val pendingBulkDeleteTasks by viewModel.pendingBulkDeleteTasks.collectAsStateWithLifecycle()
+
     // Snackbar host state
     val snackbarHostState = remember { SnackbarHostState() }
 
@@ -39,9 +45,16 @@ fun TaskListScreen(
     LaunchedEffect(viewModel) {
         viewModel.uiEvent.collect { event ->
             when (event) {
-                is UiEvent.ShowDeleteUndo -> {
+                is UiEvent.ShowUndoDelete -> {
+                    val taskCount = event.tasks.size
+                    val message = if (taskCount == 1) {
+                        "Task deleted"
+                    } else {
+                        "$taskCount tasks deleted"
+                    }
+
                     val result = snackbarHostState.showSnackbar(
-                        message = "Task deleted",
+                        message = message,
                         actionLabel = "UNDO",
                         duration = SnackbarDuration.Short
                     )
@@ -75,7 +88,14 @@ fun TaskListScreen(
         topBar = {
             TaskListTopBar(
                 currentSort = currentSort,
-                onSortChanged = viewModel::setSort
+                onSortChanged = viewModel::setSort,
+                isSelectionMode = isSelectionMode,
+                selectedCount = selectedCount,
+                onBulkMarkCompleted = viewModel::bulkMarkCompleted,
+                onBulkMarkActive = viewModel::bulkMarkActive,
+                onBulkDelete = viewModel::requestBulkDelete,
+                onClearSelection = viewModel::clearSelection,
+                onSelectAll = { viewModel.selectAll(visibleTasks.map { it.id }) }
             )
         },
         floatingActionButton = {
@@ -98,12 +118,16 @@ fun TaskListScreen(
             visibleTasks = visibleTasks,
             searchQuery = searchQuery,
             currentFilter = currentFilter,
+            selectedIds = selectedIds,
+            isSelectionMode = isSelectionMode,
             onSearchQueryChange = viewModel::updateSearchQuery,
             onClearSearch = viewModel::clearSearch,
             onFilterChange = viewModel::setFilter,
             onToggleTaskComplete = viewModel::toggleTaskCompletion,
             onEditTask = viewModel::showEditTaskDialog,
             onDeleteTask = viewModel::deleteTask,
+            onLongPressTask = viewModel::enterSelection,
+            onToggleSelection = viewModel::toggleSelection,
             modifier = Modifier.padding(paddingValues)
         )
     }
@@ -134,6 +158,32 @@ fun TaskListScreen(
             dismissButton = {
                 TextButton(
                     onClick = { viewModel.cancelDeleteTask() }
+                ) {
+                    Text("Cancel")
+                }
+            }
+        )
+    }
+
+    // Show bulk delete confirmation dialog
+    if (pendingBulkDeleteTasks.isNotEmpty()) {
+        val taskCount = pendingBulkDeleteTasks.size
+        AlertDialog(
+            onDismissRequest = { viewModel.cancelBulkDelete() },
+            title = { Text("Delete Tasks") },
+            text = {
+                Text("Delete $taskCount selected tasks? This action can be undone for a short time.")
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = { viewModel.confirmBulkDelete() }
+                ) {
+                    Text("Delete")
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = { viewModel.cancelBulkDelete() }
                 ) {
                     Text("Cancel")
                 }
