@@ -8,6 +8,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import dev.tuandoan.tasktracker.ui.events.UiEvent
 import dev.tuandoan.tasktracker.ui.components.TaskListContent
 import dev.tuandoan.tasktracker.ui.components.TaskListTopBar
 import dev.tuandoan.tasktracker.ui.viewmodel.TaskViewModel
@@ -29,6 +30,45 @@ fun TaskListScreen(
     val currentFilter by viewModel.filter.collectAsStateWithLifecycle()
     val currentSort by viewModel.taskSort.collectAsStateWithLifecycle()
     val showAddTaskDialog by viewModel.showAddTaskDialog.collectAsStateWithLifecycle()
+    val pendingDeleteTask by viewModel.pendingDeleteTask.collectAsStateWithLifecycle()
+
+    // Snackbar host state
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    // Handle UI events
+    LaunchedEffect(viewModel) {
+        viewModel.uiEvent.collect { event ->
+            when (event) {
+                is UiEvent.ShowDeleteUndo -> {
+                    val result = snackbarHostState.showSnackbar(
+                        message = "Task deleted",
+                        actionLabel = "UNDO",
+                        duration = SnackbarDuration.Short
+                    )
+                    if (result == SnackbarResult.ActionPerformed) {
+                        event.onUndo()
+                    }
+                }
+                is UiEvent.ShowSnackbar -> {
+                    if (event.actionLabel != null) {
+                        val result = snackbarHostState.showSnackbar(
+                            message = event.message,
+                            actionLabel = event.actionLabel,
+                            duration = SnackbarDuration.Short
+                        )
+                        if (result == SnackbarResult.ActionPerformed) {
+                            event.onActionClick()
+                        }
+                    } else {
+                        snackbarHostState.showSnackbar(
+                            message = event.message,
+                            duration = SnackbarDuration.Short
+                        )
+                    }
+                }
+            }
+        }
+    }
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -48,6 +88,9 @@ fun TaskListScreen(
                     contentDescription = "Add Task"
                 )
             }
+        },
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState)
         }
     ) { paddingValues ->
         TaskListContent(
@@ -70,6 +113,31 @@ fun TaskListScreen(
         AddEditTaskDialog(
             viewModel = viewModel,
             onDismiss = { viewModel.hideAddTaskDialog() }
+        )
+    }
+
+    // Show delete confirmation dialog
+    pendingDeleteTask?.let { task ->
+        AlertDialog(
+            onDismissRequest = { viewModel.cancelDeleteTask() },
+            title = { Text("Delete Task") },
+            text = {
+                Text("Are you sure you want to delete \"${task.title}\"? This action can be undone for a few seconds after deletion.")
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = { viewModel.confirmDeleteTask() }
+                ) {
+                    Text("Delete")
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = { viewModel.cancelDeleteTask() }
+                ) {
+                    Text("Cancel")
+                }
+            }
         )
     }
 }

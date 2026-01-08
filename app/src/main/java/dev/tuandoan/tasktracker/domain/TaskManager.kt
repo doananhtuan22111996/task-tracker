@@ -52,6 +52,15 @@ class TaskManager @Inject constructor(
         repository.deleteTask(task)
     }
 
+    override suspend fun restoreTask(task: Task): Result<Unit> {
+        return try {
+            repository.upsert(task)
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
     override suspend fun toggleTaskCompletion(task: Task) {
         repository.toggleTaskCompletion(task)
     }

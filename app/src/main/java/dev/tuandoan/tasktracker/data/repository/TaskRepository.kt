@@ -26,6 +26,8 @@ class TaskRepository @Inject constructor(
 
     override suspend fun deleteTask(task: Task) = taskDao.deleteTask(task)
 
+    override suspend fun upsert(task: Task) = taskDao.upsert(task)
+
     override fun getActiveTasks(): Flow<List<Task>> = taskDao.getActiveTasks()
 
     override fun getCompletedTasks(): Flow<List<Task>> = taskDao.getCompletedTasks()

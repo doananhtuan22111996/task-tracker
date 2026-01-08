@@ -3,6 +3,7 @@ package dev.tuandoan.tasktracker.data.database
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
 import kotlinx.coroutines.flow.Flow
@@ -24,6 +25,9 @@ interface TaskDao {
 
     @Delete
     suspend fun deleteTask(task: Task)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun upsert(task: Task)
 
     @Query("SELECT * FROM tasks WHERE isCompleted = 0 ORDER BY createdAt DESC")
     fun getActiveTasks(): Flow<List<Task>>

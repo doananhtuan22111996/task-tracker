@@ -5,7 +5,8 @@ A modern, offline-first task tracking Android app built with **Kotlin**, **Jetpa
 ## ✨ Features
 
 ### Core Functionality
-- ✅ **CRUD Operations** - Create, read, update, and delete tasks
+- ✅ **CRUD Operations** - Create, read, update, and delete tasks with confirmation
+- 🔄 **Delete with Undo** - Safe task deletion with confirmation dialog and 4-second undo window
 - 🔍 **Smart Search** - Real-time search across task titles and descriptions with debounce
 - 🏷️ **Status Filtering** - Filter tasks by status (All, Active, Completed)
 - 📊 **Advanced Sorting** - Multiple sorting options with completion grouping
@@ -23,6 +24,7 @@ A modern, offline-first task tracking Android app built with **Kotlin**, **Jetpa
 - 📱 **Intuitive Interface** - Clean, distraction-free design
 - ⚡ **Fast Performance** - Optimized StateFlow combinations and efficient rendering
 - 🔄 **State Persistence** - Maintains search/filter state across app sessions
+- 🛡️ **Safe Deletion** - Confirmation dialogs with undo capability prevent accidental data loss
 
 ## 🏗️ Architecture
 
@@ -179,7 +181,7 @@ app/src/main/java/dev/tuandoan/tasktracker/
 1. **Add Task** - Tap the floating action button (➕) to create a new task
 2. **Edit Task** - Tap on any task to edit its title and description
 3. **Complete Task** - Tap the checkbox to mark a task as complete/incomplete
-4. **Delete Task** - Use the delete button in the task item
+4. **Delete Task** - Use the delete button to trigger confirmation dialog, then tap "Undo" within 4 seconds if needed
 
 ### Advanced Features
 1. **Search Tasks** - Type in the search field to find tasks by title or description
@@ -233,6 +235,11 @@ TaskViewModelTest            // End-to-end coordination tests
 - **Key-based LazyColumn** - Optimized list rendering with proper item keys
 
 ## 📚 Recent Updates
+
+### v2.1 - Enhanced User Safety
+- 🛡️ **Delete Confirmation** - Confirmation dialog prevents accidental task deletion
+- 🔄 **Undo Functionality** - 4-second undo window with Material 3 Snackbar integration
+- ⚡ **Improved UX** - Safe, user-friendly deletion workflow with instant feedback
 
 ### v2.0 - Advanced Sorting & Modular Architecture
 - ✨ **Enhanced Sorting** - Multiple sort options with completion grouping
