@@ -104,6 +104,21 @@ class TaskCrudUseCase @Inject constructor(
     }
 
     /**
+     * Restores a deleted task
+     */
+    suspend fun restoreTask(task: Task): Result<Unit> {
+        return try {
+            _errorMessage.value = null
+            taskManager.restoreTask(task)
+            _lastOperationSuccess.value = "Task restored successfully"
+            Result.success(Unit)
+        } catch (e: Exception) {
+            _errorMessage.value = e.message ?: "Failed to restore task"
+            Result.failure(e)
+        }
+    }
+
+    /**
      * Clear error message
      */
     fun clearError() {

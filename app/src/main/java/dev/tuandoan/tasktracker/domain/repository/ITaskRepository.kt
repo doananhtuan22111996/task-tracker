@@ -9,6 +9,7 @@ interface ITaskRepository {
     suspend fun insertTask(task: Task): Long
     suspend fun updateTask(task: Task)
     suspend fun deleteTask(task: Task)
+    suspend fun upsert(task: Task)
     fun getActiveTasks(): Flow<List<Task>>
     fun getCompletedTasks(): Flow<List<Task>>
     suspend fun toggleTaskCompletion(task: Task)

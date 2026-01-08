@@ -8,11 +8,19 @@ import dev.tuandoan.tasktracker.domain.model.CompletedGrouping
 import dev.tuandoan.tasktracker.domain.model.SortDirection
 import dev.tuandoan.tasktracker.domain.model.SortKey
 import dev.tuandoan.tasktracker.domain.model.TaskSort
+import dev.tuandoan.tasktracker.ui.events.UiEvent
 import dev.tuandoan.tasktracker.ui.manager.TaskCrudManager
+import dev.tuandoan.tasktracker.ui.viewmodel.TaskFilter
 import dev.tuandoan.tasktracker.ui.state.TaskFormState
 import dev.tuandoan.tasktracker.ui.state.TaskFormStateManager
 import dev.tuandoan.tasktracker.ui.state.TaskListState
 import dev.tuandoan.tasktracker.ui.state.TaskListStateManager
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -59,6 +67,16 @@ class TaskViewModel @Inject constructor(
     // Combined error state
     val errorMessage = crudManager.initializeErrorState(viewModelScope)
 
+    // === Delete Confirmation State ===
+
+    // StateFlow for pending delete confirmation
+    private val _pendingDeleteTask = MutableStateFlow<Task?>(null)
+    val pendingDeleteTask: StateFlow<Task?> = _pendingDeleteTask.asStateFlow()
+
+    // SharedFlow for UI events (snackbar, etc.)
+    private val _uiEvent = MutableSharedFlow<UiEvent>()
+    val uiEvent: SharedFlow<UiEvent> = _uiEvent.asSharedFlow()
+
     // === CRUD Operations ===
 
     fun createTask() {
@@ -83,9 +101,38 @@ class TaskViewModel @Inject constructor(
     }
 
     fun deleteTask(task: Task) {
+        _pendingDeleteTask.value = task
+    }
+
+    fun confirmDeleteTask() {
+        val task = _pendingDeleteTask.value ?: return
+        _pendingDeleteTask.value = null
+
         crudManager.executeOperation(
             scope = viewModelScope,
-            operation = { crudManager.deleteTask(task) }
+            operation = { crudManager.deleteTask(task) },
+            onSuccess = {
+                // Show undo snackbar after successful deletion
+                viewModelScope.launch {
+                    _uiEvent.emit(
+                        UiEvent.ShowDeleteUndo(
+                            task = task,
+                            onUndo = { restoreTask(task) }
+                        )
+                    )
+                }
+            }
+        )
+    }
+
+    fun cancelDeleteTask() {
+        _pendingDeleteTask.value = null
+    }
+
+    private fun restoreTask(task: Task) {
+        crudManager.executeOperation(
+            scope = viewModelScope,
+            operation = { crudManager.restoreTask(task) }
         )
     }
 

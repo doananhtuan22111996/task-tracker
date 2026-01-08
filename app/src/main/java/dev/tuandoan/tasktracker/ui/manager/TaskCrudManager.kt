@@ -138,6 +138,20 @@ class TaskCrudManager @Inject constructor(
     }
 
     /**
+     * Restores a deleted task
+     */
+    suspend fun restoreTask(task: Task): TaskOperationResult {
+        val result = crudUseCase.restoreTask(task)
+
+        return if (result.isSuccess) {
+            TaskOperationResult.Success("Task restored successfully")
+        } else {
+            val errorMessage = result.exceptionOrNull()?.message ?: "Failed to restore task"
+            TaskOperationResult.CrudError(errorMessage)
+        }
+    }
+
+    /**
      * Clears all errors from both CRUD and form state
      */
     fun clearAllErrors() {

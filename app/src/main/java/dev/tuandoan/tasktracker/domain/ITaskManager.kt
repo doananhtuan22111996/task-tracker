@@ -13,6 +13,7 @@ interface ITaskManager {
     suspend fun updateTask(task: Task)
     suspend fun updateTaskContent(taskId: Long, title: String, description: String)
     suspend fun deleteTask(task: Task)
+    suspend fun restoreTask(task: Task): Result<Unit>
     suspend fun toggleTaskCompletion(task: Task)
     suspend fun markTaskComplete(task: Task)
     suspend fun markTaskIncomplete(task: Task)
