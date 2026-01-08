@@ -27,7 +27,7 @@ fun AddEditTaskDialog(
     val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
     val errorMessage by viewModel.errorMessage.collectAsStateWithLifecycle()
 
-    val isEditing = viewModel.isEditMode
+    val isEditing by viewModel.isEditMode.collectAsStateWithLifecycle()
     val dialogTitle = if (isEditing) "Edit Task" else "Add New Task"
 
     Dialog(
