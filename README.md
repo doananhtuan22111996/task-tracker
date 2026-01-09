@@ -7,6 +7,7 @@ A modern, offline-first task tracking Android app built with **Kotlin**, **Jetpa
 ### Core Functionality
 - ✅ **CRUD Operations** - Create, read, update, and delete tasks with confirmation
 - 🔄 **Delete with Undo** - Safe task deletion with confirmation dialog and 4-second undo window
+- 🎯 **Multi-Select & Bulk Actions** - Select multiple tasks for bulk delete, mark completed, or mark active
 - 🔍 **Smart Search** - Real-time search across task titles and descriptions with debounce
 - 🏷️ **Status Filtering** - Filter tasks by status (All, Active, Completed)
 - 📊 **Advanced Sorting** - Multiple sorting options with completion grouping
@@ -25,6 +26,7 @@ A modern, offline-first task tracking Android app built with **Kotlin**, **Jetpa
 - ⚡ **Fast Performance** - Optimized StateFlow combinations and efficient rendering
 - 🔄 **State Persistence** - Maintains search/filter state across app sessions
 - 🛡️ **Safe Deletion** - Confirmation dialogs with undo capability prevent accidental data loss
+- 👆 **Long-press Selection** - Long-press to enter selection mode, tap to toggle selection
 
 ## 🏗️ Architecture
 
@@ -179,9 +181,19 @@ app/src/main/java/dev/tuandoan/tasktracker/
 
 ### Basic Operations
 1. **Add Task** - Tap the floating action button (➕) to create a new task
-2. **Edit Task** - Tap on any task to edit its title and description
+2. **Edit Task** - Tap on any task to edit its title and description (in normal mode)
 3. **Complete Task** - Tap the checkbox to mark a task as complete/incomplete
 4. **Delete Task** - Use the delete button to trigger confirmation dialog, then tap "Undo" within 4 seconds if needed
+
+### Bulk Operations
+1. **Enter Selection Mode** - Long-press on any task to enter selection mode
+2. **Select Multiple Tasks** - Tap on tasks to toggle selection (highlighted in blue)
+3. **Bulk Actions** - Use top bar buttons to:
+   - Mark selected tasks as completed (✓)
+   - Mark selected tasks as active (□)
+   - Delete selected tasks (🗑️) with confirmation and undo
+4. **Select All** - Use overflow menu (⋮) to select all visible tasks
+5. **Exit Selection** - Tap the close button (✕) to clear selection
 
 ### Advanced Features
 1. **Search Tasks** - Type in the search field to find tasks by title or description
@@ -235,6 +247,12 @@ TaskViewModelTest            // End-to-end coordination tests
 - **Key-based LazyColumn** - Optimized list rendering with proper item keys
 
 ## 📚 Recent Updates
+
+### v2.2 - Multi-Select & Bulk Actions
+- 🎯 **Multi-Select Mode** - Long-press to enter selection mode, tap to toggle task selection
+- ⚡ **Bulk Operations** - Efficiently mark multiple tasks as completed/active or delete in batch
+- 🔄 **Bulk Delete Safety** - Confirmation dialog and undo functionality for bulk deletions
+- 🎨 **Selection UI** - Visual selection indicators and dedicated top bar with bulk action buttons
 
 ### v2.1 - Enhanced User Safety
 - 🛡️ **Delete Confirmation** - Confirmation dialog prevents accidental task deletion

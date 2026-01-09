@@ -79,6 +79,34 @@ class TaskManager @Inject constructor(
         }
     }
 
+    // Bulk operations
+    override suspend fun setCompletedBulk(ids: List<Long>, completed: Boolean) {
+        if (ids.isEmpty()) return
+
+        if (completed) {
+            repository.markCompleted(ids)
+        } else {
+            repository.markActive(ids)
+        }
+    }
+
+    override suspend fun deleteTasksByIds(ids: List<Long>) {
+        if (ids.isNotEmpty()) {
+            repository.deleteByIds(ids)
+        }
+    }
+
+    override suspend fun restoreTasks(tasks: List<Task>): Result<Unit> {
+        return try {
+            if (tasks.isNotEmpty()) {
+                repository.upsertAll(tasks)
+            }
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
     // Filtered data access
     override fun getActiveTasks(): Flow<List<Task>> = repository.getActiveTasks()
 

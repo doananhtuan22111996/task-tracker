@@ -18,12 +18,16 @@ fun TaskListContent(
     visibleTasks: List<Task>,
     searchQuery: String,
     currentFilter: TaskFilter,
+    selectedIds: Set<Long>,
+    isSelectionMode: Boolean,
     onSearchQueryChange: (String) -> Unit,
     onClearSearch: () -> Unit,
     onFilterChange: (TaskFilter) -> Unit,
     onToggleTaskComplete: (Task) -> Unit,
     onEditTask: (Task) -> Unit,
     onDeleteTask: (Task) -> Unit,
+    onLongPressTask: (Long) -> Unit,
+    onToggleSelection: (Long) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -56,9 +60,13 @@ fun TaskListContent(
             visibleTasks = visibleTasks,
             searchQuery = searchQuery,
             currentFilter = currentFilter,
+            selectedIds = selectedIds,
+            isSelectionMode = isSelectionMode,
             onToggleTaskComplete = onToggleTaskComplete,
             onEditTask = onEditTask,
             onDeleteTask = onDeleteTask,
+            onLongPressTask = onLongPressTask,
+            onToggleSelection = onToggleSelection,
             onClearSearch = onClearSearch,
             onChangeFilter = { onFilterChange(TaskFilter.ALL) }
         )
@@ -74,9 +82,13 @@ private fun TaskListOrEmptyState(
     visibleTasks: List<Task>,
     searchQuery: String,
     currentFilter: TaskFilter,
+    selectedIds: Set<Long>,
+    isSelectionMode: Boolean,
     onToggleTaskComplete: (Task) -> Unit,
     onEditTask: (Task) -> Unit,
     onDeleteTask: (Task) -> Unit,
+    onLongPressTask: (Long) -> Unit,
+    onToggleSelection: (Long) -> Unit,
     onClearSearch: () -> Unit,
     onChangeFilter: () -> Unit
 ) {
@@ -95,9 +107,13 @@ private fun TaskListOrEmptyState(
         else -> {
             TaskList(
                 tasks = visibleTasks,
+                selectedIds = selectedIds,
+                isSelectionMode = isSelectionMode,
                 onToggleTaskComplete = onToggleTaskComplete,
                 onEditTask = onEditTask,
-                onDeleteTask = onDeleteTask
+                onDeleteTask = onDeleteTask,
+                onLongPressTask = onLongPressTask,
+                onToggleSelection = onToggleSelection
             )
         }
     }
@@ -109,9 +125,13 @@ private fun TaskListOrEmptyState(
 @Composable
 private fun TaskList(
     tasks: List<Task>,
+    selectedIds: Set<Long>,
+    isSelectionMode: Boolean,
     onToggleTaskComplete: (Task) -> Unit,
     onEditTask: (Task) -> Unit,
-    onDeleteTask: (Task) -> Unit
+    onDeleteTask: (Task) -> Unit,
+    onLongPressTask: (Long) -> Unit,
+    onToggleSelection: (Long) -> Unit
 ) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
@@ -123,9 +143,13 @@ private fun TaskList(
         ) { task ->
             TaskItem(
                 task = task,
+                isSelected = selectedIds.contains(task.id),
+                isSelectionMode = isSelectionMode,
                 onToggleComplete = { onToggleTaskComplete(task) },
                 onEditClick = { onEditTask(task) },
-                onDeleteClick = { onDeleteTask(task) }
+                onDeleteClick = { onDeleteTask(task) },
+                onLongPress = { onLongPressTask(task.id) },
+                onToggleSelection = { onToggleSelection(task.id) }
             )
         }
     }

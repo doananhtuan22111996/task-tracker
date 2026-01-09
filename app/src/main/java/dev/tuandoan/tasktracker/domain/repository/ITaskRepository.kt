@@ -13,4 +13,11 @@ interface ITaskRepository {
     fun getActiveTasks(): Flow<List<Task>>
     fun getCompletedTasks(): Flow<List<Task>>
     suspend fun toggleTaskCompletion(task: Task)
+
+    // Bulk operations
+    suspend fun markCompleted(ids: List<Long>)
+    suspend fun markActive(ids: List<Long>)
+    suspend fun deleteByIds(ids: List<Long>)
+    suspend fun getTasksByIds(ids: List<Long>): List<Task>
+    suspend fun upsertAll(tasks: List<Task>)
 }
