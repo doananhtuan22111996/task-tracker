@@ -75,6 +75,10 @@ class TaskViewModel @Inject constructor(
     val taskDescription = formState.taskDescription
     val isFormValid = formState.isFormValid
     val isEditMode = formState.isEditMode
+    val titleError = formState.titleError
+    val isTitleValid = formState.isTitleValid
+    val hasChanges = formState.hasChanges
+    val isSaveEnabled = formState.isSaveEnabled
 
     // Selection state (from manager)
     val selectedIds = selectionState.selectedIds

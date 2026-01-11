@@ -32,6 +32,27 @@ class TaskFormStateManager @Inject constructor(
                 initialValue = false
             )
 
+        val isTitleValid = formUseCase.isTitleValid
+            .stateIn(
+                scope = scope,
+                started = SharingStarted.WhileSubscribed(5000),
+                initialValue = false
+            )
+
+        val hasChanges = formUseCase.hasChanges
+            .stateIn(
+                scope = scope,
+                started = SharingStarted.WhileSubscribed(5000),
+                initialValue = false
+            )
+
+        val isSaveEnabled = formUseCase.isSaveEnabled
+            .stateIn(
+                scope = scope,
+                started = SharingStarted.WhileSubscribed(5000),
+                initialValue = false
+            )
+
         return TaskFormState(
             showAddTaskDialog = formUseCase.showAddTaskDialog,
             selectedTask = formUseCase.selectedTask,
@@ -39,6 +60,10 @@ class TaskFormStateManager @Inject constructor(
             taskDescription = formUseCase.taskDescription,
             isFormValid = isFormValid,
             isEditMode = isEditMode,
+            titleError = formUseCase.titleError,
+            isTitleValid = isTitleValid,
+            hasChanges = hasChanges,
+            isSaveEnabled = isSaveEnabled,
             errorMessage = formUseCase.errorMessage
         )
     }
@@ -54,14 +79,19 @@ class TaskFormStateManager @Inject constructor(
 
     // === Form Validation ===
     suspend fun validateForm(): FormValidationResult {
-        val formData = formUseCase.getFormData().first()
+        val (isValid, errorMessage) = formUseCase.validateForm()
 
-        return when {
-            formData.title.isBlank() -> FormValidationResult.Error("Title cannot be empty")
-            formData.selectedTaskId != null && formData.selectedTaskId <= 0 -> {
+        return if (isValid) {
+            val formData = formUseCase.getTrimmedFormData()
+
+            // Additional validation for edit mode
+            if (formData.selectedTaskId != null && formData.selectedTaskId <= 0) {
                 FormValidationResult.Error("Invalid task selected for update")
+            } else {
+                FormValidationResult.Success(formData)
             }
-            else -> FormValidationResult.Success(formData)
+        } else {
+            FormValidationResult.Error(errorMessage ?: "Validation failed")
         }
     }
 
@@ -93,6 +123,10 @@ data class TaskFormState(
     val taskDescription: StateFlow<String>,
     val isFormValid: StateFlow<Boolean>,
     val isEditMode: StateFlow<Boolean>,
+    val titleError: StateFlow<String?>,
+    val isTitleValid: StateFlow<Boolean>,
+    val hasChanges: StateFlow<Boolean>,
+    val isSaveEnabled: StateFlow<Boolean>,
     val errorMessage: StateFlow<String?>
 )
 
