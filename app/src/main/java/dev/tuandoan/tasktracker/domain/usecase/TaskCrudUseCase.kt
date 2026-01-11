@@ -30,11 +30,18 @@ class TaskCrudUseCase @Inject constructor(
      * Creates a new task with the provided title and description
      */
     suspend fun createTask(title: String, description: String): Result<Unit> {
+        return createTask(title, description, null, null)
+    }
+
+    /**
+     * Creates a new task with the provided title, description, due date and reminder
+     */
+    suspend fun createTask(title: String, description: String, dueAt: Long?, reminderOffsetMinutes: Int?): Result<Unit> {
         return try {
             _isLoading.value = true
             _errorMessage.value = null
 
-            taskManager.createTask(title = title, description = description)
+            taskManager.createTask(title = title, description = description, dueAt = dueAt, reminderOffsetMinutes = reminderOffsetMinutes)
 
             _lastOperationSuccess.value = "Task created successfully"
             Result.success(Unit)
@@ -51,18 +58,32 @@ class TaskCrudUseCase @Inject constructor(
      * Updates an existing task with new title and description
      */
     suspend fun updateTask(taskId: Long, title: String, description: String): Result<Unit> {
+        return updateTask(taskId, title, description, null, null)
+    }
+
+    /**
+     * Updates an existing task with new title, description, due date and reminder
+     */
+    suspend fun updateTask(taskId: Long, title: String, description: String, dueAt: Long?, reminderOffsetMinutes: Int?): Result<Unit> {
         return try {
             _isLoading.value = true
             _errorMessage.value = null
 
-            taskManager.updateTaskContent(
+            val success = taskManager.updateTaskContent(
                 taskId = taskId,
                 title = title,
-                description = description
+                description = description,
+                dueAt = dueAt,
+                reminderOffsetMinutes = reminderOffsetMinutes
             )
 
-            _lastOperationSuccess.value = "Task updated successfully"
-            Result.success(Unit)
+            if (success) {
+                _lastOperationSuccess.value = "Task updated successfully"
+                Result.success(Unit)
+            } else {
+                _errorMessage.value = "Failed to schedule reminder"
+                Result.failure(RuntimeException("Failed to schedule reminder"))
+            }
         } catch (e: Exception) {
             val errorMsg = e.message ?: "Failed to update task"
             _errorMessage.value = errorMsg
