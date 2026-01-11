@@ -2,15 +2,22 @@ package dev.tuandoan.tasktracker.ui.screens
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import dev.tuandoan.tasktracker.domain.usecase.TaskFormUseCase
 import dev.tuandoan.tasktracker.ui.viewmodel.TaskViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -27,8 +34,23 @@ fun AddEditTaskDialog(
     val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
     val errorMessage by viewModel.errorMessage.collectAsStateWithLifecycle()
 
+    // New validation states
+    val titleError by viewModel.titleError.collectAsStateWithLifecycle()
+    val isTitleValid by viewModel.isTitleValid.collectAsStateWithLifecycle()
+    val hasChanges by viewModel.hasChanges.collectAsStateWithLifecycle()
+    val isSaveEnabled by viewModel.isSaveEnabled.collectAsStateWithLifecycle()
+
     val isEditing by viewModel.isEditMode.collectAsStateWithLifecycle()
     val dialogTitle = if (isEditing) "Edit Task" else "Add New Task"
+
+    // Focus and keyboard management
+    val focusRequester = remember { FocusRequester() }
+    val keyboardController = LocalSoftwareKeyboardController.current
+
+    // Auto-focus title field when dialog opens
+    LaunchedEffect(Unit) {
+        focusRequester.requestFocus()
+    }
 
     Dialog(
         onDismissRequest = onDismiss,
@@ -65,23 +87,47 @@ fun AddEditTaskDialog(
                     onValueChange = { viewModel.updateTaskTitle(it) },
                     label = { Text("Task Title") },
                     placeholder = { Text("Enter task title") },
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .focusRequester(focusRequester),
                     singleLine = true,
-                    isError = taskTitle.isBlank() && taskTitle.isNotEmpty(),
+                    isError = titleError != null,
+                    supportingText = {
+                        Column {
+                            titleError?.let { error ->
+                                Text(
+                                    text = error,
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.error
+                                )
+                            }
+                            Text(
+                                text = "${taskTitle.length}/${TaskFormUseCase.MAX_TITLE_LENGTH}",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = if (taskTitle.length > TaskFormUseCase.MAX_TITLE_LENGTH) {
+                                    MaterialTheme.colorScheme.error
+                                } else {
+                                    MaterialTheme.colorScheme.onSurfaceVariant
+                                }
+                            )
+                        }
+                    },
+                    keyboardOptions = KeyboardOptions(
+                        imeAction = ImeAction.Done
+                    ),
+                    keyboardActions = KeyboardActions(
+                        onDone = {
+                            if (isSaveEnabled) {
+                                keyboardController?.hide()
+                                viewModel.saveTask()
+                            }
+                        }
+                    ),
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedBorderColor = MaterialTheme.colorScheme.primary,
                         unfocusedBorderColor = MaterialTheme.colorScheme.outline
                     )
                 )
-
-                if (taskTitle.isBlank() && taskTitle.isNotEmpty()) {
-                    Text(
-                        text = "Title is required",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.error,
-                        modifier = Modifier.padding(start = 16.dp, top = 4.dp)
-                    )
-                }
 
                 Spacer(modifier = Modifier.height(16.dp))
 
@@ -94,6 +140,17 @@ fun AddEditTaskDialog(
                     modifier = Modifier.fillMaxWidth(),
                     minLines = 3,
                     maxLines = 5,
+                    supportingText = {
+                        Text(
+                            text = "${taskDescription.length}/${TaskFormUseCase.MAX_DESCRIPTION_LENGTH}",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = if (taskDescription.length > TaskFormUseCase.MAX_DESCRIPTION_LENGTH) {
+                                MaterialTheme.colorScheme.error
+                            } else {
+                                MaterialTheme.colorScheme.onSurfaceVariant
+                            }
+                        )
+                    },
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedBorderColor = MaterialTheme.colorScheme.primary,
                         unfocusedBorderColor = MaterialTheme.colorScheme.outline
@@ -142,7 +199,7 @@ fun AddEditTaskDialog(
                         onClick = {
                             viewModel.saveTask()
                         },
-                        enabled = isFormValid && !isLoading,
+                        enabled = isSaveEnabled && !isLoading,
                         colors = ButtonDefaults.buttonColors(
                             containerColor = MaterialTheme.colorScheme.primary,
                             contentColor = MaterialTheme.colorScheme.onPrimary,
