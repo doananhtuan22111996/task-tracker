@@ -11,6 +11,7 @@ A modern, offline-first task tracking Android app built with **Kotlin**, **Jetpa
 - 🔍 **Smart Search** - Real-time search across task titles and descriptions with debounce
 - 🏷️ **Status Filtering** - Filter tasks by status (All, Active, Completed)
 - 📊 **Advanced Sorting** - Multiple sorting options with completion grouping
+- 📅 **Day-based Grouping** - Tasks automatically grouped by day (Today/Yesterday/Date) in all tabs for better readability
 - 📅 **Future-Only Due Dates** - Set optional due dates and times (future dates only) with visual overdue indicators
 - ⏰ **Validated Local Reminders** - WorkManager-powered notifications (1 minute, 5 minutes, 1 hour, or 1 day before) with automatic validation ensuring reminder time is in the future
 - 📝 **Production-Ready Validation** - Comprehensive form validation with required title, input trimming, length limits, and disabled save when no changes
@@ -276,6 +277,7 @@ TaskViewModelTest            // End-to-end coordination tests
 - 🔄 **Intelligent Scheduling** - Automatic reminder rescheduling when tasks are edited or completed
 - 💾 **Database Migration** - Seamless Room database upgrade from v1 to v2 with new fields
 - 🎯 **Enhanced Form Validation** - Comprehensive validation ensuring due dates are future-only and reminder times are valid
+- 📅 **Day-based Grouping** - Task list automatically organized by day (Today/Yesterday/specific dates) with sticky headers for improved readability
 - 🏗️ **Clean Architecture** - Modular reminder system with WorkManager integration and Hilt DI
 
 > **Note**: On Android 13+ (API 33+), notification permission is required for reminders. The app will prompt contextually when enabling reminders with an education dialog explaining the requirement.

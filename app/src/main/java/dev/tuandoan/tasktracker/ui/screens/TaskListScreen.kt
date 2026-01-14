@@ -26,6 +26,7 @@ fun TaskListScreen(
     // Collect all required state
     val allTasks by viewModel.allTasks.collectAsStateWithLifecycle()
     val visibleTasks by viewModel.visibleTasks.collectAsStateWithLifecycle()
+    val groupedVisibleTasks by viewModel.groupedVisibleTasks.collectAsStateWithLifecycle()
     val searchQuery by viewModel.searchQuery.collectAsStateWithLifecycle()
     val currentFilter by viewModel.filter.collectAsStateWithLifecycle()
     val currentSort by viewModel.taskSort.collectAsStateWithLifecycle()
@@ -116,6 +117,7 @@ fun TaskListScreen(
         TaskListContent(
             allTasks = allTasks,
             visibleTasks = visibleTasks,
+            groupedVisibleTasks = groupedVisibleTasks,
             searchQuery = searchQuery,
             currentFilter = currentFilter,
             selectedIds = selectedIds,

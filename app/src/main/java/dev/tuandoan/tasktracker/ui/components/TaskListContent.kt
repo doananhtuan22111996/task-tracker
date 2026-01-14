@@ -1,13 +1,17 @@
 package dev.tuandoan.tasktracker.ui.components
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import dev.tuandoan.tasktracker.data.database.Task
 import dev.tuandoan.tasktracker.ui.viewmodel.TaskFilter
+import dev.tuandoan.tasktracker.utils.TaskSection
 
 /**
  * Main content area of the task list screen containing search, filter, and task list
@@ -16,6 +20,7 @@ import dev.tuandoan.tasktracker.ui.viewmodel.TaskFilter
 fun TaskListContent(
     allTasks: List<Task>,
     visibleTasks: List<Task>,
+    groupedVisibleTasks: List<TaskSection>,
     searchQuery: String,
     currentFilter: TaskFilter,
     selectedIds: Set<Long>,
@@ -58,6 +63,7 @@ fun TaskListContent(
         TaskListOrEmptyState(
             allTasks = allTasks,
             visibleTasks = visibleTasks,
+            groupedVisibleTasks = groupedVisibleTasks,
             searchQuery = searchQuery,
             currentFilter = currentFilter,
             selectedIds = selectedIds,
@@ -80,6 +86,7 @@ fun TaskListContent(
 private fun TaskListOrEmptyState(
     allTasks: List<Task>,
     visibleTasks: List<Task>,
+    groupedVisibleTasks: List<TaskSection>,
     searchQuery: String,
     currentFilter: TaskFilter,
     selectedIds: Set<Long>,
@@ -105,8 +112,8 @@ private fun TaskListOrEmptyState(
             )
         }
         else -> {
-            TaskList(
-                tasks = visibleTasks,
+            GroupedTaskList(
+                taskSections = groupedVisibleTasks,
                 selectedIds = selectedIds,
                 isSelectionMode = isSelectionMode,
                 onToggleTaskComplete = onToggleTaskComplete,
@@ -120,11 +127,12 @@ private fun TaskListOrEmptyState(
 }
 
 /**
- * Scrollable list of tasks
+ * Scrollable list of tasks grouped by day with sticky section headers
  */
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun TaskList(
-    tasks: List<Task>,
+private fun GroupedTaskList(
+    taskSections: List<TaskSection>,
     selectedIds: Set<Long>,
     isSelectionMode: Boolean,
     onToggleTaskComplete: (Task) -> Unit,
@@ -135,21 +143,61 @@ private fun TaskList(
 ) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
+        verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
-        items(
-            items = tasks,
-            key = { task -> task.id }
-        ) { task ->
-            TaskItem(
-                task = task,
-                isSelected = selectedIds.contains(task.id),
-                isSelectionMode = isSelectionMode,
-                onToggleComplete = { onToggleTaskComplete(task) },
-                onEditClick = { onEditTask(task) },
-                onDeleteClick = { onDeleteTask(task) },
-                onLongPress = { onLongPressTask(task.id) },
-                onToggleSelection = { onToggleSelection(task.id) }
+        taskSections.forEach { section ->
+            // Sticky header for each day section
+            stickyHeader(key = section.dateKey) {
+                TaskSectionHeader(
+                    header = section.header
+                )
+            }
+
+            // Tasks in this section
+            items(
+                items = section.tasks,
+                key = { task -> task.id }
+            ) { task ->
+                TaskItem(
+                    task = task,
+                    isSelected = selectedIds.contains(task.id),
+                    isSelectionMode = isSelectionMode,
+                    onToggleComplete = { onToggleTaskComplete(task) },
+                    onEditClick = { onEditTask(task) },
+                    onDeleteClick = { onDeleteTask(task) },
+                    onLongPress = { onLongPressTask(task.id) },
+                    onToggleSelection = { onToggleSelection(task.id) }
+                )
+            }
+        }
+    }
+}
+
+/**
+ * Header for a task section (Today, Yesterday, etc.)
+ */
+@Composable
+private fun TaskSectionHeader(
+    header: String
+) {
+    Surface(
+        modifier = Modifier.fillMaxWidth(),
+        color = MaterialTheme.colorScheme.background.copy(alpha = 0.95f)
+    ) {
+        Column {
+            Text(
+                text = header,
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.SemiBold,
+                color = MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier.padding(
+                    horizontal = 16.dp,
+                    vertical = 12.dp
+                )
+            )
+            HorizontalDivider(
+                color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f),
+                thickness = 0.5.dp
             )
         }
     }
