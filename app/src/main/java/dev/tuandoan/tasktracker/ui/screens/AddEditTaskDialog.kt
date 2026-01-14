@@ -1,5 +1,7 @@
 package dev.tuandoan.tasktracker.ui.screens
 
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
@@ -12,6 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -22,6 +25,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dev.tuandoan.tasktracker.domain.model.ReminderOption
 import dev.tuandoan.tasktracker.domain.usecase.TaskFormUseCase
 import dev.tuandoan.tasktracker.ui.viewmodel.TaskViewModel
+import dev.tuandoan.tasktracker.utils.NotificationPermission
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -32,6 +36,7 @@ fun AddEditTaskDialog(
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val context = LocalContext.current
     val selectedTask by viewModel.selectedTask.collectAsStateWithLifecycle()
     val taskTitle by viewModel.taskTitle.collectAsStateWithLifecycle()
     val taskDescription by viewModel.taskDescription.collectAsStateWithLifecycle()
@@ -53,6 +58,57 @@ fun AddEditTaskDialog(
 
     val isEditing by viewModel.isEditMode.collectAsStateWithLifecycle()
     val dialogTitle = if (isEditing) "Edit Task" else "Add New Task"
+
+    // Notification permission handling
+    var showNotificationPermissionDialog by remember { mutableStateOf(false) }
+    var permissionDeniedSnackbarMessage by remember { mutableStateOf<String?>(null) }
+    var pendingReminderOption by remember { mutableStateOf<ReminderOption?>(null) }
+    var shouldSaveAfterPermission by remember { mutableStateOf(false) }
+
+    // Permission request launcher
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { granted ->
+        if (granted) {
+            // Permission granted, apply the pending reminder option
+            pendingReminderOption?.let { option ->
+                viewModel.updateReminderOption(option)
+                pendingReminderOption = null
+            }
+            // Save task if this was triggered from save button
+            if (shouldSaveAfterPermission) {
+                viewModel.saveTask()
+                shouldSaveAfterPermission = false
+            }
+        } else {
+            // Permission denied, show snackbar hint
+            permissionDeniedSnackbarMessage = "Enable notifications in settings to receive reminders"
+            // Still apply the reminder option (user can enable permission later)
+            pendingReminderOption?.let { option ->
+                viewModel.updateReminderOption(option)
+                pendingReminderOption = null
+            }
+            // Save task even without permission (reminder won't work but task is saved)
+            if (shouldSaveAfterPermission) {
+                viewModel.saveTask()
+                shouldSaveAfterPermission = false
+            }
+        }
+    }
+
+    // Function to check and handle reminder option change
+    fun handleReminderOptionChange(newOption: ReminderOption) {
+        if (newOption != ReminderOption.NONE &&
+            NotificationPermission.shouldRequest() &&
+            !NotificationPermission.isGranted(context)) {
+            // Need to request permission
+            pendingReminderOption = newOption
+            showNotificationPermissionDialog = true
+        } else {
+            // No permission needed or already granted
+            viewModel.updateReminderOption(newOption)
+        }
+    }
 
     // Focus and keyboard management
     val focusRequester = remember { FocusRequester() }
@@ -284,7 +340,7 @@ fun AddEditTaskDialog(
                             DropdownMenuItem(
                                 text = { Text(option.displayName) },
                                 onClick = {
-                                    viewModel.updateReminderOption(option)
+                                    handleReminderOptionChange(option)
                                     reminderExpanded = false
                                 },
                                 enabled = dueAt != null // Only allow selection if due date is set
@@ -311,6 +367,50 @@ fun AddEditTaskDialog(
                     Spacer(modifier = Modifier.height(16.dp))
                 }
 
+                // Permission denied snackbar message
+                permissionDeniedSnackbarMessage?.let { message ->
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.primaryContainer
+                        )
+                    ) {
+                        Column(
+                            modifier = Modifier.padding(12.dp)
+                        ) {
+                            Text(
+                                text = message,
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onPrimaryContainer
+                            )
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Row {
+                                TextButton(
+                                    onClick = { permissionDeniedSnackbarMessage = null },
+                                    colors = ButtonDefaults.textButtonColors(
+                                        contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                                    )
+                                ) {
+                                    Text("Dismiss")
+                                }
+                                Spacer(modifier = Modifier.width(8.dp))
+                                TextButton(
+                                    onClick = {
+                                        NotificationPermission.openAppNotificationSettings(context)
+                                        permissionDeniedSnackbarMessage = null
+                                    },
+                                    colors = ButtonDefaults.textButtonColors(
+                                        contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                                    )
+                                ) {
+                                    Text("Open Settings")
+                                }
+                            }
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(16.dp))
+                }
+
                 Spacer(modifier = Modifier.height(24.dp))
 
                 // Action Buttons
@@ -333,7 +433,18 @@ fun AddEditTaskDialog(
 
                     Button(
                         onClick = {
-                            viewModel.saveTask()
+                            // Check for notification permission before saving if reminder is set
+                            if (reminderOption != ReminderOption.NONE &&
+                                NotificationPermission.shouldRequest() &&
+                                !NotificationPermission.isGranted(context)) {
+                                // Need to request permission before saving
+                                pendingReminderOption = reminderOption
+                                shouldSaveAfterPermission = true
+                                showNotificationPermissionDialog = true
+                            } else {
+                                // Save normally
+                                viewModel.saveTask()
+                            }
                         },
                         enabled = isSaveEnabled && !isLoading,
                         colors = ButtonDefaults.buttonColors(
@@ -359,5 +470,58 @@ fun AddEditTaskDialog(
                 }
             }
         }
+    }
+
+    // Permission education dialog
+    if (showNotificationPermissionDialog) {
+        AlertDialog(
+            onDismissRequest = {
+                showNotificationPermissionDialog = false
+                pendingReminderOption = null
+                shouldSaveAfterPermission = false
+            },
+            title = {
+                Text(
+                    text = "Enable notifications?",
+                    style = MaterialTheme.typography.headlineSmall
+                )
+            },
+            text = {
+                Text(
+                    text = "Notifications are required for task reminders.",
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showNotificationPermissionDialog = false
+                        permissionLauncher.launch(NotificationPermission.getPermissionString())
+                    }
+                ) {
+                    Text("Allow")
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = {
+                        showNotificationPermissionDialog = false
+                        // Apply the reminder option even without permission (user can enable later)
+                        pendingReminderOption?.let { option ->
+                            viewModel.updateReminderOption(option)
+                        }
+                        pendingReminderOption = null
+                        permissionDeniedSnackbarMessage = "Enable notifications in settings to receive reminders"
+                        // Save task if this was triggered from save button
+                        if (shouldSaveAfterPermission) {
+                            viewModel.saveTask()
+                            shouldSaveAfterPermission = false
+                        }
+                    }
+                ) {
+                    Text("Not now")
+                }
+            }
+        )
     }
 }
