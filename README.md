@@ -219,7 +219,7 @@ app/src/main/java/dev/tuandoan/tasktracker/
    - Title: A-Z
 4. **Group Completed** - Toggle "Completed last" to group completed tasks at the bottom
 5. **Set Due Dates** - Tap the calendar icon in Add/Edit dialog to set optional due dates
-6. **Configure Reminders** - Choose from 1 minute, 5 minutes, 1 hour, or 1 day before due date (requires future due date and validates reminder time is in the future)
+6. **Configure Reminders** - Choose from 1 minute, 5 minutes, 1 hour, or 1 day before due date (requires future due date and validates reminder time is in the future). On Android 13+, the app will prompt for notification permission when first enabling reminders.
 7. **Track Overdue Tasks** - Overdue tasks display in red with "Overdue" indicators in the task list
 
 ### Pro Tips
@@ -228,7 +228,7 @@ app/src/main/java/dev/tuandoan/tasktracker/
 - 💾 **State persistence** - Your search and filter settings are remembered
 - 🎯 **Efficient UI** - Optimized for performance with large task lists
 - ⏰ **Smart reminders** - Notifications work offline and survive app restarts via WorkManager
-- 📱 **Permission aware** - First-time reminder setup will prompt for notification permissions on Android 13+
+- 📱 **Permission aware** - On Android 13+ (API 33+), notification permission is required for reminders. The app will prompt contextually when enabling reminders.
 
 ## 🔧 Development
 
@@ -272,13 +272,13 @@ TaskViewModelTest            // End-to-end coordination tests
 - 📅 **Future-Only Due Dates** - Add optional due dates and times to tasks with strict future-only validation
 - ⏰ **Validated Smart Reminders** - Local notifications via WorkManager (1 minute, 5 minutes, 1 hour, or 1 day before) with automatic validation ensuring reminder time is in the future
 - 🚨 **Overdue Detection** - Visual indicators for overdue tasks with red coloring and "Overdue" labels
-- 📱 **Notification System** - Complete notification channel setup with Android 13+ permission support
+- 📱 **Notification System** - Complete notification channel setup with contextual Android 13+ permission requests
 - 🔄 **Intelligent Scheduling** - Automatic reminder rescheduling when tasks are edited or completed
 - 💾 **Database Migration** - Seamless Room database upgrade from v1 to v2 with new fields
 - 🎯 **Enhanced Form Validation** - Comprehensive validation ensuring due dates are future-only and reminder times are valid
 - 🏗️ **Clean Architecture** - Modular reminder system with WorkManager integration and Hilt DI
 
-> **Note**: On Android 13+, users will be prompted for notification permissions when setting their first reminder.
+> **Note**: On Android 13+ (API 33+), notification permission is required for reminders. The app will prompt contextually when enabling reminders with an education dialog explaining the requirement.
 
 ### v2.3 - Production-Ready Validation & Form UX
 - 📝 **Comprehensive Form Validation** - Required title validation with real-time error feedback
