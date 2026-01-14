@@ -19,6 +19,8 @@ import dev.tuandoan.tasktracker.ui.state.TaskListState
 import dev.tuandoan.tasktracker.ui.state.TaskListStateManager
 import dev.tuandoan.tasktracker.ui.state.SelectionState
 import dev.tuandoan.tasktracker.ui.state.TaskSelectionStateManager
+import dev.tuandoan.tasktracker.utils.TaskDateGrouper
+import dev.tuandoan.tasktracker.utils.TaskSection
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -62,6 +64,16 @@ class TaskViewModel @Inject constructor(
     // List state
     val allTasks = listState.allTasks
     val visibleTasks = listState.visibleTasks
+
+    // Grouped tasks for day-based sections
+    val groupedVisibleTasks: StateFlow<List<TaskSection>> = visibleTasks
+        .map { tasks -> TaskDateGrouper.groupTasksByDay(tasks) }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = emptyList()
+        )
+
     val searchQuery = listState.searchQuery
     val filter = listState.filter
     val taskSort = listState.taskSort
