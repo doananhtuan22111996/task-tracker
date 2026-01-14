@@ -4,6 +4,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -17,8 +19,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import dev.tuandoan.tasktracker.domain.model.ReminderOption
 import dev.tuandoan.tasktracker.domain.usecase.TaskFormUseCase
 import dev.tuandoan.tasktracker.ui.viewmodel.TaskViewModel
+import java.text.SimpleDateFormat
+import java.util.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -30,13 +35,19 @@ fun AddEditTaskDialog(
     val selectedTask by viewModel.selectedTask.collectAsStateWithLifecycle()
     val taskTitle by viewModel.taskTitle.collectAsStateWithLifecycle()
     val taskDescription by viewModel.taskDescription.collectAsStateWithLifecycle()
+    val dueAt by viewModel.dueAt.collectAsStateWithLifecycle()
+    val reminderOption by viewModel.reminderOption.collectAsStateWithLifecycle()
     val isFormValid by viewModel.isFormValid.collectAsStateWithLifecycle()
     val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
     val errorMessage by viewModel.errorMessage.collectAsStateWithLifecycle()
 
     // New validation states
     val titleError by viewModel.titleError.collectAsStateWithLifecycle()
+    val dueDateError by viewModel.dueDateError.collectAsStateWithLifecycle()
+    val reminderError by viewModel.reminderError.collectAsStateWithLifecycle()
     val isTitleValid by viewModel.isTitleValid.collectAsStateWithLifecycle()
+    val isDueDateValid by viewModel.isDueDateValid.collectAsStateWithLifecycle()
+    val isReminderValid by viewModel.isReminderValid.collectAsStateWithLifecycle()
     val hasChanges by viewModel.hasChanges.collectAsStateWithLifecycle()
     val isSaveEnabled by viewModel.isSaveEnabled.collectAsStateWithLifecycle()
 
@@ -156,6 +167,131 @@ fun AddEditTaskDialog(
                         unfocusedBorderColor = MaterialTheme.colorScheme.outline
                     )
                 )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // Due Date Field
+                OutlinedTextField(
+                    value = if (dueAt != null) {
+                        val dateFormat = SimpleDateFormat("MMM dd, yyyy 'at' HH:mm", Locale.getDefault())
+                        dateFormat.format(Date(dueAt!!))
+                    } else {
+                        ""
+                    },
+                    onValueChange = { /* Read-only field - use date picker */ },
+                    label = { Text("Due Date (Optional)") },
+                    placeholder = { Text("Set due date and time") },
+                    modifier = Modifier.fillMaxWidth(),
+                    readOnly = true,
+                    isError = dueDateError != null,
+                    trailingIcon = {
+                        IconButton(
+                            onClick = {
+                                // For now, set to 8 hours from now as a sensible default
+                                // This ensures the due date is always in the future
+                                val currentTime = System.currentTimeMillis()
+                                val eightHoursLater = currentTime + (8 * 60 * 60 * 1000L) // Add 8 hours
+                                viewModel.updateDueAt(eightHoursLater)
+                            }
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.DateRange,
+                                contentDescription = "Select date and time"
+                            )
+                        }
+                    },
+                    supportingText = {
+                        Column {
+                            dueDateError?.let { error ->
+                                Text(
+                                    text = error,
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.error
+                                )
+                            }
+                            if (dueAt != null) {
+                                Row {
+                                    TextButton(
+                                        onClick = { viewModel.updateDueAt(null) },
+                                        modifier = Modifier.padding(0.dp)
+                                    ) {
+                                        Text(
+                                            text = "Clear",
+                                            style = MaterialTheme.typography.bodySmall
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = MaterialTheme.colorScheme.primary,
+                        unfocusedBorderColor = MaterialTheme.colorScheme.outline
+                    )
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // Reminder Selection
+                var reminderExpanded by remember { mutableStateOf(false) }
+
+                ExposedDropdownMenuBox(
+                    expanded = reminderExpanded,
+                    onExpandedChange = { reminderExpanded = !reminderExpanded }
+                ) {
+                    OutlinedTextField(
+                        value = reminderOption.displayName,
+                        onValueChange = { },
+                        label = { Text("Reminder") },
+                        readOnly = true,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .menuAnchor(),
+                        trailingIcon = {
+                            ExposedDropdownMenuDefaults.TrailingIcon(expanded = reminderExpanded)
+                        },
+                        isError = reminderError != null,
+                        supportingText = {
+                            reminderError?.let { error ->
+                                Text(
+                                    text = error,
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.error
+                                )
+                            }
+                        },
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = MaterialTheme.colorScheme.primary,
+                            unfocusedBorderColor = MaterialTheme.colorScheme.outline
+                        )
+                    )
+
+                    ExposedDropdownMenu(
+                        expanded = reminderExpanded,
+                        onDismissRequest = { reminderExpanded = false }
+                    ) {
+                        // None option
+                        DropdownMenuItem(
+                            text = { Text(ReminderOption.NONE.displayName) },
+                            onClick = {
+                                viewModel.updateReminderOption(ReminderOption.NONE)
+                                reminderExpanded = false
+                            }
+                        )
+
+                        // Selectable options
+                        ReminderOption.getSelectableOptions().forEach { option ->
+                            DropdownMenuItem(
+                                text = { Text(option.displayName) },
+                                onClick = {
+                                    viewModel.updateReminderOption(option)
+                                    reminderExpanded = false
+                                },
+                                enabled = dueAt != null // Only allow selection if due date is set
+                            )
+                        }
+                    }
+                }
 
                 // Error Message
                 errorMessage?.let { error ->

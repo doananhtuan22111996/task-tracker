@@ -90,7 +90,9 @@ class TaskCrudManager @Inject constructor(
             is FormValidationResult.Success -> {
                 val result = crudUseCase.createTask(
                     validation.formData.title,
-                    validation.formData.description
+                    validation.formData.description,
+                    validation.formData.dueAt,
+                    validation.formData.reminderOffsetMinutes
                 )
 
                 if (result.isSuccess) {
@@ -124,7 +126,9 @@ class TaskCrudManager @Inject constructor(
                 val result = crudUseCase.updateTask(
                     taskId, // taskId is smart-cast to non-null Long after the null check
                     validation.formData.title,
-                    validation.formData.description
+                    validation.formData.description,
+                    validation.formData.dueAt,
+                    validation.formData.reminderOffsetMinutes
                 )
 
                 if (result.isSuccess) {

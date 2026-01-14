@@ -11,6 +11,8 @@ A modern, offline-first task tracking Android app built with **Kotlin**, **Jetpa
 - 🔍 **Smart Search** - Real-time search across task titles and descriptions with debounce
 - 🏷️ **Status Filtering** - Filter tasks by status (All, Active, Completed)
 - 📊 **Advanced Sorting** - Multiple sorting options with completion grouping
+- 📅 **Future-Only Due Dates** - Set optional due dates and times (future dates only) with visual overdue indicators
+- ⏰ **Validated Local Reminders** - WorkManager-powered notifications (1 minute, 5 minutes, 1 hour, or 1 day before) with automatic validation ensuring reminder time is in the future
 - 📝 **Production-Ready Validation** - Comprehensive form validation with required title, input trimming, length limits, and disabled save when no changes
 - 💾 **Offline First** - Works completely offline with Room database
 - 🎨 **Material 3 Design** - Modern UI following Material Design guidelines
@@ -80,6 +82,7 @@ Recent refactoring has separated concerns into focused, maintainable components:
 - **ViewModel** - UI-related data holder with lifecycle awareness
 - **StateFlow** - Reactive state management with coroutines
 - **Room Database** - Local SQLite database with compile-time verification
+- **WorkManager** - Background task scheduling for reminder notifications
 - **Hilt** - Dependency injection for Android
 
 ### Data & Persistence
@@ -97,16 +100,21 @@ Recent refactoring has separated concerns into focused, maintainable components:
 ```
 app/src/main/java/dev/tuandoan/tasktracker/
 ├── data/
-│   └── database/
-│       ├── Task.kt                 # Task entity
-│       ├── TaskDao.kt              # Room data access object
-│       └── TaskDatabase.kt         # Room database configuration
+│   ├── database/
+│   │   ├── Task.kt                 # Task entity with due dates and reminders
+│   │   ├── TaskDao.kt              # Room data access object
+│   │   └── TaskDatabase.kt         # Room database with migration support
+│   └── scheduler/
+│       └── WorkManagerTaskReminderScheduler.kt # WorkManager reminder implementation
 ├── domain/
 │   ├── model/                      # Domain models and data classes
 │   │   ├── TaskSort.kt            # Sorting enums and configuration
+│   │   ├── ReminderOption.kt      # Reminder time options enum
 │   │   └── ...
 │   ├── service/                    # Pure business logic services
 │   │   └── TaskSortService.kt     # Sorting algorithms and rules
+│   ├── scheduler/                  # Background task scheduling
+│   │   └── TaskReminderScheduler.kt # Reminder scheduling interface
 │   └── usecase/                   # Business use cases
 │       ├── TaskCrudUseCase.kt     # CRUD operations
 │       ├── TaskSearchUseCase.kt   # Search with debounce
@@ -130,6 +138,11 @@ app/src/main/java/dev/tuandoan/tasktracker/
 │   └── viewmodel/
 │       ├── TaskViewModel.kt       # Main ViewModel coordinator
 │       └── TaskFilter.kt          # Filter enum
+├── utils/
+│   └── DateUtils.kt              # Date formatting and overdue detection
+├── work/
+│   └── TaskReminderWorker.kt     # WorkManager worker for notifications
+├── TaskTrackerApplication.kt     # Application class with notification setup
 └── MainActivity.kt                # App entry point
 ```
 
@@ -205,12 +218,17 @@ app/src/main/java/dev/tuandoan/tasktracker/
    - Created: Oldest first
    - Title: A-Z
 4. **Group Completed** - Toggle "Completed last" to group completed tasks at the bottom
+5. **Set Due Dates** - Tap the calendar icon in Add/Edit dialog to set optional due dates
+6. **Configure Reminders** - Choose from 1 minute, 5 minutes, 1 hour, or 1 day before due date (requires future due date and validates reminder time is in the future)
+7. **Track Overdue Tasks** - Overdue tasks display in red with "Overdue" indicators in the task list
 
 ### Pro Tips
 - 🔍 **Search is live** - Results update as you type with smart debouncing
 - ⚡ **Instant sorting** - Changes apply immediately when you select options
 - 💾 **State persistence** - Your search and filter settings are remembered
 - 🎯 **Efficient UI** - Optimized for performance with large task lists
+- ⏰ **Smart reminders** - Notifications work offline and survive app restarts via WorkManager
+- 📱 **Permission aware** - First-time reminder setup will prompt for notification permissions on Android 13+
 
 ## 🔧 Development
 
@@ -249,6 +267,18 @@ TaskViewModelTest            // End-to-end coordination tests
 - **Key-based LazyColumn** - Optimized list rendering with proper item keys
 
 ## 📚 Recent Updates
+
+### v2.4 - Due Dates & Local Reminders
+- 📅 **Future-Only Due Dates** - Add optional due dates and times to tasks with strict future-only validation
+- ⏰ **Validated Smart Reminders** - Local notifications via WorkManager (1 minute, 5 minutes, 1 hour, or 1 day before) with automatic validation ensuring reminder time is in the future
+- 🚨 **Overdue Detection** - Visual indicators for overdue tasks with red coloring and "Overdue" labels
+- 📱 **Notification System** - Complete notification channel setup with Android 13+ permission support
+- 🔄 **Intelligent Scheduling** - Automatic reminder rescheduling when tasks are edited or completed
+- 💾 **Database Migration** - Seamless Room database upgrade from v1 to v2 with new fields
+- 🎯 **Enhanced Form Validation** - Comprehensive validation ensuring due dates are future-only and reminder times are valid
+- 🏗️ **Clean Architecture** - Modular reminder system with WorkManager integration and Hilt DI
+
+> **Note**: On Android 13+, users will be prompted for notification permissions when setting their first reminder.
 
 ### v2.3 - Production-Ready Validation & Form UX
 - 📝 **Comprehensive Form Validation** - Required title validation with real-time error feedback

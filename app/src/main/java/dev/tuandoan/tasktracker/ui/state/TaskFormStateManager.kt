@@ -1,6 +1,7 @@
 package dev.tuandoan.tasktracker.ui.state
 
 import dev.tuandoan.tasktracker.data.database.Task
+import dev.tuandoan.tasktracker.domain.model.ReminderOption
 import dev.tuandoan.tasktracker.domain.usecase.TaskFormUseCase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.*
@@ -53,15 +54,35 @@ class TaskFormStateManager @Inject constructor(
                 initialValue = false
             )
 
+        val isDueDateValid = formUseCase.isDueDateValid
+            .stateIn(
+                scope = scope,
+                started = SharingStarted.WhileSubscribed(5000),
+                initialValue = true
+            )
+
+        val isReminderValid = formUseCase.isReminderValid
+            .stateIn(
+                scope = scope,
+                started = SharingStarted.WhileSubscribed(5000),
+                initialValue = true
+            )
+
         return TaskFormState(
             showAddTaskDialog = formUseCase.showAddTaskDialog,
             selectedTask = formUseCase.selectedTask,
             taskTitle = formUseCase.taskTitle,
             taskDescription = formUseCase.taskDescription,
+            dueAt = formUseCase.dueAt,
+            reminderOption = formUseCase.reminderOption,
             isFormValid = isFormValid,
             isEditMode = isEditMode,
             titleError = formUseCase.titleError,
+            dueDateError = formUseCase.dueDateError,
+            reminderError = formUseCase.reminderError,
             isTitleValid = isTitleValid,
+            isDueDateValid = isDueDateValid,
+            isReminderValid = isReminderValid,
             hasChanges = hasChanges,
             isSaveEnabled = isSaveEnabled,
             errorMessage = formUseCase.errorMessage
@@ -76,6 +97,8 @@ class TaskFormStateManager @Inject constructor(
     // === Form Field Management ===
     fun updateTaskTitle(title: String) = formUseCase.updateTaskTitle(title)
     fun updateTaskDescription(description: String) = formUseCase.updateTaskDescription(description)
+    fun updateDueAt(dueAt: Long?) = formUseCase.updateDueAt(dueAt)
+    fun updateReminderOption(reminderOption: ReminderOption) = formUseCase.updateReminderOption(reminderOption)
 
     // === Form Validation ===
     suspend fun validateForm(): FormValidationResult {
@@ -121,10 +144,16 @@ data class TaskFormState(
     val selectedTask: StateFlow<Task?>,
     val taskTitle: StateFlow<String>,
     val taskDescription: StateFlow<String>,
+    val dueAt: StateFlow<Long?>,
+    val reminderOption: StateFlow<ReminderOption>,
     val isFormValid: StateFlow<Boolean>,
     val isEditMode: StateFlow<Boolean>,
     val titleError: StateFlow<String?>,
+    val dueDateError: StateFlow<String?>,
+    val reminderError: StateFlow<String?>,
     val isTitleValid: StateFlow<Boolean>,
+    val isDueDateValid: StateFlow<Boolean>,
+    val isReminderValid: StateFlow<Boolean>,
     val hasChanges: StateFlow<Boolean>,
     val isSaveEnabled: StateFlow<Boolean>,
     val errorMessage: StateFlow<String?>

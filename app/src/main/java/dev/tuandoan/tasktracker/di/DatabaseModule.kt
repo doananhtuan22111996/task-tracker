@@ -2,6 +2,8 @@ package dev.tuandoan.tasktracker.di
 
 import android.content.Context
 import androidx.room.Room
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -20,6 +22,37 @@ import javax.inject.Singleton
 object DatabaseModule {
 
     /**
+     * Migration from version 1 to 2: Add due date and reminder columns (idempotent)
+     */
+    private val MIGRATION_1_2 = object : Migration(1, 2) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            // Helper function to check if a column exists in a table
+            fun hasColumn(db: SupportSQLiteDatabase, tableName: String, columnName: String): Boolean {
+                db.query("PRAGMA table_info($tableName)").use { cursor ->
+                    val nameColumnIndex = cursor.getColumnIndex("name")
+                    while (cursor.moveToNext()) {
+                        val existingColumnName = cursor.getString(nameColumnIndex)
+                        if (existingColumnName == columnName) {
+                            return true
+                        }
+                    }
+                }
+                return false
+            }
+
+            // Add dueAt column only if it doesn't exist (nullable Long for epoch millis)
+            if (!hasColumn(database, "tasks", "dueAt")) {
+                database.execSQL("ALTER TABLE tasks ADD COLUMN dueAt INTEGER")
+            }
+
+            // Add reminderOffsetMinutes column only if it doesn't exist (nullable Int for offset in minutes)
+            if (!hasColumn(database, "tasks", "reminderOffsetMinutes")) {
+                database.execSQL("ALTER TABLE tasks ADD COLUMN reminderOffsetMinutes INTEGER")
+            }
+        }
+    }
+
+    /**
      * Provides a singleton instance of TaskDatabase.
      * Uses Room.databaseBuilder for database creation with proper configuration.
      */
@@ -33,7 +66,7 @@ object DatabaseModule {
             klass = TaskDatabase::class.java,
             name = "task_database"
         )
-            // Enable database inspection in debug builds
+            .addMigrations(MIGRATION_1_2)
             .build()
     }
 

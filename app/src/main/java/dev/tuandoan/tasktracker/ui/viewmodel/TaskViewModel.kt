@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dev.tuandoan.tasktracker.data.database.Task
 import dev.tuandoan.tasktracker.domain.model.CompletedGrouping
+import dev.tuandoan.tasktracker.domain.model.ReminderOption
 import dev.tuandoan.tasktracker.domain.model.SortDirection
 import dev.tuandoan.tasktracker.domain.model.SortKey
 import dev.tuandoan.tasktracker.domain.model.TaskSort
@@ -73,10 +74,16 @@ class TaskViewModel @Inject constructor(
     val selectedTask = formState.selectedTask
     val taskTitle = formState.taskTitle
     val taskDescription = formState.taskDescription
+    val dueAt = formState.dueAt
+    val reminderOption = formState.reminderOption
     val isFormValid = formState.isFormValid
     val isEditMode = formState.isEditMode
     val titleError = formState.titleError
+    val dueDateError = formState.dueDateError
+    val reminderError = formState.reminderError
     val isTitleValid = formState.isTitleValid
+    val isDueDateValid = formState.isDueDateValid
+    val isReminderValid = formState.isReminderValid
     val hasChanges = formState.hasChanges
     val isSaveEnabled = formState.isSaveEnabled
 
@@ -203,6 +210,8 @@ class TaskViewModel @Inject constructor(
     fun hideAddTaskDialog() = formStateManager.hideAddTaskDialog()
     fun updateTaskTitle(title: String) = formStateManager.updateTaskTitle(title)
     fun updateTaskDescription(description: String) = formStateManager.updateTaskDescription(description)
+    fun updateDueAt(dueAt: Long?) = formStateManager.updateDueAt(dueAt)
+    fun updateReminderOption(reminderOption: ReminderOption) = formStateManager.updateReminderOption(reminderOption)
 
     // === Search Operations ===
 

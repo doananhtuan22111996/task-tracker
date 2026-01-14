@@ -17,6 +17,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import dev.tuandoan.tasktracker.data.database.Task
 import dev.tuandoan.tasktracker.utils.formatDate
+import dev.tuandoan.tasktracker.utils.formatDueDate
+import dev.tuandoan.tasktracker.utils.isOverdue
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -111,9 +113,39 @@ fun TaskItem(
                     )
                 }
 
+                // Due Date Display
+                if (task.dueAt != null) {
+                    Spacer(modifier = Modifier.height(4.dp))
+                    val overdue = !task.isCompleted && isOverdue(task.dueAt)
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "Due: ${formatDueDate(task.dueAt)}",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = if (overdue) {
+                                MaterialTheme.colorScheme.error
+                            } else {
+                                MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                            },
+                            fontWeight = if (overdue) FontWeight.Medium else FontWeight.Normal
+                        )
+
+                        if (overdue) {
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                text = "Overdue",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f),
+                                fontWeight = FontWeight.Medium
+                            )
+                        }
+                    }
+                }
+
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = formatDate(task.createdAt),
+                    text = "Created: ${formatDate(task.createdAt)}",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
                 )
