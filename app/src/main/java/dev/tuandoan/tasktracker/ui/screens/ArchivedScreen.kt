@@ -3,45 +3,37 @@ package dev.tuandoan.tasktracker.ui.screens
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dev.tuandoan.tasktracker.ui.events.UiEvent
-import dev.tuandoan.tasktracker.ui.components.TaskListContent
-import dev.tuandoan.tasktracker.ui.components.TaskListTopBar
-import dev.tuandoan.tasktracker.ui.screens.AddEditTaskDialog
+import dev.tuandoan.tasktracker.ui.components.ArchivedTaskListContent
+import dev.tuandoan.tasktracker.ui.components.ArchivedTaskListTopBar
 import dev.tuandoan.tasktracker.ui.viewmodel.TaskViewModel
-import dev.tuandoan.tasktracker.ui.viewmodel.TaskFilter
 
 /**
- * Main task list screen that coordinates all task-related UI components
+ * Screen for viewing and managing archived tasks
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TaskListScreen(
+fun ArchivedScreen(
     viewModel: TaskViewModel,
+    onNavigateBack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    // Collect all required state
-    val allTasks by viewModel.allTasks.collectAsStateWithLifecycle()
-    val visibleTasks by viewModel.visibleTasks.collectAsStateWithLifecycle()
-    val groupedVisibleTasks by viewModel.groupedVisibleTasks.collectAsStateWithLifecycle()
+    // Collect archived tasks state
+    val archivedTasks by viewModel.archivedTasks.collectAsStateWithLifecycle()
     val searchQuery by viewModel.searchQuery.collectAsStateWithLifecycle()
-    val currentFilter by viewModel.filter.collectAsStateWithLifecycle()
-    val currentTagFilter by viewModel.tagFilter.collectAsStateWithLifecycle()
-    val availableTags by viewModel.availableTags.collectAsStateWithLifecycle()
     val currentSort by viewModel.taskSort.collectAsStateWithLifecycle()
-    val showAddTaskDialog by viewModel.showAddTaskDialog.collectAsStateWithLifecycle()
-    val pendingDeleteTask by viewModel.pendingDeleteTask.collectAsStateWithLifecycle()
 
     // Selection state
     val selectedIds by viewModel.selectedIds.collectAsStateWithLifecycle()
     val isSelectionMode by viewModel.isSelectionMode.collectAsStateWithLifecycle()
     val selectedCount by viewModel.selectedCount.collectAsStateWithLifecycle()
     val pendingBulkDeleteTasks by viewModel.pendingBulkDeleteTasks.collectAsStateWithLifecycle()
-    val pendingBulkArchiveTasks by viewModel.pendingBulkArchiveTasks.collectAsStateWithLifecycle()
+    val pendingDeleteTask by viewModel.pendingDeleteTask.collectAsStateWithLifecycle()
 
     // Snackbar host state
     val snackbarHostState = remember { SnackbarHostState() }
@@ -53,9 +45,9 @@ fun TaskListScreen(
                 is UiEvent.ShowUndoDelete -> {
                     val taskCount = event.tasks.size
                     val message = event.message ?: if (taskCount == 1) {
-                        "Task deleted"
+                        "Task permanently deleted"
                     } else {
-                        "$taskCount tasks deleted"
+                        "$taskCount tasks permanently deleted"
                     }
 
                     val result = snackbarHostState.showSnackbar(
@@ -91,78 +83,50 @@ fun TaskListScreen(
     Scaffold(
         modifier = modifier.fillMaxSize(),
         topBar = {
-            TaskListTopBar(
+            ArchivedTaskListTopBar(
                 currentSort = currentSort,
                 onSortChanged = viewModel::setSort,
                 isSelectionMode = isSelectionMode,
                 selectedCount = selectedCount,
-                onBulkMarkCompleted = viewModel::bulkMarkCompleted,
-                onBulkMarkActive = viewModel::bulkMarkActive,
-                onBulkArchive = viewModel::requestBulkArchive,
+                onBulkRestore = viewModel::bulkRestoreArchived,
+                onBulkPermanentDelete = viewModel::requestBulkPermanentDelete,
                 onClearSelection = viewModel::clearSelection,
-                onSelectAll = { viewModel.selectAll(visibleTasks.map { it.id }) }
+                onSelectAll = { viewModel.selectAll(archivedTasks.map { it.id }) },
+                onNavigateBack = onNavigateBack
             )
-        },
-        floatingActionButton = {
-            FloatingActionButton(
-                onClick = { viewModel.showAddTaskDialog() },
-                containerColor = MaterialTheme.colorScheme.primary
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Add,
-                    contentDescription = "Add Task"
-                )
-            }
         },
         snackbarHost = {
             SnackbarHost(hostState = snackbarHostState)
         }
     ) { paddingValues ->
-        TaskListContent(
-            allTasks = allTasks,
-            visibleTasks = visibleTasks,
-            groupedVisibleTasks = groupedVisibleTasks,
+        ArchivedTaskListContent(
+            archivedTasks = archivedTasks,
             searchQuery = searchQuery,
-            currentFilter = currentFilter,
-            currentTagFilter = currentTagFilter,
-            availableTags = availableTags,
             selectedIds = selectedIds,
             isSelectionMode = isSelectionMode,
             onSearchQueryChange = viewModel::updateSearchQuery,
             onClearSearch = viewModel::clearSearch,
-            onFilterChange = viewModel::setFilter,
-            onTagFilterChange = viewModel::setTagFilter,
-            onToggleTaskComplete = viewModel::toggleTaskCompletion,
-            onEditTask = viewModel::showEditTaskDialog,
-            onArchiveTask = viewModel::archiveTask,
-            onPinTask = viewModel::toggleTaskPin,
+            onRestoreTask = viewModel::restoreArchivedTask,
+            onPermanentDeleteTask = viewModel::requestPermanentDeleteTask,
             onLongPressTask = viewModel::enterSelection,
             onToggleSelection = viewModel::toggleSelection,
             modifier = Modifier.padding(paddingValues)
         )
     }
 
-    // Show dialog when requested
-    if (showAddTaskDialog) {
-        AddEditTaskDialog(
-            viewModel = viewModel,
-            onDismiss = { viewModel.hideAddTaskDialog() }
-        )
-    }
-
-    // Show archive confirmation dialog
+    // Show permanent delete confirmation dialog
     pendingDeleteTask?.let { task ->
         AlertDialog(
             onDismissRequest = { viewModel.cancelDeleteTask() },
-            title = { Text("Archive Task") },
+            title = { Text("Permanently Delete Task") },
             text = {
-                Text("Are you sure you want to archive \"${task.title}\"? This action can be undone for a few seconds after archiving.")
+                Text("Are you sure you want to permanently delete \"${task.title}\"? This action cannot be undone.")
             },
             confirmButton = {
                 TextButton(
-                    onClick = { viewModel.confirmArchiveTask() }
+                    onClick = { viewModel.confirmPermanentDeleteTask() }
                 ) {
-                    Text("Archive")
+                    Text("Delete Permanently")
                 }
             },
             dismissButton = {
@@ -175,51 +139,25 @@ fun TaskListScreen(
         )
     }
 
-    // Show bulk delete confirmation dialog
+    // Show bulk permanent delete confirmation dialog
     if (pendingBulkDeleteTasks.isNotEmpty()) {
         val taskCount = pendingBulkDeleteTasks.size
         AlertDialog(
             onDismissRequest = { viewModel.cancelBulkDelete() },
-            title = { Text("Delete Tasks") },
+            title = { Text("Permanently Delete Tasks") },
             text = {
-                Text("Delete $taskCount selected tasks? This action can be undone for a short time.")
+                Text("Permanently delete $taskCount selected tasks? This action cannot be undone.")
             },
             confirmButton = {
                 TextButton(
-                    onClick = { viewModel.confirmBulkDelete() }
+                    onClick = { viewModel.confirmBulkPermanentDelete() }
                 ) {
-                    Text("Delete")
+                    Text("Delete Permanently")
                 }
             },
             dismissButton = {
                 TextButton(
                     onClick = { viewModel.cancelBulkDelete() }
-                ) {
-                    Text("Cancel")
-                }
-            }
-        )
-    }
-
-    // Show bulk archive confirmation dialog
-    if (pendingBulkArchiveTasks.isNotEmpty()) {
-        val taskCount = pendingBulkArchiveTasks.size
-        AlertDialog(
-            onDismissRequest = { viewModel.cancelBulkArchive() },
-            title = { Text("Archive Tasks") },
-            text = {
-                Text("Archive $taskCount selected tasks? This action can be undone for a short time.")
-            },
-            confirmButton = {
-                TextButton(
-                    onClick = { viewModel.confirmBulkArchive() }
-                ) {
-                    Text("Archive")
-                }
-            },
-            dismissButton = {
-                TextButton(
-                    onClick = { viewModel.cancelBulkArchive() }
                 ) {
                     Text("Cancel")
                 }

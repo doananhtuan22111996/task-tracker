@@ -65,6 +65,14 @@ class TaskViewModel @Inject constructor(
     val allTasks = listState.allTasks
     val visibleTasks = listState.visibleTasks
 
+    // Archived tasks - get from domain layer
+    val archivedTasks: StateFlow<List<Task>> = crudManager.getArchivedTasks()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = emptyList()
+        )
+
     // Grouped tasks for day-based sections
     val groupedVisibleTasks: StateFlow<List<TaskSection>> = visibleTasks
         .map { tasks -> TaskDateGrouper.groupTasksByDay(tasks) }
@@ -125,6 +133,7 @@ class TaskViewModel @Inject constructor(
 
     // Bulk action state
     val pendingBulkDeleteTasks = bulkActionManager.pendingBulkDeleteTasks
+    val pendingBulkArchiveTasks = bulkActionManager.pendingBulkArchiveTasks
 
     // Combined error state
     val errorMessage = crudManager.initializeErrorState(viewModelScope)
@@ -197,6 +206,76 @@ class TaskViewModel @Inject constructor(
     fun cancelDeleteTask() {
         _pendingDeleteTask.value = null
     }
+
+    // === Archive Operations ===
+
+    fun archiveTask(task: Task) {
+        _pendingDeleteTask.value = task
+    }
+
+    fun confirmArchiveTask() {
+        val task = _pendingDeleteTask.value ?: return
+        _pendingDeleteTask.value = null
+
+        crudManager.executeOperation(
+            scope = viewModelScope,
+            operation = { crudManager.archiveTask(task) },
+            onSuccess = {
+                // Show undo snackbar after successful archive
+                viewModelScope.launch {
+                    _singleTaskUiEvent.emit(
+                        UiEvent.ShowUndoDelete(
+                            tasks = listOf(task),
+                            onUndo = { unarchiveTask(task) },
+                            message = "Task archived"
+                        )
+                    )
+                }
+            }
+        )
+    }
+
+    private fun unarchiveTask(task: Task) {
+        crudManager.executeOperation(
+            scope = viewModelScope,
+            operation = { crudManager.unarchiveTask(task) }
+        )
+    }
+
+    // === Archive Management Operations ===
+
+    fun restoreArchivedTask(task: Task) {
+        crudManager.executeOperation(
+            scope = viewModelScope,
+            operation = { crudManager.unarchiveTask(task) }
+        )
+    }
+
+    fun requestPermanentDeleteTask(task: Task) {
+        _pendingDeleteTask.value = task
+    }
+
+    fun confirmPermanentDeleteTask() {
+        val task = _pendingDeleteTask.value ?: return
+        _pendingDeleteTask.value = null
+
+        crudManager.executeOperation(
+            scope = viewModelScope,
+            operation = { crudManager.hardDeleteTask(task) }
+        )
+    }
+
+    fun bulkRestoreArchived() = bulkActionManager.bulkRestoreArchived(viewModelScope)
+
+    fun requestBulkPermanentDelete() = bulkActionManager.requestBulkPermanentDelete(archivedTasks.value)
+
+    fun confirmBulkPermanentDelete() = bulkActionManager.confirmBulkPermanentDelete(viewModelScope)
+
+    fun requestBulkArchive() = bulkActionManager.requestBulkArchive(allTasks.value)
+
+    fun confirmBulkArchive() = bulkActionManager.confirmBulkArchive(viewModelScope)
+
+    fun cancelBulkArchive() = bulkActionManager.cancelBulkArchive()
 
     private fun restoreTask(task: Task) {
         crudManager.executeOperation(

@@ -84,6 +84,23 @@ object DatabaseModule {
     }
 
     /**
+     * Migration from version 4 to 5: Add archive columns (idempotent)
+     */
+    private val MIGRATION_4_5 = object : Migration(4, 5) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            // Add isArchived column only if it doesn't exist (Boolean with default false)
+            if (!hasColumn(database, "tasks", "isArchived")) {
+                database.execSQL("ALTER TABLE tasks ADD COLUMN isArchived INTEGER NOT NULL DEFAULT 0")
+            }
+
+            // Add archivedAt column only if it doesn't exist (nullable Long for timestamp)
+            if (!hasColumn(database, "tasks", "archivedAt")) {
+                database.execSQL("ALTER TABLE tasks ADD COLUMN archivedAt INTEGER")
+            }
+        }
+    }
+
+    /**
      * Provides a singleton instance of TaskDatabase.
      * Uses Room.databaseBuilder for database creation with proper configuration.
      */
@@ -97,7 +114,7 @@ object DatabaseModule {
             klass = TaskDatabase::class.java,
             name = "task_database"
         )
-            .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4)
+            .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5)
             .build()
     }
 

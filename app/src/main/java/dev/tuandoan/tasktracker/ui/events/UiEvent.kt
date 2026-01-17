@@ -17,10 +17,11 @@ sealed class UiEvent {
     ) : UiEvent()
 
     /**
-     * Event to show delete confirmation with undo functionality (supports single or bulk delete)
+     * Event to show undo action with custom message (supports single or bulk operations)
      */
     data class ShowUndoDelete(
         val tasks: List<Task>,
-        val onUndo: () -> Unit
+        val onUndo: () -> Unit,
+        val message: String? = null // Custom message, if null will generate default
     ) : UiEvent()
 }

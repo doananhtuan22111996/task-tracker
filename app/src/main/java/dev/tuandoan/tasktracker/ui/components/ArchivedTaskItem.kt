@@ -18,18 +18,15 @@ import androidx.compose.ui.unit.dp
 import dev.tuandoan.tasktracker.data.database.Task
 import dev.tuandoan.tasktracker.utils.formatDate
 import dev.tuandoan.tasktracker.utils.formatDueDate
-import dev.tuandoan.tasktracker.utils.isOverdue
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun TaskItem(
+fun ArchivedTaskItem(
     task: Task,
     isSelected: Boolean = false,
     isSelectionMode: Boolean = false,
-    onToggleComplete: () -> Unit,
-    onEditClick: () -> Unit,
-    onArchiveClick: () -> Unit,
-    onPinClick: () -> Unit,
+    onRestoreClick: () -> Unit,
+    onPermanentDeleteClick: () -> Unit,
     onLongPress: () -> Unit = {},
     onToggleSelection: () -> Unit = {},
     modifier: Modifier = Modifier
@@ -41,9 +38,8 @@ fun TaskItem(
                 onClick = {
                     if (isSelectionMode) {
                         onToggleSelection()
-                    } else {
-                        onEditClick()
                     }
+                    // In archived screen, we don't have edit functionality, so no click action in normal mode
                 },
                 onLongClick = {
                     if (!isSelectionMode) {
@@ -55,8 +51,7 @@ fun TaskItem(
         colors = CardDefaults.cardColors(
             containerColor = when {
                 isSelected -> MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f)
-                task.isCompleted -> MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.7f)
-                else -> MaterialTheme.colorScheme.surface
+                else -> MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.7f) // Always show archived appearance
             }
         )
     ) {
@@ -77,27 +72,19 @@ fun TaskItem(
                     )
                 )
             } else {
-                // Completion checkbox in normal mode
-                Checkbox(
-                    checked = task.isCompleted,
-                    onCheckedChange = { onToggleComplete() },
-                    colors = CheckboxDefaults.colors(
-                        checkedColor = MaterialTheme.colorScheme.primary,
-                        uncheckedColor = MaterialTheme.colorScheme.outline
-                    )
-                )
+                // Archive indicator in normal mode - just spacing
+                Spacer(modifier = Modifier.width(40.dp))
             }
 
             Column(
                 modifier = Modifier
                     .weight(1f)
-                    .alpha(if (task.isCompleted) 0.7f else 1f)
+                    .alpha(0.8f) // Slightly faded to indicate archived status
             ) {
                 Text(
                     text = task.title,
                     style = MaterialTheme.typography.bodyLarge,
                     fontWeight = FontWeight.Medium,
-                    textDecoration = if (task.isCompleted) TextDecoration.LineThrough else null,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis
                 )
@@ -108,7 +95,6 @@ fun TaskItem(
                         text = task.description,
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
-                        textDecoration = if (task.isCompleted) TextDecoration.LineThrough else null,
                         maxLines = 2,
                         overflow = TextOverflow.Ellipsis
                     )
@@ -118,7 +104,7 @@ fun TaskItem(
                 if (!task.tag.isNullOrEmpty()) {
                     Spacer(modifier = Modifier.height(4.dp))
                     AssistChip(
-                        onClick = { /* Could add tag filtering functionality here later */ },
+                        onClick = { },
                         label = {
                             Text(
                                 text = task.tag,
@@ -130,76 +116,53 @@ fun TaskItem(
                             labelColor = MaterialTheme.colorScheme.onSecondaryContainer
                         ),
                         border = null,
-                        modifier = Modifier.alpha(if (task.isCompleted) 0.7f else 1f)
+                        modifier = Modifier.alpha(0.8f)
                     )
                 }
 
-                // Due Date Display
+                // Due Date Display (if it existed)
                 if (task.dueAt != null) {
                     Spacer(modifier = Modifier.height(4.dp))
-                    val overdue = !task.isCompleted && isOverdue(task.dueAt)
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = "Due: ${formatDueDate(task.dueAt)}",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = if (overdue) {
-                                MaterialTheme.colorScheme.error
-                            } else {
-                                MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-                            },
-                            fontWeight = if (overdue) FontWeight.Medium else FontWeight.Normal
-                        )
-
-                        if (overdue) {
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text(
-                                text = "Overdue",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f),
-                                fontWeight = FontWeight.Medium
-                            )
-                        }
-                    }
+                    Text(
+                        text = "Due: ${formatDueDate(task.dueAt)}",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                    )
                 }
 
+                // Archive info
                 Spacer(modifier = Modifier.height(4.dp))
+                val archiveDate = task.archivedAt ?: task.createdAt
+                Text(
+                    text = "Archived: ${formatDate(archiveDate)}",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
+                )
+
+                // Original creation date
                 Text(
                     text = "Created: ${formatDate(task.createdAt)}",
                     style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f)
                 )
             }
 
             // Action buttons only in normal mode
             if (!isSelectionMode) {
                 Row {
-                    IconButton(onClick = onPinClick) {
+                    IconButton(onClick = onRestoreClick) {
                         Icon(
-                            imageVector = if (task.isPinned) Icons.Default.Star else Icons.Default.StarBorder,
-                            contentDescription = if (task.isPinned) "Unpin task" else "Pin task",
-                            tint = if (task.isPinned) {
-                                MaterialTheme.colorScheme.primary
-                            } else {
-                                MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-                            }
+                            imageVector = Icons.Default.Unarchive,
+                            contentDescription = "Restore task",
+                            tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.7f)
                         )
                     }
 
-                    IconButton(onClick = onEditClick) {
+                    IconButton(onClick = onPermanentDeleteClick) {
                         Icon(
-                            imageVector = Icons.Default.Edit,
-                            contentDescription = "Edit task",
-                            tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-                        )
-                    }
-
-                    IconButton(onClick = onArchiveClick) {
-                        Icon(
-                            imageVector = Icons.Default.Archive,
-                            contentDescription = "Archive task",
-                            tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                            imageVector = Icons.Default.DeleteForever,
+                            contentDescription = "Permanently delete task",
+                            tint = MaterialTheme.colorScheme.error.copy(alpha = 0.7f)
                         )
                     }
                 }

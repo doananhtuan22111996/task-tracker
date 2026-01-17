@@ -52,4 +52,29 @@ class TaskRepository @Inject constructor(
     override suspend fun setPinned(taskId: Long, pinned: Boolean) = taskDao.setPinned(taskId, pinned)
 
     override suspend fun setPriority(taskId: Long, priority: Int) = taskDao.setPriority(taskId, priority)
+
+    // Archive operations
+    override fun getArchivedTasks(): Flow<List<Task>> = taskDao.getArchivedTasks()
+
+    override suspend fun archiveTask(taskId: Long) {
+        val currentTime = System.currentTimeMillis()
+        taskDao.setArchived(taskId, archived = true, archivedAt = currentTime)
+    }
+
+    override suspend fun unarchiveTask(taskId: Long) {
+        taskDao.setArchived(taskId, archived = false, archivedAt = null)
+    }
+
+    override suspend fun archiveTasks(ids: List<Long>) {
+        val currentTime = System.currentTimeMillis()
+        taskDao.setArchivedBulk(ids, archived = true, archivedAt = currentTime)
+    }
+
+    override suspend fun unarchiveTasks(ids: List<Long>) {
+        taskDao.setArchivedBulk(ids, archived = false, archivedAt = null)
+    }
+
+    override suspend fun hardDeleteTask(taskId: Long) = taskDao.hardDeleteById(taskId)
+
+    override suspend fun hardDeleteTasks(ids: List<Long>) = taskDao.hardDeleteByIds(ids)
 }

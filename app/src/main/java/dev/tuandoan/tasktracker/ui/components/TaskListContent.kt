@@ -33,7 +33,7 @@ fun TaskListContent(
     onTagFilterChange: (String?) -> Unit,
     onToggleTaskComplete: (Task) -> Unit,
     onEditTask: (Task) -> Unit,
-    onDeleteTask: (Task) -> Unit,
+    onArchiveTask: (Task) -> Unit,
     onPinTask: (Task) -> Unit,
     onLongPressTask: (Long) -> Unit,
     onToggleSelection: (Long) -> Unit,
@@ -77,7 +77,7 @@ fun TaskListContent(
             isSelectionMode = isSelectionMode,
             onToggleTaskComplete = onToggleTaskComplete,
             onEditTask = onEditTask,
-            onDeleteTask = onDeleteTask,
+            onArchiveTask = onArchiveTask,
             onPinTask = onPinTask,
             onLongPressTask = onLongPressTask,
             onToggleSelection = onToggleSelection,
@@ -101,7 +101,7 @@ private fun TaskListOrEmptyState(
     isSelectionMode: Boolean,
     onToggleTaskComplete: (Task) -> Unit,
     onEditTask: (Task) -> Unit,
-    onDeleteTask: (Task) -> Unit,
+    onArchiveTask: (Task) -> Unit,
     onPinTask: (Task) -> Unit,
     onLongPressTask: (Long) -> Unit,
     onToggleSelection: (Long) -> Unit,
@@ -127,7 +127,7 @@ private fun TaskListOrEmptyState(
                 isSelectionMode = isSelectionMode,
                 onToggleTaskComplete = onToggleTaskComplete,
                 onEditTask = onEditTask,
-                onDeleteTask = onDeleteTask,
+                onArchiveTask = onArchiveTask,
                 onPinTask = onPinTask,
                 onLongPressTask = onLongPressTask,
                 onToggleSelection = onToggleSelection
@@ -147,7 +147,7 @@ private fun GroupedTaskList(
     isSelectionMode: Boolean,
     onToggleTaskComplete: (Task) -> Unit,
     onEditTask: (Task) -> Unit,
-    onDeleteTask: (Task) -> Unit,
+    onArchiveTask: (Task) -> Unit,
     onPinTask: (Task) -> Unit,
     onLongPressTask: (Long) -> Unit,
     onToggleSelection: (Long) -> Unit
@@ -175,7 +175,7 @@ private fun GroupedTaskList(
                     isSelectionMode = isSelectionMode,
                     onToggleComplete = { onToggleTaskComplete(task) },
                     onEditClick = { onEditTask(task) },
-                    onDeleteClick = { onDeleteTask(task) },
+                    onArchiveClick = { onArchiveTask(task) },
                     onPinClick = { onPinTask(task) },
                     onLongPress = { onLongPressTask(task.id) },
                     onToggleSelection = { onToggleSelection(task.id) }
@@ -189,7 +189,7 @@ private fun GroupedTaskList(
  * Header for a task section (Today, Yesterday, etc.)
  */
 @Composable
-private fun TaskSectionHeader(
+fun TaskSectionHeader(
     header: String
 ) {
     Surface(

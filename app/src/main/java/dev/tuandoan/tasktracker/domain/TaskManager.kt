@@ -223,6 +223,65 @@ class TaskManager @Inject constructor(
         repository.setPriority(taskId, priority)
     }
 
+    // Archive operations
+    override fun getArchivedTasks(): Flow<List<Task>> = repository.getArchivedTasks()
+
+    override suspend fun archiveTask(taskId: Long) {
+        // Cancel any pending reminder before archiving
+        reminderScheduler.cancel(taskId)
+        repository.archiveTask(taskId)
+    }
+
+    override suspend fun unarchiveTask(taskId: Long) {
+        repository.unarchiveTask(taskId)
+
+        // Reschedule reminder if task is not completed and has reminder settings
+        val task = repository.getTaskById(taskId)
+        if (task != null && !task.isCompleted) {
+            scheduleReminderIfNeeded(taskId, task.title, task.dueAt, task.reminderOffsetMinutes)
+        }
+    }
+
+    override suspend fun archiveTasks(ids: List<Long>) {
+        if (ids.isNotEmpty()) {
+            // Cancel reminders for all archived tasks
+            ids.forEach { taskId ->
+                reminderScheduler.cancel(taskId)
+            }
+            repository.archiveTasks(ids)
+        }
+    }
+
+    override suspend fun unarchiveTasks(ids: List<Long>) {
+        if (ids.isNotEmpty()) {
+            repository.unarchiveTasks(ids)
+
+            // Reschedule reminders for all restored incomplete tasks
+            ids.forEach { taskId ->
+                val task = repository.getTaskById(taskId)
+                if (task != null && !task.isCompleted) {
+                    scheduleReminderIfNeeded(taskId, task.title, task.dueAt, task.reminderOffsetMinutes)
+                }
+            }
+        }
+    }
+
+    override suspend fun hardDeleteTask(taskId: Long) {
+        // Cancel any pending reminder before permanently deleting
+        reminderScheduler.cancel(taskId)
+        repository.hardDeleteTask(taskId)
+    }
+
+    override suspend fun hardDeleteTasks(ids: List<Long>) {
+        if (ids.isNotEmpty()) {
+            // Cancel reminders for all permanently deleted tasks
+            ids.forEach { taskId ->
+                reminderScheduler.cancel(taskId)
+            }
+            repository.hardDeleteTasks(ids)
+        }
+    }
+
     // Helper method for scheduling reminders
     private suspend fun scheduleReminderIfNeeded(taskId: Long, title: String, dueAt: Long?, reminderOffsetMinutes: Int?): Boolean {
         return if (dueAt != null && reminderOffsetMinutes != null && reminderOffsetMinutes > 0) {
