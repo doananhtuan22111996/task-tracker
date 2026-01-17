@@ -8,20 +8,20 @@ import androidx.compose.runtime.*
 import dev.tuandoan.tasktracker.domain.model.TaskSort
 
 /**
- * Top app bar for the task list screen with sort functionality and selection mode
+ * Top app bar for the archived tasks screen with sort functionality and selection mode
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TaskListTopBar(
+fun ArchivedTaskListTopBar(
     currentSort: TaskSort,
     onSortChanged: (TaskSort) -> Unit,
     isSelectionMode: Boolean = false,
     selectedCount: Int = 0,
-    onBulkMarkCompleted: () -> Unit = {},
-    onBulkMarkActive: () -> Unit = {},
-    onBulkArchive: () -> Unit = {},
+    onBulkRestore: () -> Unit = {},
+    onBulkPermanentDelete: () -> Unit = {},
     onClearSelection: () -> Unit = {},
-    onSelectAll: () -> Unit = {}
+    onSelectAll: () -> Unit = {},
+    onNavigateBack: () -> Unit
 ) {
     var showSortMenu by remember { mutableStateOf(false) }
     var showMoreMenu by remember { mutableStateOf(false) }
@@ -32,43 +32,42 @@ fun TaskListTopBar(
                 text = if (isSelectionMode) {
                     "$selectedCount selected"
                 } else {
-                    "Tasks"
+                    "Archived Tasks"
                 }
             )
         },
-        navigationIcon = if (isSelectionMode) {
-            {
+        navigationIcon = {
+            if (isSelectionMode) {
                 IconButton(onClick = onClearSelection) {
                     Icon(
                         imageVector = Icons.Default.Close,
                         contentDescription = "Clear selection"
                     )
                 }
+            } else {
+                IconButton(onClick = onNavigateBack) {
+                    Icon(
+                        imageVector = Icons.Default.ArrowBack,
+                        contentDescription = "Navigate back"
+                    )
+                }
             }
-        } else {
-            { } // Empty composable when not in selection mode
         },
         actions = {
             if (isSelectionMode) {
-                // Selection mode actions
-                IconButton(onClick = onBulkMarkActive) {
+                // Selection mode actions for archived tasks
+                IconButton(onClick = onBulkRestore) {
                     Icon(
-                        imageVector = Icons.Default.CheckBoxOutlineBlank,
-                        contentDescription = "Mark as active"
+                        imageVector = Icons.Default.Unarchive,
+                        contentDescription = "Restore selected"
                     )
                 }
 
-                IconButton(onClick = onBulkMarkCompleted) {
+                IconButton(onClick = onBulkPermanentDelete) {
                     Icon(
-                        imageVector = Icons.Default.CheckBox,
-                        contentDescription = "Mark as completed"
-                    )
-                }
-
-                IconButton(onClick = onBulkArchive) {
-                    Icon(
-                        imageVector = Icons.Default.Archive,
-                        contentDescription = "Archive selected"
+                        imageVector = Icons.Default.DeleteForever,
+                        contentDescription = "Permanently delete selected",
+                        tint = MaterialTheme.colorScheme.error
                     )
                 }
 

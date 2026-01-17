@@ -71,6 +71,11 @@ class TaskBulkActionManager @Inject constructor(
     private val _pendingBulkDeleteTasks = MutableStateFlow<List<Task>>(emptyList())
     val pendingBulkDeleteTasks: StateFlow<List<Task>> = _pendingBulkDeleteTasks.asStateFlow()
 
+    // === Bulk Archive Confirmation State ===
+
+    private val _pendingBulkArchiveTasks = MutableStateFlow<List<Task>>(emptyList())
+    val pendingBulkArchiveTasks: StateFlow<List<Task>> = _pendingBulkArchiveTasks.asStateFlow()
+
     // === UI Events ===
 
     private val _uiEvent = MutableSharedFlow<UiEvent>()
@@ -262,6 +267,119 @@ class TaskBulkActionManager @Inject constructor(
     }
 
     /**
+     * Initiates bulk archive by showing confirmation dialog
+     * @param allTasks List of all tasks to filter selected ones from
+     * @throws IllegalArgumentException if input validation fails
+     */
+    fun requestBulkArchive(allTasks: List<Task>) {
+        require(allTasks.isNotEmpty()) { "All tasks list cannot be empty" }
+
+        val validation = selectionStateManager.validateSelection()
+
+        when (validation) {
+            is SelectionValidationResult.Empty -> {
+                // No selection, nothing to archive
+                return
+            }
+            is SelectionValidationResult.SingleItem -> {
+                // Single item selection - find the task
+                val task = allTasks.find { it.id == validation.taskId }
+                if (task != null) {
+                    _pendingBulkArchiveTasks.value = listOf(task)
+                } else {
+                    throw IllegalStateException(
+                        "Selected task with ID ${validation.taskId} not found in task list"
+                    )
+                }
+            }
+            is SelectionValidationResult.MultipleItems -> {
+                // Multiple items selection
+                val selectedTasks = allTasks.filter { it.id in validation.taskIds }
+
+                if (selectedTasks.size != validation.taskIds.size) {
+                    val missingIds = validation.taskIds.filter { selectedId ->
+                        allTasks.none { it.id == selectedId }
+                    }
+                    throw IllegalStateException(
+                        "Some selected tasks not found in task list. Missing IDs: $missingIds"
+                    )
+                }
+
+                _pendingBulkArchiveTasks.value = selectedTasks
+            }
+        }
+    }
+
+    /**
+     * Confirms bulk archive and performs the operation
+     * @param scope Coroutine scope for execution
+     * @throws IllegalArgumentException if preconditions are not met
+     */
+    fun confirmBulkArchive(scope: CoroutineScope) {
+        val tasksToArchive = _pendingBulkArchiveTasks.value
+        if (tasksToArchive.isEmpty()) {
+            throw IllegalStateException("No tasks pending archive")
+        }
+
+        if (tasksToArchive.any { it.id <= 0 }) {
+            throw IllegalStateException(
+                "Invalid task IDs found: ${tasksToArchive.filter { it.id <= 0 }.map { it.id }}"
+            )
+        }
+
+        val taskIds = tasksToArchive.map { it.id }
+        _pendingBulkArchiveTasks.value = emptyList()
+
+        scope.launch {
+            try {
+                val result = crudManager.bulkArchiveTasks(taskIds)
+
+                when (result) {
+                    is TaskOperationResult.Success -> {
+                        // Clear selection and show undo snackbar
+                        selectionStateManager.clearSelection()
+
+                        _uiEvent.emit(
+                            UiEvent.ShowUndoDelete(
+                                tasks = tasksToArchive,
+                                onUndo = { restoreArchivedTasks(scope, tasksToArchive) },
+                                message = "${tasksToArchive.size} tasks archived"
+                            )
+                        )
+                    }
+                    is TaskOperationResult.CrudError -> {
+                        _uiEvent.emit(
+                            UiEvent.ShowSnackbar(
+                                message = result.message
+                            )
+                        )
+                    }
+                    is TaskOperationResult.ValidationError -> {
+                        _uiEvent.emit(
+                            UiEvent.ShowSnackbar(
+                                message = result.message
+                            )
+                        )
+                    }
+                }
+            } catch (e: Exception) {
+                _uiEvent.emit(
+                    UiEvent.ShowSnackbar(
+                        message = "Failed to archive tasks: ${e.message}"
+                    )
+                )
+            }
+        }
+    }
+
+    /**
+     * Cancels bulk archive operation
+     */
+    fun cancelBulkArchive() {
+        _pendingBulkArchiveTasks.value = emptyList()
+    }
+
+    /**
      * Restores deleted tasks
      * @param scope Coroutine scope for execution
      * @param tasks Tasks to restore
@@ -298,6 +416,50 @@ class TaskBulkActionManager @Inject constructor(
                 _uiEvent.emit(
                     UiEvent.ShowSnackbar(
                         message = "Failed to restore tasks: ${e.message}"
+                    )
+                )
+            }
+        }
+    }
+
+    /**
+     * Restores archived tasks (unarchive)
+     * @param scope Coroutine scope for execution
+     * @param tasks Tasks to unarchive
+     */
+    private fun restoreArchivedTasks(scope: CoroutineScope, tasks: List<Task>) {
+        scope.launch {
+            try {
+                val taskIds = tasks.map { it.id }
+                val result = crudManager.bulkUnarchiveTasks(taskIds)
+
+                when (result) {
+                    is TaskOperationResult.Success -> {
+                        _uiEvent.emit(
+                            UiEvent.ShowSnackbar(
+                                message = "${tasks.size} tasks restored from archive"
+                            )
+                        )
+                    }
+                    is TaskOperationResult.CrudError -> {
+                        _uiEvent.emit(
+                            UiEvent.ShowSnackbar(
+                                message = "Failed to restore tasks from archive: ${result.message}"
+                            )
+                        )
+                    }
+                    is TaskOperationResult.ValidationError -> {
+                        _uiEvent.emit(
+                            UiEvent.ShowSnackbar(
+                                message = result.message
+                            )
+                        )
+                    }
+                }
+            } catch (e: Exception) {
+                _uiEvent.emit(
+                    UiEvent.ShowSnackbar(
+                        message = "Failed to restore tasks from archive: ${e.message}"
                     )
                 )
             }
@@ -396,4 +558,134 @@ class TaskBulkActionManager @Inject constructor(
      * Gets the count of tasks pending deletion
      */
     fun getPendingDeleteCount(): Int = _pendingBulkDeleteTasks.value.size
+
+    // === Archive-specific Bulk Operations ===
+
+    /**
+     * Bulk restore archived tasks (unarchive)
+     * @param scope Coroutine scope for execution
+     * @param onSuccess Callback executed on successful completion
+     * @param onError Callback executed on error
+     */
+    fun bulkRestoreArchived(
+        scope: CoroutineScope,
+        onSuccess: (String) -> Unit = {},
+        onError: (String) -> Unit = {}
+    ) {
+        executeBulkOperation(
+            scope = scope,
+            operation = { taskIds ->
+                crudManager.bulkUnarchiveTasks(taskIds)
+            },
+            successMessage = { count -> "$count tasks restored from archive" },
+            errorMessage = "Failed to restore archived tasks",
+            clearSelectionOnSuccess = true,
+            onSuccess = onSuccess,
+            onError = onError
+        )
+    }
+
+    /**
+     * Initiates bulk permanent delete by showing confirmation dialog
+     * @param archivedTasks List of archived tasks to filter selected ones from
+     * @throws IllegalArgumentException if input validation fails
+     */
+    fun requestBulkPermanentDelete(archivedTasks: List<Task>) {
+        require(archivedTasks.isNotEmpty()) { "Archived tasks list cannot be empty" }
+
+        val validation = selectionStateManager.validateSelection()
+
+        when (validation) {
+            is SelectionValidationResult.Empty -> {
+                // No selection, nothing to delete
+                return
+            }
+            is SelectionValidationResult.SingleItem -> {
+                // Single item selection - find the task
+                val task = archivedTasks.find { it.id == validation.taskId }
+                if (task != null) {
+                    _pendingBulkDeleteTasks.value = listOf(task)
+                } else {
+                    throw IllegalStateException(
+                        "Selected archived task with ID ${validation.taskId} not found in archived task list"
+                    )
+                }
+            }
+            is SelectionValidationResult.MultipleItems -> {
+                // Multiple items selection
+                val selectedTasks = archivedTasks.filter { it.id in validation.taskIds }
+
+                if (selectedTasks.size != validation.taskIds.size) {
+                    val missingIds = validation.taskIds.filter { selectedId ->
+                        archivedTasks.none { it.id == selectedId }
+                    }
+                    throw IllegalStateException(
+                        "Some selected archived tasks not found in task list. Missing IDs: $missingIds"
+                    )
+                }
+
+                _pendingBulkDeleteTasks.value = selectedTasks
+            }
+        }
+    }
+
+    /**
+     * Confirms bulk permanent delete and performs the operation
+     * @param scope Coroutine scope for execution
+     * @throws IllegalArgumentException if preconditions are not met
+     */
+    fun confirmBulkPermanentDelete(scope: CoroutineScope) {
+        val tasksToDelete = _pendingBulkDeleteTasks.value
+        if (tasksToDelete.isEmpty()) {
+            throw IllegalStateException("No tasks pending permanent deletion")
+        }
+
+        if (tasksToDelete.any { it.id <= 0 }) {
+            throw IllegalStateException(
+                "Invalid task IDs found: ${tasksToDelete.filter { it.id <= 0 }.map { it.id }}"
+            )
+        }
+
+        val taskIds = tasksToDelete.map { it.id }
+        _pendingBulkDeleteTasks.value = emptyList()
+
+        scope.launch {
+            try {
+                val result = crudManager.bulkHardDeleteTasks(taskIds)
+
+                when (result) {
+                    is TaskOperationResult.Success -> {
+                        // Clear selection and show confirmation (no undo for permanent delete)
+                        selectionStateManager.clearSelection()
+
+                        _uiEvent.emit(
+                            UiEvent.ShowSnackbar(
+                                message = "${tasksToDelete.size} tasks permanently deleted"
+                            )
+                        )
+                    }
+                    is TaskOperationResult.CrudError -> {
+                        _uiEvent.emit(
+                            UiEvent.ShowSnackbar(
+                                message = result.message
+                            )
+                        )
+                    }
+                    is TaskOperationResult.ValidationError -> {
+                        _uiEvent.emit(
+                            UiEvent.ShowSnackbar(
+                                message = result.message
+                            )
+                        )
+                    }
+                }
+            } catch (e: Exception) {
+                _uiEvent.emit(
+                    UiEvent.ShowSnackbar(
+                        message = "Failed to permanently delete tasks: ${e.message}"
+                    )
+                )
+            }
+        }
+    }
 }

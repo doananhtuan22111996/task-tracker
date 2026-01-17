@@ -5,9 +5,10 @@ A modern, offline-first task tracking Android app built with **Kotlin**, **Jetpa
 ## ✨ Features
 
 ### Core Functionality
-- ✅ **CRUD Operations** - Create, read, update, and delete tasks with confirmation
-- 🔄 **Delete with Undo** - Safe task deletion with confirmation dialog and 4-second undo window
-- 🎯 **Multi-Select & Bulk Actions** - Select multiple tasks for bulk delete, mark completed, or mark active
+- ✅ **CRUD Operations** - Create, read, update, and archive tasks with confirmation
+- 🗄️ **Archive System** - Safe task archiving (soft delete) with confirmation dialog and undo functionality
+- 🔄 **Archive Management** - Dedicated archived tasks screen with restore and permanent delete options
+- 🎯 **Multi-Select & Bulk Actions** - Select multiple tasks for bulk archive, mark completed, or mark active
 - 🔍 **Smart Search** - Real-time search across task titles and descriptions with debounce
 - 🏷️ **Status Filtering** - Filter tasks by status (All, Active, Completed)
 - 🏷️ **Tags/Labels** - Single optional tag per task stored locally for organization and filtering
@@ -135,7 +136,8 @@ app/src/main/java/dev/tuandoan/tasktracker/
 │   │   ├── SearchField.kt         # Search input component
 │   │   └── FilterTabs.kt          # Status filter tabs
 │   ├── screens/                   # Main screens
-│   │   └── TaskListScreen.kt      # Primary task list screen
+│   │   ├── TaskListScreen.kt      # Primary task list screen
+│   │   └── ArchivedScreen.kt      # Archived tasks management screen
 │   ├── state/                     # State management
 │   │   ├── TaskListStateManager.kt   # List state coordination
 │   │   └── TaskFormStateManager.kt   # Form state management
@@ -204,7 +206,7 @@ app/src/main/java/dev/tuandoan/tasktracker/
 1. **Add Task** - Tap the floating action button (➕) to create a new task
 2. **Edit Task** - Tap on any task to edit its title and description (in normal mode)
 3. **Complete Task** - Tap the checkbox to mark a task as complete/incomplete
-4. **Delete Task** - Use the delete button to trigger confirmation dialog, then tap "Undo" within 4 seconds if needed
+4. **Archive Task** - Use the archive button to safely archive tasks with confirmation dialog and undo functionality
 
 ### Bulk Operations
 1. **Enter Selection Mode** - Long-press on any task to enter selection mode
@@ -212,9 +214,15 @@ app/src/main/java/dev/tuandoan/tasktracker/
 3. **Bulk Actions** - Use top bar buttons to:
    - Mark selected tasks as completed (✓)
    - Mark selected tasks as active (□)
-   - Delete selected tasks (🗑️) with confirmation and undo
+   - Archive selected tasks (🗄️) with confirmation and undo
 4. **Select All** - Use overflow menu (⋮) to select all visible tasks
 5. **Exit Selection** - Tap the close button (✕) to clear selection
+
+### Archive Management
+1. **View Archived Tasks** - Navigate to the archived tasks screen to see all archived tasks
+2. **Restore Tasks** - Tap restore button on archived tasks to return them to the main task list
+3. **Permanent Delete** - Use permanent delete on archived tasks (cannot be undone)
+4. **Bulk Archive Operations** - Select multiple archived tasks for bulk restore or permanent deletion
 
 ### Advanced Features
 1. **Search Tasks** - Type in the search field to find tasks by title or description
@@ -278,6 +286,18 @@ TaskViewModelTest            // End-to-end coordination tests
 - **Key-based LazyColumn** - Optimized list rendering with proper item keys
 
 ## 📚 Recent Updates
+
+### v2.7 - Archive System (Soft Delete)
+- 🗄️ **Archive Tasks** - Replace permanent delete with safe archiving system using soft delete pattern
+- 📱 **Dedicated Archive Screen** - Complete archived tasks management with restore and permanent delete options
+- 🔄 **Archive Undo** - Archive operations support undo functionality with appropriate messaging
+- 🎯 **Bulk Archive Operations** - Bulk archive, restore, and permanent delete for efficient task management
+- ⏰ **Reminder Integration** - Automatic reminder cancellation when tasks are archived, rescheduling when restored
+- 💾 **Database Migration** - Seamless Room database upgrade from v4 to v5 with isArchived and archivedAt fields
+- 🏗️ **Clean Architecture** - Modular archive system integrated throughout application stack with proper separation of concerns
+- 📱 **Production-Ready MVP** - Simple, intuitive archive workflow without advanced animations or complex features
+- 🛡️ **Data Safety** - Two-tier deletion system: archive first (recoverable), then permanent delete (final)
+- 🎨 **UI Updates** - Archive icons replace delete icons, confirmation dialogs updated with appropriate messaging
 
 ### v2.6 - Pin Tasks & Priority Levels
 - 📌 **Pin/Unpin Tasks** - Keep important tasks at the top within each day section with star button toggle

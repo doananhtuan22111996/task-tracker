@@ -15,5 +15,7 @@ data class Task(
     val reminderOffsetMinutes: Int? = null, // Nullable reminder offset in minutes (0 = none)
     val tag: String? = null, // Single optional tag for organizing tasks
     val isPinned: Boolean = false, // Pin/unpin tasks to keep important items on top
-    val priority: Int = 1 // Priority level: 0=LOW, 1=MEDIUM, 2=HIGH (default MEDIUM)
+    val priority: Int = 1, // Priority level: 0=LOW, 1=MEDIUM, 2=HIGH (default MEDIUM)
+    val isArchived: Boolean = false, // Archive tasks instead of deleting (soft delete)
+    val archivedAt: Long? = null // Timestamp when task was archived (nullable)
 )

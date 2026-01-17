@@ -244,6 +244,103 @@ class TaskCrudUseCase @Inject constructor(
         }
     }
 
+    // Archive operations
+
+    /**
+     * Gets archived tasks
+     */
+    fun getArchivedTasks() = taskManager.getArchivedTasks()
+
+    /**
+     * Archives a task (soft delete)
+     */
+    suspend fun archiveTask(taskId: Long): Result<Unit> {
+        return try {
+            _errorMessage.value = null
+            taskManager.archiveTask(taskId)
+            _lastOperationSuccess.value = "Task archived successfully"
+            Result.success(Unit)
+        } catch (e: Exception) {
+            _errorMessage.value = e.message ?: "Failed to archive task"
+            Result.failure(e)
+        }
+    }
+
+    /**
+     * Unarchives a task (restore from archive)
+     */
+    suspend fun unarchiveTask(taskId: Long): Result<Unit> {
+        return try {
+            _errorMessage.value = null
+            taskManager.unarchiveTask(taskId)
+            _lastOperationSuccess.value = "Task restored successfully"
+            Result.success(Unit)
+        } catch (e: Exception) {
+            _errorMessage.value = e.message ?: "Failed to restore task"
+            Result.failure(e)
+        }
+    }
+
+    /**
+     * Bulk archive tasks by IDs
+     */
+    suspend fun bulkArchiveTasks(taskIds: List<Long>): Result<Unit> {
+        return try {
+            _errorMessage.value = null
+            taskManager.archiveTasks(taskIds)
+            _lastOperationSuccess.value = "${taskIds.size} tasks archived successfully"
+            Result.success(Unit)
+        } catch (e: Exception) {
+            _errorMessage.value = e.message ?: "Failed to archive tasks"
+            Result.failure(e)
+        }
+    }
+
+    /**
+     * Bulk unarchive tasks by IDs
+     */
+    suspend fun bulkUnarchiveTasks(taskIds: List<Long>): Result<Unit> {
+        return try {
+            _errorMessage.value = null
+            taskManager.unarchiveTasks(taskIds)
+            _lastOperationSuccess.value = "${taskIds.size} tasks restored successfully"
+            Result.success(Unit)
+        } catch (e: Exception) {
+            _errorMessage.value = e.message ?: "Failed to restore tasks"
+            Result.failure(e)
+        }
+    }
+
+    /**
+     * Permanently deletes a task (hard delete - archived tasks only)
+     */
+    suspend fun hardDeleteTask(taskId: Long): Result<Unit> {
+        return try {
+            _errorMessage.value = null
+            taskManager.hardDeleteTask(taskId)
+            _lastOperationSuccess.value = "Task permanently deleted"
+            Result.success(Unit)
+        } catch (e: Exception) {
+            _errorMessage.value = e.message ?: "Failed to permanently delete task"
+            Result.failure(e)
+        }
+    }
+
+    /**
+     * Bulk permanently delete tasks by IDs (hard delete - archived tasks only)
+     */
+    suspend fun bulkHardDeleteTasks(taskIds: List<Long>): Result<Unit> {
+        return try {
+            _errorMessage.value = null
+            taskManager.hardDeleteTasks(taskIds)
+            _lastOperationSuccess.value = "${taskIds.size} tasks permanently deleted"
+            Result.success(Unit)
+        } catch (e: Exception) {
+            _errorMessage.value = e.message ?: "Failed to permanently delete tasks"
+            Result.failure(e)
+        }
+    }
+
     /**
      * Clear success message
      */

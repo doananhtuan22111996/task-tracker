@@ -301,6 +301,109 @@ class TaskCrudManager @Inject constructor(
         }
     }
 
+    // === Archive Operations ===
+
+    /**
+     * Archives a task (soft delete)
+     */
+    suspend fun archiveTask(task: Task): TaskOperationResult {
+        val result = crudUseCase.archiveTask(task.id)
+
+        return if (result.isSuccess) {
+            TaskOperationResult.Success("Task archived successfully")
+        } else {
+            val errorMessage = result.exceptionOrNull()?.message ?: "Failed to archive task"
+            TaskOperationResult.CrudError(errorMessage)
+        }
+    }
+
+    /**
+     * Unarchives a task (restore from archive)
+     */
+    suspend fun unarchiveTask(task: Task): TaskOperationResult {
+        val result = crudUseCase.unarchiveTask(task.id)
+
+        return if (result.isSuccess) {
+            TaskOperationResult.Success("Task restored successfully")
+        } else {
+            val errorMessage = result.exceptionOrNull()?.message ?: "Failed to restore task"
+            TaskOperationResult.CrudError(errorMessage)
+        }
+    }
+
+    /**
+     * Bulk archive tasks by IDs
+     * @param taskIds List of task IDs to archive
+     * @throws IllegalArgumentException if input validation fails
+     */
+    suspend fun bulkArchiveTasks(taskIds: List<Long>): TaskOperationResult {
+        return try {
+            validateBulkOperationInput(taskIds, "archive")
+            crudUseCase.bulkArchiveTasks(taskIds)
+            TaskOperationResult.Success("${taskIds.size} tasks archived successfully")
+        } catch (e: IllegalArgumentException) {
+            TaskOperationResult.ValidationError(e.message ?: "Invalid input for bulk archive")
+        } catch (e: Exception) {
+            val errorMessage = e.message ?: "Failed to archive tasks"
+            TaskOperationResult.CrudError(errorMessage)
+        }
+    }
+
+    /**
+     * Bulk unarchive tasks by IDs
+     * @param taskIds List of task IDs to unarchive
+     * @throws IllegalArgumentException if input validation fails
+     */
+    suspend fun bulkUnarchiveTasks(taskIds: List<Long>): TaskOperationResult {
+        return try {
+            validateBulkOperationInput(taskIds, "unarchive")
+            crudUseCase.bulkUnarchiveTasks(taskIds)
+            TaskOperationResult.Success("${taskIds.size} tasks restored successfully")
+        } catch (e: IllegalArgumentException) {
+            TaskOperationResult.ValidationError(e.message ?: "Invalid input for bulk unarchive")
+        } catch (e: Exception) {
+            val errorMessage = e.message ?: "Failed to restore tasks"
+            TaskOperationResult.CrudError(errorMessage)
+        }
+    }
+
+    /**
+     * Permanently deletes a task (hard delete - archived tasks only)
+     */
+    suspend fun hardDeleteTask(task: Task): TaskOperationResult {
+        val result = crudUseCase.hardDeleteTask(task.id)
+
+        return if (result.isSuccess) {
+            TaskOperationResult.Success("Task permanently deleted")
+        } else {
+            val errorMessage = result.exceptionOrNull()?.message ?: "Failed to permanently delete task"
+            TaskOperationResult.CrudError(errorMessage)
+        }
+    }
+
+    /**
+     * Bulk permanently delete tasks by IDs (hard delete - archived tasks only)
+     * @param taskIds List of task IDs to permanently delete
+     * @throws IllegalArgumentException if input validation fails
+     */
+    suspend fun bulkHardDeleteTasks(taskIds: List<Long>): TaskOperationResult {
+        return try {
+            validateBulkOperationInput(taskIds, "permanently delete")
+            crudUseCase.bulkHardDeleteTasks(taskIds)
+            TaskOperationResult.Success("${taskIds.size} tasks permanently deleted")
+        } catch (e: IllegalArgumentException) {
+            TaskOperationResult.ValidationError(e.message ?: "Invalid input for bulk permanent deletion")
+        } catch (e: Exception) {
+            val errorMessage = e.message ?: "Failed to permanently delete tasks"
+            TaskOperationResult.CrudError(errorMessage)
+        }
+    }
+
+    /**
+     * Gets archived tasks flow
+     */
+    fun getArchivedTasks() = crudUseCase.getArchivedTasks()
+
     /**
      * Clears all errors from both CRUD and form state
      */
