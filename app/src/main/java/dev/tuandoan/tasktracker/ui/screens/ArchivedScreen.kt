@@ -2,15 +2,13 @@ package dev.tuandoan.tasktracker.ui.screens
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import dev.tuandoan.tasktracker.ui.events.UiEvent
 import dev.tuandoan.tasktracker.ui.components.ArchivedTaskListContent
 import dev.tuandoan.tasktracker.ui.components.ArchivedTaskListTopBar
+import dev.tuandoan.tasktracker.ui.events.UiEvent
 import dev.tuandoan.tasktracker.ui.viewmodel.TaskViewModel
 
 /**
@@ -18,11 +16,7 @@ import dev.tuandoan.tasktracker.ui.viewmodel.TaskViewModel
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ArchivedScreen(
-    viewModel: TaskViewModel,
-    onNavigateBack: () -> Unit,
-    modifier: Modifier = Modifier
-) {
+fun ArchivedScreen(viewModel: TaskViewModel, onNavigateBack: () -> Unit, modifier: Modifier = Modifier) {
     // Collect archived tasks state
     val archivedTasks by viewModel.archivedTasks.collectAsStateWithLifecycle()
     val searchQuery by viewModel.searchQuery.collectAsStateWithLifecycle()
@@ -53,7 +47,7 @@ fun ArchivedScreen(
                     val result = snackbarHostState.showSnackbar(
                         message = message,
                         actionLabel = "UNDO",
-                        duration = SnackbarDuration.Short
+                        duration = SnackbarDuration.Short,
                     )
                     if (result == SnackbarResult.ActionPerformed) {
                         event.onUndo()
@@ -64,7 +58,7 @@ fun ArchivedScreen(
                         val result = snackbarHostState.showSnackbar(
                             message = event.message,
                             actionLabel = event.actionLabel,
-                            duration = SnackbarDuration.Short
+                            duration = SnackbarDuration.Short,
                         )
                         if (result == SnackbarResult.ActionPerformed) {
                             event.onActionClick()
@@ -72,7 +66,7 @@ fun ArchivedScreen(
                     } else {
                         snackbarHostState.showSnackbar(
                             message = event.message,
-                            duration = SnackbarDuration.Short
+                            duration = SnackbarDuration.Short,
                         )
                     }
                 }
@@ -92,12 +86,12 @@ fun ArchivedScreen(
                 onBulkPermanentDelete = viewModel::requestBulkPermanentDelete,
                 onClearSelection = viewModel::clearSelection,
                 onSelectAll = { viewModel.selectAll(archivedTasks.map { it.id }) },
-                onNavigateBack = onNavigateBack
+                onNavigateBack = onNavigateBack,
             )
         },
         snackbarHost = {
             SnackbarHost(hostState = snackbarHostState)
-        }
+        },
     ) { paddingValues ->
         ArchivedTaskListContent(
             archivedTasks = archivedTasks,
@@ -110,7 +104,7 @@ fun ArchivedScreen(
             onPermanentDeleteTask = viewModel::requestPermanentDeleteTask,
             onLongPressTask = viewModel::enterSelection,
             onToggleSelection = viewModel::toggleSelection,
-            modifier = Modifier.padding(paddingValues)
+            modifier = Modifier.padding(paddingValues),
         )
     }
 
@@ -124,18 +118,18 @@ fun ArchivedScreen(
             },
             confirmButton = {
                 TextButton(
-                    onClick = { viewModel.confirmPermanentDeleteTask() }
+                    onClick = { viewModel.confirmPermanentDeleteTask() },
                 ) {
                     Text("Delete Permanently")
                 }
             },
             dismissButton = {
                 TextButton(
-                    onClick = { viewModel.cancelDeleteTask() }
+                    onClick = { viewModel.cancelDeleteTask() },
                 ) {
                     Text("Cancel")
                 }
-            }
+            },
         )
     }
 
@@ -150,18 +144,18 @@ fun ArchivedScreen(
             },
             confirmButton = {
                 TextButton(
-                    onClick = { viewModel.confirmBulkPermanentDelete() }
+                    onClick = { viewModel.confirmBulkPermanentDelete() },
                 ) {
                     Text("Delete Permanently")
                 }
             },
             dismissButton = {
                 TextButton(
-                    onClick = { viewModel.cancelBulkDelete() }
+                    onClick = { viewModel.cancelBulkDelete() },
                 ) {
                     Text("Cancel")
                 }
-            }
+            },
         )
     }
 }

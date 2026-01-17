@@ -4,14 +4,10 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Archive
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -51,38 +47,11 @@ fun TaskTrackerApp() {
     var showArchivedScreen by remember { mutableStateOf(false) }
     var showStatsScreen by remember { mutableStateOf(false) }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = when {
-                            showArchivedScreen -> "Archived Tasks"
-                            showStatsScreen -> "Stats"
-                            else -> "Task Tracker"
-                        },
-                        style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Bold
-                    )
-                },
-                actions = {
-                    if (!showArchivedScreen && !showStatsScreen) {
-                        // Show archive button only on main screen
-                        IconButton(onClick = { showArchivedScreen = true }) {
-                            Icon(
-                                imageVector = Icons.Default.Archive,
-                                contentDescription = "View archived tasks"
-                            )
-                        }
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
-                )
-            )
-        }
-    ) { paddingValues ->
+    // Remove parent Scaffold with TopAppBar to avoid duplication - each screen manages its own TopAppBar
+    Surface(
+        modifier = Modifier.fillMaxSize(),
+        color = MaterialTheme.colorScheme.background,
+    ) {
         when {
             showArchivedScreen -> {
                 ArchivedScreen(
@@ -91,7 +60,6 @@ fun TaskTrackerApp() {
                         showArchivedScreen = false
                         showStatsScreen = false
                     },
-                    modifier = Modifier.padding(paddingValues)
                 )
             }
             showStatsScreen -> {
@@ -101,7 +69,6 @@ fun TaskTrackerApp() {
                         showStatsScreen = false
                         showArchivedScreen = false
                     },
-                    modifier = Modifier.padding(paddingValues)
                 )
             }
             else -> {
@@ -111,7 +78,10 @@ fun TaskTrackerApp() {
                         showStatsScreen = true
                         showArchivedScreen = false
                     },
-                    modifier = Modifier.padding(paddingValues)
+                    onArchiveClick = {
+                        showArchivedScreen = true
+                        showStatsScreen = false
+                    },
                 )
             }
         }

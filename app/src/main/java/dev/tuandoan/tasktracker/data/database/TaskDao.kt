@@ -84,10 +84,14 @@ interface TaskDao {
     @Query("SELECT COUNT(*) FROM tasks WHERE isCompleted = 1 AND isArchived = 0")
     fun observeCompletedCount(): Flow<Int>
 
-    @Query("SELECT COUNT(*) FROM tasks WHERE isCompleted = 1 AND isArchived = 0 AND completedAt >= :startOfDayMillis AND completedAt < :endOfDayMillis")
+    @Query(
+        "SELECT COUNT(*) FROM tasks WHERE isCompleted = 1 AND isArchived = 0 AND completedAt >= :startOfDayMillis AND completedAt < :endOfDayMillis",
+    )
     fun observeCompletedTodayCount(startOfDayMillis: Long, endOfDayMillis: Long): Flow<Int>
 
-    @Query("SELECT COUNT(*) FROM tasks WHERE isCompleted = 0 AND isArchived = 0 AND dueAt >= :startOfDayMillis AND dueAt < :endOfDayMillis")
+    @Query(
+        "SELECT COUNT(*) FROM tasks WHERE isCompleted = 0 AND isArchived = 0 AND dueAt >= :startOfDayMillis AND dueAt < :endOfDayMillis",
+    )
     fun observeDueTodayCount(startOfDayMillis: Long, endOfDayMillis: Long): Flow<Int>
 
     @Query("SELECT COUNT(*) FROM tasks WHERE isCompleted = 0 AND isArchived = 0 AND dueAt < :nowMillis")

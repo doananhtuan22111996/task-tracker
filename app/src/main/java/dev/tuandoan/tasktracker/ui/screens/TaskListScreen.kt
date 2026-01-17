@@ -7,13 +7,12 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import dev.tuandoan.tasktracker.ui.events.UiEvent
 import dev.tuandoan.tasktracker.ui.components.TaskListContent
 import dev.tuandoan.tasktracker.ui.components.TaskListTopBar
-import dev.tuandoan.tasktracker.ui.screens.AddEditTaskDialog
+import dev.tuandoan.tasktracker.ui.events.UiEvent
 import dev.tuandoan.tasktracker.ui.viewmodel.TaskViewModel
-import dev.tuandoan.tasktracker.ui.viewmodel.TaskFilter
 
 /**
  * Main task list screen that coordinates all task-related UI components
@@ -21,9 +20,10 @@ import dev.tuandoan.tasktracker.ui.viewmodel.TaskFilter
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TaskListScreen(
+    modifier: Modifier = Modifier,
     viewModel: TaskViewModel,
     onStatsClick: () -> Unit = {},
-    modifier: Modifier = Modifier
+    onArchiveClick: () -> Unit = {},
 ) {
     // Collect all required state
     val allTasks by viewModel.allTasks.collectAsStateWithLifecycle()
@@ -62,7 +62,7 @@ fun TaskListScreen(
                     val result = snackbarHostState.showSnackbar(
                         message = message,
                         actionLabel = "UNDO",
-                        duration = SnackbarDuration.Short
+                        duration = SnackbarDuration.Short,
                     )
                     if (result == SnackbarResult.ActionPerformed) {
                         event.onUndo()
@@ -73,7 +73,7 @@ fun TaskListScreen(
                         val result = snackbarHostState.showSnackbar(
                             message = event.message,
                             actionLabel = event.actionLabel,
-                            duration = SnackbarDuration.Short
+                            duration = SnackbarDuration.Short,
                         )
                         if (result == SnackbarResult.ActionPerformed) {
                             event.onActionClick()
@@ -81,7 +81,7 @@ fun TaskListScreen(
                     } else {
                         snackbarHostState.showSnackbar(
                             message = event.message,
-                            duration = SnackbarDuration.Short
+                            duration = SnackbarDuration.Short,
                         )
                     }
                 }
@@ -102,23 +102,30 @@ fun TaskListScreen(
                 onBulkArchive = viewModel::requestBulkArchive,
                 onClearSelection = viewModel::clearSelection,
                 onSelectAll = { viewModel.selectAll(visibleTasks.map { it.id }) },
-                onStatsClick = onStatsClick
+                onStatsClick = onStatsClick,
+                onArchiveClick = onArchiveClick,
             )
         },
         floatingActionButton = {
             FloatingActionButton(
                 onClick = { viewModel.showAddTaskDialog() },
-                containerColor = MaterialTheme.colorScheme.primary
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary,
+                elevation = FloatingActionButtonDefaults.elevation(
+                    defaultElevation = 6.dp,
+                    pressedElevation = 8.dp,
+                ),
             ) {
                 Icon(
                     imageVector = Icons.Default.Add,
-                    contentDescription = "Add Task"
+                    contentDescription = "Add Task",
+                    tint = MaterialTheme.colorScheme.onPrimary,
                 )
             }
         },
         snackbarHost = {
             SnackbarHost(hostState = snackbarHostState)
-        }
+        },
     ) { paddingValues ->
         TaskListContent(
             allTasks = allTasks,
@@ -140,7 +147,7 @@ fun TaskListScreen(
             onPinTask = viewModel::toggleTaskPin,
             onLongPressTask = viewModel::enterSelection,
             onToggleSelection = viewModel::toggleSelection,
-            modifier = Modifier.padding(paddingValues)
+            modifier = Modifier.padding(paddingValues),
         )
     }
 
@@ -148,7 +155,7 @@ fun TaskListScreen(
     if (showAddTaskDialog) {
         AddEditTaskDialog(
             viewModel = viewModel,
-            onDismiss = { viewModel.hideAddTaskDialog() }
+            onDismiss = { viewModel.hideAddTaskDialog() },
         )
     }
 
@@ -158,22 +165,24 @@ fun TaskListScreen(
             onDismissRequest = { viewModel.cancelDeleteTask() },
             title = { Text("Archive Task") },
             text = {
-                Text("Are you sure you want to archive \"${task.title}\"? This action can be undone for a few seconds after archiving.")
+                Text(
+                    "Are you sure you want to archive \"${task.title}\"? This action can be undone for a few seconds after archiving.",
+                )
             },
             confirmButton = {
                 TextButton(
-                    onClick = { viewModel.confirmArchiveTask() }
+                    onClick = { viewModel.confirmArchiveTask() },
                 ) {
                     Text("Archive")
                 }
             },
             dismissButton = {
                 TextButton(
-                    onClick = { viewModel.cancelDeleteTask() }
+                    onClick = { viewModel.cancelDeleteTask() },
                 ) {
                     Text("Cancel")
                 }
-            }
+            },
         )
     }
 
@@ -188,18 +197,18 @@ fun TaskListScreen(
             },
             confirmButton = {
                 TextButton(
-                    onClick = { viewModel.confirmBulkDelete() }
+                    onClick = { viewModel.confirmBulkDelete() },
                 ) {
                     Text("Delete")
                 }
             },
             dismissButton = {
                 TextButton(
-                    onClick = { viewModel.cancelBulkDelete() }
+                    onClick = { viewModel.cancelBulkDelete() },
                 ) {
                     Text("Cancel")
                 }
-            }
+            },
         )
     }
 
@@ -214,18 +223,18 @@ fun TaskListScreen(
             },
             confirmButton = {
                 TextButton(
-                    onClick = { viewModel.confirmBulkArchive() }
+                    onClick = { viewModel.confirmBulkArchive() },
                 ) {
                     Text("Archive")
                 }
             },
             dismissButton = {
                 TextButton(
-                    onClick = { viewModel.cancelBulkArchive() }
+                    onClick = { viewModel.cancelBulkArchive() },
                 ) {
                     Text("Cancel")
                 }
-            }
+            },
         )
     }
 }

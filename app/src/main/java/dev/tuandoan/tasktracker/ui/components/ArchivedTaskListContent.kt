@@ -8,7 +8,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import dev.tuandoan.tasktracker.data.database.Task
@@ -30,23 +29,21 @@ fun ArchivedTaskListContent(
     onPermanentDeleteTask: (Task) -> Unit,
     onLongPressTask: (Long) -> Unit,
     onToggleSelection: (Long) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Column(
         modifier = modifier
             .fillMaxSize()
             .padding(horizontal = 16.dp)
+            .padding(top = 8.dp),
     ) {
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Search Field
+        // Search Field - optimized spacing
         SearchField(
             query = searchQuery,
             onQueryChange = onSearchQueryChange,
-            onClearClick = onClearSearch
+            onClearClick = onClearSearch,
+            modifier = Modifier.padding(bottom = 8.dp),
         )
-
-        Spacer(modifier = Modifier.height(16.dp))
 
         // Filter archived tasks by search query
         val filteredTasks = if (searchQuery.isBlank()) {
@@ -55,7 +52,7 @@ fun ArchivedTaskListContent(
             archivedTasks.filter { task ->
                 val lowercaseQuery = searchQuery.lowercase()
                 task.title.lowercase().contains(lowercaseQuery) ||
-                task.description.lowercase().contains(lowercaseQuery)
+                    task.description.lowercase().contains(lowercaseQuery)
             }
         }
 
@@ -65,7 +62,7 @@ fun ArchivedTaskListContent(
         } else if (filteredTasks.isEmpty() && searchQuery.isNotBlank()) {
             EmptySearchResults(
                 hasQuery = true,
-                onClearSearch = onClearSearch
+                onClearSearch = onClearSearch,
             )
         } else {
             val groupedTasks = TaskDateGrouper.groupTasksByDay(filteredTasks)
@@ -77,7 +74,7 @@ fun ArchivedTaskListContent(
                 onRestoreTask = onRestoreTask,
                 onPermanentDeleteTask = onPermanentDeleteTask,
                 onLongPressTask = onLongPressTask,
-                onToggleSelection = onToggleSelection
+                onToggleSelection = onToggleSelection,
             )
         }
     }
@@ -95,24 +92,27 @@ private fun ArchivedTaskList(
     onRestoreTask: (Task) -> Unit,
     onPermanentDeleteTask: (Task) -> Unit,
     onLongPressTask: (Long) -> Unit,
-    onToggleSelection: (Long) -> Unit
+    onToggleSelection: (Long) -> Unit,
 ) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.spacedBy(4.dp)
+        verticalArrangement = Arrangement.spacedBy(4.dp),
+        contentPadding = PaddingValues(
+            bottom = 16.dp, // Proper clearance for navigation bars
+        ),
     ) {
         taskSections.forEach { section ->
             // Sticky header for each archive date section
             stickyHeader(key = section.dateKey) {
                 TaskSectionHeader(
-                    header = section.header
+                    header = section.header,
                 )
             }
 
             // Tasks in this section
             items(
                 items = section.tasks,
-                key = { task -> task.id }
+                key = { task -> task.id },
             ) { task ->
                 ArchivedTaskItem(
                     task = task,
@@ -121,7 +121,7 @@ private fun ArchivedTaskList(
                     onRestoreClick = { onRestoreTask(task) },
                     onPermanentDeleteClick = { onPermanentDeleteTask(task) },
                     onLongPress = { onLongPressTask(task.id) },
-                    onToggleSelection = { onToggleSelection(task.id) }
+                    onToggleSelection = { onToggleSelection(task.id) },
                 )
             }
         }
@@ -138,13 +138,13 @@ private fun EmptyArchivedTaskList() {
             .fillMaxSize()
             .padding(32.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+        verticalArrangement = Arrangement.Center,
     ) {
         Text(
             text = "No archived tasks",
             style = MaterialTheme.typography.headlineSmall,
             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
-            textAlign = TextAlign.Center
+            textAlign = TextAlign.Center,
         )
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -153,7 +153,7 @@ private fun EmptyArchivedTaskList() {
             text = "Tasks you archive will appear here",
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
-            textAlign = TextAlign.Center
+            textAlign = TextAlign.Center,
         )
     }
 }
@@ -162,22 +162,19 @@ private fun EmptyArchivedTaskList() {
  * Empty state for search results in archived tasks
  */
 @Composable
-private fun EmptySearchResults(
-    hasQuery: Boolean,
-    onClearSearch: () -> Unit
-) {
+private fun EmptySearchResults(hasQuery: Boolean, onClearSearch: () -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(32.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+        verticalArrangement = Arrangement.Center,
     ) {
         Text(
             text = "No archived tasks found",
             style = MaterialTheme.typography.headlineSmall,
             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
-            textAlign = TextAlign.Center
+            textAlign = TextAlign.Center,
         )
 
         if (hasQuery) {
@@ -185,7 +182,7 @@ private fun EmptySearchResults(
 
             Button(
                 onClick = onClearSearch,
-                colors = ButtonDefaults.textButtonColors()
+                colors = ButtonDefaults.textButtonColors(),
             ) {
                 Text("Clear search")
             }

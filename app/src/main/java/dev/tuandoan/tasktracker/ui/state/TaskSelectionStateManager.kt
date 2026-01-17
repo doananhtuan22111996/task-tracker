@@ -76,20 +76,20 @@ class TaskSelectionStateManager @Inject constructor() {
             .stateIn(
                 scope = scope,
                 started = SharingStarted.WhileSubscribed(5000),
-                initialValue = false
+                initialValue = false,
             )
 
         val selectedCount = selectedIds.map { it.size }
             .stateIn(
                 scope = scope,
                 started = SharingStarted.WhileSubscribed(5000),
-                initialValue = 0
+                initialValue = 0,
             )
 
         return SelectionState(
             selectedIds = selectedIds,
             isSelectionMode = isSelectionMode,
-            selectedCount = selectedCount
+            selectedCount = selectedCount,
         )
     }
 
@@ -214,12 +214,10 @@ class TaskSelectionStateManager @Inject constructor() {
      *
      * @see SelectionValidationResult
      */
-    fun validateSelection(): SelectionValidationResult {
-        return when {
-            _selectedIds.value.isEmpty() -> SelectionValidationResult.Empty
-            _selectedIds.value.size == 1 -> SelectionValidationResult.SingleItem(_selectedIds.value.first())
-            else -> SelectionValidationResult.MultipleItems(_selectedIds.value.toList())
-        }
+    fun validateSelection(): SelectionValidationResult = when {
+        _selectedIds.value.isEmpty() -> SelectionValidationResult.Empty
+        _selectedIds.value.size == 1 -> SelectionValidationResult.SingleItem(_selectedIds.value.first())
+        else -> SelectionValidationResult.MultipleItems(_selectedIds.value.toList())
     }
 }
 
@@ -229,7 +227,7 @@ class TaskSelectionStateManager @Inject constructor() {
 data class SelectionState(
     val selectedIds: StateFlow<Set<Long>>,
     val isSelectionMode: StateFlow<Boolean>,
-    val selectedCount: StateFlow<Int>
+    val selectedCount: StateFlow<Int>,
 )
 
 /**

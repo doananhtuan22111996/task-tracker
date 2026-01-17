@@ -6,5 +6,5 @@ package dev.tuandoan.tasktracker.ui.viewmodel
 enum class TaskFilter {
     ALL,
     ACTIVE,
-    COMPLETED
+    COMPLETED,
 }

@@ -9,9 +9,8 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class WorkManagerTaskReminderScheduler @Inject constructor(
-    private val workManager: WorkManager
-) : TaskReminderScheduler {
+class WorkManagerTaskReminderScheduler @Inject constructor(private val workManager: WorkManager) :
+    TaskReminderScheduler {
 
     companion object {
         private const val TAG = "TaskReminder"
@@ -54,7 +53,7 @@ class WorkManagerTaskReminderScheduler @Inject constructor(
         workManager.enqueueUniqueWork(
             workName,
             ExistingWorkPolicy.REPLACE,
-            workRequest
+            workRequest,
         )
 
         Log.d(TAG, "Reminder scheduled successfully for task $taskId")
@@ -67,7 +66,5 @@ class WorkManagerTaskReminderScheduler @Inject constructor(
         workManager.cancelUniqueWork(workName)
     }
 
-    private fun getUniqueWorkName(taskId: Long): String {
-        return "task_reminder_$taskId"
-    }
+    private fun getUniqueWorkName(taskId: Long): String = "task_reminder_$taskId"
 }

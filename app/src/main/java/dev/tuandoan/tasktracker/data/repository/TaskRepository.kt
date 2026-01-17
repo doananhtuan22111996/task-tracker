@@ -5,16 +5,13 @@ import dev.tuandoan.tasktracker.data.database.TaskDao
 import dev.tuandoan.tasktracker.domain.repository.ITaskRepository
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
-import javax.inject.Singleton
 
 /**
  * Implementation of ITaskRepository that handles task data operations.
  * Uses @Inject constructor for Hilt dependency injection.
  * @Singleton ensures single instance across the app lifecycle.
  */
-class TaskRepository @Inject constructor(
-    private val taskDao: TaskDao
-) : ITaskRepository {
+class TaskRepository @Inject constructor(private val taskDao: TaskDao) : ITaskRepository {
 
     override fun getAllTasks(): Flow<List<Task>> = taskDao.getAllTasks()
 
@@ -92,6 +89,5 @@ class TaskRepository @Inject constructor(
     override fun observeDueTodayCount(startOfDayMillis: Long, endOfDayMillis: Long): Flow<Int> =
         taskDao.observeDueTodayCount(startOfDayMillis, endOfDayMillis)
 
-    override fun observeOverdueCount(nowMillis: Long): Flow<Int> =
-        taskDao.observeOverdueCount(nowMillis)
+    override fun observeOverdueCount(nowMillis: Long): Flow<Int> = taskDao.observeOverdueCount(nowMillis)
 }

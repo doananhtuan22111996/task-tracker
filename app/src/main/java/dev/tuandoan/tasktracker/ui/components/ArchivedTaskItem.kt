@@ -12,7 +12,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import dev.tuandoan.tasktracker.data.database.Task
@@ -29,7 +28,7 @@ fun ArchivedTaskItem(
     onPermanentDeleteClick: () -> Unit,
     onLongPress: () -> Unit = {},
     onToggleSelection: () -> Unit = {},
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Card(
         modifier = modifier
@@ -45,21 +44,21 @@ fun ArchivedTaskItem(
                     if (!isSelectionMode) {
                         onLongPress()
                     }
-                }
+                },
             ),
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(
             containerColor = when {
                 isSelected -> MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f)
                 else -> MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.7f) // Always show archived appearance
-            }
-        )
+            },
+        ),
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             if (isSelectionMode) {
                 // Selection indicator in selection mode
@@ -68,8 +67,8 @@ fun ArchivedTaskItem(
                     onCheckedChange = { onToggleSelection() },
                     colors = CheckboxDefaults.colors(
                         checkedColor = MaterialTheme.colorScheme.primary,
-                        uncheckedColor = MaterialTheme.colorScheme.outline
-                    )
+                        uncheckedColor = MaterialTheme.colorScheme.outline,
+                    ),
                 )
             } else {
                 // Archive indicator in normal mode - just spacing
@@ -79,14 +78,14 @@ fun ArchivedTaskItem(
             Column(
                 modifier = Modifier
                     .weight(1f)
-                    .alpha(0.8f) // Slightly faded to indicate archived status
+                    .alpha(0.8f), // Slightly faded to indicate archived status
             ) {
                 Text(
                     text = task.title,
                     style = MaterialTheme.typography.bodyLarge,
                     fontWeight = FontWeight.Medium,
                     maxLines = 2,
-                    overflow = TextOverflow.Ellipsis
+                    overflow = TextOverflow.Ellipsis,
                 )
 
                 if (task.description.isNotEmpty()) {
@@ -96,7 +95,7 @@ fun ArchivedTaskItem(
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
                         maxLines = 2,
-                        overflow = TextOverflow.Ellipsis
+                        overflow = TextOverflow.Ellipsis,
                     )
                 }
 
@@ -108,15 +107,15 @@ fun ArchivedTaskItem(
                         label = {
                             Text(
                                 text = task.tag,
-                                style = MaterialTheme.typography.bodySmall
+                                style = MaterialTheme.typography.bodySmall,
                             )
                         },
                         colors = AssistChipDefaults.assistChipColors(
                             containerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.6f),
-                            labelColor = MaterialTheme.colorScheme.onSecondaryContainer
+                            labelColor = MaterialTheme.colorScheme.onSecondaryContainer,
                         ),
                         border = null,
-                        modifier = Modifier.alpha(0.8f)
+                        modifier = Modifier.alpha(0.8f),
                     )
                 }
 
@@ -126,7 +125,7 @@ fun ArchivedTaskItem(
                     Text(
                         text = "Due: ${formatDueDate(task.dueAt)}",
                         style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
                     )
                 }
 
@@ -136,14 +135,14 @@ fun ArchivedTaskItem(
                 Text(
                     text = "Archived: ${formatDate(archiveDate)}",
                     style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
                 )
 
                 // Original creation date
                 Text(
                     text = "Created: ${formatDate(task.createdAt)}",
                     style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f)
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f),
                 )
             }
 
@@ -154,7 +153,7 @@ fun ArchivedTaskItem(
                         Icon(
                             imageVector = Icons.Default.Unarchive,
                             contentDescription = "Restore task",
-                            tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.7f)
+                            tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.7f),
                         )
                     }
 
@@ -162,7 +161,7 @@ fun ArchivedTaskItem(
                         Icon(
                             imageVector = Icons.Default.DeleteForever,
                             contentDescription = "Permanently delete task",
-                            tint = MaterialTheme.colorScheme.error.copy(alpha = 0.7f)
+                            tint = MaterialTheme.colorScheme.error.copy(alpha = 0.7f),
                         )
                     }
                 }

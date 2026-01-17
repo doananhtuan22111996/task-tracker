@@ -288,6 +288,21 @@ TaskViewModelTest            // End-to-end coordination tests
 
 ## 📚 Recent Updates
 
+### v2.9 - UI/UX Enhancements & Material 3 Polish
+- 🎨 **Enhanced Typography System** - Comprehensive Material 3 typography hierarchy with proper font weights, sizes, and semantic styles for improved readability and visual hierarchy
+- 📐 **Consistent Spacing System** - New 8dp-based spacing system (AppSpacing) ensuring consistent layout throughout the app with specific use-case spacing for cards, buttons, and touch targets
+- 🔶 **Custom Shape System** - Refined shape system with custom shapes for task items, chips, dialogs, and other components following Material 3 rounded corner guidelines
+- 🏗️ **Enhanced Task Item Design** - Material 3 ListItem hybrid design with improved visual differentiation for completed, overdue, and pinned tasks, enhanced metadata display with chips
+- 📱 **Improved Main Screen Layout** - CenterAlignedTopAppBar, enhanced filter row, polished sort UI, refined sticky headers, and better empty state messaging
+- ✏️ **Enhanced Add/Edit Task Dialog** - Better form layout with visual grouping (Task Details, Organization), improved field styling, and enhanced action buttons with icons
+- 🎯 **Polished Bulk Selection UI** - Clear visual selection states, improved action button styling, and consistent Material 3 theming throughout selection mode
+- 🗄️ **Enhanced Archived Screen** - Mirror main screen styling improvements with consistent CenterAlignedTopAppBar and enhanced visual hierarchy
+- 📤 **Improved Snackbar Consistency** - Consistent styling and messaging across all operations with proper Material 3 theming
+- 🎨 **Global Theme Integration** - All components now use new typography, spacing, and shape systems for cohesive Material 3 design language
+- 🧹 **Polished Material 3 Layout** - Optimized spacing and visual hierarchy with single app bar title, removing duplication and excessive whitespace for a more compact, cohesive user interface
+- 📱 **Enhanced Archived and Stats Screens** - Polished secondary screens with consistent Material 3 layout, optimized spacing, and improved visual hierarchy matching the main screen design
+- 📊 **Single App Bar Architecture** - Archived and Stats screens use a single Material 3 app bar (no duplicated titles) with optimized spacing
+
 ### v2.8 - Minimal Stats (Lightweight Analytics)
 - 📊 **Stats Screen** - Lightweight statistics view showing key task counts without charts or complex analytics
 - 🔢 **Five Key Metrics** - Active tasks, completed tasks (overall), completed today, due today (active only), and overdue counts
@@ -377,13 +392,38 @@ TaskViewModelTest            // End-to-end coordination tests
 - 💾 **Room Database** - Offline-first local storage
 - 🎨 **Material 3 UI** - Modern, clean interface
 
+## 🎯 Code Style & Formatting
+
+This project uses **Spotless** with **ktlint** to enforce consistent code formatting across all Kotlin and Gradle files.
+
+### Running Formatting
+
+```bash
+# Apply code formatting fixes
+./gradlew spotlessApply
+
+# Check code formatting (fails build if violations exist)
+./gradlew spotlessCheck
+```
+
+### Configuration
+
+- **Kotlin files**: Formatted with ktlint 1.4.1
+- **Gradle files**: Basic formatting (trailing whitespace, newlines)
+- **Compose-friendly**: Wildcard imports and parameter wrapping rules disabled for better Compose readability
+- **Line length**: 120 characters maximum
+- **Indentation**: 4 spaces
+
+The formatting check runs automatically during the build process. All code must pass formatting checks before merging.
+
 ## 🤝 Contributing
 
 1. Fork the repository
 2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+3. **Run formatting**: `./gradlew spotlessApply`
+4. Commit your changes (`git commit -m 'Add amazing feature'`)
+5. Push to the branch (`git push origin feature/amazing-feature`)
+6. Open a Pull Request
 
 ### Development Guidelines
 - Follow **MVVM + Clean Architecture** patterns
@@ -391,6 +431,7 @@ TaskViewModelTest            // End-to-end coordination tests
 - Write **unit tests** for business logic
 - Use **StateFlow** for reactive state management
 - Follow **Material 3** design guidelines
+- **Code formatting**: Run `./gradlew spotlessApply` before committing
 
 ## 📄 License
 

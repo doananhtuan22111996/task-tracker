@@ -11,9 +11,7 @@ import javax.inject.Inject
  * State manager for task form operations including dialog state, validation, and form fields.
  * Encapsulates form-related business logic and state management.
  */
-class TaskFormStateManager @Inject constructor(
-    private val formUseCase: TaskFormUseCase
-) {
+class TaskFormStateManager @Inject constructor(private val formUseCase: TaskFormUseCase) {
 
     /**
      * Initialize form state flows for a given coroutine scope
@@ -23,56 +21,56 @@ class TaskFormStateManager @Inject constructor(
             .stateIn(
                 scope = scope,
                 started = SharingStarted.WhileSubscribed(5000),
-                initialValue = false
+                initialValue = false,
             )
 
         val isEditMode = formUseCase.isEditMode()
             .stateIn(
                 scope = scope,
                 started = SharingStarted.WhileSubscribed(5000),
-                initialValue = false
+                initialValue = false,
             )
 
         val isTitleValid = formUseCase.isTitleValid
             .stateIn(
                 scope = scope,
                 started = SharingStarted.WhileSubscribed(5000),
-                initialValue = false
+                initialValue = false,
             )
 
         val hasChanges = formUseCase.hasChanges
             .stateIn(
                 scope = scope,
                 started = SharingStarted.WhileSubscribed(5000),
-                initialValue = false
+                initialValue = false,
             )
 
         val isSaveEnabled = formUseCase.isSaveEnabled
             .stateIn(
                 scope = scope,
                 started = SharingStarted.WhileSubscribed(5000),
-                initialValue = false
+                initialValue = false,
             )
 
         val isDueDateValid = formUseCase.isDueDateValid
             .stateIn(
                 scope = scope,
                 started = SharingStarted.WhileSubscribed(5000),
-                initialValue = true
+                initialValue = true,
             )
 
         val isReminderValid = formUseCase.isReminderValid
             .stateIn(
                 scope = scope,
                 started = SharingStarted.WhileSubscribed(5000),
-                initialValue = true
+                initialValue = true,
             )
 
         val isTagValid = formUseCase.isTagValid
             .stateIn(
                 scope = scope,
                 started = SharingStarted.WhileSubscribed(5000),
-                initialValue = true
+                initialValue = true,
             )
 
         return TaskFormState(
@@ -95,7 +93,7 @@ class TaskFormStateManager @Inject constructor(
             isTagValid = isTagValid,
             hasChanges = hasChanges,
             isSaveEnabled = isSaveEnabled,
-            errorMessage = formUseCase.errorMessage
+            errorMessage = formUseCase.errorMessage,
         )
     }
 
@@ -170,7 +168,7 @@ data class TaskFormState(
     val isTagValid: StateFlow<Boolean>,
     val hasChanges: StateFlow<Boolean>,
     val isSaveEnabled: StateFlow<Boolean>,
-    val errorMessage: StateFlow<String?>
+    val errorMessage: StateFlow<String?>,
 )
 
 /**

@@ -13,7 +13,9 @@ import dagger.hilt.android.HiltAndroidApp
 import javax.inject.Inject
 
 @HiltAndroidApp
-class TaskTrackerApplication : Application(), Configuration.Provider {
+class TaskTrackerApplication :
+    Application(),
+    Configuration.Provider {
 
     @Inject
     lateinit var workerFactory: HiltWorkerFactory
@@ -43,7 +45,7 @@ class TaskTrackerApplication : Application(), Configuration.Provider {
             val channel = NotificationChannel(
                 TASK_REMINDER_CHANNEL_ID,
                 "Task Reminders",
-                NotificationManager.IMPORTANCE_DEFAULT
+                NotificationManager.IMPORTANCE_DEFAULT,
             ).apply {
                 description = "Notifications for task due date reminders"
             }
@@ -51,7 +53,10 @@ class TaskTrackerApplication : Application(), Configuration.Provider {
             val notificationManager = getSystemService<NotificationManager>()
             notificationManager?.createNotificationChannel(channel)
 
-            Log.d(TAG, "Notification channel '$TASK_REMINDER_CHANNEL_ID' created with importance: ${NotificationManager.IMPORTANCE_DEFAULT}")
+            Log.d(
+                TAG,
+                "Notification channel '$TASK_REMINDER_CHANNEL_ID' created with importance: ${NotificationManager.IMPORTANCE_DEFAULT}",
+            )
         } else {
             Log.d(TAG, "Android version < O, no notification channel needed")
         }
@@ -64,7 +69,10 @@ class TaskTrackerApplication : Application(), Configuration.Provider {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             Log.i(TAG, "Running on Android 13+ - notification permission may need to be granted manually")
             if (!notificationsEnabled) {
-                Log.w(TAG, "Notifications are disabled! Reminders will not work. User needs to enable them in Settings > Apps > Task Tracker > Notifications")
+                Log.w(
+                    TAG,
+                    "Notifications are disabled! Reminders will not work. User needs to enable them in Settings > Apps > Task Tracker > Notifications",
+                )
             }
         }
     }

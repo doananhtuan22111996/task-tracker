@@ -5,7 +5,6 @@ import dev.tuandoan.tasktracker.domain.repository.ITaskRepository
 import dev.tuandoan.tasktracker.domain.scheduler.TaskReminderScheduler
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
-import javax.inject.Singleton
 
 /**
  * Implementation of ITaskManager that provides business logic for task operations.
@@ -14,7 +13,7 @@ import javax.inject.Singleton
  */
 class TaskManager @Inject constructor(
     private val repository: ITaskRepository,
-    private val reminderScheduler: TaskReminderScheduler
+    private val reminderScheduler: TaskReminderScheduler,
 ) : ITaskManager {
 
     // Data access
@@ -23,15 +22,23 @@ class TaskManager @Inject constructor(
     override suspend fun getTaskById(id: Long): Task? = repository.getTaskById(id)
 
     // Task operations
-    override suspend fun createTask(title: String, description: String): Long {
-        return createTask(title, description, null, null)
-    }
+    override suspend fun createTask(title: String, description: String): Long =
+        createTask(title, description, null, null)
 
-    override suspend fun createTask(title: String, description: String, dueAt: Long?, reminderOffsetMinutes: Int?): Long {
-        return createTask(title, description, dueAt, reminderOffsetMinutes, null)
-    }
+    override suspend fun createTask(
+        title: String,
+        description: String,
+        dueAt: Long?,
+        reminderOffsetMinutes: Int?,
+    ): Long = createTask(title, description, dueAt, reminderOffsetMinutes, null)
 
-    override suspend fun createTask(title: String, description: String, dueAt: Long?, reminderOffsetMinutes: Int?, tag: String?): Long {
+    override suspend fun createTask(
+        title: String,
+        description: String,
+        dueAt: Long?,
+        reminderOffsetMinutes: Int?,
+        tag: String?,
+    ): Long {
         require(title.isNotBlank()) { "Task title cannot be blank" }
 
         val task = Task(
@@ -39,7 +46,7 @@ class TaskManager @Inject constructor(
             description = description.trim(),
             dueAt = dueAt,
             reminderOffsetMinutes = reminderOffsetMinutes,
-            tag = tag?.trim()?.takeIf { it.isNotEmpty() }
+            tag = tag?.trim()?.takeIf { it.isNotEmpty() },
         )
         val taskId = repository.insertTask(task)
 
@@ -74,11 +81,22 @@ class TaskManager @Inject constructor(
         updateTaskContent(taskId, title, description, null, null, null)
     }
 
-    override suspend fun updateTaskContent(taskId: Long, title: String, description: String, dueAt: Long?, reminderOffsetMinutes: Int?): Boolean {
-        return updateTaskContent(taskId, title, description, dueAt, reminderOffsetMinutes, null)
-    }
+    override suspend fun updateTaskContent(
+        taskId: Long,
+        title: String,
+        description: String,
+        dueAt: Long?,
+        reminderOffsetMinutes: Int?,
+    ): Boolean = updateTaskContent(taskId, title, description, dueAt, reminderOffsetMinutes, null)
 
-    override suspend fun updateTaskContent(taskId: Long, title: String, description: String, dueAt: Long?, reminderOffsetMinutes: Int?, tag: String?): Boolean {
+    override suspend fun updateTaskContent(
+        taskId: Long,
+        title: String,
+        description: String,
+        dueAt: Long?,
+        reminderOffsetMinutes: Int?,
+        tag: String?,
+    ): Boolean {
         require(title.isNotBlank()) { "Task title cannot be blank" }
 
         val existingTask = repository.getTaskById(taskId)
@@ -89,7 +107,7 @@ class TaskManager @Inject constructor(
             description = description.trim(),
             dueAt = dueAt,
             reminderOffsetMinutes = reminderOffsetMinutes,
-            tag = tag?.trim()?.takeIf { it.isNotEmpty() }
+            tag = tag?.trim()?.takeIf { it.isNotEmpty() },
         )
 
         repository.updateTask(updatedTask)
@@ -117,24 +135,22 @@ class TaskManager @Inject constructor(
         repository.deleteTask(task)
     }
 
-    override suspend fun restoreTask(task: Task): Result<Unit> {
-        return try {
-            repository.upsert(task)
-            // Reschedule reminder if task is not completed and has reminder settings
-            if (!task.isCompleted) {
-                scheduleReminderIfNeeded(task.id, task.title, task.dueAt, task.reminderOffsetMinutes)
-            }
-            Result.success(Unit)
-        } catch (e: Exception) {
-            Result.failure(e)
+    override suspend fun restoreTask(task: Task): Result<Unit> = try {
+        repository.upsert(task)
+        // Reschedule reminder if task is not completed and has reminder settings
+        if (!task.isCompleted) {
+            scheduleReminderIfNeeded(task.id, task.title, task.dueAt, task.reminderOffsetMinutes)
         }
+        Result.success(Unit)
+    } catch (e: Exception) {
+        Result.failure(e)
     }
 
     override suspend fun toggleTaskCompletion(task: Task) {
         val currentTime = System.currentTimeMillis()
         val updatedTask = task.copy(
             isCompleted = !task.isCompleted,
-            completedAt = if (!task.isCompleted) currentTime else null
+            completedAt = if (!task.isCompleted) currentTime else null,
         )
         repository.updateTask(updatedTask)
 
@@ -199,19 +215,17 @@ class TaskManager @Inject constructor(
         }
     }
 
-    override suspend fun restoreTasks(tasks: List<Task>): Result<Unit> {
-        return try {
-            if (tasks.isNotEmpty()) {
-                repository.upsertAll(tasks)
-                // Reschedule reminders for all restored incomplete tasks
-                tasks.filter { !it.isCompleted }.forEach { task ->
-                    scheduleReminderIfNeeded(task.id, task.title, task.dueAt, task.reminderOffsetMinutes)
-                }
+    override suspend fun restoreTasks(tasks: List<Task>): Result<Unit> = try {
+        if (tasks.isNotEmpty()) {
+            repository.upsertAll(tasks)
+            // Reschedule reminders for all restored incomplete tasks
+            tasks.filter { !it.isCompleted }.forEach { task ->
+                scheduleReminderIfNeeded(task.id, task.title, task.dueAt, task.reminderOffsetMinutes)
             }
-            Result.success(Unit)
-        } catch (e: Exception) {
-            Result.failure(e)
         }
+        Result.success(Unit)
+    } catch (e: Exception) {
+        Result.failure(e)
     }
 
     // Filtered data access
@@ -298,20 +312,24 @@ class TaskManager @Inject constructor(
     override fun observeDueTodayCount(startOfDayMillis: Long, endOfDayMillis: Long): Flow<Int> =
         repository.observeDueTodayCount(startOfDayMillis, endOfDayMillis)
 
-    override fun observeOverdueCount(nowMillis: Long): Flow<Int> =
-        repository.observeOverdueCount(nowMillis)
+    override fun observeOverdueCount(nowMillis: Long): Flow<Int> = repository.observeOverdueCount(nowMillis)
 
     // Helper method for scheduling reminders
-    private suspend fun scheduleReminderIfNeeded(taskId: Long, title: String, dueAt: Long?, reminderOffsetMinutes: Int?): Boolean {
-        return if (dueAt != null && reminderOffsetMinutes != null && reminderOffsetMinutes > 0) {
-            val scheduled = reminderScheduler.schedule(taskId, title, dueAt, reminderOffsetMinutes)
-            if (!scheduled) {
-                // This happens when reminder time is in the past
-                throw IllegalArgumentException("Reminder time must be in the future. Please set a due date that allows for the selected reminder timing.")
-            }
-            scheduled
-        } else {
-            true
+    private suspend fun scheduleReminderIfNeeded(
+        taskId: Long,
+        title: String,
+        dueAt: Long?,
+        reminderOffsetMinutes: Int?,
+    ): Boolean = if (dueAt != null && reminderOffsetMinutes != null && reminderOffsetMinutes > 0) {
+        val scheduled = reminderScheduler.schedule(taskId, title, dueAt, reminderOffsetMinutes)
+        if (!scheduled) {
+            // This happens when reminder time is in the past
+            throw IllegalArgumentException(
+                "Reminder time must be in the future. Please set a due date that allows for the selected reminder timing.",
+            )
         }
+        scheduled
+    } else {
+        true
     }
 }

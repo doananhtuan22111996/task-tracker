@@ -12,13 +12,13 @@ import dev.tuandoan.tasktracker.domain.model.TaskSort
 import dev.tuandoan.tasktracker.ui.events.UiEvent
 import dev.tuandoan.tasktracker.ui.manager.TaskBulkActionManager
 import dev.tuandoan.tasktracker.ui.manager.TaskCrudManager
-import dev.tuandoan.tasktracker.ui.viewmodel.TaskFilter
+import dev.tuandoan.tasktracker.ui.state.SelectionState
 import dev.tuandoan.tasktracker.ui.state.TaskFormState
 import dev.tuandoan.tasktracker.ui.state.TaskFormStateManager
 import dev.tuandoan.tasktracker.ui.state.TaskListState
 import dev.tuandoan.tasktracker.ui.state.TaskListStateManager
-import dev.tuandoan.tasktracker.ui.state.SelectionState
 import dev.tuandoan.tasktracker.ui.state.TaskSelectionStateManager
+import dev.tuandoan.tasktracker.ui.viewmodel.TaskFilter
 import dev.tuandoan.tasktracker.utils.TaskDateGrouper
 import dev.tuandoan.tasktracker.utils.TaskSection
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -51,7 +51,7 @@ class TaskViewModel @Inject constructor(
     private val formStateManager: TaskFormStateManager,
     private val crudManager: TaskCrudManager,
     private val selectionStateManager: TaskSelectionStateManager,
-    private val bulkActionManager: TaskBulkActionManager
+    private val bulkActionManager: TaskBulkActionManager,
 ) : ViewModel() {
 
     // Initialize state from managers
@@ -70,7 +70,7 @@ class TaskViewModel @Inject constructor(
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),
-            initialValue = emptyList()
+            initialValue = emptyList(),
         )
 
     // Grouped tasks for day-based sections
@@ -79,7 +79,7 @@ class TaskViewModel @Inject constructor(
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),
-            initialValue = emptyList()
+            initialValue = emptyList(),
         )
 
     val searchQuery = listState.searchQuery
@@ -102,7 +102,7 @@ class TaskViewModel @Inject constructor(
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),
-            initialValue = emptyList()
+            initialValue = emptyList(),
         )
 
     // Form state
@@ -148,11 +148,11 @@ class TaskViewModel @Inject constructor(
     private val _singleTaskUiEvent = MutableSharedFlow<UiEvent>()
     val uiEvent: SharedFlow<UiEvent> = merge(
         bulkActionManager.uiEvent,
-        _singleTaskUiEvent.asSharedFlow()
+        _singleTaskUiEvent.asSharedFlow(),
     ).shareIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5000),
-        replay = 0
+        replay = 0,
     )
 
     // === CRUD Operations ===
@@ -160,21 +160,21 @@ class TaskViewModel @Inject constructor(
     fun createTask() {
         crudManager.executeOperation(
             scope = viewModelScope,
-            operation = { crudManager.createTask(viewModelScope) }
+            operation = { crudManager.createTask(viewModelScope) },
         )
     }
 
     fun updateTask() {
         crudManager.executeOperation(
             scope = viewModelScope,
-            operation = { crudManager.updateTask(viewModelScope) }
+            operation = { crudManager.updateTask(viewModelScope) },
         )
     }
 
     fun saveTask() {
         crudManager.executeOperation(
             scope = viewModelScope,
-            operation = { crudManager.saveTask(viewModelScope) }
+            operation = { crudManager.saveTask(viewModelScope) },
         )
     }
 
@@ -195,11 +195,11 @@ class TaskViewModel @Inject constructor(
                     _singleTaskUiEvent.emit(
                         UiEvent.ShowUndoDelete(
                             tasks = listOf(task),
-                            onUndo = { restoreTask(task) }
-                        )
+                            onUndo = { restoreTask(task) },
+                        ),
                     )
                 }
-            }
+            },
         )
     }
 
@@ -227,18 +227,18 @@ class TaskViewModel @Inject constructor(
                         UiEvent.ShowUndoDelete(
                             tasks = listOf(task),
                             onUndo = { unarchiveTask(task) },
-                            message = "Task archived"
-                        )
+                            message = "Task archived",
+                        ),
                     )
                 }
-            }
+            },
         )
     }
 
     private fun unarchiveTask(task: Task) {
         crudManager.executeOperation(
             scope = viewModelScope,
-            operation = { crudManager.unarchiveTask(task) }
+            operation = { crudManager.unarchiveTask(task) },
         )
     }
 
@@ -247,7 +247,7 @@ class TaskViewModel @Inject constructor(
     fun restoreArchivedTask(task: Task) {
         crudManager.executeOperation(
             scope = viewModelScope,
-            operation = { crudManager.unarchiveTask(task) }
+            operation = { crudManager.unarchiveTask(task) },
         )
     }
 
@@ -261,7 +261,7 @@ class TaskViewModel @Inject constructor(
 
         crudManager.executeOperation(
             scope = viewModelScope,
-            operation = { crudManager.hardDeleteTask(task) }
+            operation = { crudManager.hardDeleteTask(task) },
         )
     }
 
@@ -280,28 +280,28 @@ class TaskViewModel @Inject constructor(
     private fun restoreTask(task: Task) {
         crudManager.executeOperation(
             scope = viewModelScope,
-            operation = { crudManager.restoreTask(task) }
+            operation = { crudManager.restoreTask(task) },
         )
     }
 
     fun toggleTaskCompletion(task: Task) {
         crudManager.executeOperation(
             scope = viewModelScope,
-            operation = { crudManager.toggleTaskCompletion(task) }
+            operation = { crudManager.toggleTaskCompletion(task) },
         )
     }
 
     fun toggleTaskPin(task: Task) {
         crudManager.executeOperation(
             scope = viewModelScope,
-            operation = { crudManager.toggleTaskPin(task) }
+            operation = { crudManager.toggleTaskPin(task) },
         )
     }
 
     fun updateTaskPriority(taskId: Long, priority: Int) {
         crudManager.executeOperation(
             scope = viewModelScope,
-            operation = { crudManager.updateTaskPriority(taskId, priority) }
+            operation = { crudManager.updateTaskPriority(taskId, priority) },
         )
     }
 

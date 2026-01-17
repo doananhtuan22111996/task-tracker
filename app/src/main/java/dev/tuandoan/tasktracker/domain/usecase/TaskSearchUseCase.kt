@@ -40,7 +40,7 @@ class TaskSearchUseCase @Inject constructor() {
             val lowercaseQuery = trimmedQuery.lowercase(Locale.getDefault())
             tasks.filter { task ->
                 task.title.lowercase(Locale.getDefault()).contains(lowercaseQuery) ||
-                task.description.lowercase(Locale.getDefault()).contains(lowercaseQuery)
+                    task.description.lowercase(Locale.getDefault()).contains(lowercaseQuery)
             }
         }
     }
