@@ -13,6 +13,4 @@ fun formatDueDate(timestamp: Long): String {
     return formatter.format(Date(timestamp))
 }
 
-fun isOverdue(dueAt: Long): Boolean {
-    return dueAt < System.currentTimeMillis()
-}
+fun isOverdue(dueAt: Long): Boolean = dueAt < System.currentTimeMillis()

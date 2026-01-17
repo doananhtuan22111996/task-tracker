@@ -3,11 +3,15 @@ package dev.tuandoan.tasktracker.ui.screens
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -25,18 +29,17 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dev.tuandoan.tasktracker.domain.model.Priority
 import dev.tuandoan.tasktracker.domain.model.ReminderOption
 import dev.tuandoan.tasktracker.domain.usecase.TaskFormUseCase
+import dev.tuandoan.tasktracker.ui.theme.AppSpacing
+import dev.tuandoan.tasktracker.ui.theme.CustomShapes
 import dev.tuandoan.tasktracker.ui.viewmodel.TaskViewModel
 import dev.tuandoan.tasktracker.utils.NotificationPermission
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Date
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddEditTaskDialog(
-    viewModel: TaskViewModel,
-    onDismiss: () -> Unit,
-    modifier: Modifier = Modifier
-) {
+fun AddEditTaskDialog(viewModel: TaskViewModel, onDismiss: () -> Unit, modifier: Modifier = Modifier) {
     val context = LocalContext.current
     val selectedTask by viewModel.selectedTask.collectAsStateWithLifecycle()
     val taskTitle by viewModel.taskTitle.collectAsStateWithLifecycle()
@@ -70,7 +73,7 @@ fun AddEditTaskDialog(
 
     // Permission request launcher
     val permissionLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestPermission()
+        contract = ActivityResultContracts.RequestPermission(),
     ) { granted ->
         if (granted) {
             // Permission granted, apply the pending reminder option
@@ -102,8 +105,8 @@ fun AddEditTaskDialog(
     // Function to check and handle reminder option change
     fun handleReminderOptionChange(newOption: ReminderOption) {
         if (newOption != ReminderOption.NONE &&
-            NotificationPermission.shouldRequest() &&
-            !NotificationPermission.isGranted(context)) {
+            NotificationPermission.needsPermissionRequest(context)
+        ) {
             // Need to request permission
             pendingReminderOption = newOption
             showNotificationPermissionDialog = true
@@ -126,37 +129,58 @@ fun AddEditTaskDialog(
         onDismissRequest = onDismiss,
         properties = DialogProperties(
             dismissOnBackPress = true,
-            dismissOnClickOutside = true
-        )
+            dismissOnClickOutside = true,
+        ),
     ) {
         Card(
             modifier = modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(16.dp),
+            shape = CustomShapes.bottomSheet,
             colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surface
-            )
+                containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+            ),
+            elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
         ) {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(24.dp)
+                    .padding(AppSpacing.dialogPadding),
             ) {
-                // Title
+                // Enhanced dialog title with better typography
                 Text(
                     text = dialogTitle,
-                    style = MaterialTheme.typography.headlineSmall,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onSurface
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Medium,
+                    color = MaterialTheme.colorScheme.onSurface,
                 )
 
-                Spacer(modifier = Modifier.height(20.dp))
+                Spacer(modifier = Modifier.height(AppSpacing.sectionSpacing))
 
-                // Task Title Field
+                // Basic Information Section
+                Text(
+                    text = "Task Details",
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Medium,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    modifier = Modifier.padding(bottom = AppSpacing.medium),
+                )
+
+                // Task Title Field with enhanced styling
                 OutlinedTextField(
                     value = taskTitle,
                     onValueChange = { viewModel.updateTaskTitle(it) },
-                    label = { Text("Task Title") },
-                    placeholder = { Text("Enter task title") },
+                    label = {
+                        Text(
+                            "Task Title",
+                            style = MaterialTheme.typography.bodyMedium,
+                        )
+                    },
+                    placeholder = {
+                        Text(
+                            "Enter task title",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    },
                     modifier = Modifier
                         .fillMaxWidth()
                         .focusRequester(focusRequester),
@@ -168,22 +192,22 @@ fun AddEditTaskDialog(
                                 Text(
                                     text = error,
                                     style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.error
+                                    color = MaterialTheme.colorScheme.error,
                                 )
                             }
                             Text(
                                 text = "${taskTitle.length}/${TaskFormUseCase.MAX_TITLE_LENGTH}",
-                                style = MaterialTheme.typography.bodySmall,
+                                style = MaterialTheme.typography.labelSmall,
                                 color = if (taskTitle.length > TaskFormUseCase.MAX_TITLE_LENGTH) {
                                     MaterialTheme.colorScheme.error
                                 } else {
-                                    MaterialTheme.colorScheme.onSurfaceVariant
-                                }
+                                    MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
+                                },
                             )
                         }
                     },
                     keyboardOptions = KeyboardOptions(
-                        imeAction = ImeAction.Done
+                        imeAction = ImeAction.Done,
                     ),
                     keyboardActions = KeyboardActions(
                         onDone = {
@@ -191,131 +215,210 @@ fun AddEditTaskDialog(
                                 keyboardController?.hide()
                                 viewModel.saveTask()
                             }
-                        }
+                        },
                     ),
+                    shape = CustomShapes.searchField,
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedBorderColor = MaterialTheme.colorScheme.primary,
-                        unfocusedBorderColor = MaterialTheme.colorScheme.outline
-                    )
+                        unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+                        focusedLabelColor = MaterialTheme.colorScheme.primary,
+                        unfocusedLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                        cursorColor = MaterialTheme.colorScheme.primary,
+                    ),
                 )
 
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(AppSpacing.large))
 
-                // Task Description Field
+                // Task Description Field with enhanced styling
                 OutlinedTextField(
                     value = taskDescription,
                     onValueChange = { viewModel.updateTaskDescription(it) },
-                    label = { Text("Description (Optional)") },
-                    placeholder = { Text("Enter task description") },
+                    label = {
+                        Text(
+                            "Description (Optional)",
+                            style = MaterialTheme.typography.bodyMedium,
+                        )
+                    },
+                    placeholder = {
+                        Text(
+                            "Add more details about your task...",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    },
                     modifier = Modifier.fillMaxWidth(),
-                    minLines = 3,
-                    maxLines = 5,
+                    minLines = 2,
+                    maxLines = 4,
                     supportingText = {
                         Text(
                             text = "${taskDescription.length}/${TaskFormUseCase.MAX_DESCRIPTION_LENGTH}",
-                            style = MaterialTheme.typography.bodySmall,
+                            style = MaterialTheme.typography.labelSmall,
                             color = if (taskDescription.length > TaskFormUseCase.MAX_DESCRIPTION_LENGTH) {
                                 MaterialTheme.colorScheme.error
                             } else {
-                                MaterialTheme.colorScheme.onSurfaceVariant
-                            }
+                                MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
+                            },
                         )
                     },
+                    shape = CustomShapes.searchField,
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedBorderColor = MaterialTheme.colorScheme.primary,
-                        unfocusedBorderColor = MaterialTheme.colorScheme.outline
-                    )
+                        unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+                        focusedLabelColor = MaterialTheme.colorScheme.primary,
+                        unfocusedLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                        cursorColor = MaterialTheme.colorScheme.primary,
+                    ),
                 )
 
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(AppSpacing.sectionSpacing))
 
-                // Tag Field
-                OutlinedTextField(
-                    value = tag,
-                    onValueChange = { viewModel.updateTag(it) },
-                    label = { Text("Tag (Optional)") },
-                    placeholder = { Text("Enter tag") },
+                // Organization Section
+                Text(
+                    text = "Organization",
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Medium,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    modifier = Modifier.padding(bottom = AppSpacing.medium),
+                )
+
+                // Tag and Priority Row for better space utilization
+                Row(
                     modifier = Modifier.fillMaxWidth(),
-                    singleLine = true,
-                    isError = tagError != null,
-                    supportingText = {
-                        Column {
-                            tagError?.let { error ->
+                    horizontalArrangement = Arrangement.spacedBy(AppSpacing.large),
+                ) {
+                    // Tag Field
+                    OutlinedTextField(
+                        value = tag,
+                        onValueChange = { viewModel.updateTag(it) },
+                        label = {
+                            Text(
+                                "Tag (Optional)",
+                                style = MaterialTheme.typography.bodyMedium,
+                            )
+                        },
+                        placeholder = {
+                            Text(
+                                "e.g., work, personal",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        },
+                        modifier = Modifier.weight(1f),
+                        singleLine = true,
+                        isError = tagError != null,
+                        supportingText = {
+                            Column {
+                                tagError?.let { error ->
+                                    Text(
+                                        text = error,
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.error,
+                                    )
+                                }
                                 Text(
-                                    text = error,
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.error
+                                    text = "${tag.length}/${TaskFormUseCase.MAX_TAG_LENGTH}",
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = if (tag.length > TaskFormUseCase.MAX_TAG_LENGTH) {
+                                        MaterialTheme.colorScheme.error
+                                    } else {
+                                        MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
+                                    },
                                 )
                             }
-                            Text(
-                                text = "${tag.length}/${TaskFormUseCase.MAX_TAG_LENGTH}",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = if (tag.length > TaskFormUseCase.MAX_TAG_LENGTH) {
-                                    MaterialTheme.colorScheme.error
-                                } else {
-                                    MaterialTheme.colorScheme.onSurfaceVariant
-                                }
-                            )
-                        }
-                    },
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = MaterialTheme.colorScheme.primary,
-                        unfocusedBorderColor = MaterialTheme.colorScheme.outline
-                    )
-                )
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                // Priority Selection
-                var priorityExpanded by remember { mutableStateOf(false) }
-                val currentPriority = remember(selectedTask) {
-                    selectedTask?.let { Priority.fromValue(it.priority) } ?: Priority.MEDIUM
-                }
-                var selectedPriority by remember(selectedTask) {
-                    mutableStateOf(currentPriority)
-                }
-
-                ExposedDropdownMenuBox(
-                    expanded = priorityExpanded,
-                    onExpandedChange = { priorityExpanded = !priorityExpanded }
-                ) {
-                    OutlinedTextField(
-                        value = selectedPriority.displayName,
-                        onValueChange = { },
-                        label = { Text("Priority") },
-                        readOnly = true,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .menuAnchor(),
-                        trailingIcon = {
-                            ExposedDropdownMenuDefaults.TrailingIcon(expanded = priorityExpanded)
                         },
+                        shape = CustomShapes.searchField,
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedBorderColor = MaterialTheme.colorScheme.primary,
-                            unfocusedBorderColor = MaterialTheme.colorScheme.outline
-                        )
+                            unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+                            focusedLabelColor = MaterialTheme.colorScheme.primary,
+                            unfocusedLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                            cursorColor = MaterialTheme.colorScheme.primary,
+                        ),
                     )
 
-                    ExposedDropdownMenu(
+                    // Priority Selection with enhanced styling
+                    var priorityExpanded by remember { mutableStateOf(false) }
+                    val currentPriority = remember(selectedTask) {
+                        selectedTask?.let { Priority.fromValue(it.priority) } ?: Priority.MEDIUM
+                    }
+                    var selectedPriority by remember(selectedTask) {
+                        mutableStateOf(currentPriority)
+                    }
+
+                    ExposedDropdownMenuBox(
                         expanded = priorityExpanded,
-                        onDismissRequest = { priorityExpanded = false }
+                        onExpandedChange = { priorityExpanded = !priorityExpanded },
+                        modifier = Modifier.weight(1f),
                     ) {
-                        Priority.entries.forEach { priority ->
-                            DropdownMenuItem(
-                                text = {
-                                    Text(
-                                        text = priority.displayName,
-                                        style = MaterialTheme.typography.bodyLarge
-                                    )
-                                },
-                                onClick = {
-                                    selectedPriority = priority
-                                    selectedTask?.let { task ->
-                                        viewModel.updateTaskPriority(task.id, priority.value)
-                                    }
-                                    priorityExpanded = false
-                                }
-                            )
+                        OutlinedTextField(
+                            value = selectedPriority.displayName,
+                            onValueChange = { },
+                            label = {
+                                Text(
+                                    "Priority",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                )
+                            },
+                            readOnly = true,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .menuAnchor(),
+                            trailingIcon = {
+                                ExposedDropdownMenuDefaults.TrailingIcon(
+                                    expanded = priorityExpanded,
+                                )
+                            },
+                            shape = CustomShapes.searchField,
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = MaterialTheme.colorScheme.primary,
+                                unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+                                focusedLabelColor = MaterialTheme.colorScheme.primary,
+                                unfocusedLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                            ),
+                        )
+
+                        DropdownMenu(
+                            expanded = priorityExpanded,
+                            onDismissRequest = { priorityExpanded = false },
+                            containerColor = MaterialTheme.colorScheme.surface,
+                            tonalElevation = 8.dp,
+                        ) {
+                            Priority.entries.forEach { priority ->
+                                DropdownMenuItem(
+                                    text = {
+                                        Row(
+                                            verticalAlignment = Alignment.CenterVertically,
+                                        ) {
+                                            Icon(
+                                                imageVector = when (priority) {
+                                                    Priority.HIGH -> Icons.Default.KeyboardArrowUp
+                                                    Priority.LOW -> Icons.Default.KeyboardArrowDown
+                                                    else -> Icons.Default.Remove
+                                                },
+                                                contentDescription = null,
+                                                tint = when (priority) {
+                                                    Priority.HIGH -> MaterialTheme.colorScheme.error
+                                                    Priority.LOW -> MaterialTheme.colorScheme.secondary
+                                                    else -> MaterialTheme.colorScheme.onSurface
+                                                },
+                                                modifier = Modifier.size(18.dp),
+                                            )
+                                            Spacer(modifier = Modifier.width(AppSpacing.small))
+                                            Text(
+                                                text = priority.displayName,
+                                                style = MaterialTheme.typography.labelLarge,
+                                            )
+                                        }
+                                    },
+                                    onClick = {
+                                        selectedPriority = priority
+                                        selectedTask?.let { task ->
+                                            viewModel.updateTaskPriority(task.id, priority.value)
+                                        }
+                                        priorityExpanded = false
+                                    },
+                                )
+                            }
                         }
                     }
                 }
@@ -344,11 +447,11 @@ fun AddEditTaskDialog(
                                 val currentTime = System.currentTimeMillis()
                                 val eightHoursLater = currentTime + (8 * 60 * 60 * 1000L) // Add 8 hours
                                 viewModel.updateDueAt(eightHoursLater)
-                            }
+                            },
                         ) {
                             Icon(
                                 imageVector = Icons.Default.DateRange,
-                                contentDescription = "Select date and time"
+                                contentDescription = "Select date and time",
                             )
                         }
                     },
@@ -358,18 +461,18 @@ fun AddEditTaskDialog(
                                 Text(
                                     text = error,
                                     style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.error
+                                    color = MaterialTheme.colorScheme.error,
                                 )
                             }
                             if (dueAt != null) {
                                 Row {
                                     TextButton(
                                         onClick = { viewModel.updateDueAt(null) },
-                                        modifier = Modifier.padding(0.dp)
+                                        modifier = Modifier.padding(0.dp),
                                     ) {
                                         Text(
                                             text = "Clear",
-                                            style = MaterialTheme.typography.bodySmall
+                                            style = MaterialTheme.typography.bodySmall,
                                         )
                                     }
                                 }
@@ -378,8 +481,8 @@ fun AddEditTaskDialog(
                     },
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedBorderColor = MaterialTheme.colorScheme.primary,
-                        unfocusedBorderColor = MaterialTheme.colorScheme.outline
-                    )
+                        unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+                    ),
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -389,7 +492,7 @@ fun AddEditTaskDialog(
 
                 ExposedDropdownMenuBox(
                     expanded = reminderExpanded,
-                    onExpandedChange = { reminderExpanded = !reminderExpanded }
+                    onExpandedChange = { reminderExpanded = !reminderExpanded },
                 ) {
                     OutlinedTextField(
                         value = reminderOption.displayName,
@@ -408,19 +511,19 @@ fun AddEditTaskDialog(
                                 Text(
                                     text = error,
                                     style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.error
+                                    color = MaterialTheme.colorScheme.error,
                                 )
                             }
                         },
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedBorderColor = MaterialTheme.colorScheme.primary,
-                            unfocusedBorderColor = MaterialTheme.colorScheme.outline
-                        )
+                            unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+                        ),
                     )
 
                     ExposedDropdownMenu(
                         expanded = reminderExpanded,
-                        onDismissRequest = { reminderExpanded = false }
+                        onDismissRequest = { reminderExpanded = false },
                     ) {
                         // None option
                         DropdownMenuItem(
@@ -428,7 +531,7 @@ fun AddEditTaskDialog(
                             onClick = {
                                 viewModel.updateReminderOption(ReminderOption.NONE)
                                 reminderExpanded = false
-                            }
+                            },
                         )
 
                         // Selectable options
@@ -439,7 +542,7 @@ fun AddEditTaskDialog(
                                     handleReminderOptionChange(option)
                                     reminderExpanded = false
                                 },
-                                enabled = dueAt != null // Only allow selection if due date is set
+                                enabled = dueAt != null, // Only allow selection if due date is set
                             )
                         }
                     }
@@ -450,14 +553,14 @@ fun AddEditTaskDialog(
                     Card(
                         modifier = Modifier.fillMaxWidth(),
                         colors = CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.errorContainer
-                        )
+                            containerColor = MaterialTheme.colorScheme.errorContainer,
+                        ),
                     ) {
                         Text(
                             text = error,
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onErrorContainer,
-                            modifier = Modifier.padding(12.dp)
+                            modifier = Modifier.padding(12.dp),
                         )
                     }
                     Spacer(modifier = Modifier.height(16.dp))
@@ -468,24 +571,24 @@ fun AddEditTaskDialog(
                     Card(
                         modifier = Modifier.fillMaxWidth(),
                         colors = CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.primaryContainer
-                        )
+                            containerColor = MaterialTheme.colorScheme.primaryContainer,
+                        ),
                     ) {
                         Column(
-                            modifier = Modifier.padding(12.dp)
+                            modifier = Modifier.padding(12.dp),
                         ) {
                             Text(
                                 text = message,
                                 style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onPrimaryContainer
+                                color = MaterialTheme.colorScheme.onPrimaryContainer,
                             )
                             Spacer(modifier = Modifier.height(8.dp))
                             Row {
                                 TextButton(
                                     onClick = { permissionDeniedSnackbarMessage = null },
                                     colors = ButtonDefaults.textButtonColors(
-                                        contentColor = MaterialTheme.colorScheme.onPrimaryContainer
-                                    )
+                                        contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                                    ),
                                 ) {
                                     Text("Dismiss")
                                 }
@@ -496,8 +599,8 @@ fun AddEditTaskDialog(
                                         permissionDeniedSnackbarMessage = null
                                     },
                                     colors = ButtonDefaults.textButtonColors(
-                                        contentColor = MaterialTheme.colorScheme.onPrimaryContainer
-                                    )
+                                        contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                                    ),
                                 ) {
                                     Text("Open Settings")
                                 }
@@ -507,32 +610,42 @@ fun AddEditTaskDialog(
                     Spacer(modifier = Modifier.height(16.dp))
                 }
 
-                Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(AppSpacing.sectionSpacing))
 
-                // Action Buttons
+                // Enhanced Action Buttons
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.End,
-                    verticalAlignment = Alignment.CenterVertically
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    TextButton(
+                    OutlinedButton(
                         onClick = onDismiss,
                         enabled = !isLoading,
-                        colors = ButtonDefaults.textButtonColors(
-                            contentColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
-                        )
+                        colors = ButtonDefaults.outlinedButtonColors(
+                            contentColor = MaterialTheme.colorScheme.onSurface,
+                            disabledContentColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f),
+                        ),
+                        border = ButtonDefaults.outlinedButtonBorder.copy(
+                            width = 1.dp,
+                            brush = androidx.compose.ui.graphics.SolidColor(MaterialTheme.colorScheme.outline),
+                        ),
+                        shape = CustomShapes.searchField,
                     ) {
-                        Text("Cancel")
+                        Text(
+                            text = "Cancel",
+                            style = MaterialTheme.typography.labelLarge,
+                            fontWeight = FontWeight.Medium,
+                        )
                     }
 
-                    Spacer(modifier = Modifier.width(8.dp))
+                    Spacer(modifier = Modifier.width(AppSpacing.buttonSpacing))
 
                     Button(
                         onClick = {
                             // Check for notification permission before saving if reminder is set
                             if (reminderOption != ReminderOption.NONE &&
-                                NotificationPermission.shouldRequest() &&
-                                !NotificationPermission.isGranted(context)) {
+                                NotificationPermission.needsPermissionRequest(context)
+                            ) {
                                 // Need to request permission before saving
                                 pendingReminderOption = reminderOption
                                 shouldSaveAfterPermission = true
@@ -546,21 +659,37 @@ fun AddEditTaskDialog(
                         colors = ButtonDefaults.buttonColors(
                             containerColor = MaterialTheme.colorScheme.primary,
                             contentColor = MaterialTheme.colorScheme.onPrimary,
-                            disabledContainerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.3f),
-                            disabledContentColor = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.5f)
-                        )
+                            disabledContainerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.38f),
+                            disabledContentColor = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.38f),
+                        ),
+                        shape = CustomShapes.searchField,
+                        elevation = ButtonDefaults.buttonElevation(
+                            defaultElevation = 2.dp,
+                            pressedElevation = 4.dp,
+                        ),
                     ) {
                         if (isLoading) {
                             CircularProgressIndicator(
-                                modifier = Modifier.size(16.dp),
+                                modifier = Modifier.size(18.dp),
                                 strokeWidth = 2.dp,
-                                color = MaterialTheme.colorScheme.onPrimary
+                                color = MaterialTheme.colorScheme.onPrimary,
                             )
                         } else {
-                            Text(
-                                text = if (isEditing) "Update" else "Add",
-                                fontWeight = FontWeight.Medium
-                            )
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                            ) {
+                                Icon(
+                                    imageVector = if (isEditing) Icons.Default.Edit else Icons.Default.Add,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(16.dp),
+                                )
+                                Spacer(modifier = Modifier.width(AppSpacing.extraSmall))
+                                Text(
+                                    text = if (isEditing) "Update Task" else "Add Task",
+                                    style = MaterialTheme.typography.labelLarge,
+                                    fontWeight = FontWeight.Medium,
+                                )
+                            }
                         }
                     }
                 }
@@ -579,13 +708,13 @@ fun AddEditTaskDialog(
             title = {
                 Text(
                     text = "Enable notifications?",
-                    style = MaterialTheme.typography.headlineSmall
+                    style = MaterialTheme.typography.headlineSmall,
                 )
             },
             text = {
                 Text(
                     text = "Notifications are required for task reminders.",
-                    style = MaterialTheme.typography.bodyMedium
+                    style = MaterialTheme.typography.bodyMedium,
                 )
             },
             confirmButton = {
@@ -593,7 +722,7 @@ fun AddEditTaskDialog(
                     onClick = {
                         showNotificationPermissionDialog = false
                         permissionLauncher.launch(NotificationPermission.getPermissionString())
-                    }
+                    },
                 ) {
                     Text("Allow")
                 }
@@ -613,11 +742,11 @@ fun AddEditTaskDialog(
                             viewModel.saveTask()
                             shouldSaveAfterPermission = false
                         }
-                    }
+                    },
                 ) {
                     Text("Not now")
                 }
-            }
+            },
         )
     }
 }

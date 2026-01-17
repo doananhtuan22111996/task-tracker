@@ -19,12 +19,10 @@ class TaskFilterUseCase @Inject constructor() {
     /**
      * Applies status filter to a list of tasks
      */
-    fun filterTasksByStatus(tasks: List<Task>, filter: TaskFilter): List<Task> {
-        return when (filter) {
-            TaskFilter.ALL -> tasks
-            TaskFilter.ACTIVE -> tasks.filter { !it.isCompleted }
-            TaskFilter.COMPLETED -> tasks.filter { it.isCompleted }
-        }
+    fun filterTasksByStatus(tasks: List<Task>, filter: TaskFilter): List<Task> = when (filter) {
+        TaskFilter.ALL -> tasks
+        TaskFilter.ACTIVE -> tasks.filter { !it.isCompleted }
+        TaskFilter.COMPLETED -> tasks.filter { it.isCompleted }
     }
 
     /**

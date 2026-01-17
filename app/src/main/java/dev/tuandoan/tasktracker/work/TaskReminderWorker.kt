@@ -19,7 +19,7 @@ import dev.tuandoan.tasktracker.TaskTrackerApplication
 @HiltWorker
 class TaskReminderWorker @AssistedInject constructor(
     @Assisted context: Context,
-    @Assisted workerParams: WorkerParameters
+    @Assisted workerParams: WorkerParameters,
 ) : CoroutineWorker(context, workerParams) {
 
     companion object {
@@ -67,13 +67,13 @@ class TaskReminderWorker @AssistedInject constructor(
             applicationContext,
             taskId.toInt(),
             intent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
         )
 
         // Use app icon instead of system icon for better reliability
         val notification = NotificationCompat.Builder(
             applicationContext,
-            TaskTrackerApplication.TASK_REMINDER_CHANNEL_ID
+            TaskTrackerApplication.TASK_REMINDER_CHANNEL_ID,
         )
             .setSmallIcon(android.R.drawable.ic_dialog_alert) // Better system icon
             .setContentTitle("Task Reminder")

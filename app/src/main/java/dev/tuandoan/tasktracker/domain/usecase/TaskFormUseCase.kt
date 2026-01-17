@@ -88,7 +88,7 @@ class TaskFormUseCase @Inject constructor() {
     }
 
     val hasChanges: Flow<Boolean> = combine(
-        listOf(_taskTitle, _taskDescription, _dueAt, _reminderOption, _tag, _selectedTask)
+        listOf(_taskTitle, _taskDescription, _dueAt, _reminderOption, _tag, _selectedTask),
     ) { values ->
         val title = values[0] as String
         val description = values[1] as String
@@ -99,7 +99,10 @@ class TaskFormUseCase @Inject constructor() {
 
         if (selectedTask == null) {
             // Add mode - has changes if title is not blank or due date/reminder/tag is set
-            title.trim().isNotBlank() || dueAt != null || reminderOption != ReminderOption.NONE || tag.trim().isNotBlank()
+            title.trim().isNotBlank() ||
+                dueAt != null ||
+                reminderOption != ReminderOption.NONE ||
+                tag.trim().isNotBlank()
         } else {
             // Edit mode - has changes if values differ from original (after trimming)
             val titleChanged = title.trim() != originalTitle.trim()
@@ -112,12 +115,24 @@ class TaskFormUseCase @Inject constructor() {
         }
     }
 
-    val isSaveEnabled: Flow<Boolean> = combine(isTitleValid, isDueDateValid, isReminderValid, isTagValid, hasChanges) { titleValid, dueDateValid, reminderValid, tagValid, hasChanges ->
-        titleValid && dueDateValid && reminderValid && tagValid && hasChanges
-    }
+    val isSaveEnabled: Flow<Boolean> =
+        combine(isTitleValid, isDueDateValid, isReminderValid, isTagValid, hasChanges) {
+                titleValid,
+                dueDateValid,
+                reminderValid,
+                tagValid,
+                hasChanges,
+            ->
+            titleValid && dueDateValid && reminderValid && tagValid && hasChanges
+        }
 
     // Form Validation
-    fun isFormValid(): Flow<Boolean> = combine(isTitleValid, isDueDateValid, isReminderValid, isTagValid) { titleValid, dueDateValid, reminderValid, tagValid ->
+    fun isFormValid(): Flow<Boolean> = combine(isTitleValid, isDueDateValid, isReminderValid, isTagValid) {
+            titleValid,
+            dueDateValid,
+            reminderValid,
+            tagValid,
+        ->
         titleValid && dueDateValid && reminderValid && tagValid
     }
 
@@ -261,27 +276,35 @@ class TaskFormUseCase @Inject constructor() {
         return when {
             title.isEmpty() -> false to "Title cannot be empty"
             title.length > MAX_TITLE_LENGTH -> false to "Title must be ≤ $MAX_TITLE_LENGTH characters"
-            description.length > MAX_DESCRIPTION_LENGTH -> false to "Description must be ≤ $MAX_DESCRIPTION_LENGTH characters"
+            description.length > MAX_DESCRIPTION_LENGTH ->
+                false to
+                    "Description must be ≤ $MAX_DESCRIPTION_LENGTH characters"
             tag.length > MAX_TAG_LENGTH -> false to "Tag must be ≤ $MAX_TAG_LENGTH characters"
             dueAt != null && dueAt <= System.currentTimeMillis() -> false to "Due date must be in the future"
             reminderOption != ReminderOption.NONE && dueAt == null -> false to "Due date is required for reminders"
-            reminderOption != ReminderOption.NONE && dueAt != null && !isReminderTimeValid(dueAt, reminderOption.offsetMinutes) ->
+            reminderOption != ReminderOption.NONE &&
+                dueAt != null &&
+                !isReminderTimeValid(dueAt, reminderOption.offsetMinutes) ->
                 false to "Reminder time must be in the future. Choose a later due date or smaller reminder."
             else -> true to null
         }
     }
 
     // Get trimmed form data for saving
-    fun getTrimmedFormData(): FormData {
-        return FormData(
-            title = _taskTitle.value.trim(),
-            description = _taskDescription.value.trim(),
-            selectedTaskId = _selectedTask.value?.id,
-            dueAt = _dueAt.value,
-            reminderOffsetMinutes = if (_reminderOption.value == ReminderOption.NONE) null else _reminderOption.value.offsetMinutes,
-            tag = _tag.value.trim().takeIf { it.isNotEmpty() }
-        )
-    }
+    fun getTrimmedFormData(): FormData = FormData(
+        title = _taskTitle.value.trim(),
+        description = _taskDescription.value.trim(),
+        selectedTaskId = _selectedTask.value?.id,
+        dueAt = _dueAt.value,
+        reminderOffsetMinutes = if (_reminderOption.value ==
+            ReminderOption.NONE
+        ) {
+            null
+        } else {
+            _reminderOption.value.offsetMinutes
+        },
+        tag = _tag.value.trim().takeIf { it.isNotEmpty() },
+    )
 
     // Error Management
     fun setError(message: String) {
@@ -307,11 +330,11 @@ class TaskFormUseCase @Inject constructor() {
         val selectedTaskId: Long?,
         val dueAt: Long?,
         val reminderOffsetMinutes: Int?,
-        val tag: String?
+        val tag: String?,
     )
 
     fun getFormData(): Flow<FormData> = combine(
-        listOf(_taskTitle, _taskDescription, _selectedTask, _dueAt, _reminderOption, _tag)
+        listOf(_taskTitle, _taskDescription, _selectedTask, _dueAt, _reminderOption, _tag),
     ) { values ->
         val title = values[0] as String
         val description = values[1] as String
@@ -326,7 +349,7 @@ class TaskFormUseCase @Inject constructor() {
             selectedTaskId = selectedTask?.id,
             dueAt = dueAt,
             reminderOffsetMinutes = if (reminderOption == ReminderOption.NONE) null else reminderOption.offsetMinutes,
-            tag = tag.trim().takeIf { it.isNotEmpty() }
+            tag = tag.trim().takeIf { it.isNotEmpty() },
         )
     }
 }

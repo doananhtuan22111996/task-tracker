@@ -24,9 +24,7 @@ abstract class RepositoryModule {
      */
     @Binds
     @Singleton
-    abstract fun bindTaskRepository(
-        taskRepository: TaskRepository
-    ): ITaskRepository
+    abstract fun bindTaskRepository(taskRepository: TaskRepository): ITaskRepository
 
     /**
      * Binds TaskManager implementation to ITaskManager interface.
@@ -34,7 +32,5 @@ abstract class RepositoryModule {
      */
     @Binds
     @Singleton
-    abstract fun bindTaskManager(
-        taskManager: TaskManager
-    ): ITaskManager
+    abstract fun bindTaskManager(taskManager: TaskManager): ITaskManager
 }

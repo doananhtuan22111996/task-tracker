@@ -10,12 +10,36 @@ interface ITaskManager {
 
     // Task operations
     suspend fun createTask(title: String, description: String = ""): Long
-    suspend fun createTask(title: String, description: String = "", dueAt: Long? = null, reminderOffsetMinutes: Int? = null): Long
-    suspend fun createTask(title: String, description: String = "", dueAt: Long? = null, reminderOffsetMinutes: Int? = null, tag: String? = null): Long
+    suspend fun createTask(
+        title: String,
+        description: String = "",
+        dueAt: Long? = null,
+        reminderOffsetMinutes: Int? = null,
+    ): Long
+    suspend fun createTask(
+        title: String,
+        description: String = "",
+        dueAt: Long? = null,
+        reminderOffsetMinutes: Int? = null,
+        tag: String? = null,
+    ): Long
     suspend fun updateTask(task: Task)
     suspend fun updateTaskContent(taskId: Long, title: String, description: String)
-    suspend fun updateTaskContent(taskId: Long, title: String, description: String, dueAt: Long?, reminderOffsetMinutes: Int?): Boolean
-    suspend fun updateTaskContent(taskId: Long, title: String, description: String, dueAt: Long?, reminderOffsetMinutes: Int?, tag: String?): Boolean
+    suspend fun updateTaskContent(
+        taskId: Long,
+        title: String,
+        description: String,
+        dueAt: Long?,
+        reminderOffsetMinutes: Int?,
+    ): Boolean
+    suspend fun updateTaskContent(
+        taskId: Long,
+        title: String,
+        description: String,
+        dueAt: Long?,
+        reminderOffsetMinutes: Int?,
+        tag: String?,
+    ): Boolean
     suspend fun deleteTask(task: Task)
     suspend fun restoreTask(task: Task): Result<Unit>
     suspend fun toggleTaskCompletion(task: Task)

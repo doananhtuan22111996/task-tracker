@@ -8,7 +8,8 @@ enum class ReminderOption(val displayName: String, val offsetMinutes: Int) {
     MINUTES_1("1 minutes before", 1),
     MINUTES_5("5 minutes before", 5),
     HOURS_1("1 hour before", 60),
-    DAYS_1("1 day before", 24 * 60);
+    DAYS_1("1 day before", 24 * 60),
+    ;
 
     companion object {
         /**
@@ -23,8 +24,6 @@ enum class ReminderOption(val displayName: String, val offsetMinutes: Int) {
         /**
          * Get all options except NONE for UI display.
          */
-        fun getSelectableOptions(): List<ReminderOption> {
-            return entries.filter { it != NONE }
-        }
+        fun getSelectableOptions(): List<ReminderOption> = entries.filter { it != NONE }
     }
 }

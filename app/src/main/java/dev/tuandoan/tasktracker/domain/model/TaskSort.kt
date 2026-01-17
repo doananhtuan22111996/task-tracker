@@ -6,7 +6,8 @@ package dev.tuandoan.tasktracker.domain.model
 enum class Priority(val value: Int, val displayName: String) {
     LOW(0, "Low"),
     MEDIUM(1, "Medium"),
-    HIGH(2, "High");
+    HIGH(2, "High"),
+    ;
 
     companion object {
         fun fromValue(value: Int): Priority = when (value) {
@@ -24,24 +25,24 @@ enum class Priority(val value: Int, val displayName: String) {
 enum class SortKey {
     CREATED_AT,
     TITLE,
-    PRIORITY
+    PRIORITY,
 }
 
 /**
  * Defines the sorting direction
  */
 enum class SortDirection {
-    ASC,    // Ascending
-    DESC    // Descending
+    ASC, // Ascending
+    DESC, // Descending
 }
 
 /**
  * Defines how completed tasks should be grouped
  */
 enum class CompletedGrouping {
-    NONE,               // No special grouping
-    COMPLETED_FIRST,    // Show completed tasks first
-    COMPLETED_LAST      // Show completed tasks last
+    NONE, // No special grouping
+    COMPLETED_FIRST, // Show completed tasks first
+    COMPLETED_LAST, // Show completed tasks last
 }
 
 /**
@@ -50,7 +51,7 @@ enum class CompletedGrouping {
 data class TaskSort(
     val key: SortKey = SortKey.CREATED_AT,
     val direction: SortDirection = SortDirection.DESC, // Default newest first
-    val completedGrouping: CompletedGrouping = CompletedGrouping.NONE
+    val completedGrouping: CompletedGrouping = CompletedGrouping.NONE,
 ) {
     /**
      * Returns a human-readable description of the current sort

@@ -57,7 +57,7 @@ import javax.inject.Singleton
 @Singleton
 class TaskBulkActionManager @Inject constructor(
     private val crudManager: TaskCrudManager,
-    private val selectionStateManager: TaskSelectionStateManager
+    private val selectionStateManager: TaskSelectionStateManager,
 ) {
 
     // === Constants ===
@@ -112,11 +112,7 @@ class TaskBulkActionManager @Inject constructor(
      * @see bulkMarkActive
      * @see SelectionValidationResult
      */
-    fun bulkMarkCompleted(
-        scope: CoroutineScope,
-        onSuccess: (String) -> Unit = {},
-        onError: (String) -> Unit = {}
-    ) {
+    fun bulkMarkCompleted(scope: CoroutineScope, onSuccess: (String) -> Unit = {}, onError: (String) -> Unit = {}) {
         executeBulkOperation(
             scope = scope,
             operation = { taskIds ->
@@ -126,7 +122,7 @@ class TaskBulkActionManager @Inject constructor(
             errorMessage = "Failed to mark tasks as completed",
             clearSelectionOnSuccess = true,
             onSuccess = onSuccess,
-            onError = onError
+            onError = onError,
         )
     }
 
@@ -136,11 +132,7 @@ class TaskBulkActionManager @Inject constructor(
      * @param onSuccess Callback executed on successful completion
      * @param onError Callback executed on error
      */
-    fun bulkMarkActive(
-        scope: CoroutineScope,
-        onSuccess: (String) -> Unit = {},
-        onError: (String) -> Unit = {}
-    ) {
+    fun bulkMarkActive(scope: CoroutineScope, onSuccess: (String) -> Unit = {}, onError: (String) -> Unit = {}) {
         executeBulkOperation(
             scope = scope,
             operation = { taskIds ->
@@ -150,7 +142,7 @@ class TaskBulkActionManager @Inject constructor(
             errorMessage = "Failed to mark tasks as active",
             clearSelectionOnSuccess = true,
             onSuccess = onSuccess,
-            onError = onError
+            onError = onError,
         )
     }
 
@@ -176,7 +168,7 @@ class TaskBulkActionManager @Inject constructor(
                     _pendingBulkDeleteTasks.value = listOf(task)
                 } else {
                     throw IllegalStateException(
-                        "Selected task with ID ${validation.taskId} not found in task list"
+                        "Selected task with ID ${validation.taskId} not found in task list",
                     )
                 }
             }
@@ -189,7 +181,7 @@ class TaskBulkActionManager @Inject constructor(
                         allTasks.none { it.id == selectedId }
                     }
                     throw IllegalStateException(
-                        "Some selected tasks not found in task list. Missing IDs: $missingIds"
+                        "Some selected tasks not found in task list. Missing IDs: $missingIds",
                     )
                 }
 
@@ -211,7 +203,7 @@ class TaskBulkActionManager @Inject constructor(
 
         if (tasksToDelete.any { it.id <= 0 }) {
             throw IllegalStateException(
-                "Invalid task IDs found: ${tasksToDelete.filter { it.id <= 0 }.map { it.id }}"
+                "Invalid task IDs found: ${tasksToDelete.filter { it.id <= 0 }.map { it.id }}",
             )
         }
 
@@ -230,30 +222,30 @@ class TaskBulkActionManager @Inject constructor(
                         _uiEvent.emit(
                             UiEvent.ShowUndoDelete(
                                 tasks = tasksToDelete,
-                                onUndo = { restoreTasks(scope, tasksToDelete) }
-                            )
+                                onUndo = { restoreTasks(scope, tasksToDelete) },
+                            ),
                         )
                     }
                     is TaskOperationResult.CrudError -> {
                         _uiEvent.emit(
                             UiEvent.ShowSnackbar(
-                                message = result.message
-                            )
+                                message = result.message,
+                            ),
                         )
                     }
                     is TaskOperationResult.ValidationError -> {
                         _uiEvent.emit(
                             UiEvent.ShowSnackbar(
-                                message = result.message
-                            )
+                                message = result.message,
+                            ),
                         )
                     }
                 }
             } catch (e: Exception) {
                 _uiEvent.emit(
                     UiEvent.ShowSnackbar(
-                        message = "Failed to delete tasks: ${e.message}"
-                    )
+                        message = "Failed to delete tasks: ${e.message}",
+                    ),
                 )
             }
         }
@@ -288,7 +280,7 @@ class TaskBulkActionManager @Inject constructor(
                     _pendingBulkArchiveTasks.value = listOf(task)
                 } else {
                     throw IllegalStateException(
-                        "Selected task with ID ${validation.taskId} not found in task list"
+                        "Selected task with ID ${validation.taskId} not found in task list",
                     )
                 }
             }
@@ -301,7 +293,7 @@ class TaskBulkActionManager @Inject constructor(
                         allTasks.none { it.id == selectedId }
                     }
                     throw IllegalStateException(
-                        "Some selected tasks not found in task list. Missing IDs: $missingIds"
+                        "Some selected tasks not found in task list. Missing IDs: $missingIds",
                     )
                 }
 
@@ -323,7 +315,7 @@ class TaskBulkActionManager @Inject constructor(
 
         if (tasksToArchive.any { it.id <= 0 }) {
             throw IllegalStateException(
-                "Invalid task IDs found: ${tasksToArchive.filter { it.id <= 0 }.map { it.id }}"
+                "Invalid task IDs found: ${tasksToArchive.filter { it.id <= 0 }.map { it.id }}",
             )
         }
 
@@ -343,30 +335,30 @@ class TaskBulkActionManager @Inject constructor(
                             UiEvent.ShowUndoDelete(
                                 tasks = tasksToArchive,
                                 onUndo = { restoreArchivedTasks(scope, tasksToArchive) },
-                                message = "${tasksToArchive.size} tasks archived"
-                            )
+                                message = "${tasksToArchive.size} tasks archived",
+                            ),
                         )
                     }
                     is TaskOperationResult.CrudError -> {
                         _uiEvent.emit(
                             UiEvent.ShowSnackbar(
-                                message = result.message
-                            )
+                                message = result.message,
+                            ),
                         )
                     }
                     is TaskOperationResult.ValidationError -> {
                         _uiEvent.emit(
                             UiEvent.ShowSnackbar(
-                                message = result.message
-                            )
+                                message = result.message,
+                            ),
                         )
                     }
                 }
             } catch (e: Exception) {
                 _uiEvent.emit(
                     UiEvent.ShowSnackbar(
-                        message = "Failed to archive tasks: ${e.message}"
-                    )
+                        message = "Failed to archive tasks: ${e.message}",
+                    ),
                 )
             }
         }
@@ -393,30 +385,30 @@ class TaskBulkActionManager @Inject constructor(
                     is TaskOperationResult.Success -> {
                         _uiEvent.emit(
                             UiEvent.ShowSnackbar(
-                                message = result.message
-                            )
+                                message = result.message,
+                            ),
                         )
                     }
                     is TaskOperationResult.CrudError -> {
                         _uiEvent.emit(
                             UiEvent.ShowSnackbar(
-                                message = "Failed to restore tasks: ${result.message}"
-                            )
+                                message = "Failed to restore tasks: ${result.message}",
+                            ),
                         )
                     }
                     is TaskOperationResult.ValidationError -> {
                         _uiEvent.emit(
                             UiEvent.ShowSnackbar(
-                                message = result.message
-                            )
+                                message = result.message,
+                            ),
                         )
                     }
                 }
             } catch (e: Exception) {
                 _uiEvent.emit(
                     UiEvent.ShowSnackbar(
-                        message = "Failed to restore tasks: ${e.message}"
-                    )
+                        message = "Failed to restore tasks: ${e.message}",
+                    ),
                 )
             }
         }
@@ -437,30 +429,30 @@ class TaskBulkActionManager @Inject constructor(
                     is TaskOperationResult.Success -> {
                         _uiEvent.emit(
                             UiEvent.ShowSnackbar(
-                                message = "${tasks.size} tasks restored from archive"
-                            )
+                                message = "${tasks.size} tasks restored from archive",
+                            ),
                         )
                     }
                     is TaskOperationResult.CrudError -> {
                         _uiEvent.emit(
                             UiEvent.ShowSnackbar(
-                                message = "Failed to restore tasks from archive: ${result.message}"
-                            )
+                                message = "Failed to restore tasks from archive: ${result.message}",
+                            ),
                         )
                     }
                     is TaskOperationResult.ValidationError -> {
                         _uiEvent.emit(
                             UiEvent.ShowSnackbar(
-                                message = result.message
-                            )
+                                message = result.message,
+                            ),
                         )
                     }
                 }
             } catch (e: Exception) {
                 _uiEvent.emit(
                     UiEvent.ShowSnackbar(
-                        message = "Failed to restore tasks from archive: ${e.message}"
-                    )
+                        message = "Failed to restore tasks from archive: ${e.message}",
+                    ),
                 )
             }
         }
@@ -485,7 +477,7 @@ class TaskBulkActionManager @Inject constructor(
         errorMessage: String,
         clearSelectionOnSuccess: Boolean = true,
         onSuccess: (String) -> Unit = {},
-        onError: (String) -> Unit = {}
+        onError: (String) -> Unit = {},
     ) {
         if (!scope.coroutineContext[kotlinx.coroutines.Job]?.isActive!!) {
             onError("Operation cancelled: scope is not active")
@@ -567,11 +559,7 @@ class TaskBulkActionManager @Inject constructor(
      * @param onSuccess Callback executed on successful completion
      * @param onError Callback executed on error
      */
-    fun bulkRestoreArchived(
-        scope: CoroutineScope,
-        onSuccess: (String) -> Unit = {},
-        onError: (String) -> Unit = {}
-    ) {
+    fun bulkRestoreArchived(scope: CoroutineScope, onSuccess: (String) -> Unit = {}, onError: (String) -> Unit = {}) {
         executeBulkOperation(
             scope = scope,
             operation = { taskIds ->
@@ -581,7 +569,7 @@ class TaskBulkActionManager @Inject constructor(
             errorMessage = "Failed to restore archived tasks",
             clearSelectionOnSuccess = true,
             onSuccess = onSuccess,
-            onError = onError
+            onError = onError,
         )
     }
 
@@ -607,7 +595,7 @@ class TaskBulkActionManager @Inject constructor(
                     _pendingBulkDeleteTasks.value = listOf(task)
                 } else {
                     throw IllegalStateException(
-                        "Selected archived task with ID ${validation.taskId} not found in archived task list"
+                        "Selected archived task with ID ${validation.taskId} not found in archived task list",
                     )
                 }
             }
@@ -620,7 +608,7 @@ class TaskBulkActionManager @Inject constructor(
                         archivedTasks.none { it.id == selectedId }
                     }
                     throw IllegalStateException(
-                        "Some selected archived tasks not found in task list. Missing IDs: $missingIds"
+                        "Some selected archived tasks not found in task list. Missing IDs: $missingIds",
                     )
                 }
 
@@ -642,7 +630,7 @@ class TaskBulkActionManager @Inject constructor(
 
         if (tasksToDelete.any { it.id <= 0 }) {
             throw IllegalStateException(
-                "Invalid task IDs found: ${tasksToDelete.filter { it.id <= 0 }.map { it.id }}"
+                "Invalid task IDs found: ${tasksToDelete.filter { it.id <= 0 }.map { it.id }}",
             )
         }
 
@@ -660,30 +648,30 @@ class TaskBulkActionManager @Inject constructor(
 
                         _uiEvent.emit(
                             UiEvent.ShowSnackbar(
-                                message = "${tasksToDelete.size} tasks permanently deleted"
-                            )
+                                message = "${tasksToDelete.size} tasks permanently deleted",
+                            ),
                         )
                     }
                     is TaskOperationResult.CrudError -> {
                         _uiEvent.emit(
                             UiEvent.ShowSnackbar(
-                                message = result.message
-                            )
+                                message = result.message,
+                            ),
                         )
                     }
                     is TaskOperationResult.ValidationError -> {
                         _uiEvent.emit(
                             UiEvent.ShowSnackbar(
-                                message = result.message
-                            )
+                                message = result.message,
+                            ),
                         )
                     }
                 }
             } catch (e: Exception) {
                 _uiEvent.emit(
                     UiEvent.ShowSnackbar(
-                        message = "Failed to permanently delete tasks: ${e.message}"
-                    )
+                        message = "Failed to permanently delete tasks: ${e.message}",
+                    ),
                 )
             }
         }

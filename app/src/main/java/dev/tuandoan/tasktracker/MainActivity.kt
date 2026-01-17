@@ -4,14 +4,12 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Archive
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -53,35 +51,28 @@ fun TaskTrackerApp() {
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = when {
-                            showArchivedScreen -> "Archived Tasks"
-                            showStatsScreen -> "Stats"
-                            else -> "Task Tracker"
-                        },
-                        style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Bold
-                    )
-                },
-                actions = {
-                    if (!showArchivedScreen && !showStatsScreen) {
-                        // Show archive button only on main screen
-                        IconButton(onClick = { showArchivedScreen = true }) {
-                            Icon(
-                                imageVector = Icons.Default.Archive,
-                                contentDescription = "View archived tasks"
-                            )
-                        }
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
+            // Only show TopAppBar for archived and stats screens (they need back navigation)
+            if (showArchivedScreen || showStatsScreen) {
+                TopAppBar(
+                    title = {
+                        Text(
+                            text = when {
+                                showArchivedScreen -> "Archived Tasks"
+                                showStatsScreen -> "Stats"
+                                else -> "Task Tracker"
+                            },
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.Bold,
+                            textAlign = TextAlign.Left,
+                        )
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.primaryContainer,
+                        titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                    ),
                 )
-            )
-        }
+            }
+        },
     ) { paddingValues ->
         when {
             showArchivedScreen -> {
@@ -91,7 +82,7 @@ fun TaskTrackerApp() {
                         showArchivedScreen = false
                         showStatsScreen = false
                     },
-                    modifier = Modifier.padding(paddingValues)
+                    modifier = Modifier.padding(paddingValues),
                 )
             }
             showStatsScreen -> {
@@ -101,17 +92,21 @@ fun TaskTrackerApp() {
                         showStatsScreen = false
                         showArchivedScreen = false
                     },
-                    modifier = Modifier.padding(paddingValues)
+                    modifier = Modifier.padding(paddingValues),
                 )
             }
             else -> {
                 TaskListScreen(
+                    modifier = Modifier, // No padding needed since no outer TopAppBar
                     viewModel = viewModel,
                     onStatsClick = {
                         showStatsScreen = true
                         showArchivedScreen = false
                     },
-                    modifier = Modifier.padding(paddingValues)
+                    onArchiveClick = {
+                        showArchivedScreen = true
+                        showStatsScreen = false
+                    },
                 )
             }
         }

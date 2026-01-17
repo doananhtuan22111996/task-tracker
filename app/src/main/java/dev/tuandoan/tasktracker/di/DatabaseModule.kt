@@ -118,24 +118,18 @@ object DatabaseModule {
      */
     @Provides
     @Singleton
-    fun provideTaskDatabase(
-        @ApplicationContext context: Context
-    ): TaskDatabase {
-        return Room.databaseBuilder(
-            context = context.applicationContext,
-            klass = TaskDatabase::class.java,
-            name = "task_database"
-        )
-            .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6)
-            .build()
-    }
+    fun provideTaskDatabase(@ApplicationContext context: Context): TaskDatabase = Room.databaseBuilder(
+        context = context.applicationContext,
+        klass = TaskDatabase::class.java,
+        name = "task_database",
+    )
+        .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6)
+        .build()
 
     /**
      * Provides TaskDao from the database.
      * No @Singleton needed here as it's tied to the singleton database instance.
      */
     @Provides
-    fun provideTaskDao(database: TaskDatabase): TaskDao {
-        return database.taskDao()
-    }
+    fun provideTaskDao(database: TaskDatabase): TaskDao = database.taskDao()
 }

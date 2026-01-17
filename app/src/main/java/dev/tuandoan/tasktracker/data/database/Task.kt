@@ -18,5 +18,5 @@ data class Task(
     val isPinned: Boolean = false, // Pin/unpin tasks to keep important items on top
     val priority: Int = 1, // Priority level: 0=LOW, 1=MEDIUM, 2=HIGH (default MEDIUM)
     val isArchived: Boolean = false, // Archive tasks instead of deleting (soft delete)
-    val archivedAt: Long? = null // Timestamp when task was archived (nullable)
+    val archivedAt: Long? = null, // Timestamp when task was archived (nullable)
 )

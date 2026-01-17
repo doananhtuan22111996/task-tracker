@@ -35,12 +35,12 @@ class TaskSortService @Inject constructor() {
             CompletedGrouping.COMPLETED_FIRST -> {
                 val (completed, active) = tasks.partition { it.isCompleted }
                 applySorting(completed, sort.key, sort.direction) +
-                applySorting(active, sort.key, sort.direction)
+                    applySorting(active, sort.key, sort.direction)
             }
             CompletedGrouping.COMPLETED_LAST -> {
                 val (completed, active) = tasks.partition { it.isCompleted }
                 applySorting(active, sort.key, sort.direction) +
-                applySorting(completed, sort.key, sort.direction)
+                    applySorting(completed, sort.key, sort.direction)
             }
         }
     }
@@ -90,7 +90,7 @@ class TaskSortService @Inject constructor() {
     fun getDefaultSort(): TaskSort = TaskSort(
         key = SortKey.CREATED_AT,
         direction = SortDirection.DESC,
-        completedGrouping = CompletedGrouping.NONE
+        completedGrouping = CompletedGrouping.NONE,
     )
 
     /**
@@ -106,6 +106,6 @@ class TaskSortService @Inject constructor() {
         TaskSort(SortKey.CREATED_AT, SortDirection.DESC, CompletedGrouping.NONE),
         TaskSort(SortKey.CREATED_AT, SortDirection.ASC, CompletedGrouping.NONE),
         TaskSort(SortKey.TITLE, SortDirection.ASC, CompletedGrouping.NONE),
-        TaskSort(SortKey.PRIORITY, SortDirection.DESC, CompletedGrouping.NONE) // Priority: High to Low
+        TaskSort(SortKey.PRIORITY, SortDirection.DESC, CompletedGrouping.NONE), // Priority: High to Low
     )
 }

@@ -10,6 +10,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import dev.tuandoan.tasktracker.data.database.Task
+import dev.tuandoan.tasktracker.ui.theme.AppSpacing
+import dev.tuandoan.tasktracker.ui.theme.CustomShapes
 import dev.tuandoan.tasktracker.ui.viewmodel.TaskFilter
 import dev.tuandoan.tasktracker.utils.TaskSection
 
@@ -37,34 +39,32 @@ fun TaskListContent(
     onPinTask: (Task) -> Unit,
     onLongPressTask: (Long) -> Unit,
     onToggleSelection: (Long) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Column(
         modifier = modifier
             .fillMaxSize()
-            .padding(horizontal = 16.dp)
+            .padding(horizontal = AppSpacing.screenPadding),
     ) {
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Search Field
+        // Search Field - placed directly below TopAppBar with minimal spacing
         SearchField(
             query = searchQuery,
             onQueryChange = onSearchQueryChange,
-            onClearClick = onClearSearch
+            onClearClick = onClearSearch,
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(AppSpacing.small))
 
-        // Filter Tabs
+        // Filter Tabs - compact spacing for cohesive feel
         FilterTabs(
             currentFilter = currentFilter,
             onFilterChange = onFilterChange,
             currentTagFilter = currentTagFilter,
             availableTags = availableTags,
-            onTagFilterChange = onTagFilterChange
+            onTagFilterChange = onTagFilterChange,
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(AppSpacing.small))
 
         // Task List or Empty State
         TaskListOrEmptyState(
@@ -82,7 +82,7 @@ fun TaskListContent(
             onLongPressTask = onLongPressTask,
             onToggleSelection = onToggleSelection,
             onClearSearch = onClearSearch,
-            onChangeFilter = { onFilterChange(TaskFilter.ALL) }
+            onChangeFilter = { onFilterChange(TaskFilter.ALL) },
         )
     }
 }
@@ -106,7 +106,7 @@ private fun TaskListOrEmptyState(
     onLongPressTask: (Long) -> Unit,
     onToggleSelection: (Long) -> Unit,
     onClearSearch: () -> Unit,
-    onChangeFilter: () -> Unit
+    onChangeFilter: () -> Unit,
 ) {
     when {
         allTasks.isEmpty() -> {
@@ -117,7 +117,7 @@ private fun TaskListOrEmptyState(
                 hasQuery = searchQuery.isNotEmpty(),
                 filter = currentFilter,
                 onClearSearch = onClearSearch,
-                onChangeFilter = onChangeFilter
+                onChangeFilter = onChangeFilter,
             )
         }
         else -> {
@@ -130,7 +130,7 @@ private fun TaskListOrEmptyState(
                 onArchiveTask = onArchiveTask,
                 onPinTask = onPinTask,
                 onLongPressTask = onLongPressTask,
-                onToggleSelection = onToggleSelection
+                onToggleSelection = onToggleSelection,
             )
         }
     }
@@ -150,24 +150,27 @@ private fun GroupedTaskList(
     onArchiveTask: (Task) -> Unit,
     onPinTask: (Task) -> Unit,
     onLongPressTask: (Long) -> Unit,
-    onToggleSelection: (Long) -> Unit
+    onToggleSelection: (Long) -> Unit,
 ) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.spacedBy(4.dp)
+        verticalArrangement = Arrangement.spacedBy(AppSpacing.extraSmall),
+        contentPadding = PaddingValues(
+            bottom = 88.dp, // FAB height (56dp) + margin (32dp) for proper clearance
+        ),
     ) {
         taskSections.forEach { section ->
             // Sticky header for each day section
             stickyHeader(key = section.dateKey) {
                 TaskSectionHeader(
-                    header = section.header
+                    header = section.header,
                 )
             }
 
             // Tasks in this section
             items(
                 items = section.tasks,
-                key = { task -> task.id }
+                key = { task -> task.id },
             ) { task ->
                 TaskItem(
                     task = task,
@@ -178,7 +181,7 @@ private fun GroupedTaskList(
                     onArchiveClick = { onArchiveTask(task) },
                     onPinClick = { onPinTask(task) },
                     onLongPress = { onLongPressTask(task.id) },
-                    onToggleSelection = { onToggleSelection(task.id) }
+                    onToggleSelection = { onToggleSelection(task.id) },
                 )
             }
         }
@@ -186,30 +189,30 @@ private fun GroupedTaskList(
 }
 
 /**
- * Header for a task section (Today, Yesterday, etc.)
+ * Enhanced header for a task section (Today, Yesterday, etc.) with improved Material 3 styling
  */
 @Composable
-fun TaskSectionHeader(
-    header: String
-) {
+fun TaskSectionHeader(header: String) {
     Surface(
         modifier = Modifier.fillMaxWidth(),
-        color = MaterialTheme.colorScheme.background.copy(alpha = 0.95f)
+        color = MaterialTheme.colorScheme.surfaceContainerLow.copy(alpha = 0.98f),
+        shape = CustomShapes.sectionHeader,
+        tonalElevation = 2.dp,
     ) {
         Column {
             Text(
                 text = header,
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.SemiBold,
+                style = MaterialTheme.typography.titleSmall,
+                fontWeight = FontWeight.Medium,
                 color = MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier.padding(
-                    horizontal = 16.dp,
-                    vertical = 12.dp
-                )
+                    horizontal = AppSpacing.large,
+                    vertical = AppSpacing.small, // Compact header padding per layout guidelines
+                ),
             )
             HorizontalDivider(
-                color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f),
-                thickness = 0.5.dp
+                color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f),
+                thickness = 1.dp,
             )
         }
     }

@@ -7,7 +7,6 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.provider.Settings
-import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 
 /**
@@ -19,24 +18,26 @@ object NotificationPermission {
      * Check if notification permission is granted.
      * Always returns true for API < 33 since no runtime permission is required.
      */
-    fun isGranted(context: Context): Boolean {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            ContextCompat.checkSelfPermission(
-                context,
-                Manifest.permission.POST_NOTIFICATIONS
-            ) == PackageManager.PERMISSION_GRANTED
-        } else {
-            true // No runtime permission required before API 33
-        }
+    fun isGranted(context: Context): Boolean = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        ContextCompat.checkSelfPermission(
+            context,
+            Manifest.permission.POST_NOTIFICATIONS,
+        ) == PackageManager.PERMISSION_GRANTED
+    } else {
+        true // No runtime permission required before API 33
     }
 
     /**
      * Check if we should request notification permission.
-     * Only returns true for API >= 33.
+     * Only returns true for API >= 33 where runtime permission is required.
      */
-    fun shouldRequest(): Boolean {
-        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
-    }
+    fun shouldRequest(): Boolean = Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
+
+    /**
+     * Check if we need to request notification permission for the given context.
+     * Combines both API level check and current permission status.
+     */
+    fun needsPermissionRequest(context: Context): Boolean = shouldRequest() && !isGranted(context)
 
     /**
      * Open the app's notification settings screen.
@@ -62,10 +63,8 @@ object NotificationPermission {
 
     /**
      * Get the notification permission string for requesting.
-     * Only relevant for API >= 33.
+     * Returns the permission constant - safe to call on any API level.
+     * Only meaningful for permission requests on API >= 33.
      */
-    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
-    fun getPermissionString(): String {
-        return Manifest.permission.POST_NOTIFICATIONS
-    }
+    fun getPermissionString(): String = Manifest.permission.POST_NOTIFICATIONS
 }

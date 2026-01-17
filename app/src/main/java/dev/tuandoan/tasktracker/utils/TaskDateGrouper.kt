@@ -10,7 +10,7 @@ import java.util.*
 data class TaskSection(
     val header: String, // e.g., "Today", "Yesterday", "Jan 15, 2026"
     val dateKey: String, // e.g., "2026-01-15" for sorting/grouping
-    val tasks: List<Task>
+    val tasks: List<Task>,
 )
 
 /**
@@ -55,7 +55,7 @@ object TaskDateGrouper {
                 TaskSection(
                     header = getDateHeaderLabel(dateKey, today, yesterday, tomorrow),
                     dateKey = dateKey,
-                    tasks = applyPinnedFirstOrdering(tasksInGroup)
+                    tasks = applyPinnedFirstOrdering(tasksInGroup),
                 )
             }
     }
@@ -90,7 +90,7 @@ object TaskDateGrouper {
         dateKey: String,
         todayKey: String,
         yesterdayKey: String,
-        tomorrowKey: String
+        tomorrowKey: String,
     ): String {
         return when (dateKey) {
             todayKey -> "Today"

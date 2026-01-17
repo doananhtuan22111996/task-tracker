@@ -29,11 +29,7 @@ import dev.tuandoan.tasktracker.ui.viewmodel.StatsViewModel
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun StatsScreen(
-    viewModel: StatsViewModel,
-    onNavigateBack: () -> Unit,
-    modifier: Modifier = Modifier
-) {
+fun StatsScreen(viewModel: StatsViewModel, onNavigateBack: () -> Unit, modifier: Modifier = Modifier) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     Scaffold(
@@ -45,12 +41,12 @@ fun StatsScreen(
                     IconButton(onClick = onNavigateBack) {
                         Icon(
                             imageVector = Icons.Default.ArrowBack,
-                            contentDescription = "Back"
+                            contentDescription = "Back",
                         )
                     }
-                }
+                },
             )
-        }
+        },
     ) { paddingValues ->
         Column(
             modifier = Modifier
@@ -58,55 +54,55 @@ fun StatsScreen(
                 .padding(paddingValues)
                 .padding(16.dp)
                 .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+            verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             // Active tasks
             StatCard(
                 title = "Active Tasks",
                 count = uiState.activeCount,
-                description = "Tasks not yet completed"
+                description = "Tasks not yet completed",
             )
 
             // Completed tasks (overall)
             StatCard(
                 title = "Completed Tasks",
                 count = uiState.completedCount,
-                description = "All completed tasks"
+                description = "All completed tasks",
             )
 
             // Completed today
             StatCard(
                 title = "Completed Today",
                 count = uiState.completedTodayCount,
-                description = "Tasks completed today"
+                description = "Tasks completed today",
             )
 
             // Due today
             StatCard(
                 title = "Due Today",
                 count = uiState.dueTodayCount,
-                description = "Active tasks due today"
+                description = "Active tasks due today",
             )
 
             // Overdue tasks
             StatCard(
                 title = "Overdue",
                 count = uiState.overdueCount,
-                description = "Active tasks past due date"
+                description = "Active tasks past due date",
             )
 
             // Note about archived tasks
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceVariant
-                )
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                ),
             ) {
                 Text(
                     text = "Note: Archived tasks are excluded from all statistics",
                     modifier = Modifier.padding(16.dp),
                     style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
         }
@@ -117,34 +113,29 @@ fun StatsScreen(
  * Individual stat card displaying a count with title and description
  */
 @Composable
-private fun StatCard(
-    title: String,
-    count: Int,
-    description: String,
-    modifier: Modifier = Modifier
-) {
+private fun StatCard(title: String, count: Int, description: String, modifier: Modifier = Modifier) {
     ElevatedCard(
-        modifier = modifier.fillMaxWidth()
+        modifier = modifier.fillMaxWidth(),
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             Column(
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.weight(1f),
             ) {
                 Text(
                     text = title,
                     style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Medium
+                    fontWeight = FontWeight.Medium,
                 )
                 Text(
                     text = description,
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
 
@@ -153,7 +144,7 @@ private fun StatCard(
                 style = MaterialTheme.typography.headlineMedium,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.primary,
-                textAlign = TextAlign.End
+                textAlign = TextAlign.End,
             )
         }
     }

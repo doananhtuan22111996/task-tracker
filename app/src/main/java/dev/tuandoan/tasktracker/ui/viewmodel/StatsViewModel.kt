@@ -8,7 +8,6 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
-import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
 import javax.inject.Inject
@@ -27,9 +26,7 @@ import javax.inject.Inject
  * Uses local timezone for "today" calculations.
  */
 @HiltViewModel
-class StatsViewModel @Inject constructor(
-    private val taskManager: ITaskManager
-) : ViewModel() {
+class StatsViewModel @Inject constructor(private val taskManager: ITaskManager) : ViewModel() {
 
     /**
      * UI state for stats screen containing all statistical counts
@@ -39,7 +36,7 @@ class StatsViewModel @Inject constructor(
         val completedCount: Int = 0,
         val completedTodayCount: Int = 0,
         val dueTodayCount: Int = 0,
-        val overdueCount: Int = 0
+        val overdueCount: Int = 0,
     )
 
     /**
@@ -50,19 +47,19 @@ class StatsViewModel @Inject constructor(
         taskManager.observeCompletedCount(),
         taskManager.observeCompletedTodayCount(getTodayStartMillis(), getTodayEndMillis()),
         taskManager.observeDueTodayCount(getTodayStartMillis(), getTodayEndMillis()),
-        taskManager.observeOverdueCount(System.currentTimeMillis())
+        taskManager.observeOverdueCount(System.currentTimeMillis()),
     ) { activeCount, completedCount, completedTodayCount, dueTodayCount, overdueCount ->
         StatsUiState(
             activeCount = activeCount,
             completedCount = completedCount,
             completedTodayCount = completedTodayCount,
             dueTodayCount = dueTodayCount,
-            overdueCount = overdueCount
+            overdueCount = overdueCount,
         )
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5000),
-        initialValue = StatsUiState()
+        initialValue = StatsUiState(),
     )
 
     /**

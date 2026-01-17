@@ -24,4 +24,3 @@ dependencyResolutionManagement {
 
 rootProject.name = "Task Tracker"
 include(":app")
- 

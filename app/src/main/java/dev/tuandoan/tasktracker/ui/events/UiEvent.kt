@@ -10,11 +10,8 @@ sealed class UiEvent {
     /**
      * Event to show a snackbar with an optional action
      */
-    data class ShowSnackbar(
-        val message: String,
-        val actionLabel: String? = null,
-        val onActionClick: () -> Unit = {}
-    ) : UiEvent()
+    data class ShowSnackbar(val message: String, val actionLabel: String? = null, val onActionClick: () -> Unit = {}) :
+        UiEvent()
 
     /**
      * Event to show undo action with custom message (supports single or bulk operations)
@@ -22,6 +19,6 @@ sealed class UiEvent {
     data class ShowUndoDelete(
         val tasks: List<Task>,
         val onUndo: () -> Unit,
-        val message: String? = null // Custom message, if null will generate default
+        val message: String? = null, // Custom message, if null will generate default
     ) : UiEvent()
 }
