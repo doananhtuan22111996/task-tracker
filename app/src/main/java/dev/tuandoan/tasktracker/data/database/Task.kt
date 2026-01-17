@@ -11,6 +11,7 @@ data class Task(
     val description: String = "",
     val isCompleted: Boolean = false,
     val createdAt: Long = System.currentTimeMillis(),
+    val completedAt: Long? = null, // Timestamp when task was completed (nullable)
     val dueAt: Long? = null, // Nullable epoch millis
     val reminderOffsetMinutes: Int? = null, // Nullable reminder offset in minutes (0 = none)
     val tag: String? = null, // Single optional tag for organizing tasks

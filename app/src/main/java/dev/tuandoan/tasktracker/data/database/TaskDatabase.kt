@@ -5,7 +5,7 @@ import androidx.room.RoomDatabase
 
 @Database(
     entities = [Task::class],
-    version = 5,
+    version = 6,
     exportSchema = false
 )
 abstract class TaskDatabase : RoomDatabase() {

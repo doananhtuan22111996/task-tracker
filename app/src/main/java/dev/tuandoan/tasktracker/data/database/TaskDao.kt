@@ -41,10 +41,10 @@ interface TaskDao {
     fun getArchivedTasks(): Flow<List<Task>>
 
     // Bulk operations (exclude archived tasks)
-    @Query("UPDATE tasks SET isCompleted = 1 WHERE id IN (:ids) AND isArchived = 0")
-    suspend fun markCompleted(ids: List<Long>)
+    @Query("UPDATE tasks SET isCompleted = 1, completedAt = :completedAt WHERE id IN (:ids) AND isArchived = 0")
+    suspend fun markCompleted(ids: List<Long>, completedAt: Long)
 
-    @Query("UPDATE tasks SET isCompleted = 0 WHERE id IN (:ids) AND isArchived = 0")
+    @Query("UPDATE tasks SET isCompleted = 0, completedAt = NULL WHERE id IN (:ids) AND isArchived = 0")
     suspend fun markActive(ids: List<Long>)
 
     @Query("DELETE FROM tasks WHERE id IN (:ids)")
@@ -76,4 +76,20 @@ interface TaskDao {
 
     @Query("UPDATE tasks SET priority = :priority WHERE id = :id")
     suspend fun setPriority(id: Long, priority: Int)
+
+    // Stats queries (exclude archived tasks)
+    @Query("SELECT COUNT(*) FROM tasks WHERE isCompleted = 0 AND isArchived = 0")
+    fun observeActiveCount(): Flow<Int>
+
+    @Query("SELECT COUNT(*) FROM tasks WHERE isCompleted = 1 AND isArchived = 0")
+    fun observeCompletedCount(): Flow<Int>
+
+    @Query("SELECT COUNT(*) FROM tasks WHERE isCompleted = 1 AND isArchived = 0 AND completedAt >= :startOfDayMillis AND completedAt < :endOfDayMillis")
+    fun observeCompletedTodayCount(startOfDayMillis: Long, endOfDayMillis: Long): Flow<Int>
+
+    @Query("SELECT COUNT(*) FROM tasks WHERE isCompleted = 0 AND isArchived = 0 AND dueAt >= :startOfDayMillis AND dueAt < :endOfDayMillis")
+    fun observeDueTodayCount(startOfDayMillis: Long, endOfDayMillis: Long): Flow<Int>
+
+    @Query("SELECT COUNT(*) FROM tasks WHERE isCompleted = 0 AND isArchived = 0 AND dueAt < :nowMillis")
+    fun observeOverdueCount(nowMillis: Long): Flow<Int>
 }

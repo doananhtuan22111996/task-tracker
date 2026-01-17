@@ -21,7 +21,8 @@ fun TaskListTopBar(
     onBulkMarkActive: () -> Unit = {},
     onBulkArchive: () -> Unit = {},
     onClearSelection: () -> Unit = {},
-    onSelectAll: () -> Unit = {}
+    onSelectAll: () -> Unit = {},
+    onStatsClick: () -> Unit = {}
 ) {
     var showSortMenu by remember { mutableStateOf(false) }
     var showMoreMenu by remember { mutableStateOf(false) }
@@ -102,6 +103,7 @@ fun TaskListTopBar(
                 }
             } else {
                 // Normal mode actions
+                // Sort menu
                 Box {
                     IconButton(onClick = { showSortMenu = true }) {
                         Icon(
@@ -119,6 +121,35 @@ fun TaskListTopBar(
                             onSortSelected = { sort ->
                                 onSortChanged(sort)
                                 showSortMenu = false
+                            }
+                        )
+                    }
+                }
+
+                // More options menu
+                Box {
+                    IconButton(onClick = { showMoreMenu = true }) {
+                        Icon(
+                            imageVector = Icons.Default.MoreVert,
+                            contentDescription = "More options"
+                        )
+                    }
+
+                    DropdownMenu(
+                        expanded = showMoreMenu,
+                        onDismissRequest = { showMoreMenu = false }
+                    ) {
+                        DropdownMenuItem(
+                            text = { Text("Stats") },
+                            onClick = {
+                                onStatsClick()
+                                showMoreMenu = false
+                            },
+                            leadingIcon = {
+                                Icon(
+                                    imageVector = Icons.Default.BarChart,
+                                    contentDescription = null
+                                )
                             }
                         )
                     }

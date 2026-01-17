@@ -131,7 +131,11 @@ class TaskManager @Inject constructor(
     }
 
     override suspend fun toggleTaskCompletion(task: Task) {
-        val updatedTask = task.copy(isCompleted = !task.isCompleted)
+        val currentTime = System.currentTimeMillis()
+        val updatedTask = task.copy(
+            isCompleted = !task.isCompleted,
+            completedAt = if (!task.isCompleted) currentTime else null
+        )
         repository.updateTask(updatedTask)
 
         // Handle reminder based on completion status
@@ -146,7 +150,8 @@ class TaskManager @Inject constructor(
 
     override suspend fun markTaskComplete(task: Task) {
         if (!task.isCompleted) {
-            val completedTask = task.copy(isCompleted = true)
+            val currentTime = System.currentTimeMillis()
+            val completedTask = task.copy(isCompleted = true, completedAt = currentTime)
             repository.updateTask(completedTask)
             // Cancel reminder when marking as complete
             reminderScheduler.cancel(task.id)
@@ -155,7 +160,7 @@ class TaskManager @Inject constructor(
 
     override suspend fun markTaskIncomplete(task: Task) {
         if (task.isCompleted) {
-            val incompleteTask = task.copy(isCompleted = false)
+            val incompleteTask = task.copy(isCompleted = false, completedAt = null)
             repository.updateTask(incompleteTask)
             // Reschedule reminder when marking as incomplete
             scheduleReminderIfNeeded(task.id, task.title, task.dueAt, task.reminderOffsetMinutes)
@@ -281,6 +286,20 @@ class TaskManager @Inject constructor(
             repository.hardDeleteTasks(ids)
         }
     }
+
+    // Stats operations (exclude archived tasks)
+    override fun observeActiveCount(): Flow<Int> = repository.observeActiveCount()
+
+    override fun observeCompletedCount(): Flow<Int> = repository.observeCompletedCount()
+
+    override fun observeCompletedTodayCount(startOfDayMillis: Long, endOfDayMillis: Long): Flow<Int> =
+        repository.observeCompletedTodayCount(startOfDayMillis, endOfDayMillis)
+
+    override fun observeDueTodayCount(startOfDayMillis: Long, endOfDayMillis: Long): Flow<Int> =
+        repository.observeDueTodayCount(startOfDayMillis, endOfDayMillis)
+
+    override fun observeOverdueCount(nowMillis: Long): Flow<Int> =
+        repository.observeOverdueCount(nowMillis)
 
     // Helper method for scheduling reminders
     private suspend fun scheduleReminderIfNeeded(taskId: Long, title: String, dueAt: Long?, reminderOffsetMinutes: Int?): Boolean {

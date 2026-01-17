@@ -101,6 +101,18 @@ object DatabaseModule {
     }
 
     /**
+     * Migration from version 5 to 6: Add completedAt column (idempotent)
+     */
+    private val MIGRATION_5_6 = object : Migration(5, 6) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            // Add completedAt column only if it doesn't exist (nullable Long for completion timestamp)
+            if (!hasColumn(database, "tasks", "completedAt")) {
+                database.execSQL("ALTER TABLE tasks ADD COLUMN completedAt INTEGER")
+            }
+        }
+    }
+
+    /**
      * Provides a singleton instance of TaskDatabase.
      * Uses Room.databaseBuilder for database creation with proper configuration.
      */
@@ -114,7 +126,7 @@ object DatabaseModule {
             klass = TaskDatabase::class.java,
             name = "task_database"
         )
-            .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5)
+            .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6)
             .build()
     }
 
