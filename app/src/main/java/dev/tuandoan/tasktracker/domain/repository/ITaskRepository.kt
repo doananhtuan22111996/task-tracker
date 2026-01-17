@@ -20,4 +20,8 @@ interface ITaskRepository {
     suspend fun deleteByIds(ids: List<Long>)
     suspend fun getTasksByIds(ids: List<Long>): List<Task>
     suspend fun upsertAll(tasks: List<Task>)
+
+    // Pin/Priority operations
+    suspend fun setPinned(taskId: Long, pinned: Boolean)
+    suspend fun setPriority(taskId: Long, priority: Int)
 }

@@ -1,11 +1,30 @@
 package dev.tuandoan.tasktracker.domain.model
 
 /**
+ * Defines task priority levels
+ */
+enum class Priority(val value: Int, val displayName: String) {
+    LOW(0, "Low"),
+    MEDIUM(1, "Medium"),
+    HIGH(2, "High");
+
+    companion object {
+        fun fromValue(value: Int): Priority = when (value) {
+            0 -> LOW
+            1 -> MEDIUM
+            2 -> HIGH
+            else -> MEDIUM // Default to MEDIUM for invalid values
+        }
+    }
+}
+
+/**
  * Defines the sorting key for tasks
  */
 enum class SortKey {
     CREATED_AT,
-    TITLE
+    TITLE,
+    PRIORITY
 }
 
 /**
@@ -44,6 +63,10 @@ data class TaskSort(
         SortKey.TITLE -> when (direction) {
             SortDirection.ASC -> "Title: A–Z"
             SortDirection.DESC -> "Title: Z–A"
+        }
+        SortKey.PRIORITY -> when (direction) {
+            SortDirection.DESC -> "Priority: High to Low"
+            SortDirection.ASC -> "Priority: Low to High"
         }
     }
 

@@ -11,7 +11,9 @@ A modern, offline-first task tracking Android app built with **Kotlin**, **Jetpa
 - 🔍 **Smart Search** - Real-time search across task titles and descriptions with debounce
 - 🏷️ **Status Filtering** - Filter tasks by status (All, Active, Completed)
 - 🏷️ **Tags/Labels** - Single optional tag per task stored locally for organization and filtering
-- 📊 **Advanced Sorting** - Multiple sorting options with completion grouping
+- 📌 **Pin Tasks** - Pin important tasks to keep them at the top within each day section
+- 🎯 **Priority Levels** - Assign Low, Medium, or High priority to tasks with optional priority-based sorting
+- 📊 **Advanced Sorting** - Multiple sorting options including priority (High to Low) with completion grouping
 - 📅 **Day-based Grouping** - Tasks automatically grouped by day (Today/Yesterday/Date) in all tabs for better readability
 - 📅 **Future-Only Due Dates** - Set optional due dates and times (future dates only) with visual overdue indicators
 - ⏰ **Validated Local Reminders** - WorkManager-powered notifications (1 minute, 5 minutes, 1 hour, or 1 day before) with automatic validation ensuring reminder time is in the future
@@ -22,6 +24,8 @@ A modern, offline-first task tracking Android app built with **Kotlin**, **Jetpa
 ### Sorting & Organization
 - **Sort by Creation Date**: Newest first (default) or oldest first
 - **Sort by Title**: Alphabetical (A-Z) with locale-safe, case-insensitive ordering
+- **Sort by Priority**: High to Low priority ordering
+- **Pin First**: Pinned tasks always appear first within each day section
 - **Completion Grouping**: Option to group completed tasks separately
 - **Stable Sorting**: Deterministic ordering with secondary sort keys
 
@@ -219,12 +223,15 @@ app/src/main/java/dev/tuandoan/tasktracker/
    - Created: Newest first (default)
    - Created: Oldest first
    - Title: A-Z
+   - Priority: High to Low
 4. **Group Completed** - Toggle "Completed last" to group completed tasks at the bottom
 5. **Set Due Dates** - Tap the calendar icon in Add/Edit dialog to set optional due dates
 6. **Configure Reminders** - Choose from 1 minute, 5 minutes, 1 hour, or 1 day before due date (requires future due date and validates reminder time is in the future). On Android 13+, the app will prompt for notification permission when first enabling reminders.
 7. **Organize with Tags** - Add an optional single tag to tasks for categorization (up to 20 characters). Tags appear as chips in the task list and can be used for filtering.
 8. **Filter by Tags** - Use the tag filter chips below the status tabs to filter tasks by specific tags. Tap a tag chip to filter, tap again to clear.
-9. **Track Overdue Tasks** - Overdue tasks display in red with "Overdue" indicators in the task list
+9. **Pin Important Tasks** - Tap the star button on any task to pin/unpin it. Pinned tasks appear first within each day section.
+10. **Set Task Priority** - In the Add/Edit task dialog, use the Priority dropdown to set Low, Medium (default), or High priority levels.
+11. **Track Overdue Tasks** - Overdue tasks display in red with "Overdue" indicators in the task list
 
 ### Pro Tips
 - 🔍 **Search is live** - Results update as you type with smart debouncing
@@ -271,6 +278,16 @@ TaskViewModelTest            // End-to-end coordination tests
 - **Key-based LazyColumn** - Optimized list rendering with proper item keys
 
 ## 📚 Recent Updates
+
+### v2.6 - Pin Tasks & Priority Levels
+- 📌 **Pin/Unpin Tasks** - Keep important tasks at the top within each day section with star button toggle
+- 🎯 **Priority System** - Assign Low, Medium (default), or High priority levels to tasks for better organization
+- 📊 **Priority Sorting** - New "Priority: High to Low" sort option to organize tasks by importance
+- 💾 **Database Migration** - Seamless Room database upgrade from v3 to v4 with new isPinned and priority fields
+- 🎨 **Enhanced UI** - Pin button with filled/outlined star icons and priority dropdown in edit dialog
+- 🏗️ **Pinned-First Ordering** - Pinned tasks automatically appear first within each day section while preserving existing sort order
+- 📱 **Production-Ready MVP** - Simple, intuitive implementation without advanced animations or extra dependencies
+- ✨ **Clean Architecture Integration** - Modular pin/priority system integrated throughout application stack
 
 ### v2.5 - Tag Organization & Filtering
 - 🏷️ **Single Tag per Task** - Add optional tags to tasks for organization and categorization (up to 20 characters)

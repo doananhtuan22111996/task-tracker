@@ -70,6 +70,14 @@ class TaskSortService @Inject constructor() {
                         .thenByDescending { it.createdAt } // Secondary sort for stability
                 }
             }
+            SortKey.PRIORITY -> {
+                when (direction) {
+                    SortDirection.DESC -> compareByDescending<Task> { it.priority }
+                        .thenByDescending { it.createdAt } // Secondary sort for stability
+                    SortDirection.ASC -> compareBy<Task> { it.priority }
+                        .thenByDescending { it.createdAt } // Secondary sort for stability
+                }
+            }
         }
 
         return tasks.sortedWith(comparator)
@@ -97,6 +105,7 @@ class TaskSortService @Inject constructor() {
     fun getAvailableSortOptions(): List<TaskSort> = listOf(
         TaskSort(SortKey.CREATED_AT, SortDirection.DESC, CompletedGrouping.NONE),
         TaskSort(SortKey.CREATED_AT, SortDirection.ASC, CompletedGrouping.NONE),
-        TaskSort(SortKey.TITLE, SortDirection.ASC, CompletedGrouping.NONE)
+        TaskSort(SortKey.TITLE, SortDirection.ASC, CompletedGrouping.NONE),
+        TaskSort(SortKey.PRIORITY, SortDirection.DESC, CompletedGrouping.NONE) // Priority: High to Low
     )
 }

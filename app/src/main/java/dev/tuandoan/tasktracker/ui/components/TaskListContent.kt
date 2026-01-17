@@ -34,6 +34,7 @@ fun TaskListContent(
     onToggleTaskComplete: (Task) -> Unit,
     onEditTask: (Task) -> Unit,
     onDeleteTask: (Task) -> Unit,
+    onPinTask: (Task) -> Unit,
     onLongPressTask: (Long) -> Unit,
     onToggleSelection: (Long) -> Unit,
     modifier: Modifier = Modifier
@@ -77,6 +78,7 @@ fun TaskListContent(
             onToggleTaskComplete = onToggleTaskComplete,
             onEditTask = onEditTask,
             onDeleteTask = onDeleteTask,
+            onPinTask = onPinTask,
             onLongPressTask = onLongPressTask,
             onToggleSelection = onToggleSelection,
             onClearSearch = onClearSearch,
@@ -100,6 +102,7 @@ private fun TaskListOrEmptyState(
     onToggleTaskComplete: (Task) -> Unit,
     onEditTask: (Task) -> Unit,
     onDeleteTask: (Task) -> Unit,
+    onPinTask: (Task) -> Unit,
     onLongPressTask: (Long) -> Unit,
     onToggleSelection: (Long) -> Unit,
     onClearSearch: () -> Unit,
@@ -125,6 +128,7 @@ private fun TaskListOrEmptyState(
                 onToggleTaskComplete = onToggleTaskComplete,
                 onEditTask = onEditTask,
                 onDeleteTask = onDeleteTask,
+                onPinTask = onPinTask,
                 onLongPressTask = onLongPressTask,
                 onToggleSelection = onToggleSelection
             )
@@ -144,6 +148,7 @@ private fun GroupedTaskList(
     onToggleTaskComplete: (Task) -> Unit,
     onEditTask: (Task) -> Unit,
     onDeleteTask: (Task) -> Unit,
+    onPinTask: (Task) -> Unit,
     onLongPressTask: (Long) -> Unit,
     onToggleSelection: (Long) -> Unit
 ) {
@@ -171,6 +176,7 @@ private fun GroupedTaskList(
                     onToggleComplete = { onToggleTaskComplete(task) },
                     onEditClick = { onEditTask(task) },
                     onDeleteClick = { onDeleteTask(task) },
+                    onPinClick = { onPinTask(task) },
                     onLongPress = { onLongPressTask(task.id) },
                     onToggleSelection = { onToggleSelection(task.id) }
                 )

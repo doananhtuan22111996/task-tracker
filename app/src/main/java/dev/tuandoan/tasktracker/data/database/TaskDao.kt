@@ -50,4 +50,11 @@ interface TaskDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun upsertAll(tasks: List<Task>)
+
+    // Pin/Priority operations
+    @Query("UPDATE tasks SET isPinned = :pinned WHERE id = :id")
+    suspend fun setPinned(id: Long, pinned: Boolean)
+
+    @Query("UPDATE tasks SET priority = :priority WHERE id = :id")
+    suspend fun setPriority(id: Long, priority: Int)
 }

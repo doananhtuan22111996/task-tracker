@@ -30,4 +30,8 @@ interface ITaskManager {
     // Filtered data access
     fun getActiveTasks(): Flow<List<Task>>
     fun getCompletedTasks(): Flow<List<Task>>
+
+    // Pin/Priority operations
+    suspend fun setPinned(taskId: Long, pinned: Boolean)
+    suspend fun setPriority(taskId: Long, priority: Int)
 }
