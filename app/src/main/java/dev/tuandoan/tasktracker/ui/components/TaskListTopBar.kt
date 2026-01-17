@@ -30,7 +30,7 @@ fun TaskListTopBar(
     var showSortMenu by remember { mutableStateOf(false) }
     var showMoreMenu by remember { mutableStateOf(false) }
 
-    CenterAlignedTopAppBar(
+    TopAppBar(
         title = {
             Text(
                 text = if (isSelectionMode) {

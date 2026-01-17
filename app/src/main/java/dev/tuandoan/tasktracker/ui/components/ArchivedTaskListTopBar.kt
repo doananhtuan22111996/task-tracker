@@ -28,13 +28,13 @@ fun ArchivedTaskListTopBar(
     var showSortMenu by remember { mutableStateOf(false) }
     var showMoreMenu by remember { mutableStateOf(false) }
 
-    CenterAlignedTopAppBar(
+    TopAppBar(
         title = {
             Text(
                 text = if (isSelectionMode) {
                     "$selectedCount selected"
                 } else {
-                    "Archived Tasks"
+                    "Archived"
                 },
                 style = MaterialTheme.typography.titleLarge,
                 color = MaterialTheme.colorScheme.onSurface,

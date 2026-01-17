@@ -4,12 +4,10 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -49,31 +47,11 @@ fun TaskTrackerApp() {
     var showArchivedScreen by remember { mutableStateOf(false) }
     var showStatsScreen by remember { mutableStateOf(false) }
 
-    Scaffold(
-        topBar = {
-            // Only show TopAppBar for archived and stats screens (they need back navigation)
-            if (showArchivedScreen || showStatsScreen) {
-                TopAppBar(
-                    title = {
-                        Text(
-                            text = when {
-                                showArchivedScreen -> "Archived Tasks"
-                                showStatsScreen -> "Stats"
-                                else -> "Task Tracker"
-                            },
-                            style = MaterialTheme.typography.titleLarge,
-                            fontWeight = FontWeight.Bold,
-                            textAlign = TextAlign.Left,
-                        )
-                    },
-                    colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = MaterialTheme.colorScheme.primaryContainer,
-                        titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                    ),
-                )
-            }
-        },
-    ) { paddingValues ->
+    // Remove parent Scaffold with TopAppBar to avoid duplication - each screen manages its own TopAppBar
+    Surface(
+        modifier = Modifier.fillMaxSize(),
+        color = MaterialTheme.colorScheme.background,
+    ) {
         when {
             showArchivedScreen -> {
                 ArchivedScreen(
@@ -82,7 +60,6 @@ fun TaskTrackerApp() {
                         showArchivedScreen = false
                         showStatsScreen = false
                     },
-                    modifier = Modifier.padding(paddingValues),
                 )
             }
             showStatsScreen -> {
@@ -92,12 +69,10 @@ fun TaskTrackerApp() {
                         showStatsScreen = false
                         showArchivedScreen = false
                     },
-                    modifier = Modifier.padding(paddingValues),
                 )
             }
             else -> {
                 TaskListScreen(
-                    modifier = Modifier, // No padding needed since no outer TopAppBar
                     viewModel = viewModel,
                     onStatsClick = {
                         showStatsScreen = true

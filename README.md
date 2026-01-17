@@ -300,6 +300,8 @@ TaskViewModelTest            // End-to-end coordination tests
 - 📤 **Improved Snackbar Consistency** - Consistent styling and messaging across all operations with proper Material 3 theming
 - 🎨 **Global Theme Integration** - All components now use new typography, spacing, and shape systems for cohesive Material 3 design language
 - 🧹 **Polished Material 3 Layout** - Optimized spacing and visual hierarchy with single app bar title, removing duplication and excessive whitespace for a more compact, cohesive user interface
+- 📱 **Enhanced Archived and Stats Screens** - Polished secondary screens with consistent Material 3 layout, optimized spacing, and improved visual hierarchy matching the main screen design
+- 📊 **Single App Bar Architecture** - Archived and Stats screens use a single Material 3 app bar (no duplicated titles) with optimized spacing
 
 ### v2.8 - Minimal Stats (Lightweight Analytics)
 - 📊 **Stats Screen** - Lightweight statistics view showing key task counts without charts or complex analytics

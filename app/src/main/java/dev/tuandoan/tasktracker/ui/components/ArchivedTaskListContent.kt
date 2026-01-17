@@ -34,18 +34,16 @@ fun ArchivedTaskListContent(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .padding(horizontal = 16.dp),
+            .padding(horizontal = 16.dp)
+            .padding(top = 8.dp),
     ) {
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Search Field
+        // Search Field - optimized spacing
         SearchField(
             query = searchQuery,
             onQueryChange = onSearchQueryChange,
             onClearClick = onClearSearch,
+            modifier = Modifier.padding(bottom = 8.dp),
         )
-
-        Spacer(modifier = Modifier.height(16.dp))
 
         // Filter archived tasks by search query
         val filteredTasks = if (searchQuery.isBlank()) {
@@ -99,6 +97,9 @@ private fun ArchivedTaskList(
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(4.dp),
+        contentPadding = PaddingValues(
+            bottom = 16.dp, // Proper clearance for navigation bars
+        ),
     ) {
         taskSections.forEach { section ->
             // Sticky header for each archive date section
