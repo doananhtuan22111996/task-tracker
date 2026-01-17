@@ -92,7 +92,8 @@ class TaskCrudManager @Inject constructor(
                     validation.formData.title,
                     validation.formData.description,
                     validation.formData.dueAt,
-                    validation.formData.reminderOffsetMinutes
+                    validation.formData.reminderOffsetMinutes,
+                    validation.formData.tag
                 )
 
                 if (result.isSuccess) {
@@ -128,7 +129,8 @@ class TaskCrudManager @Inject constructor(
                     validation.formData.title,
                     validation.formData.description,
                     validation.formData.dueAt,
-                    validation.formData.reminderOffsetMinutes
+                    validation.formData.reminderOffsetMinutes,
+                    validation.formData.tag
                 )
 
                 if (result.isSuccess) {

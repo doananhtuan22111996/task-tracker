@@ -23,11 +23,14 @@ fun TaskListContent(
     groupedVisibleTasks: List<TaskSection>,
     searchQuery: String,
     currentFilter: TaskFilter,
+    currentTagFilter: String?,
+    availableTags: List<String>,
     selectedIds: Set<Long>,
     isSelectionMode: Boolean,
     onSearchQueryChange: (String) -> Unit,
     onClearSearch: () -> Unit,
     onFilterChange: (TaskFilter) -> Unit,
+    onTagFilterChange: (String?) -> Unit,
     onToggleTaskComplete: (Task) -> Unit,
     onEditTask: (Task) -> Unit,
     onDeleteTask: (Task) -> Unit,
@@ -54,7 +57,10 @@ fun TaskListContent(
         // Filter Tabs
         FilterTabs(
             currentFilter = currentFilter,
-            onFilterChange = onFilterChange
+            onFilterChange = onFilterChange,
+            currentTagFilter = currentTagFilter,
+            availableTags = availableTags,
+            onTagFilterChange = onTagFilterChange
         )
 
         Spacer(modifier = Modifier.height(16.dp))

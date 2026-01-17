@@ -76,10 +76,26 @@ class TaskViewModel @Inject constructor(
 
     val searchQuery = listState.searchQuery
     val filter = listState.filter
+    val tagFilter = listState.tagFilter
     val taskSort = listState.taskSort
     val hasActiveSearch = listState.hasActiveSearch
     val hasActiveFilter = listState.hasActiveFilter
+    val hasActiveTagFilter = listState.hasActiveTagFilter
     val isLoading = listState.isLoading
+
+    // Available tags computed from all tasks
+    val availableTags: StateFlow<List<String>> = allTasks
+        .map { tasks ->
+            tasks.mapNotNull { it.tag }
+                .filter { it.isNotEmpty() }
+                .distinct()
+                .sorted()
+        }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = emptyList()
+        )
 
     // Form state
     val showAddTaskDialog = formState.showAddTaskDialog
@@ -88,14 +104,17 @@ class TaskViewModel @Inject constructor(
     val taskDescription = formState.taskDescription
     val dueAt = formState.dueAt
     val reminderOption = formState.reminderOption
+    val tag = formState.tag
     val isFormValid = formState.isFormValid
     val isEditMode = formState.isEditMode
     val titleError = formState.titleError
     val dueDateError = formState.dueDateError
     val reminderError = formState.reminderError
+    val tagError = formState.tagError
     val isTitleValid = formState.isTitleValid
     val isDueDateValid = formState.isDueDateValid
     val isReminderValid = formState.isReminderValid
+    val isTagValid = formState.isTagValid
     val hasChanges = formState.hasChanges
     val isSaveEnabled = formState.isSaveEnabled
 
@@ -224,6 +243,7 @@ class TaskViewModel @Inject constructor(
     fun updateTaskDescription(description: String) = formStateManager.updateTaskDescription(description)
     fun updateDueAt(dueAt: Long?) = formStateManager.updateDueAt(dueAt)
     fun updateReminderOption(reminderOption: ReminderOption) = formStateManager.updateReminderOption(reminderOption)
+    fun updateTag(tag: String) = formStateManager.updateTag(tag)
 
     // === Search Operations ===
 
@@ -233,6 +253,8 @@ class TaskViewModel @Inject constructor(
     // === Filter Operations ===
 
     fun setFilter(filter: TaskFilter) = listStateManager.setFilter(filter)
+    fun setTagFilter(tag: String?) = listStateManager.setTagFilter(tag)
+    fun clearTagFilter() = listStateManager.clearTagFilter()
 
     // === Sort Operations ===
 

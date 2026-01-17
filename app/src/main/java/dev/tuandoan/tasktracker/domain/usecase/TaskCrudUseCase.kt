@@ -37,11 +37,18 @@ class TaskCrudUseCase @Inject constructor(
      * Creates a new task with the provided title, description, due date and reminder
      */
     suspend fun createTask(title: String, description: String, dueAt: Long?, reminderOffsetMinutes: Int?): Result<Unit> {
+        return createTask(title, description, dueAt, reminderOffsetMinutes, null)
+    }
+
+    /**
+     * Creates a new task with the provided title, description, due date, reminder and tag
+     */
+    suspend fun createTask(title: String, description: String, dueAt: Long?, reminderOffsetMinutes: Int?, tag: String?): Result<Unit> {
         return try {
             _isLoading.value = true
             _errorMessage.value = null
 
-            taskManager.createTask(title = title, description = description, dueAt = dueAt, reminderOffsetMinutes = reminderOffsetMinutes)
+            taskManager.createTask(title = title, description = description, dueAt = dueAt, reminderOffsetMinutes = reminderOffsetMinutes, tag = tag)
 
             _lastOperationSuccess.value = "Task created successfully"
             Result.success(Unit)
@@ -65,6 +72,13 @@ class TaskCrudUseCase @Inject constructor(
      * Updates an existing task with new title, description, due date and reminder
      */
     suspend fun updateTask(taskId: Long, title: String, description: String, dueAt: Long?, reminderOffsetMinutes: Int?): Result<Unit> {
+        return updateTask(taskId, title, description, dueAt, reminderOffsetMinutes, null)
+    }
+
+    /**
+     * Updates an existing task with new title, description, due date, reminder and tag
+     */
+    suspend fun updateTask(taskId: Long, title: String, description: String, dueAt: Long?, reminderOffsetMinutes: Int?, tag: String?): Result<Unit> {
         return try {
             _isLoading.value = true
             _errorMessage.value = null
@@ -74,7 +88,8 @@ class TaskCrudUseCase @Inject constructor(
                 title = title,
                 description = description,
                 dueAt = dueAt,
-                reminderOffsetMinutes = reminderOffsetMinutes
+                reminderOffsetMinutes = reminderOffsetMinutes,
+                tag = tag
             )
 
             if (success) {

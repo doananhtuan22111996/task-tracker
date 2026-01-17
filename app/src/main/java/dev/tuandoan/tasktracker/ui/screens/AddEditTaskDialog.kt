@@ -40,6 +40,7 @@ fun AddEditTaskDialog(
     val selectedTask by viewModel.selectedTask.collectAsStateWithLifecycle()
     val taskTitle by viewModel.taskTitle.collectAsStateWithLifecycle()
     val taskDescription by viewModel.taskDescription.collectAsStateWithLifecycle()
+    val tag by viewModel.tag.collectAsStateWithLifecycle()
     val dueAt by viewModel.dueAt.collectAsStateWithLifecycle()
     val reminderOption by viewModel.reminderOption.collectAsStateWithLifecycle()
     val isFormValid by viewModel.isFormValid.collectAsStateWithLifecycle()
@@ -50,6 +51,7 @@ fun AddEditTaskDialog(
     val titleError by viewModel.titleError.collectAsStateWithLifecycle()
     val dueDateError by viewModel.dueDateError.collectAsStateWithLifecycle()
     val reminderError by viewModel.reminderError.collectAsStateWithLifecycle()
+    val tagError by viewModel.tagError.collectAsStateWithLifecycle()
     val isTitleValid by viewModel.isTitleValid.collectAsStateWithLifecycle()
     val isDueDateValid by viewModel.isDueDateValid.collectAsStateWithLifecycle()
     val isReminderValid by viewModel.isReminderValid.collectAsStateWithLifecycle()
@@ -217,6 +219,43 @@ fun AddEditTaskDialog(
                                 MaterialTheme.colorScheme.onSurfaceVariant
                             }
                         )
+                    },
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = MaterialTheme.colorScheme.primary,
+                        unfocusedBorderColor = MaterialTheme.colorScheme.outline
+                    )
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // Tag Field
+                OutlinedTextField(
+                    value = tag,
+                    onValueChange = { viewModel.updateTag(it) },
+                    label = { Text("Tag (Optional)") },
+                    placeholder = { Text("Enter tag") },
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true,
+                    isError = tagError != null,
+                    supportingText = {
+                        Column {
+                            tagError?.let { error ->
+                                Text(
+                                    text = error,
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.error
+                                )
+                            }
+                            Text(
+                                text = "${tag.length}/${TaskFormUseCase.MAX_TAG_LENGTH}",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = if (tag.length > TaskFormUseCase.MAX_TAG_LENGTH) {
+                                    MaterialTheme.colorScheme.error
+                                } else {
+                                    MaterialTheme.colorScheme.onSurfaceVariant
+                                }
+                            )
+                        }
                     },
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedBorderColor = MaterialTheme.colorScheme.primary,
