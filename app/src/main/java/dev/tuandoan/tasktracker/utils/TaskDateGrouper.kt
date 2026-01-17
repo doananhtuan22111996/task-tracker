@@ -49,14 +49,24 @@ object TaskDateGrouper {
         }
 
         // Sort groups by date (most recent first) and create sections
+        // Apply pinned-first ordering within each day section
         return groupedTasks.toSortedMap(compareByDescending { it })
             .map { (dateKey, tasksInGroup) ->
                 TaskSection(
                     header = getDateHeaderLabel(dateKey, today, yesterday, tomorrow),
                     dateKey = dateKey,
-                    tasks = tasksInGroup
+                    tasks = applyPinnedFirstOrdering(tasksInGroup)
                 )
             }
+    }
+
+    /**
+     * Apply pinned-first ordering within a group of tasks.
+     * Pinned tasks come first, then unpinned tasks, preserving the existing order within each group.
+     */
+    private fun applyPinnedFirstOrdering(tasks: List<Task>): List<Task> {
+        val (pinned, unpinned) = tasks.partition { it.isPinned }
+        return pinned + unpinned
     }
 
     /**

@@ -134,6 +134,7 @@ fun TaskListScreen(
             onToggleTaskComplete = viewModel::toggleTaskCompletion,
             onEditTask = viewModel::showEditTaskDialog,
             onDeleteTask = viewModel::deleteTask,
+            onPinTask = viewModel::toggleTaskPin,
             onLongPressTask = viewModel::enterSelection,
             onToggleSelection = viewModel::toggleSelection,
             modifier = Modifier.padding(paddingValues)

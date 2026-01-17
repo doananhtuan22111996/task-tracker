@@ -29,6 +29,7 @@ fun TaskItem(
     onToggleComplete: () -> Unit,
     onEditClick: () -> Unit,
     onDeleteClick: () -> Unit,
+    onPinClick: () -> Unit,
     onLongPress: () -> Unit = {},
     onToggleSelection: () -> Unit = {},
     modifier: Modifier = Modifier
@@ -174,6 +175,18 @@ fun TaskItem(
             // Action buttons only in normal mode
             if (!isSelectionMode) {
                 Row {
+                    IconButton(onClick = onPinClick) {
+                        Icon(
+                            imageVector = if (task.isPinned) Icons.Default.Star else Icons.Default.StarBorder,
+                            contentDescription = if (task.isPinned) "Unpin task" else "Pin task",
+                            tint = if (task.isPinned) {
+                                MaterialTheme.colorScheme.primary
+                            } else {
+                                MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                            }
+                        )
+                    }
+
                     IconButton(onClick = onEditClick) {
                         Icon(
                             imageVector = Icons.Default.Edit,

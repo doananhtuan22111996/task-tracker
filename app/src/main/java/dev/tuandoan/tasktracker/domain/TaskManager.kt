@@ -214,6 +214,15 @@ class TaskManager @Inject constructor(
 
     override fun getCompletedTasks(): Flow<List<Task>> = repository.getCompletedTasks()
 
+    // Pin/Priority operations
+    override suspend fun setPinned(taskId: Long, pinned: Boolean) {
+        repository.setPinned(taskId, pinned)
+    }
+
+    override suspend fun setPriority(taskId: Long, priority: Int) {
+        repository.setPriority(taskId, priority)
+    }
+
     // Helper method for scheduling reminders
     private suspend fun scheduleReminderIfNeeded(taskId: Long, title: String, dueAt: Long?, reminderOffsetMinutes: Int?): Boolean {
         return if (dueAt != null && reminderOffsetMinutes != null && reminderOffsetMinutes > 0) {

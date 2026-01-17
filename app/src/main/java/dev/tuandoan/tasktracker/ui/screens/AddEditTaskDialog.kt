@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import dev.tuandoan.tasktracker.domain.model.Priority
 import dev.tuandoan.tasktracker.domain.model.ReminderOption
 import dev.tuandoan.tasktracker.domain.usecase.TaskFormUseCase
 import dev.tuandoan.tasktracker.ui.viewmodel.TaskViewModel
@@ -262,6 +263,62 @@ fun AddEditTaskDialog(
                         unfocusedBorderColor = MaterialTheme.colorScheme.outline
                     )
                 )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // Priority Selection
+                var priorityExpanded by remember { mutableStateOf(false) }
+                val currentPriority = remember(selectedTask) {
+                    selectedTask?.let { Priority.fromValue(it.priority) } ?: Priority.MEDIUM
+                }
+                var selectedPriority by remember(selectedTask) {
+                    mutableStateOf(currentPriority)
+                }
+
+                ExposedDropdownMenuBox(
+                    expanded = priorityExpanded,
+                    onExpandedChange = { priorityExpanded = !priorityExpanded }
+                ) {
+                    OutlinedTextField(
+                        value = selectedPriority.displayName,
+                        onValueChange = { },
+                        label = { Text("Priority") },
+                        readOnly = true,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .menuAnchor(),
+                        trailingIcon = {
+                            ExposedDropdownMenuDefaults.TrailingIcon(expanded = priorityExpanded)
+                        },
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = MaterialTheme.colorScheme.primary,
+                            unfocusedBorderColor = MaterialTheme.colorScheme.outline
+                        )
+                    )
+
+                    ExposedDropdownMenu(
+                        expanded = priorityExpanded,
+                        onDismissRequest = { priorityExpanded = false }
+                    ) {
+                        Priority.entries.forEach { priority ->
+                            DropdownMenuItem(
+                                text = {
+                                    Text(
+                                        text = priority.displayName,
+                                        style = MaterialTheme.typography.bodyLarge
+                                    )
+                                },
+                                onClick = {
+                                    selectedPriority = priority
+                                    selectedTask?.let { task ->
+                                        viewModel.updateTaskPriority(task.id, priority.value)
+                                    }
+                                    priorityExpanded = false
+                                }
+                            )
+                        }
+                    }
+                }
 
                 Spacer(modifier = Modifier.height(16.dp))
 

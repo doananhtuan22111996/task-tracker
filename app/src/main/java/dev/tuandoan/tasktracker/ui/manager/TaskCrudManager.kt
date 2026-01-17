@@ -273,6 +273,35 @@ class TaskCrudManager @Inject constructor(
     }
 
     /**
+     * Toggles pin status for a task
+     */
+    suspend fun toggleTaskPin(task: Task): TaskOperationResult {
+        val result = crudUseCase.setPinned(task.id, !task.isPinned)
+
+        return if (result.isSuccess) {
+            val status = if (task.isPinned) "unpinned" else "pinned"
+            TaskOperationResult.Success("Task $status successfully")
+        } else {
+            val errorMessage = result.exceptionOrNull()?.message ?: "Failed to update pin status"
+            TaskOperationResult.CrudError(errorMessage)
+        }
+    }
+
+    /**
+     * Updates priority for a task
+     */
+    suspend fun updateTaskPriority(taskId: Long, priority: Int): TaskOperationResult {
+        val result = crudUseCase.setPriority(taskId, priority)
+
+        return if (result.isSuccess) {
+            TaskOperationResult.Success("Task priority updated successfully")
+        } else {
+            val errorMessage = result.exceptionOrNull()?.message ?: "Failed to update priority"
+            TaskOperationResult.CrudError(errorMessage)
+        }
+    }
+
+    /**
      * Clears all errors from both CRUD and form state
      */
     fun clearAllErrors() {

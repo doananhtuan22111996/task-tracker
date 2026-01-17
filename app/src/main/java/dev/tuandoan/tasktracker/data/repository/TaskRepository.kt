@@ -47,4 +47,9 @@ class TaskRepository @Inject constructor(
     override suspend fun getTasksByIds(ids: List<Long>): List<Task> = taskDao.getTasksByIds(ids)
 
     override suspend fun upsertAll(tasks: List<Task>) = taskDao.upsertAll(tasks)
+
+    // Pin/Priority operations
+    override suspend fun setPinned(taskId: Long, pinned: Boolean) = taskDao.setPinned(taskId, pinned)
+
+    override suspend fun setPriority(taskId: Long, priority: Int) = taskDao.setPriority(taskId, priority)
 }

@@ -212,6 +212,20 @@ class TaskViewModel @Inject constructor(
         )
     }
 
+    fun toggleTaskPin(task: Task) {
+        crudManager.executeOperation(
+            scope = viewModelScope,
+            operation = { crudManager.toggleTaskPin(task) }
+        )
+    }
+
+    fun updateTaskPriority(taskId: Long, priority: Int) {
+        crudManager.executeOperation(
+            scope = viewModelScope,
+            operation = { crudManager.updateTaskPriority(taskId, priority) }
+        )
+    }
+
     // === Selection Management ===
 
     fun enterSelection(taskId: Long) = selectionStateManager.enterSelection(taskId)

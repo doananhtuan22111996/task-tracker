@@ -214,6 +214,37 @@ class TaskCrudUseCase @Inject constructor(
     }
 
     /**
+     * Sets pin status for a task
+     */
+    suspend fun setPinned(taskId: Long, pinned: Boolean): Result<Unit> {
+        return try {
+            _errorMessage.value = null
+            taskManager.setPinned(taskId, pinned)
+            val status = if (pinned) "pinned" else "unpinned"
+            _lastOperationSuccess.value = "Task $status successfully"
+            Result.success(Unit)
+        } catch (e: Exception) {
+            _errorMessage.value = e.message ?: "Failed to update pin status"
+            Result.failure(e)
+        }
+    }
+
+    /**
+     * Sets priority for a task
+     */
+    suspend fun setPriority(taskId: Long, priority: Int): Result<Unit> {
+        return try {
+            _errorMessage.value = null
+            taskManager.setPriority(taskId, priority)
+            _lastOperationSuccess.value = "Task priority updated successfully"
+            Result.success(Unit)
+        } catch (e: Exception) {
+            _errorMessage.value = e.message ?: "Failed to update priority"
+            Result.failure(e)
+        }
+    }
+
+    /**
      * Clear success message
      */
     fun clearSuccess() {

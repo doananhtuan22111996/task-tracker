@@ -29,11 +29,12 @@ fun SortMenu(
         modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
     )
 
-    // Define the 3 sort options (radio group)
+    // Define the 4 sort options (radio group)
     val sortOptions = listOf(
         Triple(SortKey.CREATED_AT, SortDirection.DESC, "Created: Newest first"),
         Triple(SortKey.CREATED_AT, SortDirection.ASC, "Created: Oldest first"),
-        Triple(SortKey.TITLE, SortDirection.ASC, "Title: A–Z")
+        Triple(SortKey.TITLE, SortDirection.ASC, "Title: A–Z"),
+        Triple(SortKey.PRIORITY, SortDirection.DESC, "Priority: High to Low")
     )
 
     // Radio group for sort options

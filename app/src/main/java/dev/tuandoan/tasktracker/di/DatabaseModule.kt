@@ -67,6 +67,23 @@ object DatabaseModule {
     }
 
     /**
+     * Migration from version 3 to 4: Add pin and priority columns (idempotent)
+     */
+    private val MIGRATION_3_4 = object : Migration(3, 4) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            // Add isPinned column only if it doesn't exist (Boolean with default false)
+            if (!hasColumn(database, "tasks", "isPinned")) {
+                database.execSQL("ALTER TABLE tasks ADD COLUMN isPinned INTEGER NOT NULL DEFAULT 0")
+            }
+
+            // Add priority column only if it doesn't exist (Int with default 1 = MEDIUM)
+            if (!hasColumn(database, "tasks", "priority")) {
+                database.execSQL("ALTER TABLE tasks ADD COLUMN priority INTEGER NOT NULL DEFAULT 1")
+            }
+        }
+    }
+
+    /**
      * Provides a singleton instance of TaskDatabase.
      * Uses Room.databaseBuilder for database creation with proper configuration.
      */
@@ -80,7 +97,7 @@ object DatabaseModule {
             klass = TaskDatabase::class.java,
             name = "task_database"
         )
-            .addMigrations(MIGRATION_1_2, MIGRATION_2_3)
+            .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4)
             .build()
     }
 
