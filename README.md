@@ -10,6 +10,7 @@ A modern, offline-first task tracking Android app built with **Kotlin**, **Jetpa
 - 🎯 **Multi-Select & Bulk Actions** - Select multiple tasks for bulk delete, mark completed, or mark active
 - 🔍 **Smart Search** - Real-time search across task titles and descriptions with debounce
 - 🏷️ **Status Filtering** - Filter tasks by status (All, Active, Completed)
+- 🏷️ **Tags/Labels** - Single optional tag per task stored locally for organization and filtering
 - 📊 **Advanced Sorting** - Multiple sorting options with completion grouping
 - 📅 **Day-based Grouping** - Tasks automatically grouped by day (Today/Yesterday/Date) in all tabs for better readability
 - 📅 **Future-Only Due Dates** - Set optional due dates and times (future dates only) with visual overdue indicators
@@ -221,7 +222,9 @@ app/src/main/java/dev/tuandoan/tasktracker/
 4. **Group Completed** - Toggle "Completed last" to group completed tasks at the bottom
 5. **Set Due Dates** - Tap the calendar icon in Add/Edit dialog to set optional due dates
 6. **Configure Reminders** - Choose from 1 minute, 5 minutes, 1 hour, or 1 day before due date (requires future due date and validates reminder time is in the future). On Android 13+, the app will prompt for notification permission when first enabling reminders.
-7. **Track Overdue Tasks** - Overdue tasks display in red with "Overdue" indicators in the task list
+7. **Organize with Tags** - Add an optional single tag to tasks for categorization (up to 20 characters). Tags appear as chips in the task list and can be used for filtering.
+8. **Filter by Tags** - Use the tag filter chips below the status tabs to filter tasks by specific tags. Tap a tag chip to filter, tap again to clear.
+9. **Track Overdue Tasks** - Overdue tasks display in red with "Overdue" indicators in the task list
 
 ### Pro Tips
 - 🔍 **Search is live** - Results update as you type with smart debouncing
@@ -268,6 +271,16 @@ TaskViewModelTest            // End-to-end coordination tests
 - **Key-based LazyColumn** - Optimized list rendering with proper item keys
 
 ## 📚 Recent Updates
+
+### v2.5 - Tag Organization & Filtering
+- 🏷️ **Single Tag per Task** - Add optional tags to tasks for organization and categorization (up to 20 characters)
+- 💾 **Database Migration** - Seamless Room database upgrade from v2 to v3 with new tag field
+- 🎨 **Visual Tag Chips** - Tags display as attractive chips in the task list with proper Material 3 styling
+- 🔍 **Tag Filtering** - Filter tasks by tags using horizontal scrolling filter chips below status tabs
+- ✂️ **Smart Tag Processing** - Automatic trimming and validation with length limits and error feedback
+- 🎯 **MVP-Friendly Design** - Simple, single-tag approach without complex tag management or color coding
+- 📝 **Form Integration** - Tag input field in Add/Edit task dialog with character counter and validation
+- 🏗️ **Clean Architecture** - Modular tag system integrated throughout the application stack
 
 ### v2.4 - Due Dates & Local Reminders
 - 📅 **Future-Only Due Dates** - Add optional due dates and times to tasks with strict future-only validation

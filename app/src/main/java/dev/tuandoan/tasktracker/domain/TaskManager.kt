@@ -28,13 +28,18 @@ class TaskManager @Inject constructor(
     }
 
     override suspend fun createTask(title: String, description: String, dueAt: Long?, reminderOffsetMinutes: Int?): Long {
+        return createTask(title, description, dueAt, reminderOffsetMinutes, null)
+    }
+
+    override suspend fun createTask(title: String, description: String, dueAt: Long?, reminderOffsetMinutes: Int?, tag: String?): Long {
         require(title.isNotBlank()) { "Task title cannot be blank" }
 
         val task = Task(
             title = title.trim(),
             description = description.trim(),
             dueAt = dueAt,
-            reminderOffsetMinutes = reminderOffsetMinutes
+            reminderOffsetMinutes = reminderOffsetMinutes,
+            tag = tag?.trim()?.takeIf { it.isNotEmpty() }
         )
         val taskId = repository.insertTask(task)
 
@@ -66,10 +71,14 @@ class TaskManager @Inject constructor(
     }
 
     override suspend fun updateTaskContent(taskId: Long, title: String, description: String) {
-        updateTaskContent(taskId, title, description, null, null)
+        updateTaskContent(taskId, title, description, null, null, null)
     }
 
     override suspend fun updateTaskContent(taskId: Long, title: String, description: String, dueAt: Long?, reminderOffsetMinutes: Int?): Boolean {
+        return updateTaskContent(taskId, title, description, dueAt, reminderOffsetMinutes, null)
+    }
+
+    override suspend fun updateTaskContent(taskId: Long, title: String, description: String, dueAt: Long?, reminderOffsetMinutes: Int?, tag: String?): Boolean {
         require(title.isNotBlank()) { "Task title cannot be blank" }
 
         val existingTask = repository.getTaskById(taskId)
@@ -79,7 +88,8 @@ class TaskManager @Inject constructor(
             title = title.trim(),
             description = description.trim(),
             dueAt = dueAt,
-            reminderOffsetMinutes = reminderOffsetMinutes
+            reminderOffsetMinutes = reminderOffsetMinutes,
+            tag = tag?.trim()?.takeIf { it.isNotEmpty() }
         )
 
         repository.updateTask(updatedTask)

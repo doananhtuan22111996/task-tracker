@@ -11,6 +11,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dev.tuandoan.tasktracker.ui.events.UiEvent
 import dev.tuandoan.tasktracker.ui.components.TaskListContent
 import dev.tuandoan.tasktracker.ui.components.TaskListTopBar
+import dev.tuandoan.tasktracker.ui.screens.AddEditTaskDialog
 import dev.tuandoan.tasktracker.ui.viewmodel.TaskViewModel
 import dev.tuandoan.tasktracker.ui.viewmodel.TaskFilter
 
@@ -29,6 +30,8 @@ fun TaskListScreen(
     val groupedVisibleTasks by viewModel.groupedVisibleTasks.collectAsStateWithLifecycle()
     val searchQuery by viewModel.searchQuery.collectAsStateWithLifecycle()
     val currentFilter by viewModel.filter.collectAsStateWithLifecycle()
+    val currentTagFilter by viewModel.tagFilter.collectAsStateWithLifecycle()
+    val availableTags by viewModel.availableTags.collectAsStateWithLifecycle()
     val currentSort by viewModel.taskSort.collectAsStateWithLifecycle()
     val showAddTaskDialog by viewModel.showAddTaskDialog.collectAsStateWithLifecycle()
     val pendingDeleteTask by viewModel.pendingDeleteTask.collectAsStateWithLifecycle()
@@ -120,11 +123,14 @@ fun TaskListScreen(
             groupedVisibleTasks = groupedVisibleTasks,
             searchQuery = searchQuery,
             currentFilter = currentFilter,
+            currentTagFilter = currentTagFilter,
+            availableTags = availableTags,
             selectedIds = selectedIds,
             isSelectionMode = isSelectionMode,
             onSearchQueryChange = viewModel::updateSearchQuery,
             onClearSearch = viewModel::clearSearch,
             onFilterChange = viewModel::setFilter,
+            onTagFilterChange = viewModel::setTagFilter,
             onToggleTaskComplete = viewModel::toggleTaskCompletion,
             onEditTask = viewModel::showEditTaskDialog,
             onDeleteTask = viewModel::deleteTask,

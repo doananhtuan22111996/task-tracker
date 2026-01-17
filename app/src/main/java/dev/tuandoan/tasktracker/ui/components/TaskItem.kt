@@ -113,6 +113,26 @@ fun TaskItem(
                     )
                 }
 
+                // Tag Display
+                if (!task.tag.isNullOrEmpty()) {
+                    Spacer(modifier = Modifier.height(4.dp))
+                    AssistChip(
+                        onClick = { /* Could add tag filtering functionality here later */ },
+                        label = {
+                            Text(
+                                text = task.tag,
+                                style = MaterialTheme.typography.bodySmall
+                            )
+                        },
+                        colors = AssistChipDefaults.assistChipColors(
+                            containerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.6f),
+                            labelColor = MaterialTheme.colorScheme.onSecondaryContainer
+                        ),
+                        border = null,
+                        modifier = Modifier.alpha(if (task.isCompleted) 0.7f else 1f)
+                    )
+                }
+
                 // Due Date Display
                 if (task.dueAt != null) {
                     Spacer(modifier = Modifier.height(4.dp))

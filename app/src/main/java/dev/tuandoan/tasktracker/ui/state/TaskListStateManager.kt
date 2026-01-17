@@ -28,6 +28,10 @@ class TaskListStateManager @Inject constructor(
     private val _taskSort = MutableStateFlow(sortService.getDefaultSort())
     val taskSort: StateFlow<TaskSort> = _taskSort.asStateFlow()
 
+    // Tag filter state
+    private val _tagFilter = MutableStateFlow<String?>(null)
+    val tagFilter: StateFlow<String?> = _tagFilter.asStateFlow()
+
     /**
      * Initialize state flows for a given coroutine scope (typically ViewModel scope)
      */
@@ -53,16 +57,25 @@ class TaskListStateManager @Inject constructor(
                 initialValue = false
             )
 
+        val hasActiveTagFilter = _tagFilter.map { it != null }
+            .stateIn(
+                scope = scope,
+                started = SharingStarted.WhileSubscribed(5000),
+                initialValue = false
+            )
+
         // Combined filtered, searched, and sorted tasks
         val visibleTasks: StateFlow<List<Task>> = combine(
             allTasks,
             searchUseCase.debouncedSearchQuery,
             filterUseCase.filter,
+            _tagFilter,
             _taskSort
-        ) { tasks, query, currentFilter, sort ->
+        ) { tasks, query, currentFilter, tagFilter, sort ->
             val statusFiltered = filterUseCase.filterTasksByStatus(tasks, currentFilter)
             val searchFiltered = searchUseCase.filterTasksBySearch(statusFiltered, query)
-            sortService.sortTasks(searchFiltered, sort)
+            val tagFiltered = filterTasksByTag(searchFiltered, tagFilter)
+            sortService.sortTasks(tagFiltered, sort)
         }.stateIn(
             scope = scope,
             started = SharingStarted.WhileSubscribed(5000),
@@ -74,9 +87,11 @@ class TaskListStateManager @Inject constructor(
             visibleTasks = visibleTasks,
             searchQuery = searchUseCase.searchQuery,
             filter = filterUseCase.filter,
+            tagFilter = tagFilter,
             taskSort = taskSort,
             hasActiveSearch = hasActiveSearch,
             hasActiveFilter = hasActiveFilter,
+            hasActiveTagFilter = hasActiveTagFilter,
             isLoading = crudUseCase.isLoading
         )
     }
@@ -118,6 +133,27 @@ class TaskListStateManager @Inject constructor(
     // === Filter Operations ===
     fun setFilter(filter: TaskFilter) = filterUseCase.setFilter(filter)
 
+    // === Tag Filter Operations ===
+    fun setTagFilter(tag: String?) {
+        _tagFilter.value = tag
+    }
+
+    fun clearTagFilter() {
+        _tagFilter.value = null
+    }
+
+    /**
+     * Filter tasks by tag. If tagFilter is null, returns all tasks.
+     * If tagFilter is set, returns only tasks that have that exact tag.
+     */
+    private fun filterTasksByTag(tasks: List<Task>, tagFilter: String?): List<Task> {
+        return if (tagFilter == null) {
+            tasks
+        } else {
+            tasks.filter { task -> task.tag == tagFilter }
+        }
+    }
+
     /**
      * Get available sort options for UI
      */
@@ -132,8 +168,10 @@ data class TaskListState(
     val visibleTasks: StateFlow<List<Task>>,
     val searchQuery: StateFlow<String>,
     val filter: StateFlow<TaskFilter>,
+    val tagFilter: StateFlow<String?>,
     val taskSort: StateFlow<TaskSort>,
     val hasActiveSearch: StateFlow<Boolean>,
     val hasActiveFilter: StateFlow<Boolean>,
+    val hasActiveTagFilter: StateFlow<Boolean>,
     val isLoading: StateFlow<Boolean>
 )

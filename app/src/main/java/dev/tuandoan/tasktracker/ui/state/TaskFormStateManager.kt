@@ -68,6 +68,13 @@ class TaskFormStateManager @Inject constructor(
                 initialValue = true
             )
 
+        val isTagValid = formUseCase.isTagValid
+            .stateIn(
+                scope = scope,
+                started = SharingStarted.WhileSubscribed(5000),
+                initialValue = true
+            )
+
         return TaskFormState(
             showAddTaskDialog = formUseCase.showAddTaskDialog,
             selectedTask = formUseCase.selectedTask,
@@ -75,14 +82,17 @@ class TaskFormStateManager @Inject constructor(
             taskDescription = formUseCase.taskDescription,
             dueAt = formUseCase.dueAt,
             reminderOption = formUseCase.reminderOption,
+            tag = formUseCase.tag,
             isFormValid = isFormValid,
             isEditMode = isEditMode,
             titleError = formUseCase.titleError,
             dueDateError = formUseCase.dueDateError,
             reminderError = formUseCase.reminderError,
+            tagError = formUseCase.tagError,
             isTitleValid = isTitleValid,
             isDueDateValid = isDueDateValid,
             isReminderValid = isReminderValid,
+            isTagValid = isTagValid,
             hasChanges = hasChanges,
             isSaveEnabled = isSaveEnabled,
             errorMessage = formUseCase.errorMessage
@@ -99,6 +109,7 @@ class TaskFormStateManager @Inject constructor(
     fun updateTaskDescription(description: String) = formUseCase.updateTaskDescription(description)
     fun updateDueAt(dueAt: Long?) = formUseCase.updateDueAt(dueAt)
     fun updateReminderOption(reminderOption: ReminderOption) = formUseCase.updateReminderOption(reminderOption)
+    fun updateTag(tag: String) = formUseCase.updateTag(tag)
 
     // === Form Validation ===
     suspend fun validateForm(): FormValidationResult {
@@ -146,14 +157,17 @@ data class TaskFormState(
     val taskDescription: StateFlow<String>,
     val dueAt: StateFlow<Long?>,
     val reminderOption: StateFlow<ReminderOption>,
+    val tag: StateFlow<String>,
     val isFormValid: StateFlow<Boolean>,
     val isEditMode: StateFlow<Boolean>,
     val titleError: StateFlow<String?>,
     val dueDateError: StateFlow<String?>,
     val reminderError: StateFlow<String?>,
+    val tagError: StateFlow<String?>,
     val isTitleValid: StateFlow<Boolean>,
     val isDueDateValid: StateFlow<Boolean>,
     val isReminderValid: StateFlow<Boolean>,
+    val isTagValid: StateFlow<Boolean>,
     val hasChanges: StateFlow<Boolean>,
     val isSaveEnabled: StateFlow<Boolean>,
     val errorMessage: StateFlow<String?>
