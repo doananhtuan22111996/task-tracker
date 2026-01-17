@@ -38,7 +38,10 @@ class TaskRepository @Inject constructor(
     }
 
     // Bulk operations
-    override suspend fun markCompleted(ids: List<Long>) = taskDao.markCompleted(ids)
+    override suspend fun markCompleted(ids: List<Long>) {
+        val currentTime = System.currentTimeMillis()
+        taskDao.markCompleted(ids, currentTime)
+    }
 
     override suspend fun markActive(ids: List<Long>) = taskDao.markActive(ids)
 
@@ -77,4 +80,18 @@ class TaskRepository @Inject constructor(
     override suspend fun hardDeleteTask(taskId: Long) = taskDao.hardDeleteById(taskId)
 
     override suspend fun hardDeleteTasks(ids: List<Long>) = taskDao.hardDeleteByIds(ids)
+
+    // Stats operations (exclude archived tasks)
+    override fun observeActiveCount(): Flow<Int> = taskDao.observeActiveCount()
+
+    override fun observeCompletedCount(): Flow<Int> = taskDao.observeCompletedCount()
+
+    override fun observeCompletedTodayCount(startOfDayMillis: Long, endOfDayMillis: Long): Flow<Int> =
+        taskDao.observeCompletedTodayCount(startOfDayMillis, endOfDayMillis)
+
+    override fun observeDueTodayCount(startOfDayMillis: Long, endOfDayMillis: Long): Flow<Int> =
+        taskDao.observeDueTodayCount(startOfDayMillis, endOfDayMillis)
+
+    override fun observeOverdueCount(nowMillis: Long): Flow<Int> =
+        taskDao.observeOverdueCount(nowMillis)
 }

@@ -8,6 +8,7 @@ A modern, offline-first task tracking Android app built with **Kotlin**, **Jetpa
 - ✅ **CRUD Operations** - Create, read, update, and archive tasks with confirmation
 - 🗄️ **Archive System** - Safe task archiving (soft delete) with confirmation dialog and undo functionality
 - 🔄 **Archive Management** - Dedicated archived tasks screen with restore and permanent delete options
+- 📊 **Minimal Stats** - Lightweight statistics view showing active, completed, completed today, due today, and overdue task counts
 - 🎯 **Multi-Select & Bulk Actions** - Select multiple tasks for bulk archive, mark completed, or mark active
 - 🔍 **Smart Search** - Real-time search across task titles and descriptions with debounce
 - 🏷️ **Status Filtering** - Filter tasks by status (All, Active, Completed)
@@ -286,6 +287,18 @@ TaskViewModelTest            // End-to-end coordination tests
 - **Key-based LazyColumn** - Optimized list rendering with proper item keys
 
 ## 📚 Recent Updates
+
+### v2.8 - Minimal Stats (Lightweight Analytics)
+- 📊 **Stats Screen** - Lightweight statistics view showing key task counts without charts or complex analytics
+- 🔢 **Five Key Metrics** - Active tasks, completed tasks (overall), completed today, due today (active only), and overdue counts
+- 📅 **Timezone-Aware Today Calculations** - Proper local timezone handling for "today" boundaries using java.time
+- 💾 **Completion Timestamps** - Added completedAt field to track when tasks were completed for accurate "completed today" stats
+- 🗄️ **Archive Exclusion** - All stats exclude archived tasks by default with clear notation
+- 📱 **Material 3 UI** - Clean stats cards accessible from overflow menu in main screen
+- 🔄 **Reactive Updates** - Stats update automatically when task data changes using Flow-based architecture
+- 💾 **Database Migration** - Seamless Room database upgrade from v5 to v6 with completedAt field
+- 🏗️ **Performance Optimized** - Stats computed at database level with efficient queries and proper StateFlow usage
+- 📱 **Production-Ready MVP** - Simple numeric stats display without graphs, animations, or third-party dependencies
 
 ### v2.7 - Archive System (Soft Delete)
 - 🗄️ **Archive Tasks** - Replace permanent delete with safe archiving system using soft delete pattern

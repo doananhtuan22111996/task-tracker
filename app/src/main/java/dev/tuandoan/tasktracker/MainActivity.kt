@@ -16,8 +16,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import dev.tuandoan.tasktracker.ui.screens.ArchivedScreen
+import dev.tuandoan.tasktracker.ui.screens.StatsScreen
 import dev.tuandoan.tasktracker.ui.screens.TaskListScreen
 import dev.tuandoan.tasktracker.ui.theme.TaskTrackerTheme
+import dev.tuandoan.tasktracker.ui.viewmodel.StatsViewModel
 import dev.tuandoan.tasktracker.ui.viewmodel.TaskViewModel
 
 /**
@@ -45,20 +47,26 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun TaskTrackerApp() {
     val viewModel: TaskViewModel = hiltViewModel()
+    val statsViewModel: StatsViewModel = hiltViewModel()
     var showArchivedScreen by remember { mutableStateOf(false) }
+    var showStatsScreen by remember { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
             TopAppBar(
                 title = {
                     Text(
-                        text = if (showArchivedScreen) "Archived Tasks" else "Task Tracker",
+                        text = when {
+                            showArchivedScreen -> "Archived Tasks"
+                            showStatsScreen -> "Stats"
+                            else -> "Task Tracker"
+                        },
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold
                     )
                 },
                 actions = {
-                    if (!showArchivedScreen) {
+                    if (!showArchivedScreen && !showStatsScreen) {
                         // Show archive button only on main screen
                         IconButton(onClick = { showArchivedScreen = true }) {
                             Icon(
@@ -75,17 +83,37 @@ fun TaskTrackerApp() {
             )
         }
     ) { paddingValues ->
-        if (showArchivedScreen) {
-            ArchivedScreen(
-                viewModel = viewModel,
-                onNavigateBack = { showArchivedScreen = false },
-                modifier = Modifier.padding(paddingValues)
-            )
-        } else {
-            TaskListScreen(
-                viewModel = viewModel,
-                modifier = Modifier.padding(paddingValues)
-            )
+        when {
+            showArchivedScreen -> {
+                ArchivedScreen(
+                    viewModel = viewModel,
+                    onNavigateBack = {
+                        showArchivedScreen = false
+                        showStatsScreen = false
+                    },
+                    modifier = Modifier.padding(paddingValues)
+                )
+            }
+            showStatsScreen -> {
+                StatsScreen(
+                    viewModel = statsViewModel,
+                    onNavigateBack = {
+                        showStatsScreen = false
+                        showArchivedScreen = false
+                    },
+                    modifier = Modifier.padding(paddingValues)
+                )
+            }
+            else -> {
+                TaskListScreen(
+                    viewModel = viewModel,
+                    onStatsClick = {
+                        showStatsScreen = true
+                        showArchivedScreen = false
+                    },
+                    modifier = Modifier.padding(paddingValues)
+                )
+            }
         }
     }
 }

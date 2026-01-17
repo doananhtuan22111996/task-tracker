@@ -22,6 +22,7 @@ import dev.tuandoan.tasktracker.ui.viewmodel.TaskFilter
 @Composable
 fun TaskListScreen(
     viewModel: TaskViewModel,
+    onStatsClick: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     // Collect all required state
@@ -100,7 +101,8 @@ fun TaskListScreen(
                 onBulkMarkActive = viewModel::bulkMarkActive,
                 onBulkArchive = viewModel::requestBulkArchive,
                 onClearSelection = viewModel::clearSelection,
-                onSelectAll = { viewModel.selectAll(visibleTasks.map { it.id }) }
+                onSelectAll = { viewModel.selectAll(visibleTasks.map { it.id }) },
+                onStatsClick = onStatsClick
             )
         },
         floatingActionButton = {

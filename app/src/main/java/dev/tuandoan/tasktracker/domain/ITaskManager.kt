@@ -43,4 +43,11 @@ interface ITaskManager {
     suspend fun unarchiveTasks(ids: List<Long>)
     suspend fun hardDeleteTask(taskId: Long)
     suspend fun hardDeleteTasks(ids: List<Long>)
+
+    // Stats operations (exclude archived tasks)
+    fun observeActiveCount(): Flow<Int>
+    fun observeCompletedCount(): Flow<Int>
+    fun observeCompletedTodayCount(startOfDayMillis: Long, endOfDayMillis: Long): Flow<Int>
+    fun observeDueTodayCount(startOfDayMillis: Long, endOfDayMillis: Long): Flow<Int>
+    fun observeOverdueCount(nowMillis: Long): Flow<Int>
 }
