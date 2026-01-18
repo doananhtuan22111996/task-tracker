@@ -10,9 +10,16 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavType
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import dagger.hilt.android.AndroidEntryPoint
+import dev.tuandoan.tasktracker.navigation.TaskTrackerRoutes
 import dev.tuandoan.tasktracker.ui.screens.ArchivedScreen
 import dev.tuandoan.tasktracker.ui.screens.StatsScreen
+import dev.tuandoan.tasktracker.ui.screens.TaskEditorScreen
 import dev.tuandoan.tasktracker.ui.screens.TaskListScreen
 import dev.tuandoan.tasktracker.ui.theme.TaskTrackerTheme
 import dev.tuandoan.tasktracker.ui.viewmodel.StatsViewModel
@@ -37,52 +44,68 @@ class MainActivity : ComponentActivity() {
 
 /**
  * Main composable for the Task Tracker app.
- * Uses hiltViewModel() to get ViewModel instance with proper dependency injection.
+ * Uses NavHost for navigation between screens.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TaskTrackerApp() {
-    val viewModel: TaskViewModel = hiltViewModel()
-    val statsViewModel: StatsViewModel = hiltViewModel()
-    var showArchivedScreen by remember { mutableStateOf(false) }
-    var showStatsScreen by remember { mutableStateOf(false) }
+    val navController = rememberNavController()
 
-    // Remove parent Scaffold with TopAppBar to avoid duplication - each screen manages its own TopAppBar
     Surface(
         modifier = Modifier.fillMaxSize(),
         color = MaterialTheme.colorScheme.background,
     ) {
-        when {
-            showArchivedScreen -> {
+        NavHost(
+            navController = navController,
+            startDestination = TaskTrackerRoutes.TASK_LIST,
+        ) {
+            composable(TaskTrackerRoutes.TASK_LIST) {
+                val viewModel: TaskViewModel = hiltViewModel()
+                TaskListScreen(
+                    viewModel = viewModel,
+                    navController = navController,
+                    onStatsClick = {
+                        navController.navigate(TaskTrackerRoutes.STATS)
+                    },
+                    onArchiveClick = {
+                        navController.navigate(TaskTrackerRoutes.ARCHIVED)
+                    },
+                )
+            }
+
+            composable(TaskTrackerRoutes.ARCHIVED) {
+                val viewModel: TaskViewModel = hiltViewModel()
                 ArchivedScreen(
                     viewModel = viewModel,
                     onNavigateBack = {
-                        showArchivedScreen = false
-                        showStatsScreen = false
+                        navController.popBackStack()
                     },
                 )
             }
-            showStatsScreen -> {
+
+            composable(TaskTrackerRoutes.STATS) {
+                val statsViewModel: StatsViewModel = hiltViewModel()
                 StatsScreen(
                     viewModel = statsViewModel,
                     onNavigateBack = {
-                        showStatsScreen = false
-                        showArchivedScreen = false
+                        navController.popBackStack()
                     },
                 )
             }
-            else -> {
-                TaskListScreen(
-                    viewModel = viewModel,
-                    onStatsClick = {
-                        showStatsScreen = true
-                        showArchivedScreen = false
+
+            composable(TaskTrackerRoutes.TASK_EDITOR_CREATE) {
+                TaskEditorScreen(navController = navController)
+            }
+
+            composable(
+                route = TaskTrackerRoutes.TASK_EDITOR_EDIT,
+                arguments = listOf(
+                    navArgument("taskId") {
+                        type = NavType.LongType
                     },
-                    onArchiveClick = {
-                        showArchivedScreen = true
-                        showStatsScreen = false
-                    },
-                )
+                ),
+            ) {
+                TaskEditorScreen(navController = navController)
             }
         }
     }

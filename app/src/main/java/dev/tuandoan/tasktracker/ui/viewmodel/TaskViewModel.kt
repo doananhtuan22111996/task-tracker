@@ -5,7 +5,6 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dev.tuandoan.tasktracker.data.database.Task
 import dev.tuandoan.tasktracker.domain.model.CompletedGrouping
-import dev.tuandoan.tasktracker.domain.model.ReminderOption
 import dev.tuandoan.tasktracker.domain.model.SortDirection
 import dev.tuandoan.tasktracker.domain.model.SortKey
 import dev.tuandoan.tasktracker.domain.model.TaskSort
@@ -13,8 +12,6 @@ import dev.tuandoan.tasktracker.ui.events.UiEvent
 import dev.tuandoan.tasktracker.ui.manager.TaskBulkActionManager
 import dev.tuandoan.tasktracker.ui.manager.TaskCrudManager
 import dev.tuandoan.tasktracker.ui.state.SelectionState
-import dev.tuandoan.tasktracker.ui.state.TaskFormState
-import dev.tuandoan.tasktracker.ui.state.TaskFormStateManager
 import dev.tuandoan.tasktracker.ui.state.TaskListState
 import dev.tuandoan.tasktracker.ui.state.TaskListStateManager
 import dev.tuandoan.tasktracker.ui.state.TaskSelectionStateManager
@@ -48,7 +45,6 @@ import javax.inject.Inject
 @HiltViewModel
 class TaskViewModel @Inject constructor(
     private val listStateManager: TaskListStateManager,
-    private val formStateManager: TaskFormStateManager,
     private val crudManager: TaskCrudManager,
     private val selectionStateManager: TaskSelectionStateManager,
     private val bulkActionManager: TaskBulkActionManager,
@@ -56,7 +52,6 @@ class TaskViewModel @Inject constructor(
 
     // Initialize state from managers
     private val listState: TaskListState = listStateManager.initializeStateFlows(viewModelScope)
-    private val formState: TaskFormState = formStateManager.initializeStateFlows(viewModelScope)
     private val selectionState: SelectionState = selectionStateManager.initializeStateFlows(viewModelScope)
 
     // === Exposed State Flows ===
@@ -105,26 +100,7 @@ class TaskViewModel @Inject constructor(
             initialValue = emptyList(),
         )
 
-    // Form state
-    val showAddTaskDialog = formState.showAddTaskDialog
-    val selectedTask = formState.selectedTask
-    val taskTitle = formState.taskTitle
-    val taskDescription = formState.taskDescription
-    val dueAt = formState.dueAt
-    val reminderOption = formState.reminderOption
-    val tag = formState.tag
-    val isFormValid = formState.isFormValid
-    val isEditMode = formState.isEditMode
-    val titleError = formState.titleError
-    val dueDateError = formState.dueDateError
-    val reminderError = formState.reminderError
-    val tagError = formState.tagError
-    val isTitleValid = formState.isTitleValid
-    val isDueDateValid = formState.isDueDateValid
-    val isReminderValid = formState.isReminderValid
-    val isTagValid = formState.isTagValid
-    val hasChanges = formState.hasChanges
-    val isSaveEnabled = formState.isSaveEnabled
+    // Form state - moved to dedicated TaskEditorViewModel for screen-based editor
 
     // Selection state (from manager)
     val selectedIds = selectionState.selectedIds
@@ -328,15 +304,7 @@ class TaskViewModel @Inject constructor(
     fun cancelBulkDelete() = bulkActionManager.cancelBulkDelete()
 
     // === Form Management ===
-
-    fun showAddTaskDialog() = formStateManager.showAddTaskDialog()
-    fun showEditTaskDialog(task: Task) = formStateManager.showEditTaskDialog(task)
-    fun hideAddTaskDialog() = formStateManager.hideAddTaskDialog()
-    fun updateTaskTitle(title: String) = formStateManager.updateTaskTitle(title)
-    fun updateTaskDescription(description: String) = formStateManager.updateTaskDescription(description)
-    fun updateDueAt(dueAt: Long?) = formStateManager.updateDueAt(dueAt)
-    fun updateReminderOption(reminderOption: ReminderOption) = formStateManager.updateReminderOption(reminderOption)
-    fun updateTag(tag: String) = formStateManager.updateTag(tag)
+    // Note: Form methods moved to dedicated TaskEditorViewModel for screen-based editor
 
     // === Search Operations ===
 
