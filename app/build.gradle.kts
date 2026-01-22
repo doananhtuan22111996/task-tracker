@@ -111,6 +111,9 @@ dependencies {
     implementation(libs.androidx.hilt.navigation.compose)
     ksp(libs.dagger.hilt.compiler)
 
+    // Navigation dependencies
+    implementation(libs.androidx.navigation.compose)
+
     // WorkManager dependencies
     implementation(libs.androidx.work.runtime.ktx)
     implementation(libs.androidx.hilt.work)

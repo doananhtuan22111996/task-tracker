@@ -39,6 +39,11 @@ A modern, offline-first task tracking Android app built with **Kotlin**, **Jetpa
 - 🛡️ **Safe Deletion** - Confirmation dialogs with undo capability prevent accidental data loss
 - 👆 **Long-press Selection** - Long-press to enter selection mode, tap to toggle selection
 - ✨ **Polished Form UX** - Auto-focus input, IME Done action, character counters, and data safety with input trimming
+- 📱 **Dedicated Task Editor Screen** - Full-screen task editor optimized for small devices with better keyboard handling, scrolling, and field layout
+- 🧭 **Bottom navigation for All/Active/Completed** - Modern navigation pattern for task status filtering
+- 📝 **Modern Material 3 list items for improved readability** - Streamlined task display with clear visual hierarchy
+- 📋 **Task list redesigned to Material 3 modern list items and compact section headers** - Enhanced visual design following Material 3 guidelines from Figma kit
+- 🏷️ **Task tags are displayed at the bottom of each task item for improved readability** - Modern chip layout following Material 3 design principles
 
 ## 🏗️ Architecture
 
@@ -138,6 +143,7 @@ app/src/main/java/dev/tuandoan/tasktracker/
 │   │   └── FilterTabs.kt          # Status filter tabs
 │   ├── screens/                   # Main screens
 │   │   ├── TaskListScreen.kt      # Primary task list screen
+│   │   ├── TaskEditorScreen.kt    # Dedicated full-screen task editor (optimized for small devices)
 │   │   └── ArchivedScreen.kt      # Archived tasks management screen
 │   ├── state/                     # State management
 │   │   ├── TaskListStateManager.kt   # List state coordination
@@ -146,6 +152,7 @@ app/src/main/java/dev/tuandoan/tasktracker/
 │   │   └── TaskCrudManager.kt     # CRUD operations coordination
 │   └── viewmodel/
 │       ├── TaskViewModel.kt       # Main ViewModel coordinator
+│       ├── TaskEditorViewModel.kt # Dedicated ViewModel for task editor screen
 │       └── TaskFilter.kt          # Filter enum
 ├── utils/
 │   └── DateUtils.kt              # Date formatting and overdue detection
@@ -204,8 +211,8 @@ app/src/main/java/dev/tuandoan/tasktracker/
 ## 📱 Usage
 
 ### Basic Operations
-1. **Add Task** - Tap the floating action button (➕) to create a new task
-2. **Edit Task** - Tap on any task to edit its title and description (in normal mode)
+1. **Add Task** - Tap the floating action button (➕) to open the full-screen task editor
+2. **Edit Task** - Tap on any task to open the dedicated editor screen with all task fields (in normal mode)
 3. **Complete Task** - Tap the checkbox to mark a task as complete/incomplete
 4. **Archive Task** - Use the archive button to safely archive tasks with confirmation dialog and undo functionality
 
@@ -287,6 +294,16 @@ TaskViewModelTest            // End-to-end coordination tests
 - **Key-based LazyColumn** - Optimized list rendering with proper item keys
 
 ## 📚 Recent Updates
+
+### v3.0 - Dedicated Task Editor Screen (Small Device Optimization)
+- 📱 **Full-Screen Task Editor** - Replaced modal dialog with dedicated screen optimized for small devices with better usability
+- 🔄 **Navigation Refactor** - Implemented Compose Navigation for proper screen-based navigation instead of dialog state management
+- ⌨️ **Improved Keyboard Handling** - Full-screen editor with proper IME padding and scrolling to ensure focused fields remain visible
+- 📐 **Better Field Layout** - Optimized field spacing, organization sections, and visual hierarchy for small device usability
+- 🎯 **Dedicated ViewModel** - New TaskEditorViewModel with focused state management for editor-specific operations
+- 🧹 **Code Cleanup** - Removed unused dialog code paths and simplified navigation architecture
+- 🏗️ **Architecture Enhancement** - Proper separation between list management (TaskViewModel) and editor functionality (TaskEditorViewModel)
+- 📱 **Small Device Focus** - Improved scrolling, field visibility, and touch targets specifically designed for small screens
 
 ### v2.9 - UI/UX Enhancements & Material 3 Polish
 - 🎨 **Enhanced Typography System** - Comprehensive Material 3 typography hierarchy with proper font weights, sizes, and semantic styles for improved readability and visual hierarchy

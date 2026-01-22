@@ -11,7 +11,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import dev.tuandoan.tasktracker.data.database.Task
 import dev.tuandoan.tasktracker.ui.theme.AppSpacing
-import dev.tuandoan.tasktracker.ui.theme.CustomShapes
 import dev.tuandoan.tasktracker.ui.viewmodel.TaskFilter
 import dev.tuandoan.tasktracker.utils.TaskSection
 
@@ -31,7 +30,6 @@ fun TaskListContent(
     isSelectionMode: Boolean,
     onSearchQueryChange: (String) -> Unit,
     onClearSearch: () -> Unit,
-    onFilterChange: (TaskFilter) -> Unit,
     onTagFilterChange: (String?) -> Unit,
     onToggleTaskComplete: (Task) -> Unit,
     onEditTask: (Task) -> Unit,
@@ -55,10 +53,8 @@ fun TaskListContent(
 
         Spacer(modifier = Modifier.height(AppSpacing.small))
 
-        // Filter Tabs - compact spacing for cohesive feel
-        FilterTabs(
-            currentFilter = currentFilter,
-            onFilterChange = onFilterChange,
+        // Tag Filter Chips - compact spacing for cohesive feel
+        TagFilterChips(
             currentTagFilter = currentTagFilter,
             availableTags = availableTags,
             onTagFilterChange = onTagFilterChange,
@@ -82,7 +78,7 @@ fun TaskListContent(
             onLongPressTask = onLongPressTask,
             onToggleSelection = onToggleSelection,
             onClearSearch = onClearSearch,
-            onChangeFilter = { onFilterChange(TaskFilter.ALL) },
+            onChangeFilter = { /* Filter change now handled by bottom navigation */ },
         )
     }
 }
@@ -112,6 +108,7 @@ private fun TaskListOrEmptyState(
         allTasks.isEmpty() -> {
             EmptyTaskList()
         }
+
         visibleTasks.isEmpty() -> {
             EmptySearchResults(
                 hasQuery = searchQuery.isNotEmpty(),
@@ -120,6 +117,7 @@ private fun TaskListOrEmptyState(
                 onChangeFilter = onChangeFilter,
             )
         }
+
         else -> {
             GroupedTaskList(
                 taskSections = groupedVisibleTasks,
@@ -154,9 +152,10 @@ private fun GroupedTaskList(
 ) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.spacedBy(AppSpacing.extraSmall),
+        // Increased spacing for Material 3 ListItem design
+        verticalArrangement = Arrangement.spacedBy(AppSpacing.small),
         contentPadding = PaddingValues(
-            bottom = 88.dp, // FAB height (56dp) + margin (32dp) for proper clearance
+            bottom = 104.dp, // FAB height (56dp) + bottom nav height (80dp) - overlap (32dp) = proper clearance
         ),
     ) {
         taskSections.forEach { section ->
@@ -164,6 +163,7 @@ private fun GroupedTaskList(
             stickyHeader(key = section.dateKey) {
                 TaskSectionHeader(
                     header = section.header,
+                    itemCount = section.tasks.size,
                 )
             }
 
@@ -189,31 +189,50 @@ private fun GroupedTaskList(
 }
 
 /**
- * Enhanced header for a task section (Today, Yesterday, etc.) with improved Material 3 styling
+ * Compact modern header for task sections with optional count badge
+ * Follows Material 3 design principles with 40-48dp total height
  */
 @Composable
-fun TaskSectionHeader(header: String) {
+fun TaskSectionHeader(header: String, itemCount: Int? = null, modifier: Modifier = Modifier) {
     Surface(
-        modifier = Modifier.fillMaxWidth(),
-        color = MaterialTheme.colorScheme.surfaceContainerLow.copy(alpha = 0.98f),
-        shape = CustomShapes.sectionHeader,
-        tonalElevation = 2.dp,
+        modifier = modifier.fillMaxWidth(),
+        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.9f),
+        tonalElevation = 1.dp,
     ) {
-        Column {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(44.dp), // Compact 44dp height
+            verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween,
+        ) {
+            // Section title
             Text(
                 text = header,
                 style = MaterialTheme.typography.titleSmall,
                 fontWeight = FontWeight.Medium,
-                color = MaterialTheme.colorScheme.onSurface,
-                modifier = Modifier.padding(
-                    horizontal = AppSpacing.large,
-                    vertical = AppSpacing.small, // Compact header padding per layout guidelines
-                ),
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(start = AppSpacing.screenPadding),
             )
-            HorizontalDivider(
-                color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f),
-                thickness = 1.dp,
-            )
+
+            // Optional count badge
+            itemCount?.let { count ->
+                AssistChip(
+                    onClick = { /* No action - informational only */ },
+                    label = {
+                        Text(
+                            text = count.toString(),
+                            style = MaterialTheme.typography.labelSmall,
+                        )
+                    },
+                    modifier = Modifier.padding(end = AppSpacing.screenPadding),
+                    enabled = false, // Disabled for informational display
+                    colors = AssistChipDefaults.assistChipColors(
+                        disabledContainerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.7f),
+                        disabledLabelColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                    ),
+                )
+            }
         }
     }
 }

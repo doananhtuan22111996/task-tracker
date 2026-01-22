@@ -4,14 +4,23 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.List
+import androidx.compose.material.icons.filled.RadioButtonUnchecked
+import androidx.compose.material.icons.outlined.CheckCircle
+import androidx.compose.material.icons.outlined.List
+import androidx.compose.material.icons.outlined.RadioButtonUnchecked
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavController
+import dev.tuandoan.tasktracker.navigation.TaskTrackerRoutes
 import dev.tuandoan.tasktracker.ui.components.TaskListContent
 import dev.tuandoan.tasktracker.ui.components.TaskListTopBar
 import dev.tuandoan.tasktracker.ui.events.UiEvent
+import dev.tuandoan.tasktracker.ui.viewmodel.TaskFilter
 import dev.tuandoan.tasktracker.ui.viewmodel.TaskViewModel
 
 /**
@@ -22,6 +31,7 @@ import dev.tuandoan.tasktracker.ui.viewmodel.TaskViewModel
 fun TaskListScreen(
     modifier: Modifier = Modifier,
     viewModel: TaskViewModel,
+    navController: NavController,
     onStatsClick: () -> Unit = {},
     onArchiveClick: () -> Unit = {},
 ) {
@@ -34,7 +44,6 @@ fun TaskListScreen(
     val currentTagFilter by viewModel.tagFilter.collectAsStateWithLifecycle()
     val availableTags by viewModel.availableTags.collectAsStateWithLifecycle()
     val currentSort by viewModel.taskSort.collectAsStateWithLifecycle()
-    val showAddTaskDialog by viewModel.showAddTaskDialog.collectAsStateWithLifecycle()
     val pendingDeleteTask by viewModel.pendingDeleteTask.collectAsStateWithLifecycle()
 
     // Selection state
@@ -108,7 +117,7 @@ fun TaskListScreen(
         },
         floatingActionButton = {
             FloatingActionButton(
-                onClick = { viewModel.showAddTaskDialog() },
+                onClick = { navController.navigate(TaskTrackerRoutes.TASK_EDITOR_CREATE) },
                 containerColor = MaterialTheme.colorScheme.primary,
                 contentColor = MaterialTheme.colorScheme.onPrimary,
                 elevation = FloatingActionButtonDefaults.elevation(
@@ -126,6 +135,45 @@ fun TaskListScreen(
         snackbarHost = {
             SnackbarHost(hostState = snackbarHostState)
         },
+        bottomBar = {
+            if (!isSelectionMode) { // Hide bottom nav during selection mode
+                NavigationBar(
+                    containerColor = MaterialTheme.colorScheme.surfaceContainer,
+                ) {
+                    val navigationItems = listOf(
+                        TaskFilter.ALL to "All" to Pair(Icons.Outlined.List, Icons.Filled.List),
+                        TaskFilter.ACTIVE to "Active" to
+                            Pair(Icons.Outlined.RadioButtonUnchecked, Icons.Filled.RadioButtonUnchecked),
+                        TaskFilter.COMPLETED to "Completed" to
+                            Pair(Icons.Outlined.CheckCircle, Icons.Filled.CheckCircle),
+                    )
+
+                    navigationItems.forEach { (filterData, icons) ->
+                        val (filter, label) = filterData
+                        val (unselectedIcon, selectedIcon) = icons
+
+                        NavigationBarItem(
+                            icon = {
+                                Icon(
+                                    imageVector = if (currentFilter == filter) selectedIcon else unselectedIcon,
+                                    contentDescription = label,
+                                )
+                            },
+                            label = {
+                                Text(
+                                    text = label,
+                                    style = MaterialTheme.typography.labelSmall,
+                                )
+                            },
+                            selected = currentFilter == filter,
+                            onClick = {
+                                viewModel.setFilter(filter)
+                            },
+                        )
+                    }
+                }
+            }
+        },
     ) { paddingValues ->
         TaskListContent(
             allTasks = allTasks,
@@ -139,23 +187,14 @@ fun TaskListScreen(
             isSelectionMode = isSelectionMode,
             onSearchQueryChange = viewModel::updateSearchQuery,
             onClearSearch = viewModel::clearSearch,
-            onFilterChange = viewModel::setFilter,
             onTagFilterChange = viewModel::setTagFilter,
             onToggleTaskComplete = viewModel::toggleTaskCompletion,
-            onEditTask = viewModel::showEditTaskDialog,
+            onEditTask = { task -> navController.navigate(TaskTrackerRoutes.taskEditorEdit(task.id)) },
             onArchiveTask = viewModel::archiveTask,
             onPinTask = viewModel::toggleTaskPin,
             onLongPressTask = viewModel::enterSelection,
             onToggleSelection = viewModel::toggleSelection,
             modifier = Modifier.padding(paddingValues),
-        )
-    }
-
-    // Show dialog when requested
-    if (showAddTaskDialog) {
-        AddEditTaskDialog(
-            viewModel = viewModel,
-            onDismiss = { viewModel.hideAddTaskDialog() },
         )
     }
 
