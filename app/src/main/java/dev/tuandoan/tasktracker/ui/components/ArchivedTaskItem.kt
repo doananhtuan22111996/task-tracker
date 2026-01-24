@@ -1,16 +1,37 @@
 package dev.tuandoan.tasktracker.ui.components
 
-import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
-import androidx.compose.material3.*
+import androidx.compose.material.icons.filled.AddCircle
+import androidx.compose.material.icons.filled.Archive
+import androidx.compose.material.icons.filled.DeleteForever
+import androidx.compose.material.icons.filled.Event
+import androidx.compose.material.icons.filled.Unarchive
+import androidx.compose.material3.AssistChip
+import androidx.compose.material3.AssistChipDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CheckboxDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -18,9 +39,9 @@ import dev.tuandoan.tasktracker.data.database.Task
 import dev.tuandoan.tasktracker.utils.formatDate
 import dev.tuandoan.tasktracker.utils.formatDueDate
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ArchivedTaskItem(
+    modifier: Modifier = Modifier,
     task: Task,
     isSelected: Boolean = false,
     isSelectionMode: Boolean = false,
@@ -28,8 +49,18 @@ fun ArchivedTaskItem(
     onPermanentDeleteClick: () -> Unit,
     onLongPress: () -> Unit = {},
     onToggleSelection: () -> Unit = {},
-    modifier: Modifier = Modifier,
 ) {
+    val containerColor = when {
+        isSelected -> MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.55f)
+        else -> MaterialTheme.colorScheme.surfaceContainerLow
+    }
+
+    val border: BorderStroke? = if (isSelected) {
+        BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.45f))
+    } else {
+        null
+    }
+
     Card(
         modifier = modifier
             .fillMaxWidth()
@@ -38,7 +69,7 @@ fun ArchivedTaskItem(
                     if (isSelectionMode) {
                         onToggleSelection()
                     }
-                    // In archived screen, we don't have edit functionality, so no click action in normal mode
+                    // Archived screen: no navigation in normal mode
                 },
                 onLongClick = {
                     if (!isSelectionMode) {
@@ -46,22 +77,18 @@ fun ArchivedTaskItem(
                     }
                 },
             ),
-        shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = when {
-                isSelected -> MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f)
-                else -> MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.7f) // Always show archived appearance
-            },
-        ),
+        shape = RoundedCornerShape(20.dp),
+        border = border,
+        colors = CardDefaults.cardColors(containerColor = containerColor),
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically,
+                .padding(horizontal = 16.dp, vertical = 14.dp),
+            verticalAlignment = Alignment.Top,
         ) {
             if (isSelectionMode) {
-                // Selection indicator in selection mode
                 Checkbox(
                     checked = isSelected,
                     onCheckedChange = { onToggleSelection() },
@@ -70,102 +97,140 @@ fun ArchivedTaskItem(
                         uncheckedColor = MaterialTheme.colorScheme.outline,
                     ),
                 )
-            } else {
-                // Archive indicator in normal mode - just spacing
-                Spacer(modifier = Modifier.width(40.dp))
+                Spacer(modifier = Modifier.width(12.dp))
             }
 
-            Column(
-                modifier = Modifier
-                    .weight(1f)
-                    .alpha(0.8f), // Slightly faded to indicate archived status
+            Row(
+                modifier = Modifier.weight(1f),
+                verticalAlignment = Alignment.Top,
             ) {
-                Text(
-                    text = task.title,
-                    style = MaterialTheme.typography.bodyLarge,
-                    fontWeight = FontWeight.Medium,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis,
-                )
-
-                if (task.description.isNotEmpty()) {
-                    Spacer(modifier = Modifier.height(4.dp))
+                Column(
+                    modifier = Modifier.weight(1f),
+                ) {
+                    // Title
                     Text(
-                        text = task.description,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
+                        text = task.title,
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.SemiBold,
                         maxLines = 2,
                         overflow = TextOverflow.Ellipsis,
+                        color = MaterialTheme.colorScheme.onSurface,
                     )
-                }
 
-                // Tag Display
-                if (!task.tag.isNullOrEmpty()) {
-                    Spacer(modifier = Modifier.height(4.dp))
-                    AssistChip(
-                        onClick = { },
-                        label = {
-                            Text(
-                                text = task.tag,
-                                style = MaterialTheme.typography.bodySmall,
-                            )
-                        },
-                        colors = AssistChipDefaults.assistChipColors(
-                            containerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.6f),
-                            labelColor = MaterialTheme.colorScheme.onSecondaryContainer,
-                        ),
-                        border = null,
-                        modifier = Modifier.alpha(0.8f),
-                    )
-                }
-
-                // Due Date Display (if it existed)
-                if (task.dueAt != null) {
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Text(
-                        text = "Due: ${formatDueDate(task.dueAt)}",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
-                    )
-                }
-
-                // Archive info
-                Spacer(modifier = Modifier.height(4.dp))
-                val archiveDate = task.archivedAt ?: task.createdAt
-                Text(
-                    text = "Archived: ${formatDate(archiveDate)}",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
-                )
-
-                // Original creation date
-                Text(
-                    text = "Created: ${formatDate(task.createdAt)}",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f),
-                )
-            }
-
-            // Action buttons only in normal mode
-            if (!isSelectionMode) {
-                Row {
-                    IconButton(onClick = onRestoreClick) {
-                        Icon(
-                            imageVector = Icons.Default.Unarchive,
-                            contentDescription = "Restore task",
-                            tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.7f),
+                    // Description
+                    if (task.description.isNotEmpty()) {
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(
+                            text = task.description,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            maxLines = 2,
+                            overflow = TextOverflow.Ellipsis,
                         )
                     }
 
-                    IconButton(onClick = onPermanentDeleteClick) {
-                        Icon(
-                            imageVector = Icons.Default.DeleteForever,
-                            contentDescription = "Permanently delete task",
-                            tint = MaterialTheme.colorScheme.error.copy(alpha = 0.7f),
+                    Spacer(modifier = Modifier.height(10.dp))
+
+                    // Tag chip (left)
+                    if (!task.tag.isNullOrEmpty()) {
+                        AssistChip(
+                            onClick = { },
+                            label = {
+                                Text(
+                                    text = task.tag,
+                                    style = MaterialTheme.typography.labelMedium,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
+                                )
+                            },
+                            colors = AssistChipDefaults.assistChipColors(
+                                containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                                labelColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                            ),
+                            border = null,
                         )
+                        Spacer(modifier = Modifier.height(8.dp))
+                    }
+
+                    // Metadata rows (Due / Archived / Created)
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(6.dp),
+                    ) {
+                        if (task.dueAt != null) {
+                            MetaRow(
+                                icon = Icons.Default.Event,
+                                text = "Due: ${formatDueDate(task.dueAt)}",
+                            )
+                        }
+
+                        val archiveDate = task.archivedAt ?: task.createdAt
+                        MetaRow(
+                            icon = Icons.Default.Archive,
+                            text = "Archived: ${formatDate(archiveDate)}",
+                        )
+
+                        MetaRow(
+                            icon = Icons.Default.AddCircle,
+                            text = "Created: ${formatDate(task.createdAt)}",
+                        )
+                    }
+                }
+
+                if (!isSelectionMode) {
+                    Spacer(modifier = Modifier.width(8.dp))
+
+                    Column(
+                        horizontalAlignment = Alignment.End,
+                        verticalArrangement = Arrangement.Top,
+                    ) {
+                        IconButton(
+                            onClick = onRestoreClick,
+                            modifier = Modifier.size(40.dp),
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Unarchive,
+                                contentDescription = "Restore task",
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier.size(20.dp),
+                            )
+                        }
+
+                        IconButton(
+                            onClick = onPermanentDeleteClick,
+                            modifier = Modifier.size(40.dp),
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.DeleteForever,
+                                contentDescription = "Permanently delete task",
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier.size(20.dp),
+                            )
+                        }
                     }
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun MetaRow(icon: ImageVector, text: String) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        Icon(
+            imageVector = icon,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.75f),
+            modifier = Modifier.size(16.dp),
+        )
+        Text(
+            text = text,
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.85f),
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+        )
     }
 }

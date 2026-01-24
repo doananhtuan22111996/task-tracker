@@ -1,10 +1,22 @@
 package dev.tuandoan.tasktracker.ui.components
 
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.*
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -189,49 +201,62 @@ private fun GroupedTaskList(
 }
 
 /**
- * Compact modern header for task sections with optional count badge
- * Follows Material 3 design principles with 40-48dp total height
+ * Compact, modern header for task sections, inspired by the provided screenshot.
+ *
+ * Visual goals:
+ * - Inset pill-like container (Surface with large shape)
+ * - Uppercased section label (e.g., TODAY)
+ * - Small rounded count badge on the right
+ * - No heavy shadows; rely on tonal separation only
  */
 @Composable
-fun TaskSectionHeader(header: String, itemCount: Int? = null, modifier: Modifier = Modifier) {
-    Surface(
-        modifier = modifier.fillMaxWidth(),
-        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.9f),
-        tonalElevation = 1.dp,
+fun TaskSectionHeader(modifier: Modifier = Modifier, header: String, itemCount: Int? = null) {
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(vertical = 6.dp),
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(44.dp), // Compact 44dp height
-            verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween,
+        Surface(
+            modifier = Modifier.fillMaxWidth(),
+            color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.75f),
+            tonalElevation = 0.dp,
+            shadowElevation = 0.dp,
+            shape = MaterialTheme.shapes.large,
         ) {
-            // Section title
-            Text(
-                text = header,
-                style = MaterialTheme.typography.titleSmall,
-                fontWeight = FontWeight.Medium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.padding(start = AppSpacing.screenPadding),
-            )
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(min = 40.dp)
+                    .padding(
+                        horizontal = AppSpacing.screenPadding,
+                        vertical = 10.dp,
+                    ),
+                verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween,
+            ) {
+                Text(
+                    text = header.uppercase(),
+                    style = MaterialTheme.typography.labelLarge,
+                    fontWeight = FontWeight.SemiBold,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
 
-            // Optional count badge
-            itemCount?.let { count ->
-                AssistChip(
-                    onClick = { /* No action - informational only */ },
-                    label = {
+                itemCount?.let { count ->
+                    Surface(
+                        color = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.6f),
+                        contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                        shape = MaterialTheme.shapes.medium,
+                        tonalElevation = 0.dp,
+                        shadowElevation = 0.dp,
+                    ) {
                         Text(
                             text = count.toString(),
-                            style = MaterialTheme.typography.labelSmall,
+                            style = MaterialTheme.typography.labelMedium,
+                            fontWeight = FontWeight.Medium,
+                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
                         )
-                    },
-                    modifier = Modifier.padding(end = AppSpacing.screenPadding),
-                    enabled = false, // Disabled for informational display
-                    colors = AssistChipDefaults.assistChipColors(
-                        disabledContainerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.7f),
-                        disabledLabelColor = MaterialTheme.colorScheme.onSecondaryContainer,
-                    ),
-                )
+                    }
+                }
             }
         }
     }
