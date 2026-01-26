@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -19,6 +20,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import dagger.hilt.android.AndroidEntryPoint
 import dev.tuandoan.tasktracker.navigation.TaskTrackerRoutes
+import dev.tuandoan.tasktracker.ui.manager.NotificationPermissionManager
 import dev.tuandoan.tasktracker.ui.screens.ArchivedScreen
 import dev.tuandoan.tasktracker.ui.screens.StatsScreen
 import dev.tuandoan.tasktracker.ui.screens.TaskEditorScreen
@@ -33,12 +35,30 @@ import dev.tuandoan.tasktracker.ui.viewmodel.TaskViewModel
  */
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
+    // Notification permission manager
+    private lateinit var notificationPermissionManager: NotificationPermissionManager
+
+    // Permission request launcher
+    private val notificationPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission(),
+    ) { isGranted ->
+        notificationPermissionManager.handlePermissionResult(isGranted)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // Initialize notification permission manager
+        notificationPermissionManager = NotificationPermissionManager(
+            activity = this,
+            permissionLauncher = notificationPermissionLauncher,
+        )
+
         enableEdgeToEdge()
         setContent {
             TaskTrackerTheme {
-                TaskTrackerApp()
+                TaskTrackerApp(notificationPermissionManager)
             }
         }
     }
@@ -50,7 +70,7 @@ class MainActivity : ComponentActivity() {
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TaskTrackerApp() {
+fun TaskTrackerApp(notificationPermissionManager: NotificationPermissionManager? = null) {
     val navController = rememberNavController()
 
     Surface(
@@ -96,7 +116,10 @@ fun TaskTrackerApp() {
             }
 
             composable(TaskTrackerRoutes.TASK_EDITOR_CREATE) {
-                TaskEditorScreen(navController = navController)
+                TaskEditorScreen(
+                    navController = navController,
+                    notificationPermissionManager = notificationPermissionManager,
+                )
             }
 
             composable(
@@ -107,7 +130,10 @@ fun TaskTrackerApp() {
                     },
                 ),
             ) {
-                TaskEditorScreen(navController = navController)
+                TaskEditorScreen(
+                    navController = navController,
+                    notificationPermissionManager = notificationPermissionManager,
+                )
             }
         }
     }
