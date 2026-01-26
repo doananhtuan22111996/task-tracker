@@ -1,7 +1,13 @@
 package dev.tuandoan.tasktracker.ui.components
 
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -21,18 +27,21 @@ import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.StarBorder
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.AssistChipDefaults
+import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
-import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
@@ -56,25 +65,67 @@ fun TaskItem(
     onLongPress: () -> Unit = {},
     onToggleSelection: () -> Unit = {},
 ) {
+    // Unified interaction source for consistent ripple
+    val interactionSource = remember { MutableInteractionSource() }
+
     val completedAlpha = if (task.isCompleted) 0.65f else 1f
     val overdue = task.dueAt?.let { !task.isCompleted && isOverdue(it) } ?: false
 
     val titleTextDecoration = if (task.isCompleted) TextDecoration.LineThrough else null
     val supportingTextDecoration = if (task.isCompleted) TextDecoration.LineThrough else null
 
-    // Chips: Overdue (if any), Tag (if any), Priority (if non-medium)
+    // Chips: Tag (if any), Priority (if non-medium)
     val chips = buildList {
-        if (overdue) add("OVERDUE" to ChipType.Overdue)
         if (!task.tag.isNullOrBlank()) add(task.tag.uppercase() to ChipType.Tag)
         if (task.priority != Priority.MEDIUM.value) {
             add(Priority.fromValue(task.priority).displayName.uppercase() to ChipType.Priority)
         }
     }
 
-    ElevatedCard(
+    // Animated container color based on state
+    val baseContainerColor = when {
+        task.isPinned -> MaterialTheme.colorScheme.surfaceContainerHighest
+        else -> MaterialTheme.colorScheme.surfaceContainerLow
+    }
+
+    val selectedOverlayColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.08f)
+
+    val animatedContainerColor by animateColorAsState(
+        targetValue = when {
+            isSelected -> selectedOverlayColor.compositeOver(baseContainerColor)
+            else -> baseContainerColor
+        },
+        animationSpec = tween(durationMillis = 120),
+        label = "containerColor",
+    )
+
+    // Animated elevation
+    val animatedElevation by animateDpAsState(
+        targetValue = when {
+            isSelected -> 2.dp
+            task.isPinned -> 2.dp
+            else -> 1.dp
+        },
+        animationSpec = tween(durationMillis = 120),
+        label = "elevation",
+    )
+
+    // Selected border
+    val selectedBorder = if (isSelected) {
+        BorderStroke(
+            width = 1.dp,
+            color = MaterialTheme.colorScheme.primary.copy(alpha = 0.4f),
+        )
+    } else {
+        null
+    }
+
+    Card(
         modifier = modifier
             .fillMaxWidth()
             .combinedClickable(
+                interactionSource = interactionSource,
+                indication = null, // Use Material3 default ripple
                 onClick = {
                     if (isSelectionMode) onToggleSelection() else onEditClick()
                 },
@@ -84,21 +135,14 @@ fun TaskItem(
                 role = Role.Button,
             )
             .alpha(completedAlpha),
-        colors = CardDefaults.elevatedCardColors(
-            containerColor = when {
-                isSelected -> MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.35f)
-                task.isPinned -> MaterialTheme.colorScheme.surfaceContainerHighest
-                else -> MaterialTheme.colorScheme.surfaceContainerLow
-            },
+        colors = CardDefaults.cardColors(
+            containerColor = animatedContainerColor,
         ),
-        elevation = CardDefaults.elevatedCardElevation(
-            defaultElevation = when {
-                isSelected -> 6.dp
-                task.isPinned -> 3.dp
-                else -> 1.dp
-            },
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = animatedElevation,
         ),
         shape = MaterialTheme.shapes.large,
+        border = selectedBorder,
     ) {
         Row(
             modifier = Modifier
@@ -108,19 +152,30 @@ fun TaskItem(
         ) {
             // LEFT: Checkbox (selection mode uses selection state; normal uses completed state)
             val checkboxChecked = if (isSelectionMode) isSelected else task.isCompleted
-            val checkboxOnChange: (Boolean) -> Unit = {
-                if (isSelectionMode) onToggleSelection() else onToggleComplete()
-            }
 
-            Checkbox(
-                checked = checkboxChecked,
-                onCheckedChange = checkboxOnChange,
-                colors = CheckboxDefaults.colors(
-                    checkedColor = MaterialTheme.colorScheme.primary,
-                    uncheckedColor = MaterialTheme.colorScheme.outline,
-                    checkmarkColor = MaterialTheme.colorScheme.onPrimary,
-                ),
-            )
+            // Clickable checkbox area to handle completion without conflicting with card
+            Box(
+                modifier = Modifier
+                    .combinedClickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = null, // No ripple for checkbox area
+                        onClick = {
+                            if (!isSelectionMode) onToggleComplete()
+                        },
+                    ),
+                contentAlignment = Alignment.Center,
+            ) {
+                Checkbox(
+                    checked = checkboxChecked,
+                    onCheckedChange = null, // Handled by Box click
+                    colors = CheckboxDefaults.colors(
+                        checkedColor = MaterialTheme.colorScheme.primary,
+                        uncheckedColor = MaterialTheme.colorScheme.outline,
+                        checkmarkColor = MaterialTheme.colorScheme.onPrimary,
+                    ),
+                    interactionSource = remember { MutableInteractionSource() }, // Non-rippling
+                )
+            }
 
             Spacer(modifier = Modifier.width(12.dp))
 
@@ -274,6 +329,7 @@ fun TaskItem(
                     IconButton(
                         onClick = onPinClick,
                         modifier = Modifier.size(40.dp),
+                        interactionSource = remember { MutableInteractionSource() },
                     ) {
                         Icon(
                             imageVector = if (task.isPinned) Icons.Default.Star else Icons.Default.StarBorder,
@@ -281,7 +337,7 @@ fun TaskItem(
                             tint = if (task.isPinned) {
                                 MaterialTheme.colorScheme.primary
                             } else {
-                                MaterialTheme.colorScheme.onSurfaceVariant
+                                MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
                             },
                             modifier = Modifier.size(20.dp),
                         )
@@ -289,11 +345,12 @@ fun TaskItem(
                     IconButton(
                         onClick = onArchiveClick,
                         modifier = Modifier.size(40.dp),
+                        interactionSource = remember { MutableInteractionSource() },
                     ) {
                         Icon(
                             imageVector = Icons.Default.MoreVert,
                             contentDescription = "More options",
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
                             modifier = Modifier.size(20.dp),
                         )
                     }

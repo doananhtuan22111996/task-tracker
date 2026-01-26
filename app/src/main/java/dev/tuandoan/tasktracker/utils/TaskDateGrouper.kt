@@ -2,7 +2,8 @@ package dev.tuandoan.tasktracker.utils
 
 import dev.tuandoan.tasktracker.data.database.Task
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Calendar
+import java.util.Locale
 
 /**
  * Data class representing a group of tasks for a specific day

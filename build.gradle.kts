@@ -20,7 +20,7 @@ spotless {
                 "max_line_length" to "120",
                 "ktlint_standard_function-naming" to "disabled",
                 "ktlint_standard_parameter-list-wrapping" to "disabled",
-                "ktlint_standard_no-wildcard-imports" to "disabled",
+                "ktlint_standard_no-wildcard-imports" to "enabled",
                 "ktlint_standard_filename" to "disabled",
                 "ktlint_standard_value-parameter-comment" to "disabled",
                 "ktlint_standard_backing-property-naming" to "disabled",

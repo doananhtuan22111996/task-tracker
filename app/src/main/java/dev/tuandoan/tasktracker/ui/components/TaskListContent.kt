@@ -10,8 +10,8 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.MaterialTheme
@@ -21,6 +21,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import dev.tuandoan.tasktracker.data.database.Task
 import dev.tuandoan.tasktracker.ui.theme.AppSpacing
 import dev.tuandoan.tasktracker.ui.viewmodel.TaskFilter
@@ -201,60 +202,83 @@ private fun GroupedTaskList(
 }
 
 /**
- * Compact, modern header for task sections, inspired by the provided screenshot.
+ * Centered pill-style header for task sections matching HTML reference design
  *
  * Visual goals:
- * - Inset pill-like container (Surface with large shape)
- * - Uppercased section label (e.g., TODAY)
- * - Small rounded count badge on the right
- * - No heavy shadows; rely on tonal separation only
+ * - Centered pill/capsule label (e.g., "TODAY")
+ * - Uppercase, bold, tracking wide
+ * - For "Today" use primary with ~10% alpha (light) / ~20% alpha (dark)
+ * - For other days use neutral surface variant
+ * - Optional count badge on the right
  */
 @Composable
 fun TaskSectionHeader(modifier: Modifier = Modifier, header: String, itemCount: Int? = null) {
+    // Determine if this is "Today" for special styling
+    val isToday = header.equals("Today", ignoreCase = true)
+
+    // Colors based on HTML reference design
+    val containerColor = if (isToday) {
+        // Today: bg-primary/10 (light), bg-primary/20 (dark)
+        MaterialTheme.colorScheme.primary.copy(alpha = 0.12f)
+    } else {
+        // Other days: bg-slate-200 (light), bg-slate-800 (dark)
+        MaterialTheme.colorScheme.surfaceVariant
+    }
+
+    val contentColor = if (isToday) {
+        MaterialTheme.colorScheme.primary
+    } else {
+        MaterialTheme.colorScheme.onSurfaceVariant
+    }
+
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .padding(vertical = 6.dp),
+            .padding(vertical = 16.dp), // Add vertical spacing
+        contentAlignment = androidx.compose.ui.Alignment.Center,
     ) {
-        Surface(
-            modifier = Modifier.fillMaxWidth(),
-            color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.75f),
-            tonalElevation = 0.dp,
-            shadowElevation = 0.dp,
-            shape = MaterialTheme.shapes.large,
+        Row(
+            verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .heightIn(min = 40.dp)
-                    .padding(
-                        horizontal = AppSpacing.screenPadding,
-                        vertical = 10.dp,
-                    ),
-                verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween,
+            // Main section pill
+            Surface(
+                shape = MaterialTheme.shapes.extraLarge, // rounded-full
+                color = containerColor,
             ) {
                 Text(
                     text = header.uppercase(),
-                    style = MaterialTheme.typography.labelLarge,
-                    fontWeight = FontWeight.SemiBold,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    style = MaterialTheme.typography.labelSmall.copy(
+                        fontWeight = FontWeight.Bold,
+                        letterSpacing = 1.5.sp, // tracking-widest
+                        fontSize = 12.sp, // text-xs
+                    ),
+                    color = contentColor,
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp), // px-4 py-1.5
                 )
+            }
 
-                itemCount?.let { count ->
+            // Optional count badge
+            itemCount?.let { count ->
+                if (count > 0) {
                     Surface(
+                        shape = MaterialTheme.shapes.extraLarge, // rounded-full
                         color = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.6f),
-                        contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
-                        shape = MaterialTheme.shapes.medium,
-                        tonalElevation = 0.dp,
-                        shadowElevation = 0.dp,
+                        modifier = Modifier.size(24.dp),
                     ) {
-                        Text(
-                            text = count.toString(),
-                            style = MaterialTheme.typography.labelMedium,
-                            fontWeight = FontWeight.Medium,
-                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
-                        )
+                        Box(
+                            contentAlignment = androidx.compose.ui.Alignment.Center,
+                            modifier = Modifier.fillMaxSize(),
+                        ) {
+                            Text(
+                                text = count.toString(),
+                                style = MaterialTheme.typography.labelSmall.copy(
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 10.sp,
+                                ),
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        }
                     }
                 }
             }

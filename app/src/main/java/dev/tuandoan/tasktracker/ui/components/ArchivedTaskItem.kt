@@ -1,8 +1,13 @@
 package dev.tuandoan.tasktracker.ui.components
 
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -29,8 +34,11 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -50,13 +58,38 @@ fun ArchivedTaskItem(
     onLongPress: () -> Unit = {},
     onToggleSelection: () -> Unit = {},
 ) {
-    val containerColor = when {
-        isSelected -> MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.55f)
-        else -> MaterialTheme.colorScheme.surfaceContainerLow
-    }
+    // Unified interaction source for consistent ripple
+    val interactionSource = remember { MutableInteractionSource() }
 
-    val border: BorderStroke? = if (isSelected) {
-        BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.45f))
+    // Animated container color based on state
+    val baseContainerColor = MaterialTheme.colorScheme.surfaceContainerLow
+    val selectedOverlayColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.08f)
+
+    val animatedContainerColor by animateColorAsState(
+        targetValue = when {
+            isSelected -> selectedOverlayColor.compositeOver(baseContainerColor)
+            else -> baseContainerColor
+        },
+        animationSpec = tween(durationMillis = 120),
+        label = "containerColor",
+    )
+
+    // Animated elevation
+    val animatedElevation by animateDpAsState(
+        targetValue = when {
+            isSelected -> 2.dp
+            else -> 1.dp
+        },
+        animationSpec = tween(durationMillis = 120),
+        label = "elevation",
+    )
+
+    // Selected border
+    val selectedBorder = if (isSelected) {
+        BorderStroke(
+            width = 1.dp,
+            color = MaterialTheme.colorScheme.primary.copy(alpha = 0.4f),
+        )
     } else {
         null
     }
@@ -65,6 +98,8 @@ fun ArchivedTaskItem(
         modifier = modifier
             .fillMaxWidth()
             .combinedClickable(
+                interactionSource = interactionSource,
+                indication = null, // Use Material3 default indication
                 onClick = {
                     if (isSelectionMode) {
                         onToggleSelection()
@@ -78,9 +113,9 @@ fun ArchivedTaskItem(
                 },
             ),
         shape = RoundedCornerShape(20.dp),
-        border = border,
-        colors = CardDefaults.cardColors(containerColor = containerColor),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+        border = selectedBorder,
+        colors = CardDefaults.cardColors(containerColor = animatedContainerColor),
+        elevation = CardDefaults.cardElevation(defaultElevation = animatedElevation),
     ) {
         Row(
             modifier = Modifier
@@ -89,14 +124,27 @@ fun ArchivedTaskItem(
             verticalAlignment = Alignment.Top,
         ) {
             if (isSelectionMode) {
-                Checkbox(
-                    checked = isSelected,
-                    onCheckedChange = { onToggleSelection() },
-                    colors = CheckboxDefaults.colors(
-                        checkedColor = MaterialTheme.colorScheme.primary,
-                        uncheckedColor = MaterialTheme.colorScheme.outline,
-                    ),
-                )
+                // Clickable checkbox area to handle selection without conflicting with card
+                Box(
+                    modifier = Modifier
+                        .combinedClickable(
+                            interactionSource = remember { MutableInteractionSource() },
+                            indication = null, // No ripple for checkbox area
+                            onClick = onToggleSelection,
+                        ),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Checkbox(
+                        checked = isSelected,
+                        onCheckedChange = null, // Handled by Box click
+                        colors = CheckboxDefaults.colors(
+                            checkedColor = MaterialTheme.colorScheme.primary,
+                            uncheckedColor = MaterialTheme.colorScheme.outline,
+                            checkmarkColor = MaterialTheme.colorScheme.onPrimary,
+                        ),
+                        interactionSource = remember { MutableInteractionSource() }, // Non-rippling
+                    )
+                }
                 Spacer(modifier = Modifier.width(12.dp))
             }
 
@@ -186,11 +234,12 @@ fun ArchivedTaskItem(
                         IconButton(
                             onClick = onRestoreClick,
                             modifier = Modifier.size(40.dp),
+                            interactionSource = remember { MutableInteractionSource() },
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Unarchive,
                                 contentDescription = "Restore task",
-                                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
                                 modifier = Modifier.size(20.dp),
                             )
                         }
@@ -198,11 +247,12 @@ fun ArchivedTaskItem(
                         IconButton(
                             onClick = onPermanentDeleteClick,
                             modifier = Modifier.size(40.dp),
+                            interactionSource = remember { MutableInteractionSource() },
                         ) {
                             Icon(
                                 imageVector = Icons.Default.DeleteForever,
                                 contentDescription = "Permanently delete task",
-                                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                tint = MaterialTheme.colorScheme.error.copy(alpha = 0.8f), // Use error color for delete
                                 modifier = Modifier.size(20.dp),
                             )
                         }

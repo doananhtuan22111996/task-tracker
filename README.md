@@ -427,7 +427,8 @@ This project uses **Spotless** with **ktlint** to enforce consistent code format
 
 - **Kotlin files**: Formatted with ktlint 1.4.1
 - **Gradle files**: Basic formatting (trailing whitespace, newlines)
-- **Compose-friendly**: Wildcard imports and parameter wrapping rules disabled for better Compose readability
+- **Explicit imports**: Wildcard imports are prohibited - all imports must be explicit for better code clarity and IDE performance
+- **Compose-friendly**: Parameter wrapping rules disabled for better Compose readability
 - **Line length**: 120 characters maximum
 - **Indentation**: 4 spaces
 
