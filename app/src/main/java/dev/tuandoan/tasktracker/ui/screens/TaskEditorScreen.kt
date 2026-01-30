@@ -53,6 +53,9 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import dev.tuandoan.tasktracker.domain.model.ReminderOption
+import dev.tuandoan.tasktracker.ui.components.NotificationPermissionDialog
+import dev.tuandoan.tasktracker.ui.components.PermissionDeniedDialog
+import dev.tuandoan.tasktracker.ui.manager.NotificationPermissionManager
 import dev.tuandoan.tasktracker.ui.viewmodel.TaskEditorEvent
 import dev.tuandoan.tasktracker.ui.viewmodel.TaskEditorViewModel
 import dev.tuandoan.tasktracker.utils.formatDate
@@ -64,7 +67,11 @@ import java.util.Calendar
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TaskEditorScreen(navController: NavController, viewModel: TaskEditorViewModel = hiltViewModel()) {
+fun TaskEditorScreen(
+    navController: NavController,
+    viewModel: TaskEditorViewModel = hiltViewModel(),
+    notificationPermissionManager: NotificationPermissionManager? = null,
+) {
     val context = LocalContext.current
     val keyboardController = LocalSoftwareKeyboardController.current
     val focusManager = LocalFocusManager.current
@@ -319,7 +326,26 @@ fun TaskEditorScreen(navController: NavController, viewModel: TaskEditorViewMode
                             DropdownMenuItem(
                                 text = { Text(option.displayName) },
                                 onClick = {
-                                    viewModel.updateReminderOption(option)
+                                    // Check notification permission for reminder options (except NONE)
+                                    if (option != ReminderOption.NONE && notificationPermissionManager != null) {
+                                        if (notificationPermissionManager.shouldRequestPermission()) {
+                                            // Request permission before setting reminder
+                                            notificationPermissionManager.requestNotificationPermission { isGranted ->
+                                                if (isGranted) {
+                                                    viewModel.updateReminderOption(option)
+                                                } else {
+                                                    // Permission denied - revert to NONE
+                                                    viewModel.updateReminderOption(ReminderOption.NONE)
+                                                }
+                                            }
+                                        } else {
+                                            // Permission already granted or not needed
+                                            viewModel.updateReminderOption(option)
+                                        }
+                                    } else {
+                                        // No permission manager or NONE selected
+                                        viewModel.updateReminderOption(option)
+                                    }
                                     showReminderDropdown = false
                                 },
                             )
@@ -397,6 +423,25 @@ fun TaskEditorScreen(navController: NavController, viewModel: TaskEditorViewMode
             datePicker.minDate = System.currentTimeMillis()
             setOnDismissListener { showDatePicker = false }
             show()
+        }
+    }
+
+    // Notification permission dialogs
+    notificationPermissionManager?.let { permissionManager ->
+        // Permission rationale dialog
+        if (permissionManager.showPermissionRationale) {
+            NotificationPermissionDialog(
+                onConfirm = { permissionManager.onPermissionRationaleConfirm() },
+                onDismiss = { permissionManager.onPermissionRationaleDismiss() },
+            )
+        }
+
+        // Permission denied dialog (when user needs to go to settings)
+        if (permissionManager.showPermissionDenied) {
+            PermissionDeniedDialog(
+                onOpenSettings = { permissionManager.onPermissionDeniedOpenSettings() },
+                onDismiss = { permissionManager.onPermissionDeniedDismiss() },
+            )
         }
     }
 }
