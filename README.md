@@ -23,6 +23,13 @@ A modern, offline-first task tracking Android app built with **Kotlin**, **Jetpa
 - 💾 **Offline First** - Works completely offline with Room database
 - 🎨 **Material 3 Design** - Modern UI following Material Design guidelines
 
+### Backup & Restore
+- **Export as JSON** - Save all tasks (including archived) to a JSON backup file via the system file picker
+- **Import from JSON** - Restore tasks from a JSON backup file with confirmation dialog and validation
+- **Export as CSV** - Save all tasks as an RFC 4180 compliant CSV spreadsheet for use in external tools
+- **Settings Screen** - Dedicated settings screen accessible from the gear icon in the top bar
+- **Backup Validation** - Imported data is sanitized: blank titles skipped, priority clamped, timestamps corrected
+
 ### Sorting & Organization
 - **Sort by Creation Date**: Newest first (default) or oldest first
 - **Sort by Title**: Alphabetical (A-Z) with locale-safe, case-insensitive ordering
@@ -117,9 +124,28 @@ app/src/main/java/dev/tuandoan/tasktracker/
 │   │   ├── Task.kt                 # Task entity with due dates and reminders
 │   │   ├── TaskDao.kt              # Room data access object
 │   │   └── TaskDatabase.kt         # Room database with migration support
+│   ├── backup/
+│   │   ├── dto/
+│   │   │   ├── TaskBackupDto.kt         # Serializable DTO for task backup
+│   │   │   └── BackupPayload.kt         # JSON envelope with metadata
+│   │   ├── BackupSerializer.kt          # Serialization interface
+│   │   ├── JsonBackupSerializer.kt      # JSON implementation (kotlinx.serialization)
+│   │   ├── CsvBackupSerializer.kt       # CSV implementation (RFC 4180)
+│   │   ├── BackupFileProvider.kt        # File I/O interface
+│   │   └── AndroidBackupFileProvider.kt # ContentResolver implementation
 │   └── scheduler/
 │       └── WorkManagerTaskReminderScheduler.kt # WorkManager reminder implementation
 ├── domain/
+│   ├── backup/
+│   │   ├── model/
+│   │   │   ├── BackupFormat.kt        # Enum (JSON, CSV)
+│   │   │   ├── BackupMetadata.kt      # Metadata with schema version
+│   │   │   ├── ExportResult.kt        # Sealed class for export results
+│   │   │   └── ImportResult.kt        # Sealed class for import results
+│   │   ├── BackupValidator.kt         # Validation interface
+│   │   ├── TaskBackupValidator.kt     # Validation rules implementation
+│   │   ├── ExportBackupUseCase.kt     # Export orchestration
+│   │   └── ImportBackupUseCase.kt     # Import orchestration
 │   ├── model/                      # Domain models and data classes
 │   │   ├── TaskSort.kt            # Sorting enums and configuration
 │   │   ├── ReminderOption.kt      # Reminder time options enum

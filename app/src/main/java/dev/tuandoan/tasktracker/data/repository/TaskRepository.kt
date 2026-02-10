@@ -1,7 +1,9 @@
 package dev.tuandoan.tasktracker.data.repository
 
+import androidx.room.withTransaction
 import dev.tuandoan.tasktracker.data.database.Task
 import dev.tuandoan.tasktracker.data.database.TaskDao
+import dev.tuandoan.tasktracker.data.database.TaskDatabase
 import dev.tuandoan.tasktracker.domain.repository.ITaskRepository
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
@@ -11,7 +13,8 @@ import javax.inject.Inject
  * Uses @Inject constructor for Hilt dependency injection.
  * @Singleton ensures single instance across the app lifecycle.
  */
-class TaskRepository @Inject constructor(private val taskDao: TaskDao) : ITaskRepository {
+class TaskRepository @Inject constructor(private val taskDao: TaskDao, private val taskDatabase: TaskDatabase) :
+    ITaskRepository {
 
     override fun getAllTasks(): Flow<List<Task>> = taskDao.getAllTasks()
 
@@ -90,4 +93,14 @@ class TaskRepository @Inject constructor(private val taskDao: TaskDao) : ITaskRe
         taskDao.observeDueTodayCount(startOfDayMillis, endOfDayMillis)
 
     override fun observeOverdueCount(nowMillis: Long): Flow<Int> = taskDao.observeOverdueCount(nowMillis)
+
+    // Backup operations
+    override suspend fun getAllTasksIncludingArchived(): List<Task> = taskDao.getAllTasksIncludingArchived()
+
+    override suspend fun replaceAllTasks(tasks: List<Task>) {
+        taskDatabase.withTransaction {
+            taskDao.deleteAllTasks()
+            taskDao.upsertAll(tasks)
+        }
+    }
 }

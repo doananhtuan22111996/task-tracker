@@ -40,4 +40,8 @@ interface ITaskRepository {
     fun observeCompletedTodayCount(startOfDayMillis: Long, endOfDayMillis: Long): Flow<Int>
     fun observeDueTodayCount(startOfDayMillis: Long, endOfDayMillis: Long): Flow<Int>
     fun observeOverdueCount(nowMillis: Long): Flow<Int>
+
+    // Backup operations
+    suspend fun getAllTasksIncludingArchived(): List<Task>
+    suspend fun replaceAllTasks(tasks: List<Task>)
 }

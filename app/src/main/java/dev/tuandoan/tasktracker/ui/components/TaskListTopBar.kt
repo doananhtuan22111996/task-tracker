@@ -9,6 +9,7 @@ import androidx.compose.material.icons.filled.CheckBoxOutlineBlank
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.SelectAll
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Sort
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -46,6 +47,7 @@ fun TaskListTopBar(
     onSelectAll: () -> Unit = {},
     onStatsClick: () -> Unit = {},
     onArchiveClick: () -> Unit = {},
+    onSettingsClick: () -> Unit = {},
 ) {
     var showSortMenu by remember { mutableStateOf(false) }
     var showMoreMenu by remember { mutableStateOf(false) }
@@ -194,6 +196,18 @@ fun TaskListTopBar(
                     Icon(
                         imageVector = Icons.Default.Archive,
                         contentDescription = "View archived tasks",
+                    )
+                }
+
+                IconButton(
+                    onClick = onSettingsClick,
+                    colors = IconButtonDefaults.iconButtonColors(
+                        contentColor = MaterialTheme.colorScheme.onSurface,
+                    ),
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Settings,
+                        contentDescription = "Settings",
                     )
                 }
 

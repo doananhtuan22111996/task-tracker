@@ -22,10 +22,12 @@ import dagger.hilt.android.AndroidEntryPoint
 import dev.tuandoan.tasktracker.navigation.TaskTrackerRoutes
 import dev.tuandoan.tasktracker.ui.manager.NotificationPermissionManager
 import dev.tuandoan.tasktracker.ui.screens.ArchivedScreen
+import dev.tuandoan.tasktracker.ui.screens.SettingsScreen
 import dev.tuandoan.tasktracker.ui.screens.StatsScreen
 import dev.tuandoan.tasktracker.ui.screens.TaskEditorScreen
 import dev.tuandoan.tasktracker.ui.screens.TaskListScreen
 import dev.tuandoan.tasktracker.ui.theme.TaskTrackerTheme
+import dev.tuandoan.tasktracker.ui.viewmodel.SettingsViewModel
 import dev.tuandoan.tasktracker.ui.viewmodel.StatsViewModel
 import dev.tuandoan.tasktracker.ui.viewmodel.TaskViewModel
 
@@ -92,6 +94,9 @@ fun TaskTrackerApp(notificationPermissionManager: NotificationPermissionManager?
                     onArchiveClick = {
                         navController.navigate(TaskTrackerRoutes.ARCHIVED)
                     },
+                    onSettingsClick = {
+                        navController.navigate(TaskTrackerRoutes.SETTINGS)
+                    },
                 )
             }
 
@@ -109,6 +114,16 @@ fun TaskTrackerApp(notificationPermissionManager: NotificationPermissionManager?
                 val statsViewModel: StatsViewModel = hiltViewModel()
                 StatsScreen(
                     viewModel = statsViewModel,
+                    onNavigateBack = {
+                        navController.popBackStack()
+                    },
+                )
+            }
+
+            composable(TaskTrackerRoutes.SETTINGS) {
+                val settingsViewModel: SettingsViewModel = hiltViewModel()
+                SettingsScreen(
+                    viewModel = settingsViewModel,
                     onNavigateBack = {
                         navController.popBackStack()
                     },
