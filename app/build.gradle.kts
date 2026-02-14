@@ -8,6 +8,7 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.ksp)
     alias(libs.plugins.dagger.hilt.android)
+    alias(libs.plugins.kotlin.serialization)
 }
 
 android {
@@ -114,6 +115,9 @@ dependencies {
 
     // Navigation dependencies
     implementation(libs.androidx.navigation.compose)
+
+    // Serialization dependencies
+    implementation(libs.kotlinx.serialization.json)
 
     // WorkManager dependencies
     implementation(libs.androidx.work.runtime.ktx)

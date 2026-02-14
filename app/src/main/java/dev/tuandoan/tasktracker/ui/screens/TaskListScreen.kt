@@ -51,6 +51,7 @@ fun TaskListScreen(
     navController: NavController,
     onStatsClick: () -> Unit = {},
     onArchiveClick: () -> Unit = {},
+    onSettingsClick: () -> Unit = {},
 ) {
     // Collect all required state
     val allTasks by viewModel.allTasks.collectAsStateWithLifecycle()
@@ -130,6 +131,7 @@ fun TaskListScreen(
                 onSelectAll = { viewModel.selectAll(visibleTasks.map { it.id }) },
                 onStatsClick = onStatsClick,
                 onArchiveClick = onArchiveClick,
+                onSettingsClick = onSettingsClick,
             )
         },
         floatingActionButton = {
