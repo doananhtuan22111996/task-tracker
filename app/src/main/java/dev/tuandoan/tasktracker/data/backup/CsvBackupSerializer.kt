@@ -61,14 +61,15 @@ class CsvBackupSerializer @Inject constructor() : BackupSerializer {
             task.priority.toString(),
             task.isArchived.toString(),
             task.archivedAt?.toString() ?: "",
+            task.sortIndex.toString(),
         )
         return fields.joinToString(",") { escapeCsvField(it) }
     }
 
     private fun parseCsvRowToDto(fields: List<String>): TaskBackupDto {
-        if (fields.size < EXPECTED_FIELD_COUNT) {
+        if (fields.size < MIN_FIELD_COUNT) {
             throw BackupParseException(
-                "Expected $EXPECTED_FIELD_COUNT fields but got ${fields.size}",
+                "Expected at least $MIN_FIELD_COUNT fields but got ${fields.size}",
             )
         }
         return TaskBackupDto(
@@ -85,15 +86,16 @@ class CsvBackupSerializer @Inject constructor() : BackupSerializer {
             priority = fields[10].toInt(),
             isArchived = fields[11].toBooleanStrict(),
             archivedAt = fields[12].toLongOrNull(),
+            sortIndex = if (fields.size > 13) fields[13].toLongOrNull() ?: 0L else 0L,
         )
     }
 
     companion object {
-        private const val EXPECTED_FIELD_COUNT = 13
+        private const val MIN_FIELD_COUNT = 13
 
         private const val HEADER =
             "id,title,description,isCompleted,createdAt,completedAt,dueAt," +
-                "reminderOffsetMinutes,tag,isPinned,priority,isArchived,archivedAt"
+                "reminderOffsetMinutes,tag,isPinned,priority,isArchived,archivedAt,sortIndex"
 
         /**
          * Escapes a CSV field per RFC 4180: wrap in quotes if the field contains

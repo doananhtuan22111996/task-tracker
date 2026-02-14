@@ -23,6 +23,7 @@ enum class Priority(val value: Int, val displayName: String) {
  * Defines the sorting key for tasks
  */
 enum class SortKey {
+    MANUAL,
     CREATED_AT,
     TITLE,
     PRIORITY,
@@ -57,6 +58,7 @@ data class TaskSort(
      * Returns a human-readable description of the current sort
      */
     fun getDisplayName(): String = when (key) {
+        SortKey.MANUAL -> "Manual"
         SortKey.CREATED_AT -> when (direction) {
             SortDirection.DESC -> "Created: Newest first"
             SortDirection.ASC -> "Created: Oldest first"

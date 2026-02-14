@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.DragIndicator
 import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
@@ -58,6 +59,7 @@ fun TaskItem(
     task: Task,
     isSelected: Boolean = false,
     isSelectionMode: Boolean = false,
+    showDragHandle: Boolean = false,
     onToggleComplete: () -> Unit,
     onEditClick: () -> Unit,
     onArchiveClick: () -> Unit,
@@ -150,7 +152,24 @@ fun TaskItem(
                 .padding(horizontal = 16.dp, vertical = 14.dp),
             verticalAlignment = Alignment.Top,
         ) {
-            // LEFT: Checkbox (selection mode uses selection state; normal uses completed state)
+            // LEFT: Optional drag handle (visible only in manual sort mode)
+            if (showDragHandle) {
+                Box(
+                    modifier = Modifier
+                        .size(24.dp),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.DragIndicator,
+                        contentDescription = "Drag to reorder",
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
+                        modifier = Modifier.size(24.dp),
+                    )
+                }
+                Spacer(modifier = Modifier.width(4.dp))
+            }
+
+            // Checkbox (selection mode uses selection state; normal uses completed state)
             val checkboxChecked = if (isSelectionMode) isSelected else task.isCompleted
 
             // Clickable checkbox area to handle completion without conflicting with card

@@ -41,6 +41,10 @@ interface ITaskRepository {
     fun observeDueTodayCount(startOfDayMillis: Long, endOfDayMillis: Long): Flow<Int>
     fun observeOverdueCount(nowMillis: Long): Flow<Int>
 
+    // Reorder operations
+    suspend fun updateSortIndices(updates: List<Pair<Long, Long>>)
+    suspend fun getMaxSortIndex(): Long
+
     // Backup operations
     suspend fun getAllTasksIncludingArchived(): List<Task>
     suspend fun replaceAllTasks(tasks: List<Task>)

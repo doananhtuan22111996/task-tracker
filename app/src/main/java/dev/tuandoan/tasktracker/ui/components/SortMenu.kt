@@ -34,8 +34,9 @@ fun SortMenu(currentSort: TaskSort, onSortSelected: (TaskSort) -> Unit) {
         modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
     )
 
-    // Define the 4 sort options (radio group)
+    // Define the 5 sort options (radio group)
     val sortOptions = listOf(
+        Triple(SortKey.MANUAL, SortDirection.ASC, "Manual"),
         Triple(SortKey.CREATED_AT, SortDirection.DESC, "Created: Newest first"),
         Triple(SortKey.CREATED_AT, SortDirection.ASC, "Created: Oldest first"),
         Triple(SortKey.TITLE, SortDirection.ASC, "Title: A–Z"),

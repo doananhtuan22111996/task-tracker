@@ -1,6 +1,7 @@
 package dev.tuandoan.tasktracker.ui.components
 
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,14 +15,26 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
 import dev.tuandoan.tasktracker.data.database.Task
 import dev.tuandoan.tasktracker.ui.theme.AppSpacing
 import dev.tuandoan.tasktracker.ui.viewmodel.TaskFilter
@@ -41,6 +54,7 @@ fun TaskListContent(
     availableTags: List<String>,
     selectedIds: Set<Long>,
     isSelectionMode: Boolean,
+    isDragEnabled: Boolean,
     onSearchQueryChange: (String) -> Unit,
     onClearSearch: () -> Unit,
     onTagFilterChange: (String?) -> Unit,
@@ -50,6 +64,7 @@ fun TaskListContent(
     onPinTask: (Task) -> Unit,
     onLongPressTask: (Long) -> Unit,
     onToggleSelection: (Long) -> Unit,
+    onReorderTasks: (sectionDateKey: String, reorderedTaskIds: List<Long>) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -84,12 +99,14 @@ fun TaskListContent(
             currentFilter = currentFilter,
             selectedIds = selectedIds,
             isSelectionMode = isSelectionMode,
+            isDragEnabled = isDragEnabled,
             onToggleTaskComplete = onToggleTaskComplete,
             onEditTask = onEditTask,
             onArchiveTask = onArchiveTask,
             onPinTask = onPinTask,
             onLongPressTask = onLongPressTask,
             onToggleSelection = onToggleSelection,
+            onReorderTasks = onReorderTasks,
             onClearSearch = onClearSearch,
             onChangeFilter = { /* Filter change now handled by bottom navigation */ },
         )
@@ -108,12 +125,14 @@ private fun TaskListOrEmptyState(
     currentFilter: TaskFilter,
     selectedIds: Set<Long>,
     isSelectionMode: Boolean,
+    isDragEnabled: Boolean,
     onToggleTaskComplete: (Task) -> Unit,
     onEditTask: (Task) -> Unit,
     onArchiveTask: (Task) -> Unit,
     onPinTask: (Task) -> Unit,
     onLongPressTask: (Long) -> Unit,
     onToggleSelection: (Long) -> Unit,
+    onReorderTasks: (sectionDateKey: String, reorderedTaskIds: List<Long>) -> Unit,
     onClearSearch: () -> Unit,
     onChangeFilter: () -> Unit,
 ) {
@@ -136,19 +155,22 @@ private fun TaskListOrEmptyState(
                 taskSections = groupedVisibleTasks,
                 selectedIds = selectedIds,
                 isSelectionMode = isSelectionMode,
+                isDragEnabled = isDragEnabled,
                 onToggleTaskComplete = onToggleTaskComplete,
                 onEditTask = onEditTask,
                 onArchiveTask = onArchiveTask,
                 onPinTask = onPinTask,
                 onLongPressTask = onLongPressTask,
                 onToggleSelection = onToggleSelection,
+                onReorderTasks = onReorderTasks,
             )
         }
     }
 }
 
 /**
- * Scrollable list of tasks grouped by day with sticky section headers
+ * Scrollable list of tasks grouped by day with sticky section headers.
+ * Supports drag-and-drop reorder within sections when isDragEnabled is true.
  */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -156,22 +178,41 @@ private fun GroupedTaskList(
     taskSections: List<TaskSection>,
     selectedIds: Set<Long>,
     isSelectionMode: Boolean,
+    isDragEnabled: Boolean,
     onToggleTaskComplete: (Task) -> Unit,
     onEditTask: (Task) -> Unit,
     onArchiveTask: (Task) -> Unit,
     onPinTask: (Task) -> Unit,
     onLongPressTask: (Long) -> Unit,
     onToggleSelection: (Long) -> Unit,
+    onReorderTasks: (sectionDateKey: String, reorderedTaskIds: List<Long>) -> Unit,
 ) {
+    val lazyListState = rememberLazyListState()
+    val currentOnReorderTasks by rememberUpdatedState(onReorderTasks)
+    val currentTaskSections by rememberUpdatedState(taskSections)
+
+    // Mutable state for sections during drag reorder.
+    // Re-initialized when taskSections changes from outside (e.g., new data from DB).
+    var mutableSections by remember(taskSections) { mutableStateOf(taskSections) }
+
+    // Drag state
+    var draggedTaskId by remember { mutableStateOf<Long?>(null) }
+    var draggedSectionKey by remember { mutableStateOf<String?>(null) }
+    var dragOffset by remember { mutableFloatStateOf(0f) }
+
+    // Estimated item height for swap threshold (approximate; covers typical task cards)
+    val density = LocalDensity.current
+    val estimatedItemHeightPx = with(density) { 88.dp.toPx() }
+
     LazyColumn(
+        state = lazyListState,
         modifier = Modifier.fillMaxSize(),
-        // Increased spacing for Material 3 ListItem design
         verticalArrangement = Arrangement.spacedBy(AppSpacing.small),
         contentPadding = PaddingValues(
-            bottom = 104.dp, // FAB height (56dp) + bottom nav height (80dp) - overlap (32dp) = proper clearance
+            bottom = 104.dp,
         ),
     ) {
-        taskSections.forEach { section ->
+        mutableSections.forEach { section ->
             // Sticky header for each day section
             stickyHeader(key = section.dateKey) {
                 TaskSectionHeader(
@@ -185,16 +226,109 @@ private fun GroupedTaskList(
                 items = section.tasks,
                 key = { task -> task.id },
             ) { task ->
+                val isDragging = draggedTaskId == task.id
+
+                // Visual transform: apply elevation + scale to the dragged item,
+                // animate displacement for other items.
+                val itemModifier = if (isDragging) {
+                    Modifier
+                        .zIndex(1f)
+                        .graphicsLayer {
+                            translationY = dragOffset
+                            scaleX = 1.02f
+                            scaleY = 1.02f
+                            shadowElevation = 8f
+                            alpha = 0.95f
+                        }
+                } else {
+                    Modifier.animateItem()
+                }
+
+                // Single unified pointerInput for drag gesture.
+                // Uses a stable key so the coroutine is NOT restarted on recomposition.
+                val dragModifier = if (isDragEnabled) {
+                    Modifier.pointerInput(task.id) {
+                        detectVerticalDragGestures(
+                            onDragStart = {
+                                draggedTaskId = task.id
+                                draggedSectionKey = section.dateKey
+                                dragOffset = 0f
+                            },
+                            onDragEnd = {
+                                val sectionKey = draggedSectionKey
+                                if (sectionKey != null) {
+                                    val reorderedSection = mutableSections
+                                        .find { it.dateKey == sectionKey }
+                                    if (reorderedSection != null) {
+                                        currentOnReorderTasks(
+                                            sectionKey,
+                                            reorderedSection.tasks.map { it.id },
+                                        )
+                                    }
+                                }
+                                draggedTaskId = null
+                                draggedSectionKey = null
+                                dragOffset = 0f
+                            },
+                            onDragCancel = {
+                                draggedTaskId = null
+                                draggedSectionKey = null
+                                dragOffset = 0f
+                                mutableSections = currentTaskSections
+                            },
+                            onVerticalDrag = { change, dragAmount ->
+                                change.consume()
+                                dragOffset += dragAmount
+
+                                val sectionKey =
+                                    draggedSectionKey ?: return@detectVerticalDragGestures
+                                val currentSectionIndex = mutableSections
+                                    .indexOfFirst { it.dateKey == sectionKey }
+                                if (currentSectionIndex == -1) return@detectVerticalDragGestures
+
+                                val currentSection = mutableSections[currentSectionIndex]
+                                val currentIndex = currentSection.tasks
+                                    .indexOfFirst { it.id == task.id }
+                                if (currentIndex == -1) return@detectVerticalDragGestures
+
+                                val indexDelta =
+                                    (dragOffset / estimatedItemHeightPx).toInt()
+                                val targetIndex = (currentIndex + indexDelta)
+                                    .coerceIn(0, currentSection.tasks.size - 1)
+
+                                if (targetIndex != currentIndex) {
+                                    val newTasks = currentSection.tasks.toMutableList()
+                                    val movedItem = newTasks.removeAt(currentIndex)
+                                    newTasks.add(targetIndex, movedItem)
+
+                                    mutableSections = mutableSections.toMutableList()
+                                        .apply {
+                                            this[currentSectionIndex] =
+                                                currentSection.copy(tasks = newTasks)
+                                        }
+
+                                    dragOffset -= (targetIndex - currentIndex) *
+                                        estimatedItemHeightPx
+                                }
+                            },
+                        )
+                    }
+                } else {
+                    Modifier
+                }
+
                 TaskItem(
                     task = task,
                     isSelected = selectedIds.contains(task.id),
                     isSelectionMode = isSelectionMode,
+                    showDragHandle = isDragEnabled,
                     onToggleComplete = { onToggleTaskComplete(task) },
                     onEditClick = { onEditTask(task) },
                     onArchiveClick = { onArchiveTask(task) },
                     onPinClick = { onPinTask(task) },
                     onLongPress = { onLongPressTask(task.id) },
                     onToggleSelection = { onToggleSelection(task.id) },
+                    modifier = itemModifier.then(dragModifier),
                 )
             }
         }
@@ -235,10 +369,10 @@ fun TaskSectionHeader(modifier: Modifier = Modifier, header: String, itemCount: 
         modifier = modifier
             .fillMaxWidth()
             .padding(vertical = 16.dp), // Add vertical spacing
-        contentAlignment = androidx.compose.ui.Alignment.Center,
+        contentAlignment = Alignment.Center,
     ) {
         Row(
-            verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
+            verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             // Main section pill
@@ -267,7 +401,7 @@ fun TaskSectionHeader(modifier: Modifier = Modifier, header: String, itemCount: 
                         modifier = Modifier.size(24.dp),
                     ) {
                         Box(
-                            contentAlignment = androidx.compose.ui.Alignment.Center,
+                            contentAlignment = Alignment.Center,
                             modifier = Modifier.fillMaxSize(),
                         ) {
                             Text(

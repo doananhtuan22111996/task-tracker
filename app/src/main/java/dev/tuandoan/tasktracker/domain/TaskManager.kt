@@ -41,12 +41,14 @@ class TaskManager @Inject constructor(
     ): Long {
         require(title.isNotBlank()) { "Task title cannot be blank" }
 
+        val nextSortIndex = repository.getMaxSortIndex() + 1
         val task = Task(
             title = title.trim(),
             description = description.trim(),
             dueAt = dueAt,
             reminderOffsetMinutes = reminderOffsetMinutes,
             tag = tag?.trim()?.takeIf { it.isNotEmpty() },
+            sortIndex = nextSortIndex,
         )
         val taskId = repository.insertTask(task)
 
@@ -300,6 +302,13 @@ class TaskManager @Inject constructor(
             repository.hardDeleteTasks(ids)
         }
     }
+
+    // Reorder operations
+    override suspend fun updateSortIndices(updates: List<Pair<Long, Long>>) {
+        repository.updateSortIndices(updates)
+    }
+
+    override suspend fun getMaxSortIndex(): Long = repository.getMaxSortIndex()
 
     // Stats operations (exclude archived tasks)
     override fun observeActiveCount(): Flow<Int> = repository.observeActiveCount()

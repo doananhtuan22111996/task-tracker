@@ -19,4 +19,5 @@ data class Task(
     val priority: Int = 1, // Priority level: 0=LOW, 1=MEDIUM, 2=HIGH (default MEDIUM)
     val isArchived: Boolean = false, // Archive tasks instead of deleting (soft delete)
     val archivedAt: Long? = null, // Timestamp when task was archived (nullable)
+    val sortIndex: Long = 0, // Manual sort position (lower = higher in list)
 )

@@ -94,6 +94,17 @@ class TaskRepository @Inject constructor(private val taskDao: TaskDao, private v
 
     override fun observeOverdueCount(nowMillis: Long): Flow<Int> = taskDao.observeOverdueCount(nowMillis)
 
+    // Reorder operations
+    override suspend fun updateSortIndices(updates: List<Pair<Long, Long>>) {
+        taskDatabase.withTransaction {
+            updates.forEach { (taskId, sortIndex) ->
+                taskDao.updateSortIndex(taskId, sortIndex)
+            }
+        }
+    }
+
+    override suspend fun getMaxSortIndex(): Long = taskDao.getMaxSortIndex()
+
     // Backup operations
     override suspend fun getAllTasksIncludingArchived(): List<Task> = taskDao.getAllTasksIncludingArchived()
 

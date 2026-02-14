@@ -68,6 +68,10 @@ interface ITaskManager {
     suspend fun hardDeleteTask(taskId: Long)
     suspend fun hardDeleteTasks(ids: List<Long>)
 
+    // Reorder operations
+    suspend fun updateSortIndices(updates: List<Pair<Long, Long>>)
+    suspend fun getMaxSortIndex(): Long
+
     // Stats operations (exclude archived tasks)
     fun observeActiveCount(): Flow<Int>
     fun observeCompletedCount(): Flow<Int>

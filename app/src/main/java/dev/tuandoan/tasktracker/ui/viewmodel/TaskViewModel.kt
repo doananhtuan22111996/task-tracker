@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dev.tuandoan.tasktracker.data.database.Task
+import dev.tuandoan.tasktracker.domain.ITaskManager
 import dev.tuandoan.tasktracker.domain.model.CompletedGrouping
 import dev.tuandoan.tasktracker.domain.model.SortDirection
 import dev.tuandoan.tasktracker.domain.model.SortKey
@@ -25,6 +26,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.shareIn
@@ -48,6 +50,7 @@ class TaskViewModel @Inject constructor(
     private val crudManager: TaskCrudManager,
     private val selectionStateManager: TaskSelectionStateManager,
     private val bulkActionManager: TaskBulkActionManager,
+    private val taskManager: ITaskManager,
 ) : ViewModel() {
 
     // Initialize state from managers
@@ -305,6 +308,61 @@ class TaskViewModel @Inject constructor(
 
     // === Form Management ===
     // Note: Form methods moved to dedicated TaskEditorViewModel for screen-based editor
+
+    // === Reorder Operations ===
+
+    /**
+     * Whether drag-and-drop reorder is currently enabled.
+     * Enabled only when sort mode is MANUAL, search is not active, and not in selection mode.
+     */
+    val isDragEnabled: StateFlow<Boolean> = combine(
+        taskSort,
+        hasActiveSearch,
+        isSelectionMode,
+    ) { sort, searching, selecting ->
+        sort.key == SortKey.MANUAL && !searching && !selecting
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = false,
+    )
+
+    /**
+     * Persist the reordered task list for a given section.
+     * Preserves globally unique sortIndex values by collecting the original
+     * sortIndex values from the section's tasks, sorting them, and reassigning
+     * in the new order. This prevents index collisions across different sections.
+     */
+    fun reorderTasks(sectionDateKey: String, reorderedTaskIds: List<Long>) {
+        viewModelScope.launch {
+            try {
+                // Get current tasks to read their existing sortIndex values
+                val allCurrentTasks = allTasks.value
+                val taskMap = allCurrentTasks.associateBy { it.id }
+
+                // Collect original sortIndex values for tasks in this section, sorted ascending
+                val originalSortIndices = reorderedTaskIds
+                    .mapNotNull { id -> taskMap[id]?.sortIndex }
+                    .sorted()
+
+                // Assign the sorted original indices to the new task order
+                val updates = reorderedTaskIds.mapIndexed { index, taskId ->
+                    val newSortIndex = if (index < originalSortIndices.size) {
+                        originalSortIndices[index]
+                    } else {
+                        index.toLong()
+                    }
+                    taskId to newSortIndex
+                }
+
+                taskManager.updateSortIndices(updates)
+            } catch (e: Exception) {
+                _singleTaskUiEvent.emit(
+                    UiEvent.ShowSnackbar("Failed to save task order"),
+                )
+            }
+        }
+    }
 
     // === Search Operations ===
 

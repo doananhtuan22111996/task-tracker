@@ -31,12 +31,19 @@ A modern, offline-first task tracking Android app built with **Kotlin**, **Jetpa
 - **Backup Validation** - Imported data is sanitized: blank titles skipped, priority clamped, timestamps corrected
 
 ### Sorting & Organization
+- **Manual Drag & Drop Reorder**: Select "Manual" sort mode to reorder tasks by dragging. A drag handle icon appears on each task. Drag up/down to reorder within a day section (Today/Yesterday/Older). Order persists across app restarts.
 - **Sort by Creation Date**: Newest first (default) or oldest first
 - **Sort by Title**: Alphabetical (A-Z) with locale-safe, case-insensitive ordering
 - **Sort by Priority**: High to Low priority ordering
 - **Pin First**: Pinned tasks always appear first within each day section
 - **Completion Grouping**: Option to group completed tasks separately
 - **Stable Sorting**: Deterministic ordering with secondary sort keys
+
+#### Manual Reorder Limitations
+- Drag reorder is only available when "Manual" sort mode is selected from the sort menu
+- Reorder is disabled during active search, multi-select mode, or when using other sort modes (Created, Title, Priority)
+- Tasks can only be reordered within the same day section (e.g., within "Today" or within "Yesterday")
+- Archived tasks are not affected by manual reorder
 
 ### User Experience
 - 🚀 **Instant Feedback** - Real-time updates and responsive UI
@@ -320,6 +327,16 @@ TaskViewModelTest            // End-to-end coordination tests
 - **Key-based LazyColumn** - Optimized list rendering with proper item keys
 
 ## 📚 Recent Updates
+
+### v3.1 - Manual Drag & Drop Reorder
+- 🔀 **Manual Reorder** - New "Manual" sort mode in the sort menu enables drag-and-drop task reordering
+- ✋ **Drag Handle** - Visual drag indicator icon appears on each task in Manual sort mode
+- 💾 **Persistent Order** - Reorder is saved to the database via `sortIndex` column and survives app restarts
+- 📦 **Section-scoped** - Tasks reorder within their day section (Today, Yesterday, Older, etc.)
+- 🔒 **Smart Disabling** - Drag automatically disabled during search, multi-select, or non-manual sort modes
+- 🎨 **Visual Feedback** - Dragged item shows slight elevation and scale for clear feedback
+- 🔄 **Backward Compatible** - Existing tasks get initial sort order based on creation date via database migration
+- 📤 **Backup Support** - Sort order included in JSON/CSV export and import
 
 ### v3.0 - Dedicated Task Editor Screen (Small Device Optimization)
 - 📱 **Full-Screen Task Editor** - Replaced modal dialog with dedicated screen optimized for small devices with better usability

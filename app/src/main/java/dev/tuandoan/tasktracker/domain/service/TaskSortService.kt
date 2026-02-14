@@ -56,6 +56,11 @@ class TaskSortService @Inject constructor() {
      */
     private fun applySorting(tasks: List<Task>, key: SortKey, direction: SortDirection): List<Task> {
         val comparator = when (key) {
+            SortKey.MANUAL -> {
+                // Direction is intentionally ignored for MANUAL sort; always ascending by sortIndex
+                compareBy<Task> { it.sortIndex }
+                    .thenBy { it.createdAt } // Tie-break by createdAt for new tasks with same sortIndex
+            }
             SortKey.CREATED_AT -> {
                 when (direction) {
                     SortDirection.DESC -> compareByDescending<Task> { it.createdAt }
@@ -103,6 +108,7 @@ class TaskSortService @Inject constructor() {
      * Gets all available sort options for UI display.
      */
     fun getAvailableSortOptions(): List<TaskSort> = listOf(
+        TaskSort(SortKey.MANUAL, SortDirection.ASC, CompletedGrouping.NONE),
         TaskSort(SortKey.CREATED_AT, SortDirection.DESC, CompletedGrouping.NONE),
         TaskSort(SortKey.CREATED_AT, SortDirection.ASC, CompletedGrouping.NONE),
         TaskSort(SortKey.TITLE, SortDirection.ASC, CompletedGrouping.NONE),

@@ -22,6 +22,7 @@ data class TaskBackupDto(
     val priority: Int = 1,
     val isArchived: Boolean = false,
     val archivedAt: Long? = null,
+    val sortIndex: Long = 0,
 ) {
 
     fun toTask(): Task = Task(
@@ -38,6 +39,7 @@ data class TaskBackupDto(
         priority = priority,
         isArchived = isArchived,
         archivedAt = archivedAt,
+        sortIndex = sortIndex,
     )
 
     companion object {
@@ -55,6 +57,7 @@ data class TaskBackupDto(
             priority = task.priority,
             isArchived = task.isArchived,
             archivedAt = task.archivedAt,
+            sortIndex = task.sortIndex,
         )
     }
 }

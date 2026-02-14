@@ -70,6 +70,7 @@ fun TaskListScreen(
     val selectedCount by viewModel.selectedCount.collectAsStateWithLifecycle()
     val pendingBulkDeleteTasks by viewModel.pendingBulkDeleteTasks.collectAsStateWithLifecycle()
     val pendingBulkArchiveTasks by viewModel.pendingBulkArchiveTasks.collectAsStateWithLifecycle()
+    val isDragEnabled by viewModel.isDragEnabled.collectAsStateWithLifecycle()
 
     // Snackbar host state
     val snackbarHostState = remember { SnackbarHostState() }
@@ -204,6 +205,7 @@ fun TaskListScreen(
             availableTags = availableTags,
             selectedIds = selectedIds,
             isSelectionMode = isSelectionMode,
+            isDragEnabled = isDragEnabled,
             onSearchQueryChange = viewModel::updateSearchQuery,
             onClearSearch = viewModel::clearSearch,
             onTagFilterChange = viewModel::setTagFilter,
@@ -213,6 +215,7 @@ fun TaskListScreen(
             onPinTask = viewModel::toggleTaskPin,
             onLongPressTask = viewModel::enterSelection,
             onToggleSelection = viewModel::toggleSelection,
+            onReorderTasks = viewModel::reorderTasks,
             modifier = Modifier.padding(paddingValues),
         )
     }

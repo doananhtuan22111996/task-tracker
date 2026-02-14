@@ -113,6 +113,19 @@ object DatabaseModule {
     }
 
     /**
+     * Migration from version 6 to 7: Add sortIndex column for manual reorder (idempotent)
+     * Existing tasks get sortIndex = createdAt so oldest tasks sort first.
+     */
+    private val MIGRATION_6_7 = object : Migration(6, 7) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            if (!hasColumn(database, "tasks", "sortIndex")) {
+                database.execSQL("ALTER TABLE tasks ADD COLUMN sortIndex INTEGER NOT NULL DEFAULT 0")
+                database.execSQL("UPDATE tasks SET sortIndex = createdAt")
+            }
+        }
+    }
+
+    /**
      * Provides a singleton instance of TaskDatabase.
      * Uses Room.databaseBuilder for database creation with proper configuration.
      */
@@ -123,7 +136,7 @@ object DatabaseModule {
         klass = TaskDatabase::class.java,
         name = "task_database",
     )
-        .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6)
+        .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7)
         .build()
 
     /**
