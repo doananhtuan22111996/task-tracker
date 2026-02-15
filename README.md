@@ -298,18 +298,78 @@ app/src/main/java/dev/tuandoan/tasktracker/
 - **Material Design** - Consistent UI/UX following platform guidelines
 
 ### Testing Strategy
-```kotlin
-// Unit Tests (Fast)
-TaskSortServiceTest           // Pure sorting algorithm tests
-TaskFormStateManagerTest      // Form validation tests
 
-// Integration Tests (Medium)
-TaskListStateManagerTest      // StateFlow integration tests
-TaskCrudManagerTest          // Use case coordination tests
+The project has a comprehensive JVM unit test suite covering core business logic, domain services, use cases, state managers, and backup serialization. Tests are fast (< 1 second), deterministic, and require no emulator or device.
 
-// UI Tests (Comprehensive)
-TaskViewModelTest            // End-to-end coordination tests
+#### Running Tests
+
+```bash
+# Run all unit tests
+./gradlew testDebugUnitTest
+
+# Run all unit tests (debug + release)
+./gradlew test
+
+# Run a specific test class
+./gradlew testDebugUnitTest --tests "dev.tuandoan.tasktracker.domain.TaskManagerTest"
+
+# Run with verbose output
+./gradlew testDebugUnitTest --info
+
+# Format code before committing
+./gradlew spotlessApply
 ```
+
+#### Test Suite Overview (263 tests)
+
+| Layer | Test Class | Tests | What It Covers |
+|-------|-----------|-------|----------------|
+| **Domain** | `TaskManagerTest` | 31 | CRUD, completion toggle, archive, bulk ops, reminder scheduling |
+| **Domain** | `TaskSortServiceTest` | 16 | Sort by created/title/priority, completed grouping, stability |
+| **Domain** | `TaskSortTest` | 10 | Display names, full display names, defaults |
+| **Domain** | `ReminderOptionTest` | 10 | fromOffsetMinutes mapping, selectable options, offset values |
+| **Domain** | `PriorityTest` | 7 | fromValue mapping, display names, int values |
+| **Use Case** | `TaskCrudUseCaseTest` | 23 | Create, update, delete, toggle, restore, bulk ops, archive, pin/priority |
+| **Use Case** | `TaskFormUseCaseTest` | 23 | Title/desc/tag validation, length limits, form data trimming, dialog state |
+| **Use Case** | `TaskFilterUseCaseTest` | 9 | Status filtering (ALL/ACTIVE/COMPLETED), filter state, hasActiveFilter |
+| **Use Case** | `TaskSearchUseCaseTest` | 10 | Case-insensitive search, title+description matching, query state |
+| **UI State** | `TaskSelectionStateManagerTest` | 20 | Enter/toggle/clear/selectAll, validation, StateFlow reactivity |
+| **UI Manager** | `TaskCrudManagerValidationTest` | 25 | Input validation for bulk ops, archive ops, toggle, pin |
+| **UI Manager** | `TaskBulkActionManagerTest` | 20 | Bulk delete/archive/complete/restore flows with confirmation |
+| **Backup** | `JsonBackupSerializerTest` | 10 | Round-trip, missing fields, unknown keys, schema version, malformed JSON |
+| **Backup** | `CsvBackupSerializerTest` | 13 | Round-trip, escaping, special chars, empty fields, malformed CSV |
+| **Backup** | `TaskBackupValidatorTest` | 14 | Blank title skip, priority clamping, timestamp defaults, truncation |
+| **Backup** | `TaskBackupDtoTest` | 6 | fromTask/toTask mapping, round-trip, defaults |
+| **Utils** | `TaskDateGrouperTest` | 12 | Day grouping, date keys, header labels, pinned ordering, dueAt priority |
+| **Utils** | `DateUtilsTest` | 4 | formatDate, formatDueDate, isOverdue |
+
+#### Test Infrastructure
+
+- **Fakes over mocks**: `FakeTaskRepository` and `FakeReminderScheduler` provide deterministic in-memory implementations
+- **Test data builder**: `TestTaskFactory` creates consistent test data with fixed timestamps
+- **Coroutine testing**: `kotlinx-coroutines-test` with `runTest` for suspend function testing
+- **Flow testing**: `Turbine` for testing StateFlow/Flow emissions
+- **No Android dependencies**: All tests run on the JVM without Robolectric or emulators
+- **No wildcard imports**: Enforced by Spotless/ktlint
+
+#### CI Integration
+
+Add this step to your GitHub Actions workflow:
+
+```yaml
+- name: Run unit tests
+  run: ./gradlew testDebugUnitTest
+
+- name: Check code formatting
+  run: ./gradlew spotlessCheck
+```
+
+#### Coverage Gaps (documented, not yet covered)
+
+- **ViewModel tests**: `TaskViewModel`, `TaskEditorViewModel`, `StatsViewModel` (require SavedStateHandle/Hilt mocking)
+- **Room migration tests**: Would require instrumentation tests with `MigrationTestHelper`
+- **BackupFileProvider**: Android-specific ContentResolver interaction (instrumentation only)
+- **WorkManager reminder delivery**: OS-level notification scheduling (integration/E2E only)
 
 ## 🎯 Performance Optimizations
 
