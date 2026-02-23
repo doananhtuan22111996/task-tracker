@@ -1,5 +1,6 @@
 package dev.tuandoan.tasktracker.ui.manager
 
+import android.content.Context
 import dev.tuandoan.tasktracker.domain.TaskManager
 import dev.tuandoan.tasktracker.domain.usecase.TaskCrudUseCase
 import dev.tuandoan.tasktracker.domain.usecase.TaskFormUseCase
@@ -7,6 +8,8 @@ import dev.tuandoan.tasktracker.testutil.FakeReminderScheduler
 import dev.tuandoan.tasktracker.testutil.FakeTaskRepository
 import dev.tuandoan.tasktracker.testutil.TestTaskFactory
 import dev.tuandoan.tasktracker.ui.state.TaskFormStateManager
+import io.mockk.every
+import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -15,6 +18,7 @@ import org.junit.Test
 
 class TaskCrudManagerValidationTest {
 
+    private lateinit var context: Context
     private lateinit var repository: FakeTaskRepository
     private lateinit var scheduler: FakeReminderScheduler
     private lateinit var taskManager: TaskManager
@@ -25,13 +29,17 @@ class TaskCrudManagerValidationTest {
 
     @Before
     fun setup() {
+        context = mockk(relaxed = true) {
+            every { getString(any()) } returns "test string"
+            every { getString(any(), *anyVararg()) } returns "test string"
+        }
         repository = FakeTaskRepository()
         scheduler = FakeReminderScheduler()
         taskManager = TaskManager(repository, scheduler)
-        crudUseCase = TaskCrudUseCase(taskManager)
-        formUseCase = TaskFormUseCase()
-        formStateManager = TaskFormStateManager(formUseCase)
-        crudManager = TaskCrudManager(crudUseCase, formStateManager)
+        crudUseCase = TaskCrudUseCase(taskManager, context)
+        formUseCase = TaskFormUseCase(context)
+        formStateManager = TaskFormStateManager(formUseCase, context)
+        crudManager = TaskCrudManager(crudUseCase, formStateManager, context)
     }
 
     // === bulkMarkCompleted input validation ===
@@ -133,7 +141,6 @@ class TaskCrudManagerValidationTest {
 
         val result = crudManager.toggleTaskCompletion(task)
         assertTrue(result is TaskOperationResult.Success)
-        assertTrue((result as TaskOperationResult.Success).message.contains("complete"))
     }
 
     // === deleteTask ===
@@ -166,7 +173,6 @@ class TaskCrudManagerValidationTest {
 
         val result = crudManager.toggleTaskPin(task)
         assertTrue(result is TaskOperationResult.Success)
-        assertTrue((result as TaskOperationResult.Success).message.contains("pinned"))
     }
 
     // === archive operations ===

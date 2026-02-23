@@ -1,5 +1,8 @@
 package dev.tuandoan.tasktracker.ui.state
 
+import android.content.Context
+import dagger.hilt.android.qualifiers.ApplicationContext
+import dev.tuandoan.tasktracker.R
 import dev.tuandoan.tasktracker.data.database.Task
 import dev.tuandoan.tasktracker.domain.model.ReminderOption
 import dev.tuandoan.tasktracker.domain.usecase.TaskFormUseCase
@@ -14,7 +17,10 @@ import javax.inject.Inject
  * State manager for task form operations including dialog state, validation, and form fields.
  * Encapsulates form-related business logic and state management.
  */
-class TaskFormStateManager @Inject constructor(private val formUseCase: TaskFormUseCase) {
+class TaskFormStateManager @Inject constructor(
+    private val formUseCase: TaskFormUseCase,
+    @ApplicationContext private val context: Context,
+) {
 
     /**
      * Initialize form state flows for a given coroutine scope
@@ -121,12 +127,12 @@ class TaskFormStateManager @Inject constructor(private val formUseCase: TaskForm
 
             // Additional validation for edit mode
             if (formData.selectedTaskId != null && formData.selectedTaskId <= 0) {
-                FormValidationResult.Error("Invalid task selected for update")
+                FormValidationResult.Error(context.getString(R.string.error_invalid_task_for_update))
             } else {
                 FormValidationResult.Success(formData)
             }
         } else {
-            FormValidationResult.Error(errorMessage ?: "Validation failed")
+            FormValidationResult.Error(errorMessage ?: context.getString(R.string.error_validation_failed))
         }
     }
 

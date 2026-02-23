@@ -1,5 +1,8 @@
 package dev.tuandoan.tasktracker.domain.usecase
 
+import android.content.Context
+import dagger.hilt.android.qualifiers.ApplicationContext
+import dev.tuandoan.tasktracker.R
 import dev.tuandoan.tasktracker.data.database.Task
 import dev.tuandoan.tasktracker.domain.model.ReminderOption
 import kotlinx.coroutines.flow.Flow
@@ -12,7 +15,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class TaskFormUseCase @Inject constructor() {
+class TaskFormUseCase @Inject constructor(@ApplicationContext private val context: Context) {
 
     companion object {
         const val MAX_TITLE_LENGTH = 100
@@ -231,8 +234,8 @@ class TaskFormUseCase @Inject constructor() {
     private fun validateTitle(title: String) {
         val trimmed = title.trim()
         _titleError.value = when {
-            trimmed.isEmpty() && title.isNotEmpty() -> "Title cannot be empty"
-            trimmed.length > MAX_TITLE_LENGTH -> "Title must be ≤ $MAX_TITLE_LENGTH characters"
+            trimmed.isEmpty() && title.isNotEmpty() -> context.getString(R.string.error_title_empty)
+            trimmed.length > MAX_TITLE_LENGTH -> context.getString(R.string.error_title_too_long, MAX_TITLE_LENGTH)
             else -> null
         }
     }
@@ -241,7 +244,7 @@ class TaskFormUseCase @Inject constructor() {
         val dueAt = _dueAt.value
         _dueDateError.value = when {
             dueAt == null -> null // No due date is valid
-            dueAt <= System.currentTimeMillis() -> "Due date must be in the future"
+            dueAt <= System.currentTimeMillis() -> context.getString(R.string.error_due_date_future)
             else -> null
         }
     }
@@ -252,8 +255,11 @@ class TaskFormUseCase @Inject constructor() {
 
         _reminderError.value = when {
             reminderOption == ReminderOption.NONE -> null // No reminder is valid
-            dueAt == null -> "Due date is required for reminders"
-            !isReminderTimeValid(dueAt, reminderOption.offsetMinutes) -> "Reminder time must be in the future"
+            dueAt == null -> context.getString(R.string.error_due_date_required)
+            !isReminderTimeValid(
+                dueAt,
+                reminderOption.offsetMinutes,
+            ) -> context.getString(R.string.error_reminder_future)
             else -> null
         }
     }
@@ -266,7 +272,7 @@ class TaskFormUseCase @Inject constructor() {
     private fun validateTag(tag: String) {
         val trimmed = tag.trim()
         _tagError.value = when {
-            trimmed.length > MAX_TAG_LENGTH -> "Tag must be ≤ $MAX_TAG_LENGTH characters"
+            trimmed.length > MAX_TAG_LENGTH -> context.getString(R.string.error_tag_too_long, MAX_TAG_LENGTH)
             else -> null
         }
     }
@@ -279,18 +285,23 @@ class TaskFormUseCase @Inject constructor() {
         val reminderOption = _reminderOption.value
 
         return when {
-            title.isEmpty() -> false to "Title cannot be empty"
-            title.length > MAX_TITLE_LENGTH -> false to "Title must be ≤ $MAX_TITLE_LENGTH characters"
-            description.length > MAX_DESCRIPTION_LENGTH ->
+            title.isEmpty() -> false to context.getString(R.string.error_title_empty)
+            title.length > MAX_TITLE_LENGTH ->
                 false to
-                    "Description must be ≤ $MAX_DESCRIPTION_LENGTH characters"
-            tag.length > MAX_TAG_LENGTH -> false to "Tag must be ≤ $MAX_TAG_LENGTH characters"
-            dueAt != null && dueAt <= System.currentTimeMillis() -> false to "Due date must be in the future"
-            reminderOption != ReminderOption.NONE && dueAt == null -> false to "Due date is required for reminders"
+                    context.getString(R.string.error_title_too_long, MAX_TITLE_LENGTH)
+            description.length > MAX_DESCRIPTION_LENGTH ->
+                false to context.getString(R.string.error_title_too_long, MAX_DESCRIPTION_LENGTH)
+            tag.length > MAX_TAG_LENGTH -> false to context.getString(R.string.error_tag_too_long, MAX_TAG_LENGTH)
+            dueAt != null && dueAt <= System.currentTimeMillis() ->
+                false to
+                    context.getString(R.string.error_due_date_future)
+            reminderOption != ReminderOption.NONE && dueAt == null ->
+                false to
+                    context.getString(R.string.error_due_date_required)
             reminderOption != ReminderOption.NONE &&
                 dueAt != null &&
                 !isReminderTimeValid(dueAt, reminderOption.offsetMinutes) ->
-                false to "Reminder time must be in the future. Choose a later due date or smaller reminder."
+                false to context.getString(R.string.error_reminder_future)
             else -> true to null
         }
     }

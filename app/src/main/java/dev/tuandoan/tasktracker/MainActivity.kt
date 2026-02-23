@@ -1,24 +1,28 @@
 package dev.tuandoan.tasktracker
 
 import android.os.Bundle
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import dagger.hilt.android.AndroidEntryPoint
+import dev.tuandoan.tasktracker.data.preferences.SettingsRepository
+import dev.tuandoan.tasktracker.data.preferences.UserPreferences
 import dev.tuandoan.tasktracker.navigation.TaskTrackerRoutes
 import dev.tuandoan.tasktracker.ui.manager.NotificationPermissionManager
 import dev.tuandoan.tasktracker.ui.screens.ArchivedScreen
@@ -30,13 +34,15 @@ import dev.tuandoan.tasktracker.ui.theme.TaskTrackerTheme
 import dev.tuandoan.tasktracker.ui.viewmodel.SettingsViewModel
 import dev.tuandoan.tasktracker.ui.viewmodel.StatsViewModel
 import dev.tuandoan.tasktracker.ui.viewmodel.TaskViewModel
+import javax.inject.Inject
 
 /**
  * Main activity for the Task Tracker app.
  * Uses @AndroidEntryPoint to enable Hilt dependency injection.
+ * Extends AppCompatActivity to support per-app language selection via AppCompatDelegate.
  */
 @AndroidEntryPoint
-class MainActivity : ComponentActivity() {
+class MainActivity : AppCompatActivity() {
 
     // Notification permission manager
     private lateinit var notificationPermissionManager: NotificationPermissionManager
@@ -47,6 +53,9 @@ class MainActivity : ComponentActivity() {
     ) { isGranted ->
         notificationPermissionManager.handlePermissionResult(isGranted)
     }
+
+    @Inject
+    lateinit var settingsRepository: SettingsRepository
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -59,7 +68,13 @@ class MainActivity : ComponentActivity() {
 
         enableEdgeToEdge()
         setContent {
-            TaskTrackerTheme {
+            val userPreferences by settingsRepository.userPreferences
+                .collectAsStateWithLifecycle(initialValue = UserPreferences())
+
+            TaskTrackerTheme(
+                themeMode = userPreferences.themeMode,
+                dynamicColor = userPreferences.dynamicColor,
+            ) {
                 TaskTrackerApp(notificationPermissionManager)
             }
         }

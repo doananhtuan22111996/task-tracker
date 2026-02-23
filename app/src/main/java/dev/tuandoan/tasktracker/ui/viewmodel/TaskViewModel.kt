@@ -1,8 +1,11 @@
 package dev.tuandoan.tasktracker.ui.viewmodel
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
+import dev.tuandoan.tasktracker.R
 import dev.tuandoan.tasktracker.data.database.Task
 import dev.tuandoan.tasktracker.domain.model.CompletedGrouping
 import dev.tuandoan.tasktracker.domain.model.SortDirection
@@ -44,6 +47,7 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class TaskViewModel @Inject constructor(
+    @ApplicationContext private val context: Context,
     private val listStateManager: TaskListStateManager,
     private val crudManager: TaskCrudManager,
     private val selectionStateManager: TaskSelectionStateManager,
@@ -70,7 +74,7 @@ class TaskViewModel @Inject constructor(
 
     // Grouped tasks for day-based sections
     val groupedVisibleTasks: StateFlow<List<TaskSection>> = visibleTasks
-        .map { tasks -> TaskDateGrouper.groupTasksByDay(tasks) }
+        .map { tasks -> TaskDateGrouper.groupTasksByDay(tasks, context) }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),
@@ -203,7 +207,7 @@ class TaskViewModel @Inject constructor(
                         UiEvent.ShowUndoDelete(
                             tasks = listOf(task),
                             onUndo = { unarchiveTask(task) },
-                            message = "Task archived",
+                            message = context.getString(R.string.snackbar_task_archived),
                         ),
                     )
                 }

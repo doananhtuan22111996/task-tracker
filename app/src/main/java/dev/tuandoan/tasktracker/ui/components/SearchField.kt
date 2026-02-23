@@ -12,6 +12,8 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import dev.tuandoan.tasktracker.R
 import dev.tuandoan.tasktracker.ui.theme.CustomShapes
 
 /**
@@ -30,7 +32,7 @@ fun SearchField(
         modifier = modifier.fillMaxWidth(),
         placeholder = {
             Text(
-                text = "Search tasks...",
+                text = stringResource(R.string.search_placeholder),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
             )
@@ -38,7 +40,7 @@ fun SearchField(
         leadingIcon = {
             Icon(
                 imageVector = Icons.Default.Search,
-                contentDescription = "Search",
+                contentDescription = stringResource(R.string.cd_search),
                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         },
@@ -47,7 +49,7 @@ fun SearchField(
                 IconButton(onClick = onClearClick) {
                     Icon(
                         imageVector = Icons.Default.Clear,
-                        contentDescription = "Clear search",
+                        contentDescription = stringResource(R.string.cd_clear_search),
                         tint = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }

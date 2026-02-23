@@ -8,14 +8,14 @@ class DateUtilsTest {
 
     @Test
     fun `formatDate produces non-empty string`() {
-        val result = formatDate(1700000000000L) // Nov 14, 2023
+        val result = formatDate(1700000000000L, "MMM dd, yyyy") // Nov 14, 2023
         assertTrue(result.isNotBlank())
         assertTrue(result.contains("2023"))
     }
 
     @Test
     fun `formatDueDate produces non-empty string with time`() {
-        val result = formatDueDate(1700000000000L)
+        val result = formatDueDate(1700000000000L, "MMM dd 'at' HH:mm")
         assertTrue(result.isNotBlank())
         // Should contain "at" separator between date and time
         assertTrue(result.contains("at"))

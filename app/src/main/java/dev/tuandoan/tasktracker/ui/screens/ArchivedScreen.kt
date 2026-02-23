@@ -16,7 +16,10 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import dev.tuandoan.tasktracker.R
 import dev.tuandoan.tasktracker.ui.components.ArchivedTaskListContent
 import dev.tuandoan.tasktracker.ui.components.ArchivedTaskListTopBar
 import dev.tuandoan.tasktracker.ui.events.UiEvent
@@ -42,6 +45,7 @@ fun ArchivedScreen(viewModel: TaskViewModel, onNavigateBack: () -> Unit, modifie
 
     // Snackbar host state
     val snackbarHostState = remember { SnackbarHostState() }
+    val context = LocalContext.current
 
     // Handle UI events
     LaunchedEffect(viewModel) {
@@ -50,14 +54,14 @@ fun ArchivedScreen(viewModel: TaskViewModel, onNavigateBack: () -> Unit, modifie
                 is UiEvent.ShowUndoDelete -> {
                     val taskCount = event.tasks.size
                     val message = event.message ?: if (taskCount == 1) {
-                        "Task permanently deleted"
+                        context.getString(R.string.snackbar_task_permanently_deleted)
                     } else {
-                        "$taskCount tasks permanently deleted"
+                        context.getString(R.string.snackbar_tasks_permanently_deleted, taskCount)
                     }
 
                     val result = snackbarHostState.showSnackbar(
                         message = message,
-                        actionLabel = "UNDO",
+                        actionLabel = context.getString(R.string.action_undo),
                         duration = SnackbarDuration.Short,
                     )
                     if (result == SnackbarResult.ActionPerformed) {
@@ -123,22 +127,22 @@ fun ArchivedScreen(viewModel: TaskViewModel, onNavigateBack: () -> Unit, modifie
     pendingDeleteTask?.let { task ->
         AlertDialog(
             onDismissRequest = { viewModel.cancelDeleteTask() },
-            title = { Text("Permanently Delete Task") },
+            title = { Text(stringResource(R.string.dialog_permanent_delete_title)) },
             text = {
-                Text("Are you sure you want to permanently delete \"${task.title}\"? This action cannot be undone.")
+                Text(stringResource(R.string.dialog_permanent_delete_message, task.title))
             },
             confirmButton = {
                 TextButton(
                     onClick = { viewModel.confirmPermanentDeleteTask() },
                 ) {
-                    Text("Delete Permanently")
+                    Text(stringResource(R.string.action_delete_permanently))
                 }
             },
             dismissButton = {
                 TextButton(
                     onClick = { viewModel.cancelDeleteTask() },
                 ) {
-                    Text("Cancel")
+                    Text(stringResource(R.string.action_cancel))
                 }
             },
         )
@@ -149,22 +153,22 @@ fun ArchivedScreen(viewModel: TaskViewModel, onNavigateBack: () -> Unit, modifie
         val taskCount = pendingBulkDeleteTasks.size
         AlertDialog(
             onDismissRequest = { viewModel.cancelBulkDelete() },
-            title = { Text("Permanently Delete Tasks") },
+            title = { Text(stringResource(R.string.dialog_permanent_delete_tasks_title)) },
             text = {
-                Text("Permanently delete $taskCount selected tasks? This action cannot be undone.")
+                Text(stringResource(R.string.dialog_permanent_delete_tasks_message, taskCount))
             },
             confirmButton = {
                 TextButton(
                     onClick = { viewModel.confirmBulkPermanentDelete() },
                 ) {
-                    Text("Delete Permanently")
+                    Text(stringResource(R.string.action_delete_permanently))
                 }
             },
             dismissButton = {
                 TextButton(
                     onClick = { viewModel.cancelBulkDelete() },
                 ) {
-                    Text("Cancel")
+                    Text(stringResource(R.string.action_cancel))
                 }
             },
         )

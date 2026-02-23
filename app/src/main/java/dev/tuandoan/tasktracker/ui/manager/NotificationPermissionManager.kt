@@ -14,6 +14,7 @@ import androidx.compose.runtime.setValue
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.PermissionChecker
+import dev.tuandoan.tasktracker.R
 
 /**
  * Production-ready notification permission manager for Android 13+ compatibility
@@ -173,9 +174,9 @@ class NotificationPermissionManager(
      * @return Explanation text
      */
     fun getPermissionExplanation(): String = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-        "Enable notifications to receive task reminders when they're due"
+        activity.getString(R.string.notification_rationale)
     } else {
-        "Notifications are enabled for task reminders"
+        activity.getString(R.string.notification_explanation_enabled)
     }
 
     // ===========================================

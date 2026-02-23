@@ -177,6 +177,7 @@ private fun GroupedTaskList(
                 TaskSectionHeader(
                     header = section.header,
                     itemCount = section.tasks.size,
+                    isToday = section.isToday,
                 )
             }
 
@@ -212,10 +213,7 @@ private fun GroupedTaskList(
  * - Optional count badge on the right
  */
 @Composable
-fun TaskSectionHeader(modifier: Modifier = Modifier, header: String, itemCount: Int? = null) {
-    // Determine if this is "Today" for special styling
-    val isToday = header.equals("Today", ignoreCase = true)
-
+fun TaskSectionHeader(modifier: Modifier = Modifier, header: String, itemCount: Int? = null, isToday: Boolean = false) {
     // Colors based on HTML reference design
     val containerColor = if (isToday) {
         // Today: bg-primary/10 (light), bg-primary/20 (dark)

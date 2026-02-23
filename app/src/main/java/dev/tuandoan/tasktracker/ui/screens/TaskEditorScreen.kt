@@ -47,11 +47,13 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import dev.tuandoan.tasktracker.R
 import dev.tuandoan.tasktracker.domain.model.ReminderOption
 import dev.tuandoan.tasktracker.ui.components.NotificationPermissionDialog
 import dev.tuandoan.tasktracker.ui.components.PermissionDeniedDialog
@@ -131,14 +133,16 @@ fun TaskEditorScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = if (viewModel.isEditMode) "Edit task" else "New task",
+                        text = stringResource(
+                            if (viewModel.isEditMode) R.string.title_edit_task else R.string.title_new_task,
+                        ),
                     )
                 },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back",
+                            contentDescription = stringResource(R.string.cd_back),
                         )
                     }
                 },
@@ -153,7 +157,7 @@ fun TaskEditorScreen(
                                 strokeWidth = 2.dp,
                             )
                         } else {
-                            Text("Save")
+                            Text(stringResource(R.string.action_save))
                         }
                     }
                 },
@@ -175,7 +179,7 @@ fun TaskEditorScreen(
             OutlinedTextField(
                 value = taskTitle,
                 onValueChange = viewModel::updateTitle,
-                label = { Text("Title") },
+                label = { Text(stringResource(R.string.label_title)) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .focusRequester(titleFocusRequester),
@@ -200,7 +204,7 @@ fun TaskEditorScreen(
             OutlinedTextField(
                 value = taskDescription,
                 onValueChange = viewModel::updateDescription,
-                label = { Text("Description") },
+                label = { Text(stringResource(R.string.label_description)) },
                 modifier = Modifier.fillMaxWidth(),
                 minLines = 3,
                 maxLines = 5,
@@ -212,7 +216,7 @@ fun TaskEditorScreen(
 
             // Organization section
             Text(
-                text = "Organization",
+                text = stringResource(R.string.section_organization),
                 style = MaterialTheme.typography.titleSmall,
                 color = MaterialTheme.colorScheme.primary,
             )
@@ -226,7 +230,7 @@ fun TaskEditorScreen(
                 OutlinedTextField(
                     value = tag,
                     onValueChange = viewModel::updateTag,
-                    label = { Text("Tag") },
+                    label = { Text(stringResource(R.string.label_tag)) },
                     modifier = Modifier.weight(1f),
                     singleLine = true,
                     isError = tagError != null,
@@ -237,15 +241,26 @@ fun TaskEditorScreen(
                 )
 
                 // Priority field
+                val priorityName = when (priority) {
+                    0 -> stringResource(R.string.priority_low)
+                    1 -> stringResource(R.string.priority_medium)
+                    2 -> stringResource(R.string.priority_high)
+                    else -> stringResource(R.string.priority_medium)
+                }
+                val priorities = listOf(
+                    0 to stringResource(R.string.priority_low),
+                    1 to stringResource(R.string.priority_medium),
+                    2 to stringResource(R.string.priority_high),
+                )
                 ExposedDropdownMenuBox(
                     expanded = showPriorityDropdown,
                     onExpandedChange = { showPriorityDropdown = it },
                     modifier = Modifier.weight(1f),
                 ) {
                     OutlinedTextField(
-                        value = viewModel.getPriorityName(priority),
+                        value = priorityName,
                         onValueChange = {},
-                        label = { Text("Priority") },
+                        label = { Text(stringResource(R.string.label_priority)) },
                         readOnly = true,
                         modifier = Modifier
                             .menuAnchor()
@@ -257,9 +272,9 @@ fun TaskEditorScreen(
                         expanded = showPriorityDropdown,
                         onDismissRequest = { showPriorityDropdown = false },
                     ) {
-                        viewModel.getAllPriorities().forEach { (priorityValue, priorityName) ->
+                        priorities.forEach { (priorityValue, priorityLabel) ->
                             DropdownMenuItem(
-                                text = { Text(priorityName) },
+                                text = { Text(priorityLabel) },
                                 onClick = {
                                     viewModel.updatePriority(priorityValue)
                                     showPriorityDropdown = false
@@ -272,37 +287,51 @@ fun TaskEditorScreen(
 
             // Due date section
             Text(
-                text = "Due Date & Reminder",
+                text = stringResource(R.string.section_due_date_reminder),
                 style = MaterialTheme.typography.titleSmall,
                 color = MaterialTheme.colorScheme.primary,
             )
 
             // Due date field
             OutlinedTextField(
-                value = dueAt?.let { formatDate(it) } ?: "",
+                value = dueAt?.let { formatDate(it, stringResource(R.string.date_format_short)) } ?: "",
                 onValueChange = {},
-                label = { Text("Due date") },
+                label = { Text(stringResource(R.string.label_due_date)) },
                 modifier = Modifier.fillMaxWidth(),
                 readOnly = true,
                 isError = dueDateError != null,
                 supportingText = dueDateError?.let { { Text(it) } },
                 trailingIcon = {
                     TextButton(onClick = { showDatePicker = true }) {
-                        Text("Select")
+                        Text(stringResource(R.string.action_select))
                     }
                 },
             )
 
             // Reminder field (enabled only when due date is set)
+            val reminderDisplayName = when (reminderOption) {
+                ReminderOption.NONE -> stringResource(R.string.reminder_none)
+                ReminderOption.MINUTES_1 -> stringResource(R.string.reminder_1_minute)
+                ReminderOption.MINUTES_5 -> stringResource(R.string.reminder_5_minutes)
+                ReminderOption.HOURS_1 -> stringResource(R.string.reminder_1_hour)
+                ReminderOption.DAYS_1 -> stringResource(R.string.reminder_1_day)
+            }
+            val reminderOptions = mapOf(
+                ReminderOption.NONE to stringResource(R.string.reminder_none),
+                ReminderOption.MINUTES_1 to stringResource(R.string.reminder_1_minute),
+                ReminderOption.MINUTES_5 to stringResource(R.string.reminder_5_minutes),
+                ReminderOption.HOURS_1 to stringResource(R.string.reminder_1_hour),
+                ReminderOption.DAYS_1 to stringResource(R.string.reminder_1_day),
+            )
             ExposedDropdownMenuBox(
                 expanded = showReminderDropdown,
                 onExpandedChange = { showReminderDropdown = it && dueAt != null },
                 modifier = Modifier.fillMaxWidth(),
             ) {
                 OutlinedTextField(
-                    value = reminderOption.displayName,
+                    value = reminderDisplayName,
                     onValueChange = {},
-                    label = { Text("Reminder") },
+                    label = { Text(stringResource(R.string.label_reminder)) },
                     readOnly = true,
                     enabled = dueAt != null,
                     isError = reminderError != null,
@@ -324,7 +353,7 @@ fun TaskEditorScreen(
                     ) {
                         ReminderOption.values().forEach { option ->
                             DropdownMenuItem(
-                                text = { Text(option.displayName) },
+                                text = { Text(reminderOptions.getValue(option)) },
                                 onClick = {
                                     // Check notification permission for reminder options (except NONE)
                                     if (option != ReminderOption.NONE && notificationPermissionManager != null) {
@@ -362,11 +391,11 @@ fun TaskEditorScreen(
             ) {
                 Column {
                     Text(
-                        text = "Pin task",
+                        text = stringResource(R.string.label_pin_task),
                         style = MaterialTheme.typography.bodyMedium,
                     )
                     Text(
-                        text = "Keep this task at the top",
+                        text = stringResource(R.string.label_pin_task_description),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )

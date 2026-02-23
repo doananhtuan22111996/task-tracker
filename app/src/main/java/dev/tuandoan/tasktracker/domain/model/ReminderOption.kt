@@ -3,12 +3,12 @@ package dev.tuandoan.tasktracker.domain.model
 /**
  * Enum representing different reminder lead time options for tasks.
  */
-enum class ReminderOption(val displayName: String, val offsetMinutes: Int) {
-    NONE("None", 0),
-    MINUTES_1("1 minutes before", 1),
-    MINUTES_5("5 minutes before", 5),
-    HOURS_1("1 hour before", 60),
-    DAYS_1("1 day before", 24 * 60),
+enum class ReminderOption(val offsetMinutes: Int) {
+    NONE(0),
+    MINUTES_1(1),
+    MINUTES_5(5),
+    HOURS_1(60),
+    DAYS_1(24 * 60),
     ;
 
     companion object {

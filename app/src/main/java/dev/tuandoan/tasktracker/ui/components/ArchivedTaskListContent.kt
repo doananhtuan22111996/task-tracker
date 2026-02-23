@@ -17,8 +17,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import dev.tuandoan.tasktracker.R
 import dev.tuandoan.tasktracker.data.database.Task
 import dev.tuandoan.tasktracker.utils.TaskDateGrouper
 import dev.tuandoan.tasktracker.utils.TaskSection
@@ -74,7 +77,7 @@ fun ArchivedTaskListContent(
                 onClearSearch = onClearSearch,
             )
         } else {
-            val groupedTasks = TaskDateGrouper.groupTasksByDay(filteredTasks)
+            val groupedTasks = TaskDateGrouper.groupTasksByDay(filteredTasks, LocalContext.current)
 
             ArchivedTaskList(
                 taskSections = groupedTasks,
@@ -150,7 +153,7 @@ private fun EmptyArchivedTaskList() {
         verticalArrangement = Arrangement.Center,
     ) {
         Text(
-            text = "No archived tasks",
+            text = stringResource(R.string.empty_no_archived),
             style = MaterialTheme.typography.headlineSmall,
             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
             textAlign = TextAlign.Center,
@@ -159,7 +162,7 @@ private fun EmptyArchivedTaskList() {
         Spacer(modifier = Modifier.height(8.dp))
 
         Text(
-            text = "Tasks you archive will appear here",
+            text = stringResource(R.string.empty_archived_hint),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
             textAlign = TextAlign.Center,
@@ -180,7 +183,7 @@ private fun EmptySearchResults(hasQuery: Boolean, onClearSearch: () -> Unit) {
         verticalArrangement = Arrangement.Center,
     ) {
         Text(
-            text = "No archived tasks found",
+            text = stringResource(R.string.empty_no_archived_found),
             style = MaterialTheme.typography.headlineSmall,
             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
             textAlign = TextAlign.Center,
@@ -193,7 +196,7 @@ private fun EmptySearchResults(hasQuery: Boolean, onClearSearch: () -> Unit) {
                 onClick = onClearSearch,
                 colors = ButtonDefaults.textButtonColors(),
             ) {
-                Text("Clear search")
+                Text(stringResource(R.string.action_clear_search))
             }
         }
     }

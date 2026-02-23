@@ -1,0 +1,287 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Task Tracker</string>
+
+    <!-- Navigation -->
+    <string name="nav_all">T\u1EA5t c\u1EA3</string>
+    <string name="nav_active">\u0110ang l\u00E0m</string>
+    <string name="nav_completed">Ho\u00E0n th\u00E0nh</string>
+
+    <!-- Common Actions -->
+    <string name="action_cancel">H\u1EE7y</string>
+    <string name="action_delete">X\u00F3a</string>
+    <string name="action_archive">L\u01B0u tr\u1EEF</string>
+    <string name="action_save">L\u01B0u</string>
+    <string name="action_undo">HO\u00C0N T\u00C1C</string>
+    <string name="action_ok">OK</string>
+    <string name="action_replace">Thay th\u1EBF</string>
+    <string name="action_select">Ch\u1ECDn</string>
+    <string name="action_clear_search">X\u00F3a t\u00ECm ki\u1EBFm</string>
+    <string name="action_show_all">Hi\u1EC3n th\u1ECB t\u1EA5t c\u1EA3</string>
+    <string name="action_select_all">Ch\u1ECDn t\u1EA5t c\u1EA3</string>
+
+    <!-- Content Descriptions -->
+    <string name="cd_navigate_back">Quay l\u1EA1i</string>
+    <string name="cd_back">Quay l\u1EA1i</string>
+    <string name="cd_add_task">Th\u00EAm c\u00F4ng vi\u1EC7c</string>
+    <string name="cd_clear_selection">X\u00F3a l\u1EF1a ch\u1ECDn</string>
+    <string name="cd_mark_active">\u0110\u00E1nh d\u1EA5u \u0111ang l\u00E0m</string>
+    <string name="cd_mark_completed">\u0110\u00E1nh d\u1EA5u ho\u00E0n th\u00E0nh</string>
+    <string name="cd_archive_selected">L\u01B0u tr\u1EEF \u0111\u00E3 ch\u1ECDn</string>
+    <string name="cd_more_options">T\u00F9y ch\u1ECDn kh\u00E1c</string>
+    <string name="cd_sort_tasks">S\u1EAFp x\u1EBFp c\u00F4ng vi\u1EC7c</string>
+    <string name="cd_statistics">Th\u1ED1ng k\u00EA</string>
+    <string name="cd_view_archived">Xem c\u00F4ng vi\u1EC7c \u0111\u00E3 l\u01B0u tr\u1EEF</string>
+    <string name="cd_settings">C\u00E0i \u0111\u1EB7t</string>
+    <string name="cd_search">T\u00ECm ki\u1EBFm</string>
+    <string name="cd_clear_search">X\u00F3a t\u00ECm ki\u1EBFm</string>
+    <string name="cd_clear_filter">X\u00F3a b\u1ED9 l\u1ECDc</string>
+    <string name="cd_restore_selected">Kh\u00F4i ph\u1EE5c \u0111\u00E3 ch\u1ECDn</string>
+    <string name="cd_permanently_delete_selected">X\u00F3a v\u0129nh vi\u1EC5n \u0111\u00E3 ch\u1ECDn</string>
+    <string name="cd_restore_task">Kh\u00F4i ph\u1EE5c c\u00F4ng vi\u1EC7c</string>
+    <string name="cd_permanently_delete_task">X\u00F3a v\u0129nh vi\u1EC5n c\u00F4ng vi\u1EC7c</string>
+    <string name="cd_selected">\u0110\u00E3 ch\u1ECDn</string>
+    <string name="cd_loading">\u0110ang t\u1EA3i</string>
+    <string name="cd_export_json">Xu\u1EA5t sao l\u01B0u JSON</string>
+    <string name="cd_import_json">Nh\u1EADp sao l\u01B0u JSON</string>
+    <string name="cd_export_csv">Xu\u1EA5t sao l\u01B0u CSV</string>
+    <string name="cd_notification_permission">Quy\u1EC1n th\u00F4ng b\u00E1o</string>
+    <string name="cd_notification_denied">Quy\u1EC1n th\u00F4ng b\u00E1o b\u1ECB t\u1EEB ch\u1ED1i</string>
+
+    <!-- Task List Item Accessibility -->
+    <string name="pin_task">Ghim c\u00F4ng vi\u1EC7c</string>
+    <string name="unpin_task">B\u1ECF ghim c\u00F4ng vi\u1EC7c</string>
+    <string name="more_options">T\u00F9y ch\u1ECDn kh\u00E1c</string>
+    <string name="mark_complete">\u0110\u00E1nh d\u1EA5u ho\u00E0n th\u00E0nh</string>
+    <string name="mark_incomplete">\u0110\u00E1nh d\u1EA5u ch\u01B0a xong</string>
+    <string name="select_task">Ch\u1ECDn c\u00F4ng vi\u1EC7c</string>
+    <string name="task_completed">C\u00F4ng vi\u1EC7c \u0111\u00E3 ho\u00E0n th\u00E0nh</string>
+    <string name="task_overdue">C\u00F4ng vi\u1EC7c \u0111\u00E3 qu\u00E1 h\u1EA1n</string>
+    <string name="high_priority_task">C\u00F4ng vi\u1EC7c \u01B0u ti\u00EAn cao</string>
+
+    <!-- Top Bar -->
+    <string name="title_task_tracker">Task Tracker</string>
+    <string name="title_archived">\u0110\u00E3 l\u01B0u tr\u1EEF</string>
+    <string name="title_selected_count">\u0110\u00E3 ch\u1ECDn %d</string>
+
+    <!-- Task List Screen -->
+    <string name="snackbar_task_deleted">\u0110\u00E3 x\u00F3a c\u00F4ng vi\u1EC7c</string>
+    <string name="snackbar_tasks_deleted">\u0110\u00E3 x\u00F3a %d c\u00F4ng vi\u1EC7c</string>
+
+    <!-- Archive Dialogs -->
+    <string name="dialog_archive_task_title">L\u01B0u tr\u1EEF c\u00F4ng vi\u1EC7c</string>
+    <string name="dialog_archive_task_message">B\u1EA1n c\u00F3 ch\u1EAFc mu\u1ED1n l\u01B0u tr\u1EEF \"%s\" kh\u00F4ng? H\u00E0nh \u0111\u1ED9ng n\u00E0y c\u00F3 th\u1EC3 ho\u00E0n t\u00E1c trong v\u00E0i gi\u00E2y.</string>
+    <string name="dialog_archive_tasks_title">L\u01B0u tr\u1EEF c\u00F4ng vi\u1EC7c</string>
+    <string name="dialog_archive_tasks_message">L\u01B0u tr\u1EEF %d c\u00F4ng vi\u1EC7c \u0111\u00E3 ch\u1ECDn? H\u00E0nh \u0111\u1ED9ng n\u00E0y c\u00F3 th\u1EC3 ho\u00E0n t\u00E1c trong th\u1EDDi gian ng\u1EAFn.</string>
+
+    <!-- Delete Dialogs -->
+    <string name="dialog_delete_tasks_title">X\u00F3a c\u00F4ng vi\u1EC7c</string>
+    <string name="dialog_delete_tasks_message">X\u00F3a %d c\u00F4ng vi\u1EC7c \u0111\u00E3 ch\u1ECDn? H\u00E0nh \u0111\u1ED9ng n\u00E0y c\u00F3 th\u1EC3 ho\u00E0n t\u00E1c trong th\u1EDDi gian ng\u1EAFn.</string>
+
+    <!-- Archived Screen -->
+    <string name="snackbar_task_permanently_deleted">\u0110\u00E3 x\u00F3a v\u0129nh vi\u1EC5n c\u00F4ng vi\u1EC7c</string>
+    <string name="snackbar_tasks_permanently_deleted">\u0110\u00E3 x\u00F3a v\u0129nh vi\u1EC5n %d c\u00F4ng vi\u1EC7c</string>
+    <string name="dialog_permanent_delete_title">X\u00F3a v\u0129nh vi\u1EC5n c\u00F4ng vi\u1EC7c</string>
+    <string name="dialog_permanent_delete_message">B\u1EA1n c\u00F3 ch\u1EAFc mu\u1ED1n x\u00F3a v\u0129nh vi\u1EC5n \"%s\" kh\u00F4ng? H\u00E0nh \u0111\u1ED9ng n\u00E0y kh\u00F4ng th\u1EC3 ho\u00E0n t\u00E1c.</string>
+    <string name="dialog_permanent_delete_tasks_title">X\u00F3a v\u0129nh vi\u1EC5n c\u00F4ng vi\u1EC7c</string>
+    <string name="dialog_permanent_delete_tasks_message">X\u00F3a v\u0129nh vi\u1EC5n %d c\u00F4ng vi\u1EC7c \u0111\u00E3 ch\u1ECDn? H\u00E0nh \u0111\u1ED9ng n\u00E0y kh\u00F4ng th\u1EC3 ho\u00E0n t\u00E1c.</string>
+    <string name="action_delete_permanently">X\u00F3a v\u0129nh vi\u1EC5n</string>
+
+    <!-- Stats Screen -->
+    <string name="title_stats">Th\u1ED1ng k\u00EA</string>
+    <string name="stat_active_tasks">C\u00F4ng vi\u1EC7c \u0111ang l\u00E0m</string>
+    <string name="stat_completed_tasks">C\u00F4ng vi\u1EC7c \u0111\u00E3 xong</string>
+    <string name="stat_completed_today">Ho\u00E0n th\u00E0nh h\u00F4m nay</string>
+    <string name="stat_due_today">\u0110\u1EBFn h\u1EA1n h\u00F4m nay</string>
+    <string name="stat_overdue">Qu\u00E1 h\u1EA1n</string>
+    <string name="stat_desc_active">C\u00F4ng vi\u1EC7c ch\u01B0a ho\u00E0n th\u00E0nh</string>
+    <string name="stat_desc_completed">T\u1EA5t c\u1EA3 c\u00F4ng vi\u1EC7c \u0111\u00E3 ho\u00E0n th\u00E0nh</string>
+    <string name="stat_desc_completed_today">C\u00F4ng vi\u1EC7c ho\u00E0n th\u00E0nh h\u00F4m nay</string>
+    <string name="stat_desc_due_today">C\u00F4ng vi\u1EC7c \u0111\u1EBFn h\u1EA1n h\u00F4m nay</string>
+    <string name="stat_desc_overdue">C\u00F4ng vi\u1EC7c qu\u00E1 h\u1EA1n</string>
+    <string name="stat_archived_note">C\u00F4ng vi\u1EC7c \u0111\u00E3 l\u01B0u tr\u1EEF kh\u00F4ng n\u1EB1m trong th\u1ED1ng k\u00EA</string>
+
+    <!-- Settings Screen -->
+    <string name="title_settings">C\u00E0i \u0111\u1EB7t</string>
+    <string name="settings_section_appearance">Giao di\u1EC7n</string>
+    <string name="settings_theme">Ch\u1EE7 \u0111\u1EC1</string>
+    <string name="settings_theme_light">S\u00E1ng</string>
+    <string name="settings_theme_dark">T\u1ED1i</string>
+    <string name="settings_theme_system">Theo h\u1EC7 th\u1ED1ng</string>
+    <string name="settings_dynamic_color">M\u00E0u \u0111\u1ED9ng</string>
+    <string name="settings_dynamic_color_description">S\u1EED d\u1EE5ng m\u00E0u theo h\u00ECnh n\u1EC1n (Android 12+)</string>
+    <string name="settings_dynamic_color_unavailable">M\u00E0u \u0111\u1ED9ng ch\u1EC9 kh\u1EA3 d\u1EE5ng tr\u00EAn Android 12+</string>
+    <string name="settings_section_language">Ng\u00F4n ng\u1EEF</string>
+    <string name="settings_language">Ng\u00F4n ng\u1EEF</string>
+    <string name="settings_language_system">Theo h\u1EC7 th\u1ED1ng</string>
+    <string name="settings_section_backup">Sao l\u01B0u &amp; Kh\u00F4i ph\u1EE5c</string>
+    <string name="settings_export_backup">Xu\u1EA5t sao l\u01B0u</string>
+    <string name="settings_export_backup_desc">L\u01B0u t\u1EA5t c\u1EA3 c\u00F4ng vi\u1EC7c d\u01B0\u1EDBi d\u1EA1ng JSON</string>
+    <string name="settings_import_backup">Nh\u1EADp sao l\u01B0u</string>
+    <string name="settings_import_backup_desc">Kh\u00F4i ph\u1EE5c c\u00F4ng vi\u1EC7c t\u1EEB t\u1EC7p sao l\u01B0u JSON</string>
+    <string name="settings_export_csv">Xu\u1EA5t CSV</string>
+    <string name="settings_export_csv_desc">L\u01B0u t\u1EA5t c\u1EA3 c\u00F4ng vi\u1EC7c d\u01B0\u1EDBi d\u1EA1ng b\u1EA3ng t\u00EDnh CSV</string>
+
+    <!-- Settings Dialogs -->
+    <string name="dialog_replace_tasks_title">Thay th\u1EBF t\u1EA5t c\u1EA3 c\u00F4ng vi\u1EC7c?</string>
+    <string name="dialog_replace_tasks_message">Nh\u1EADp sao l\u01B0u s\u1EBD thay th\u1EBF t\u1EA5t c\u1EA3 c\u00F4ng vi\u1EC7c hi\u1EC7n c\u00F3. H\u00E0nh \u0111\u1ED9ng n\u00E0y kh\u00F4ng th\u1EC3 ho\u00E0n t\u00E1c. B\u1EA1n c\u00F3 ch\u1EAFc mu\u1ED1n ti\u1EBFp t\u1EE5c?</string>
+    <string name="dialog_error_title">L\u1ED7i</string>
+
+    <!-- Settings Snackbars -->
+    <string name="snackbar_exported_tasks">\u0110\u00E3 xu\u1EA5t %d c\u00F4ng vi\u1EC7c th\u00E0nh c\u00F4ng</string>
+    <string name="snackbar_imported_tasks">\u0110\u00E3 nh\u1EADp %d c\u00F4ng vi\u1EC7c th\u00E0nh c\u00F4ng</string>
+    <string name="snackbar_imported_skipped"> (%d b\u1ECF qua)</string>
+
+    <!-- Task Editor Screen -->
+    <string name="title_edit_task">S\u1EEDa c\u00F4ng vi\u1EC7c</string>
+    <string name="title_new_task">C\u00F4ng vi\u1EC7c m\u1EDBi</string>
+    <string name="label_title">Ti\u00EAu \u0111\u1EC1</string>
+    <string name="label_description">M\u00F4 t\u1EA3</string>
+    <string name="label_tag">Nh\u00E3n</string>
+    <string name="label_priority">\u0110\u1ED9 \u01B0u ti\u00EAn</string>
+    <string name="label_due_date">Ng\u00E0y h\u1EBFt h\u1EA1n</string>
+    <string name="label_reminder">Nh\u1EAFc nh\u1EDF</string>
+    <string name="section_organization">T\u1ED5 ch\u1EE9c</string>
+    <string name="section_due_date_reminder">H\u1EA1n ch\u00F3t &amp; Nh\u1EAFc nh\u1EDF</string>
+    <string name="label_pin_task">Ghim c\u00F4ng vi\u1EC7c</string>
+    <string name="label_pin_task_description">Gi\u1EEF c\u00F4ng vi\u1EC7c n\u00E0y \u1EDF \u0111\u1EA7u danh s\u00E1ch</string>
+
+    <!-- Priority -->
+    <string name="priority_low">Th\u1EA5p</string>
+    <string name="priority_medium">Trung b\u00ECnh</string>
+    <string name="priority_high">Cao</string>
+
+    <!-- Reminder Options -->
+    <string name="reminder_none">Kh\u00F4ng</string>
+    <string name="reminder_1_minute">1 ph\u00FAt tr\u01B0\u1EDBc</string>
+    <string name="reminder_5_minutes">5 ph\u00FAt tr\u01B0\u1EDBc</string>
+    <string name="reminder_1_hour">1 gi\u1EDD tr\u01B0\u1EDBc</string>
+    <string name="reminder_1_day">1 ng\u00E0y tr\u01B0\u1EDBc</string>
+
+    <!-- Sort Menu -->
+    <string name="sort_header">S\u1EAFp x\u1EBFp</string>
+    <string name="sort_created_newest">T\u1EA1o: M\u1EDBi nh\u1EA5t</string>
+    <string name="sort_created_oldest">T\u1EA1o: C\u0169 nh\u1EA5t</string>
+    <string name="sort_title_az">Ti\u00EAu \u0111\u1EC1: A\u2013Z</string>
+    <string name="sort_priority_high_low">\u01AFu ti\u00EAn: Cao \u0111\u1EBFn Th\u1EA5p</string>
+    <string name="sort_completed_last">Ho\u00E0n th\u00E0nh cu\u1ED1i</string>
+
+    <!-- Empty States -->
+    <string name="empty_no_tasks">Ch\u01B0a c\u00F3 c\u00F4ng vi\u1EC7c</string>
+    <string name="empty_add_first_task">Nh\u1EA5n n\u00FAt + \u0111\u1EC3 th\u00EAm c\u00F4ng vi\u1EC7c \u0111\u1EA7u ti\u00EAn</string>
+    <string name="empty_no_results">Kh\u00F4ng t\u00ECm th\u1EA5y k\u1EBFt qu\u1EA3</string>
+    <string name="empty_try_clear_search_filter">Th\u1EED x\u00F3a t\u00ECm ki\u1EBFm ho\u1EB7c thay \u0111\u1ED5i b\u1ED9 l\u1ECDc</string>
+    <string name="empty_try_different_search">Th\u1EED t\u1EEB kh\u00F3a kh\u00E1c</string>
+    <string name="empty_try_change_filter">Th\u1EED thay \u0111\u1ED5i b\u1ED9 l\u1ECDc \u0111\u1EC3 xem th\u00EAm</string>
+    <string name="empty_no_match">Kh\u00F4ng c\u00F3 c\u00F4ng vi\u1EC7c ph\u00F9 h\u1EE3p</string>
+    <string name="empty_no_archived">Kh\u00F4ng c\u00F3 c\u00F4ng vi\u1EC7c l\u01B0u tr\u1EEF</string>
+    <string name="empty_archived_hint">C\u00F4ng vi\u1EC7c b\u1EA1n l\u01B0u tr\u1EEF s\u1EBD xu\u1EA5t hi\u1EC7n \u1EDF \u0111\u00E2y</string>
+    <string name="empty_no_archived_found">Kh\u00F4ng t\u00ECm th\u1EA5y c\u00F4ng vi\u1EC7c l\u01B0u tr\u1EEF</string>
+
+    <!-- Search -->
+    <string name="search_placeholder">T\u00ECm ki\u1EBFm c\u00F4ng vi\u1EC7c\u2026</string>
+
+    <!-- Filter -->
+    <string name="filter_clear">X\u00F3a</string>
+
+    <!-- Task Item -->
+    <string name="task_overdue_date">Qu\u00E1 h\u1EA1n: %s</string>
+    <string name="task_due_date">H\u1EA1n: %s</string>
+    <string name="task_archived_date">L\u01B0u tr\u1EEF: %s</string>
+    <string name="task_created_date">T\u1EA1o: %s</string>
+
+    <!-- Notification Permission Dialog -->
+    <string name="notification_enable_title">B\u1EADt th\u00F4ng b\u00E1o</string>
+    <string name="notification_rationale">Task Tracker c\u1EA7n quy\u1EC1n th\u00F4ng b\u00E1o \u0111\u1EC3 g\u1EEDi nh\u1EAFc nh\u1EDF khi c\u00F4ng vi\u1EC7c \u0111\u1EBFn h\u1EA1n.</string>
+    <string name="notification_benefits_intro">V\u1EDBi th\u00F4ng b\u00E1o, b\u1EA1n c\u00F3 th\u1EC3:</string>
+    <string name="notification_benefit_reminders">Nh\u1EADn nh\u1EAFc nh\u1EDF 1 ph\u00FAt, 5 ph\u00FAt, 1 gi\u1EDD ho\u1EB7c 1 ng\u00E0y tr\u01B0\u1EDBc h\u1EA1n</string>
+    <string name="notification_benefit_deadlines">Kh\u00F4ng bao gi\u1EDD b\u1ECF l\u1EE1 deadline quan tr\u1ECDng</string>
+    <string name="notification_benefit_organized">Lu\u00F4n ng\u0103n n\u1EAFp v\u00E0 hi\u1EC7u qu\u1EA3</string>
+    <string name="notification_change_later">B\u1EA1n c\u00F3 th\u1EC3 thay \u0111\u1ED5i c\u00E0i \u0111\u1EB7t n\u00E0y sau trong c\u00E0i \u0111\u1EB7t th\u00F4ng b\u00E1o c\u1EE7a thi\u1EBFt b\u1ECB.</string>
+    <string name="notification_enable_button">B\u1EADt th\u00F4ng b\u00E1o</string>
+    <string name="notification_not_now">\u0110\u1EC3 sau</string>
+    <string name="notification_disabled_title">Th\u00F4ng b\u00E1o \u0111\u00E3 t\u1EAFt</string>
+    <string name="notification_denied_message">\u0110\u1EC3 b\u1EADt nh\u1EAFc nh\u1EDF, vui l\u00F2ng cho ph\u00E9p th\u00F4ng b\u00E1o trong c\u00E0i \u0111\u1EB7t thi\u1EBFt b\u1ECB.</string>
+    <string name="notification_how_to_enable">C\u00E1ch b\u1EADt th\u00F4ng b\u00E1o:</string>
+    <string name="notification_step_open_settings">Nh\u1EA5n \'M\u1EDF c\u00E0i \u0111\u1EB7t\' b\u00EAn d\u01B0\u1EDBi</string>
+    <string name="notification_step_find">T\u00ECm \'Th\u00F4ng b\u00E1o\' ho\u1EB7c \'Th\u00F4ng b\u00E1o \u1EE9ng d\u1EE5ng\'</string>
+    <string name="notification_step_toggle">B\u1EADt th\u00F4ng b\u00E1o cho Task Tracker</string>
+    <string name="notification_without_warning">Kh\u00F4ng c\u00F3 th\u00F4ng b\u00E1o, nh\u1EAFc nh\u1EDF s\u1EBD kh\u00F4ng ho\u1EA1t \u0111\u1ED9ng.</string>
+    <string name="notification_open_settings">M\u1EDF c\u00E0i \u0111\u1EB7t</string>
+    <string name="notification_maybe_later">\u0110\u1EC3 sau</string>
+
+    <!-- Notification Channel -->
+    <string name="notification_channel_name">Nh\u1EAFc nh\u1EDF c\u00F4ng vi\u1EC7c</string>
+    <string name="notification_channel_description">Th\u00F4ng b\u00E1o nh\u1EAFc nh\u1EDF h\u1EA1n c\u00F4ng vi\u1EC7c</string>
+    <string name="notification_title">Nh\u1EAFc nh\u1EDF c\u00F4ng vi\u1EC7c</string>
+    <string name="notification_due_soon">S\u1EAFp \u0111\u1EBFn h\u1EA1n: %s</string>
+    <string name="notification_default_task">C\u00F4ng vi\u1EC7c</string>
+
+    <!-- Date Format Patterns -->
+    <string name="date_format_short">dd MMM, yyyy</string>
+    <string name="date_format_due_time">dd MMM \'l\u00FAc\' HH:mm</string>
+
+    <!-- Date Group Headers -->
+    <string name="date_today">H\u00F4m nay</string>
+    <string name="date_yesterday">H\u00F4m qua</string>
+    <string name="date_tomorrow">Ng\u00E0y mai</string>
+
+    <!-- Validation Errors -->
+    <string name="error_title_empty">Ti\u00EAu \u0111\u1EC1 kh\u00F4ng \u0111\u01B0\u1EE3c \u0111\u1EC3 tr\u1ED1ng</string>
+    <string name="error_title_too_long">Ti\u00EAu \u0111\u1EC1 ph\u1EA3i \u2264 %d k\u00FD t\u1EF1</string>
+    <string name="error_due_date_future">Ng\u00E0y h\u1EBFt h\u1EA1n ph\u1EA3i trong t\u01B0\u01A1ng lai</string>
+    <string name="error_due_date_required">C\u1EA7n ng\u00E0y h\u1EBFt h\u1EA1n cho nh\u1EAFc nh\u1EDF</string>
+    <string name="error_reminder_future">Th\u1EDDi gian nh\u1EAFc nh\u1EDF ph\u1EA3i trong t\u01B0\u01A1ng lai</string>
+    <string name="error_tag_too_long">Nh\u00E3n ph\u1EA3i \u2264 %d k\u00FD t\u1EF1</string>
+    <string name="error_failed_load_task">Kh\u00F4ng th\u1EC3 t\u1EA3i c\u00F4ng vi\u1EC7c: %s</string>
+    <string name="error_failed_save_task">Kh\u00F4ng th\u1EC3 l\u01B0u c\u00F4ng vi\u1EC7c: %s</string>
+
+    <!-- Operation Success Messages -->
+    <string name="op_task_created">\u0110\u00E3 t\u1EA1o c\u00F4ng vi\u1EC7c</string>
+    <string name="op_task_updated">\u0110\u00E3 c\u1EADp nh\u1EADt c\u00F4ng vi\u1EC7c</string>
+    <string name="op_task_restored">\u0110\u00E3 kh\u00F4i ph\u1EE5c c\u00F4ng vi\u1EC7c</string>
+    <string name="op_task_pinned">\u0110\u00E3 ghim c\u00F4ng vi\u1EC7c</string>
+    <string name="op_task_unpinned">\u0110\u00E3 b\u1ECF ghim c\u00F4ng vi\u1EC7c</string>
+    <string name="op_task_priority_updated">\u0110\u00E3 c\u1EADp nh\u1EADt \u0111\u1ED9 \u01B0u ti\u00EAn</string>
+    <string name="op_task_marked_complete">\u0110\u00E3 \u0111\u00E1nh d\u1EA5u ho\u00E0n th\u00E0nh</string>
+    <string name="op_task_marked_incomplete">\u0110\u00E3 \u0111\u00E1nh d\u1EA5u ch\u01B0a xong</string>
+
+    <!-- Operation Error Messages -->
+    <string name="error_create_task">Kh\u00F4ng th\u1EC3 t\u1EA1o c\u00F4ng vi\u1EC7c</string>
+    <string name="error_update_task">Kh\u00F4ng th\u1EC3 c\u1EADp nh\u1EADt c\u00F4ng vi\u1EC7c</string>
+    <string name="error_schedule_reminder">Kh\u00F4ng th\u1EC3 \u0111\u1EB7t l\u1ECBch nh\u1EAFc nh\u1EDF</string>
+    <string name="error_delete_task">Kh\u00F4ng th\u1EC3 x\u00F3a c\u00F4ng vi\u1EC7c</string>
+    <string name="error_restore_task">Kh\u00F4ng th\u1EC3 kh\u00F4i ph\u1EE5c c\u00F4ng vi\u1EC7c</string>
+    <string name="error_update_tasks">Kh\u00F4ng th\u1EC3 c\u1EADp nh\u1EADt c\u00F4ng vi\u1EC7c</string>
+    <string name="error_delete_tasks">Kh\u00F4ng th\u1EC3 x\u00F3a c\u00F4ng vi\u1EC7c</string>
+    <string name="error_restore_tasks">Kh\u00F4ng th\u1EC3 kh\u00F4i ph\u1EE5c c\u00F4ng vi\u1EC7c</string>
+    <string name="error_pin_task">Kh\u00F4ng th\u1EC3 c\u1EADp nh\u1EADt ghim</string>
+    <string name="error_update_priority">Kh\u00F4ng th\u1EC3 c\u1EADp nh\u1EADt \u0111\u1ED9 \u01B0u ti\u00EAn</string>
+    <string name="error_archive_task">Kh\u00F4ng th\u1EC3 l\u01B0u tr\u1EEF c\u00F4ng vi\u1EC7c</string>
+    <string name="error_archive_tasks">Kh\u00F4ng th\u1EC3 l\u01B0u tr\u1EEF c\u00F4ng vi\u1EC7c</string>
+    <string name="error_hard_delete_task">Kh\u00F4ng th\u1EC3 x\u00F3a v\u0129nh vi\u1EC5n</string>
+    <string name="error_hard_delete_tasks">Kh\u00F4ng th\u1EC3 x\u00F3a v\u0129nh vi\u1EC5n</string>
+    <string name="error_no_task_selected">Ch\u01B0a ch\u1ECDn c\u00F4ng vi\u1EC7c \u0111\u1EC3 c\u1EADp nh\u1EADt</string>
+    <string name="error_update_task_status">Kh\u00F4ng th\u1EC3 c\u1EADp nh\u1EADt tr\u1EA1ng th\u00E1i</string>
+    <string name="error_invalid_task_for_update">C\u00F4ng vi\u1EC7c kh\u00F4ng h\u1EE3p l\u1EC7</string>
+    <string name="error_validation_failed">X\u00E1c th\u1EF1c th\u1EA5t b\u1EA1i</string>
+    <string name="error_export_backup">Xu\u1EA5t sao l\u01B0u th\u1EA5t b\u1EA1i: %s</string>
+    <string name="error_import_backup">Nh\u1EADp sao l\u01B0u th\u1EA5t b\u1EA1i: %s</string>
+
+    <!-- Notification (additional) -->
+    <string name="notification_explanation_enabled">Th\u00F4ng b\u00E1o \u0111\u00E3 \u0111\u01B0\u1EE3c b\u1EADt cho nh\u1EAFc nh\u1EDF c\u00F4ng vi\u1EC7c</string>
+
+    <!-- Snackbar Messages -->
+    <string name="snackbar_task_archived">\u0110\u00E3 l\u01B0u tr\u1EEF c\u00F4ng vi\u1EC7c</string>
+    <string name="snackbar_tasks_marked_completed">\u0110\u00E3 \u0111\u00E1nh d\u1EA5u %d c\u00F4ng vi\u1EC7c ho\u00E0n th\u00E0nh</string>
+    <string name="snackbar_tasks_marked_active">\u0110\u00E3 \u0111\u00E1nh d\u1EA5u %d c\u00F4ng vi\u1EC7c \u0111ang l\u00E0m</string>
+    <string name="snackbar_tasks_archived">\u0110\u00E3 l\u01B0u tr\u1EEF %d c\u00F4ng vi\u1EC7c</string>
+    <string name="snackbar_tasks_restored">\u0110\u00E3 kh\u00F4i ph\u1EE5c %d c\u00F4ng vi\u1EC7c t\u1EEB l\u01B0u tr\u1EEF</string>
+    <string name="snackbar_failed_mark_completed">Kh\u00F4ng th\u1EC3 \u0111\u00E1nh d\u1EA5u ho\u00E0n th\u00E0nh</string>
+    <string name="snackbar_failed_mark_active">Kh\u00F4ng th\u1EC3 \u0111\u00E1nh d\u1EA5u \u0111ang l\u00E0m</string>
+    <string name="snackbar_failed_delete_tasks">Kh\u00F4ng th\u1EC3 x\u00F3a c\u00F4ng vi\u1EC7c: %s</string>
+    <string name="snackbar_failed_archive_tasks">Kh\u00F4ng th\u1EC3 l\u01B0u tr\u1EEF c\u00F4ng vi\u1EC7c: %s</string>
+    <string name="snackbar_failed_restore_tasks">Kh\u00F4ng th\u1EC3 kh\u00F4i ph\u1EE5c c\u00F4ng vi\u1EC7c: %s</string>
+    <string name="snackbar_failed_restore_archive">Kh\u00F4ng th\u1EC3 kh\u00F4i ph\u1EE5c t\u1EEB l\u01B0u tr\u1EEF: %s</string>
+    <string name="snackbar_failed_permanent_delete">Kh\u00F4ng th\u1EC3 x\u00F3a v\u0129nh vi\u1EC5n: %s</string>
+</resources>

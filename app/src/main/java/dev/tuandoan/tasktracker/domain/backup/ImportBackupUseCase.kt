@@ -1,6 +1,9 @@
 package dev.tuandoan.tasktracker.domain.backup
 
+import android.content.Context
 import android.net.Uri
+import dagger.hilt.android.qualifiers.ApplicationContext
+import dev.tuandoan.tasktracker.R
 import dev.tuandoan.tasktracker.data.backup.BackupFileProvider
 import dev.tuandoan.tasktracker.data.backup.BackupSerializer
 import dev.tuandoan.tasktracker.di.JsonSerializer
@@ -17,6 +20,7 @@ class ImportBackupUseCase @Inject constructor(
     @JsonSerializer private val jsonSerializer: BackupSerializer,
     private val fileProvider: BackupFileProvider,
     private val validator: BackupValidator,
+    @ApplicationContext private val context: Context,
 ) {
 
     /**
@@ -40,7 +44,7 @@ class ImportBackupUseCase @Inject constructor(
         )
     } catch (e: Exception) {
         ImportResult.Error(
-            message = "Failed to import backup: ${e.message}",
+            message = context.getString(R.string.error_import_backup, e.message ?: ""),
             cause = e,
         )
     }

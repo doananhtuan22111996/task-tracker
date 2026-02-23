@@ -15,7 +15,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import dev.tuandoan.tasktracker.R
 import dev.tuandoan.tasktracker.domain.model.CompletedGrouping
 import dev.tuandoan.tasktracker.domain.model.SortDirection
 import dev.tuandoan.tasktracker.domain.model.SortKey
@@ -28,7 +30,7 @@ import dev.tuandoan.tasktracker.domain.model.TaskSort
 fun SortMenu(currentSort: TaskSort, onSortSelected: (TaskSort) -> Unit) {
     // Sort section header
     Text(
-        text = "Sort",
+        text = stringResource(R.string.sort_header),
         style = MaterialTheme.typography.labelSmall,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
         modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
@@ -36,10 +38,10 @@ fun SortMenu(currentSort: TaskSort, onSortSelected: (TaskSort) -> Unit) {
 
     // Define the 4 sort options (radio group)
     val sortOptions = listOf(
-        Triple(SortKey.CREATED_AT, SortDirection.DESC, "Created: Newest first"),
-        Triple(SortKey.CREATED_AT, SortDirection.ASC, "Created: Oldest first"),
-        Triple(SortKey.TITLE, SortDirection.ASC, "Title: A–Z"),
-        Triple(SortKey.PRIORITY, SortDirection.DESC, "Priority: High to Low"),
+        Triple(SortKey.CREATED_AT, SortDirection.DESC, stringResource(R.string.sort_created_newest)),
+        Triple(SortKey.CREATED_AT, SortDirection.ASC, stringResource(R.string.sort_created_oldest)),
+        Triple(SortKey.TITLE, SortDirection.ASC, stringResource(R.string.sort_title_az)),
+        Triple(SortKey.PRIORITY, SortDirection.DESC, stringResource(R.string.sort_priority_high_low)),
     )
 
     // Radio group for sort options
@@ -90,7 +92,7 @@ private fun SortRadioItem(label: String, isSelected: Boolean, onClick: () -> Uni
                 if (isSelected) {
                     Icon(
                         imageVector = Icons.Default.Check,
-                        contentDescription = "Selected",
+                        contentDescription = stringResource(R.string.cd_selected),
                         tint = MaterialTheme.colorScheme.primary,
                     )
                 }
@@ -113,7 +115,7 @@ private fun CompletedLastToggleItem(isEnabled: Boolean, onToggle: (Boolean) -> U
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(
-                    text = "Completed last",
+                    text = stringResource(R.string.sort_completed_last),
                     style = MaterialTheme.typography.bodyMedium,
                 )
                 Switch(

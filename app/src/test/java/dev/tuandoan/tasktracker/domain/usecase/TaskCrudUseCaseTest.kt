@@ -1,9 +1,12 @@
 package dev.tuandoan.tasktracker.domain.usecase
 
+import android.content.Context
 import dev.tuandoan.tasktracker.domain.TaskManager
 import dev.tuandoan.tasktracker.testutil.FakeReminderScheduler
 import dev.tuandoan.tasktracker.testutil.FakeTaskRepository
 import dev.tuandoan.tasktracker.testutil.TestTaskFactory
+import io.mockk.every
+import io.mockk.mockk
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -16,6 +19,7 @@ import org.junit.Test
 
 class TaskCrudUseCaseTest {
 
+    private lateinit var context: Context
     private lateinit var repository: FakeTaskRepository
     private lateinit var scheduler: FakeReminderScheduler
     private lateinit var taskManager: TaskManager
@@ -23,10 +27,14 @@ class TaskCrudUseCaseTest {
 
     @Before
     fun setup() {
+        context = mockk(relaxed = true) {
+            every { getString(any()) } returns "test string"
+            every { getString(any(), *anyVararg()) } returns "test string"
+        }
         repository = FakeTaskRepository()
         scheduler = FakeReminderScheduler()
         taskManager = TaskManager(repository, scheduler)
-        useCase = TaskCrudUseCase(taskManager)
+        useCase = TaskCrudUseCase(taskManager, context)
     }
 
     // === createTask ===

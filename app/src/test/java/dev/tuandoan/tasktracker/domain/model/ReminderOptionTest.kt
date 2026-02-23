@@ -55,11 +55,4 @@ class ReminderOptionTest {
         assertEquals(60, ReminderOption.HOURS_1.offsetMinutes)
         assertEquals(1440, ReminderOption.DAYS_1.offsetMinutes)
     }
-
-    @Test
-    fun `each option has non-empty displayName`() {
-        for (option in ReminderOption.entries) {
-            assertEquals(true, option.displayName.isNotBlank())
-        }
-    }
 }

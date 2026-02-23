@@ -42,11 +42,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.compositeOver
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import dev.tuandoan.tasktracker.R
 import dev.tuandoan.tasktracker.data.database.Task
 import dev.tuandoan.tasktracker.domain.model.Priority
 import dev.tuandoan.tasktracker.utils.formatDueDate
@@ -74,11 +76,18 @@ fun TaskItem(
     val titleTextDecoration = if (task.isCompleted) TextDecoration.LineThrough else null
     val supportingTextDecoration = if (task.isCompleted) TextDecoration.LineThrough else null
 
+    // Localized priority label
+    val priorityLabel = when (Priority.fromValue(task.priority)) {
+        Priority.LOW -> stringResource(R.string.priority_low)
+        Priority.MEDIUM -> stringResource(R.string.priority_medium)
+        Priority.HIGH -> stringResource(R.string.priority_high)
+    }
+
     // Chips: Tag (if any), Priority (if non-medium)
     val chips = buildList {
         if (!task.tag.isNullOrBlank()) add(task.tag.uppercase() to ChipType.Tag)
         if (task.priority != Priority.MEDIUM.value) {
-            add(Priority.fromValue(task.priority).displayName.uppercase() to ChipType.Priority)
+            add(priorityLabel.uppercase() to ChipType.Priority)
         }
     }
 
@@ -211,10 +220,11 @@ fun TaskItem(
 
                 // Due date row (optional)
                 task.dueAt?.let { dueDate ->
+                    val datePattern = stringResource(R.string.date_format_due_time)
                     val dueDateText = if (overdue) {
-                        "Overdue: ${formatDueDate(dueDate)}"
+                        stringResource(R.string.task_overdue_date, formatDueDate(dueDate, datePattern))
                     } else {
-                        "Due: ${formatDueDate(dueDate)}"
+                        stringResource(R.string.task_due_date, formatDueDate(dueDate, datePattern))
                     }
 
                     Row(
@@ -333,7 +343,9 @@ fun TaskItem(
                     ) {
                         Icon(
                             imageVector = if (task.isPinned) Icons.Default.Star else Icons.Default.StarBorder,
-                            contentDescription = if (task.isPinned) "Unpin task" else "Pin task",
+                            contentDescription = stringResource(
+                                if (task.isPinned) R.string.unpin_task else R.string.pin_task,
+                            ),
                             tint = if (task.isPinned) {
                                 MaterialTheme.colorScheme.primary
                             } else {
@@ -349,7 +361,7 @@ fun TaskItem(
                     ) {
                         Icon(
                             imageVector = Icons.Default.MoreVert,
-                            contentDescription = "More options",
+                            contentDescription = stringResource(R.string.more_options),
                             tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
                             modifier = Modifier.size(20.dp),
                         )

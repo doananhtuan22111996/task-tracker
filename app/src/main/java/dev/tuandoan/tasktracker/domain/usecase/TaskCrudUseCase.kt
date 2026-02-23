@@ -1,5 +1,8 @@
 package dev.tuandoan.tasktracker.domain.usecase
 
+import android.content.Context
+import dagger.hilt.android.qualifiers.ApplicationContext
+import dev.tuandoan.tasktracker.R
 import dev.tuandoan.tasktracker.data.database.Task
 import dev.tuandoan.tasktracker.domain.ITaskManager
 import kotlinx.coroutines.flow.Flow
@@ -10,7 +13,10 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class TaskCrudUseCase @Inject constructor(private val taskManager: ITaskManager) {
+class TaskCrudUseCase @Inject constructor(
+    private val taskManager: ITaskManager,
+    @ApplicationContext private val context: Context,
+) {
 
     // Loading State
     private val _isLoading = MutableStateFlow(false)
@@ -64,10 +70,10 @@ class TaskCrudUseCase @Inject constructor(private val taskManager: ITaskManager)
             tag = tag,
         )
 
-        _lastOperationSuccess.value = "Task created successfully"
+        _lastOperationSuccess.value = context.getString(R.string.op_task_created)
         Result.success(Unit)
     } catch (e: Exception) {
-        val errorMsg = e.message ?: "Failed to create task"
+        val errorMsg = e.message ?: context.getString(R.string.error_create_task)
         _errorMessage.value = errorMsg
         Result.failure(e)
     } finally {
@@ -115,14 +121,14 @@ class TaskCrudUseCase @Inject constructor(private val taskManager: ITaskManager)
         )
 
         if (success) {
-            _lastOperationSuccess.value = "Task updated successfully"
+            _lastOperationSuccess.value = context.getString(R.string.op_task_updated)
             Result.success(Unit)
         } else {
-            _errorMessage.value = "Failed to schedule reminder"
-            Result.failure(RuntimeException("Failed to schedule reminder"))
+            _errorMessage.value = context.getString(R.string.error_schedule_reminder)
+            Result.failure(RuntimeException(context.getString(R.string.error_schedule_reminder)))
         }
     } catch (e: Exception) {
-        val errorMsg = e.message ?: "Failed to update task"
+        val errorMsg = e.message ?: context.getString(R.string.error_update_task)
         _errorMessage.value = errorMsg
         Result.failure(e)
     } finally {
@@ -135,10 +141,10 @@ class TaskCrudUseCase @Inject constructor(private val taskManager: ITaskManager)
     suspend fun deleteTask(task: Task): Result<Unit> = try {
         _errorMessage.value = null
         taskManager.deleteTask(task)
-        _lastOperationSuccess.value = "Task deleted successfully"
+        _lastOperationSuccess.value = context.getString(R.string.snackbar_task_deleted)
         Result.success(Unit)
     } catch (e: Exception) {
-        _errorMessage.value = e.message ?: "Failed to delete task"
+        _errorMessage.value = e.message ?: context.getString(R.string.error_delete_task)
         Result.failure(e)
     }
 
@@ -148,11 +154,17 @@ class TaskCrudUseCase @Inject constructor(private val taskManager: ITaskManager)
     suspend fun toggleTaskCompletion(task: Task): Result<Unit> = try {
         _errorMessage.value = null
         taskManager.toggleTaskCompletion(task)
-        val status = if (!task.isCompleted) "completed" else "marked as active"
-        _lastOperationSuccess.value = "Task $status"
+        _lastOperationSuccess.value =
+            if (!task.isCompleted) {
+                context.getString(
+                    R.string.op_task_marked_complete,
+                )
+            } else {
+                context.getString(R.string.op_task_marked_incomplete)
+            }
         Result.success(Unit)
     } catch (e: Exception) {
-        _errorMessage.value = e.message ?: "Failed to update task"
+        _errorMessage.value = e.message ?: context.getString(R.string.error_update_task)
         Result.failure(e)
     }
 
@@ -162,10 +174,10 @@ class TaskCrudUseCase @Inject constructor(private val taskManager: ITaskManager)
     suspend fun restoreTask(task: Task): Result<Unit> = try {
         _errorMessage.value = null
         taskManager.restoreTask(task)
-        _lastOperationSuccess.value = "Task restored successfully"
+        _lastOperationSuccess.value = context.getString(R.string.op_task_restored)
         Result.success(Unit)
     } catch (e: Exception) {
-        _errorMessage.value = e.message ?: "Failed to restore task"
+        _errorMessage.value = e.message ?: context.getString(R.string.error_restore_task)
         Result.failure(e)
     }
 
@@ -185,11 +197,18 @@ class TaskCrudUseCase @Inject constructor(private val taskManager: ITaskManager)
 
         taskManager.setCompletedBulk(taskIds, completed)
 
-        val action = if (completed) "completed" else "marked as active"
-        _lastOperationSuccess.value = "${taskIds.size} tasks $action"
+        _lastOperationSuccess.value =
+            if (completed) {
+                context.getString(
+                    R.string.snackbar_tasks_marked_completed,
+                    taskIds.size,
+                )
+            } else {
+                context.getString(R.string.snackbar_tasks_marked_active, taskIds.size)
+            }
         Result.success(Unit)
     } catch (e: Exception) {
-        val errorMsg = e.message ?: "Failed to update tasks"
+        val errorMsg = e.message ?: context.getString(R.string.error_update_tasks)
         _errorMessage.value = errorMsg
         Result.failure(e)
     } finally {
@@ -202,10 +221,10 @@ class TaskCrudUseCase @Inject constructor(private val taskManager: ITaskManager)
     suspend fun bulkDeleteTasks(taskIds: List<Long>): Result<Unit> = try {
         _errorMessage.value = null
         taskManager.deleteTasksByIds(taskIds)
-        _lastOperationSuccess.value = "${taskIds.size} tasks deleted successfully"
+        _lastOperationSuccess.value = context.getString(R.string.snackbar_tasks_deleted, taskIds.size)
         Result.success(Unit)
     } catch (e: Exception) {
-        _errorMessage.value = e.message ?: "Failed to delete tasks"
+        _errorMessage.value = e.message ?: context.getString(R.string.error_delete_tasks)
         Result.failure(e)
     }
 
@@ -215,10 +234,10 @@ class TaskCrudUseCase @Inject constructor(private val taskManager: ITaskManager)
     suspend fun restoreTasks(tasks: List<Task>): Result<Unit> = try {
         _errorMessage.value = null
         taskManager.restoreTasks(tasks)
-        _lastOperationSuccess.value = "${tasks.size} tasks restored successfully"
+        _lastOperationSuccess.value = context.getString(R.string.snackbar_tasks_restored, tasks.size)
         Result.success(Unit)
     } catch (e: Exception) {
-        _errorMessage.value = e.message ?: "Failed to restore tasks"
+        _errorMessage.value = e.message ?: context.getString(R.string.error_restore_tasks)
         Result.failure(e)
     }
 
@@ -228,11 +247,11 @@ class TaskCrudUseCase @Inject constructor(private val taskManager: ITaskManager)
     suspend fun setPinned(taskId: Long, pinned: Boolean): Result<Unit> = try {
         _errorMessage.value = null
         taskManager.setPinned(taskId, pinned)
-        val status = if (pinned) "pinned" else "unpinned"
-        _lastOperationSuccess.value = "Task $status successfully"
+        _lastOperationSuccess.value =
+            if (pinned) context.getString(R.string.op_task_pinned) else context.getString(R.string.op_task_unpinned)
         Result.success(Unit)
     } catch (e: Exception) {
-        _errorMessage.value = e.message ?: "Failed to update pin status"
+        _errorMessage.value = e.message ?: context.getString(R.string.error_pin_task)
         Result.failure(e)
     }
 
@@ -242,10 +261,10 @@ class TaskCrudUseCase @Inject constructor(private val taskManager: ITaskManager)
     suspend fun setPriority(taskId: Long, priority: Int): Result<Unit> = try {
         _errorMessage.value = null
         taskManager.setPriority(taskId, priority)
-        _lastOperationSuccess.value = "Task priority updated successfully"
+        _lastOperationSuccess.value = context.getString(R.string.op_task_priority_updated)
         Result.success(Unit)
     } catch (e: Exception) {
-        _errorMessage.value = e.message ?: "Failed to update priority"
+        _errorMessage.value = e.message ?: context.getString(R.string.error_update_priority)
         Result.failure(e)
     }
 
@@ -262,10 +281,10 @@ class TaskCrudUseCase @Inject constructor(private val taskManager: ITaskManager)
     suspend fun archiveTask(taskId: Long): Result<Unit> = try {
         _errorMessage.value = null
         taskManager.archiveTask(taskId)
-        _lastOperationSuccess.value = "Task archived successfully"
+        _lastOperationSuccess.value = context.getString(R.string.snackbar_task_archived)
         Result.success(Unit)
     } catch (e: Exception) {
-        _errorMessage.value = e.message ?: "Failed to archive task"
+        _errorMessage.value = e.message ?: context.getString(R.string.error_archive_task)
         Result.failure(e)
     }
 
@@ -275,10 +294,10 @@ class TaskCrudUseCase @Inject constructor(private val taskManager: ITaskManager)
     suspend fun unarchiveTask(taskId: Long): Result<Unit> = try {
         _errorMessage.value = null
         taskManager.unarchiveTask(taskId)
-        _lastOperationSuccess.value = "Task restored successfully"
+        _lastOperationSuccess.value = context.getString(R.string.op_task_restored)
         Result.success(Unit)
     } catch (e: Exception) {
-        _errorMessage.value = e.message ?: "Failed to restore task"
+        _errorMessage.value = e.message ?: context.getString(R.string.error_restore_task)
         Result.failure(e)
     }
 
@@ -288,10 +307,10 @@ class TaskCrudUseCase @Inject constructor(private val taskManager: ITaskManager)
     suspend fun bulkArchiveTasks(taskIds: List<Long>): Result<Unit> = try {
         _errorMessage.value = null
         taskManager.archiveTasks(taskIds)
-        _lastOperationSuccess.value = "${taskIds.size} tasks archived successfully"
+        _lastOperationSuccess.value = context.getString(R.string.snackbar_tasks_archived, taskIds.size)
         Result.success(Unit)
     } catch (e: Exception) {
-        _errorMessage.value = e.message ?: "Failed to archive tasks"
+        _errorMessage.value = e.message ?: context.getString(R.string.error_archive_tasks)
         Result.failure(e)
     }
 
@@ -301,10 +320,10 @@ class TaskCrudUseCase @Inject constructor(private val taskManager: ITaskManager)
     suspend fun bulkUnarchiveTasks(taskIds: List<Long>): Result<Unit> = try {
         _errorMessage.value = null
         taskManager.unarchiveTasks(taskIds)
-        _lastOperationSuccess.value = "${taskIds.size} tasks restored successfully"
+        _lastOperationSuccess.value = context.getString(R.string.snackbar_tasks_restored, taskIds.size)
         Result.success(Unit)
     } catch (e: Exception) {
-        _errorMessage.value = e.message ?: "Failed to restore tasks"
+        _errorMessage.value = e.message ?: context.getString(R.string.error_restore_tasks)
         Result.failure(e)
     }
 
@@ -314,10 +333,10 @@ class TaskCrudUseCase @Inject constructor(private val taskManager: ITaskManager)
     suspend fun hardDeleteTask(taskId: Long): Result<Unit> = try {
         _errorMessage.value = null
         taskManager.hardDeleteTask(taskId)
-        _lastOperationSuccess.value = "Task permanently deleted"
+        _lastOperationSuccess.value = context.getString(R.string.snackbar_task_permanently_deleted)
         Result.success(Unit)
     } catch (e: Exception) {
-        _errorMessage.value = e.message ?: "Failed to permanently delete task"
+        _errorMessage.value = e.message ?: context.getString(R.string.error_hard_delete_task)
         Result.failure(e)
     }
 
@@ -327,10 +346,10 @@ class TaskCrudUseCase @Inject constructor(private val taskManager: ITaskManager)
     suspend fun bulkHardDeleteTasks(taskIds: List<Long>): Result<Unit> = try {
         _errorMessage.value = null
         taskManager.hardDeleteTasks(taskIds)
-        _lastOperationSuccess.value = "${taskIds.size} tasks permanently deleted"
+        _lastOperationSuccess.value = context.getString(R.string.snackbar_tasks_permanently_deleted, taskIds.size)
         Result.success(Unit)
     } catch (e: Exception) {
-        _errorMessage.value = e.message ?: "Failed to permanently delete tasks"
+        _errorMessage.value = e.message ?: context.getString(R.string.error_hard_delete_tasks)
         Result.failure(e)
     }
 

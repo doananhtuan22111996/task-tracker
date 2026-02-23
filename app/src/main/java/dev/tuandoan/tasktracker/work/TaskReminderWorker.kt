@@ -14,6 +14,7 @@ import androidx.work.WorkerParameters
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import dev.tuandoan.tasktracker.MainActivity
+import dev.tuandoan.tasktracker.R
 import dev.tuandoan.tasktracker.TaskTrackerApplication
 
 @HiltWorker
@@ -33,7 +34,8 @@ class TaskReminderWorker @AssistedInject constructor(
 
         return try {
             val taskId = inputData.getLong(KEY_TASK_ID, -1)
-            val taskTitle = inputData.getString(KEY_TASK_TITLE) ?: "Task"
+            val taskTitle = inputData.getString(KEY_TASK_TITLE)
+                ?: applicationContext.getString(R.string.notification_default_task)
 
             Log.d(TAG, "Processing reminder for task $taskId: '$taskTitle'")
 
@@ -76,9 +78,13 @@ class TaskReminderWorker @AssistedInject constructor(
             TaskTrackerApplication.TASK_REMINDER_CHANNEL_ID,
         )
             .setSmallIcon(android.R.drawable.ic_dialog_alert) // Better system icon
-            .setContentTitle("Task Reminder")
-            .setContentText("Due soon: $taskTitle")
-            .setStyle(NotificationCompat.BigTextStyle().bigText("Due soon: $taskTitle"))
+            .setContentTitle(applicationContext.getString(R.string.notification_title))
+            .setContentText(applicationContext.getString(R.string.notification_due_soon, taskTitle))
+            .setStyle(
+                NotificationCompat.BigTextStyle().bigText(
+                    applicationContext.getString(R.string.notification_due_soon, taskTitle),
+                ),
+            )
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setContentIntent(pendingIntent)
             .setAutoCancel(true)
