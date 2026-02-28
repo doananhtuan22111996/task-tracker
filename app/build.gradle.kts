@@ -119,6 +119,12 @@ dependencies {
     // Serialization dependencies
     implementation(libs.kotlinx.serialization.json)
 
+    // DataStore Preferences
+    implementation(libs.androidx.datastore.preferences)
+
+    // AppCompat (for per-app language support)
+    implementation(libs.androidx.appcompat)
+
     // WorkManager dependencies
     implementation(libs.androidx.work.runtime.ktx)
     implementation(libs.androidx.hilt.work)

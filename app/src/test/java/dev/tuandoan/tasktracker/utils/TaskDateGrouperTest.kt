@@ -1,18 +1,33 @@
 package dev.tuandoan.tasktracker.utils
 
+import android.content.Context
+import dev.tuandoan.tasktracker.R
 import dev.tuandoan.tasktracker.testutil.TestTaskFactory
+import io.mockk.every
+import io.mockk.mockk
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
+import org.junit.Before
 import org.junit.Test
 import java.util.Calendar
 
 class TaskDateGrouperTest {
 
+    private lateinit var context: Context
+
+    @Before
+    fun setup() {
+        context = mockk(relaxed = true)
+        every { context.getString(R.string.date_today) } returns "Today"
+        every { context.getString(R.string.date_yesterday) } returns "Yesterday"
+        every { context.getString(R.string.date_tomorrow) } returns "Tomorrow"
+    }
+
     // === empty list ===
 
     @Test
     fun `groupTasksByDay with empty list returns empty`() {
-        val result = TaskDateGrouper.groupTasksByDay(emptyList())
+        val result = TaskDateGrouper.groupTasksByDay(emptyList(), context)
         assertTrue(result.isEmpty())
     }
 
@@ -31,7 +46,7 @@ class TaskDateGrouperTest {
             TestTaskFactory.createTask(id = 2, title = "Afternoon", createdAt = time2),
         )
 
-        val sections = TaskDateGrouper.groupTasksByDay(tasks)
+        val sections = TaskDateGrouper.groupTasksByDay(tasks, context)
 
         assertEquals(1, sections.size)
         assertEquals(2, sections[0].tasks.size)
@@ -51,7 +66,7 @@ class TaskDateGrouperTest {
             TestTaskFactory.createTask(id = 2, title = "Day 2", createdAt = day2),
         )
 
-        val sections = TaskDateGrouper.groupTasksByDay(tasks)
+        val sections = TaskDateGrouper.groupTasksByDay(tasks, context)
 
         assertEquals(2, sections.size)
     }
@@ -71,7 +86,7 @@ class TaskDateGrouperTest {
             TestTaskFactory.createTask(id = 2, title = "New", createdAt = newDay),
         )
 
-        val sections = TaskDateGrouper.groupTasksByDay(tasks)
+        val sections = TaskDateGrouper.groupTasksByDay(tasks, context)
 
         assertEquals(2, sections.size)
         assertEquals("2024-03-20", sections[0].dateKey)
@@ -92,7 +107,7 @@ class TaskDateGrouperTest {
             TestTaskFactory.createTask(id = 1, title = "Due later", createdAt = createdAt, dueAt = dueAt),
         )
 
-        val sections = TaskDateGrouper.groupTasksByDay(tasks)
+        val sections = TaskDateGrouper.groupTasksByDay(tasks, context)
 
         assertEquals(1, sections.size)
         assertEquals("2024-03-20", sections[0].dateKey)
@@ -108,7 +123,7 @@ class TaskDateGrouperTest {
             TestTaskFactory.createTask(id = 1, title = "No due", createdAt = createdAt, dueAt = null),
         )
 
-        val sections = TaskDateGrouper.groupTasksByDay(tasks)
+        val sections = TaskDateGrouper.groupTasksByDay(tasks, context)
 
         assertEquals(1, sections.size)
         assertEquals("2024-03-10", sections[0].dateKey)
@@ -127,7 +142,7 @@ class TaskDateGrouperTest {
             TestTaskFactory.createTask(id = 2, title = "Pinned", createdAt = timestamp + 1000, isPinned = true),
         )
 
-        val sections = TaskDateGrouper.groupTasksByDay(tasks)
+        val sections = TaskDateGrouper.groupTasksByDay(tasks, context)
 
         assertEquals(1, sections.size)
         assertEquals("Pinned", sections[0].tasks[0].title)
@@ -143,7 +158,7 @@ class TaskDateGrouperTest {
             TestTaskFactory.createTask(id = 1, title = "Today task", createdAt = now),
         )
 
-        val sections = TaskDateGrouper.groupTasksByDay(tasks)
+        val sections = TaskDateGrouper.groupTasksByDay(tasks, context)
 
         assertEquals(1, sections.size)
         assertEquals("Today", sections[0].header)
@@ -159,7 +174,7 @@ class TaskDateGrouperTest {
             TestTaskFactory.createTask(id = 1, title = "Yesterday task", createdAt = yesterday),
         )
 
-        val sections = TaskDateGrouper.groupTasksByDay(tasks)
+        val sections = TaskDateGrouper.groupTasksByDay(tasks, context)
 
         assertEquals(1, sections.size)
         assertEquals("Yesterday", sections[0].header)
@@ -175,7 +190,7 @@ class TaskDateGrouperTest {
             TestTaskFactory.createTask(id = 1, title = "Tomorrow task", dueAt = tomorrow, createdAt = 1000L),
         )
 
-        val sections = TaskDateGrouper.groupTasksByDay(tasks)
+        val sections = TaskDateGrouper.groupTasksByDay(tasks, context)
 
         assertEquals(1, sections.size)
         assertEquals("Tomorrow", sections[0].header)
@@ -191,7 +206,7 @@ class TaskDateGrouperTest {
             TestTaskFactory.createTask(id = 1, title = "Old task", createdAt = oldDate),
         )
 
-        val sections = TaskDateGrouper.groupTasksByDay(tasks)
+        val sections = TaskDateGrouper.groupTasksByDay(tasks, context)
 
         assertEquals(1, sections.size)
         // The header should be a formatted date like "Jun 5, 2023"
@@ -213,7 +228,7 @@ class TaskDateGrouperTest {
             TestTaskFactory.createTask(id = 1, createdAt = timestamp),
         )
 
-        val sections = TaskDateGrouper.groupTasksByDay(tasks)
+        val sections = TaskDateGrouper.groupTasksByDay(tasks, context)
 
         assertEquals("2024-01-05", sections[0].dateKey)
     }

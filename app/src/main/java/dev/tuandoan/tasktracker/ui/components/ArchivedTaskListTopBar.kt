@@ -24,7 +24,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import dev.tuandoan.tasktracker.R
 import dev.tuandoan.tasktracker.domain.model.TaskSort
 
 /**
@@ -51,9 +53,9 @@ fun ArchivedTaskListTopBar(
         title = {
             Text(
                 text = if (isSelectionMode) {
-                    "$selectedCount selected"
+                    stringResource(R.string.title_selected_count, selectedCount)
                 } else {
-                    "Archived"
+                    stringResource(R.string.title_archived)
                 },
                 style = MaterialTheme.typography.titleLarge,
                 color = MaterialTheme.colorScheme.onSurface,
@@ -69,7 +71,7 @@ fun ArchivedTaskListTopBar(
                 ) {
                     Icon(
                         imageVector = Icons.Default.Close,
-                        contentDescription = "Clear selection",
+                        contentDescription = stringResource(R.string.cd_clear_selection),
                     )
                 }
             } else {
@@ -81,7 +83,7 @@ fun ArchivedTaskListTopBar(
                 ) {
                     Icon(
                         imageVector = Icons.Default.ArrowBack,
-                        contentDescription = "Navigate back",
+                        contentDescription = stringResource(R.string.cd_navigate_back),
                     )
                 }
             }
@@ -97,7 +99,7 @@ fun ArchivedTaskListTopBar(
                 ) {
                     Icon(
                         imageVector = Icons.Default.Unarchive,
-                        contentDescription = "Restore selected",
+                        contentDescription = stringResource(R.string.cd_restore_selected),
                     )
                 }
 
@@ -109,7 +111,7 @@ fun ArchivedTaskListTopBar(
                 ) {
                     Icon(
                         imageVector = Icons.Default.DeleteForever,
-                        contentDescription = "Permanently delete selected",
+                        contentDescription = stringResource(R.string.cd_permanently_delete_selected),
                     )
                 }
 
@@ -123,7 +125,7 @@ fun ArchivedTaskListTopBar(
                     ) {
                         Icon(
                             imageVector = Icons.Default.MoreVert,
-                            contentDescription = "More options",
+                            contentDescription = stringResource(R.string.cd_more_options),
                         )
                     }
 
@@ -136,7 +138,7 @@ fun ArchivedTaskListTopBar(
                         DropdownMenuItem(
                             text = {
                                 Text(
-                                    "Select all",
+                                    stringResource(R.string.action_select_all),
                                     style = MaterialTheme.typography.labelLarge,
                                 )
                             },
@@ -164,7 +166,7 @@ fun ArchivedTaskListTopBar(
                 ) {
                     Icon(
                         imageVector = Icons.Default.Sort,
-                        contentDescription = "Sort tasks",
+                        contentDescription = stringResource(R.string.cd_sort_tasks),
                     )
                 }
 

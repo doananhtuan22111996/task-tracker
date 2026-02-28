@@ -1,5 +1,7 @@
 package dev.tuandoan.tasktracker.utils
 
+import android.content.Context
+import dev.tuandoan.tasktracker.R
 import dev.tuandoan.tasktracker.data.database.Task
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -12,6 +14,7 @@ data class TaskSection(
     val header: String, // e.g., "Today", "Yesterday", "Jan 15, 2026"
     val dateKey: String, // e.g., "2026-01-15" for sorting/grouping
     val tasks: List<Task>,
+    val isToday: Boolean = false,
 )
 
 /**
@@ -27,9 +30,10 @@ object TaskDateGrouper {
      * 2. Otherwise, group by createdAt
      *
      * @param tasks List of tasks (should already be filtered/searched/sorted)
+     * @param context Android context for resolving localized date labels
      * @return List of TaskSection with appropriate headers and date keys
      */
-    fun groupTasksByDay(tasks: List<Task>): List<TaskSection> {
+    fun groupTasksByDay(tasks: List<Task>, context: Context): List<TaskSection> {
         if (tasks.isEmpty()) return emptyList()
 
         val calendar = Calendar.getInstance()
@@ -54,9 +58,10 @@ object TaskDateGrouper {
         return groupedTasks.toSortedMap(compareByDescending { it })
             .map { (dateKey, tasksInGroup) ->
                 TaskSection(
-                    header = getDateHeaderLabel(dateKey, today, yesterday, tomorrow),
+                    header = getDateHeaderLabel(dateKey, today, yesterday, tomorrow, context),
                     dateKey = dateKey,
                     tasks = applyPinnedFirstOrdering(tasksInGroup),
+                    isToday = dateKey == today,
                 )
             }
     }
@@ -92,11 +97,12 @@ object TaskDateGrouper {
         todayKey: String,
         yesterdayKey: String,
         tomorrowKey: String,
+        context: Context,
     ): String {
         return when (dateKey) {
-            todayKey -> "Today"
-            yesterdayKey -> "Yesterday"
-            tomorrowKey -> "Tomorrow"
+            todayKey -> context.getString(R.string.date_today)
+            yesterdayKey -> context.getString(R.string.date_yesterday)
+            tomorrowKey -> context.getString(R.string.date_tomorrow)
             else -> {
                 // Parse date key back to timestamp and format nicely
                 val parts = dateKey.split("-")

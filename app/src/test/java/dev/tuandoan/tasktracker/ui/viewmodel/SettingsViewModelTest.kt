@@ -1,0 +1,241 @@
+package dev.tuandoan.tasktracker.ui.viewmodel
+
+import android.content.Context
+import app.cash.turbine.test
+import dev.tuandoan.tasktracker.data.preferences.SettingsRepository
+import dev.tuandoan.tasktracker.data.preferences.ThemeMode
+import dev.tuandoan.tasktracker.data.preferences.UserPreferences
+import dev.tuandoan.tasktracker.domain.backup.ExportBackupUseCase
+import dev.tuandoan.tasktracker.domain.backup.ImportBackupUseCase
+import io.mockk.coVerify
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.mockkStatic
+import io.mockk.unmockkStatic
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.setMain
+import org.junit.After
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
+import org.junit.Before
+import org.junit.Test
+
+@OptIn(ExperimentalCoroutinesApi::class)
+class SettingsViewModelTest {
+
+    private val testDispatcher = StandardTestDispatcher()
+
+    private lateinit var context: Context
+    private lateinit var exportBackupUseCase: ExportBackupUseCase
+    private lateinit var importBackupUseCase: ImportBackupUseCase
+    private lateinit var settingsRepository: SettingsRepository
+    private lateinit var preferencesFlow: MutableStateFlow<UserPreferences>
+    private lateinit var viewModel: SettingsViewModel
+
+    @Before
+    fun setUp() {
+        Dispatchers.setMain(testDispatcher)
+
+        context = mockk(relaxed = true)
+        exportBackupUseCase = mockk(relaxed = true)
+        importBackupUseCase = mockk(relaxed = true)
+        settingsRepository = mockk(relaxed = true)
+        preferencesFlow = MutableStateFlow(UserPreferences())
+
+        every { settingsRepository.userPreferences } returns preferencesFlow
+
+        viewModel = SettingsViewModel(
+            context = context,
+            exportBackupUseCase = exportBackupUseCase,
+            importBackupUseCase = importBackupUseCase,
+            settingsRepository = settingsRepository,
+        )
+    }
+
+    @After
+    fun tearDown() {
+        Dispatchers.resetMain()
+    }
+
+    // --- UserPreferences StateFlow ---
+
+    @Test
+    fun `userPreferences initial value is default UserPreferences`() = runTest {
+        val prefs = viewModel.userPreferences.value
+        assertEquals(ThemeMode.SYSTEM, prefs.themeMode)
+        assertEquals(true, prefs.dynamicColor)
+        assertEquals("", prefs.languageTag)
+    }
+
+    @Test
+    fun `userPreferences reflects updates from repository flow`() = runTest {
+        viewModel.userPreferences.test {
+            // Initial value
+            val initial = awaitItem()
+            assertEquals(ThemeMode.SYSTEM, initial.themeMode)
+
+            // Simulate repository emitting new preferences
+            preferencesFlow.value = UserPreferences(
+                themeMode = ThemeMode.DARK,
+                dynamicColor = false,
+                languageTag = "vi",
+            )
+
+            val updated = awaitItem()
+            assertEquals(ThemeMode.DARK, updated.themeMode)
+            assertEquals(false, updated.dynamicColor)
+            assertEquals("vi", updated.languageTag)
+        }
+    }
+
+    // --- setThemeMode ---
+
+    @Test
+    fun `setThemeMode delegates to repository`() = runTest {
+        viewModel.setThemeMode(ThemeMode.DARK)
+        advanceUntilIdle()
+
+        coVerify { settingsRepository.setThemeMode(ThemeMode.DARK) }
+    }
+
+    @Test
+    fun `setThemeMode LIGHT delegates to repository`() = runTest {
+        viewModel.setThemeMode(ThemeMode.LIGHT)
+        advanceUntilIdle()
+
+        coVerify { settingsRepository.setThemeMode(ThemeMode.LIGHT) }
+    }
+
+    @Test
+    fun `setThemeMode SYSTEM delegates to repository`() = runTest {
+        viewModel.setThemeMode(ThemeMode.SYSTEM)
+        advanceUntilIdle()
+
+        coVerify { settingsRepository.setThemeMode(ThemeMode.SYSTEM) }
+    }
+
+    // --- setDynamicColor ---
+
+    @Test
+    fun `setDynamicColor true delegates to repository`() = runTest {
+        viewModel.setDynamicColor(true)
+        advanceUntilIdle()
+
+        coVerify { settingsRepository.setDynamicColor(true) }
+    }
+
+    @Test
+    fun `setDynamicColor false delegates to repository`() = runTest {
+        viewModel.setDynamicColor(false)
+        advanceUntilIdle()
+
+        coVerify { settingsRepository.setDynamicColor(false) }
+    }
+
+    // --- setLanguageTag ---
+
+    @Test
+    fun `setLanguageTag delegates to repository and applies locale`() = runTest {
+        // Mock the static AppCompatDelegate call
+        mockkStatic("androidx.appcompat.app.AppCompatDelegate")
+
+        viewModel.setLanguageTag("vi")
+        advanceUntilIdle()
+
+        coVerify { settingsRepository.setLanguageTag("vi") }
+
+        unmockkStatic("androidx.appcompat.app.AppCompatDelegate")
+    }
+
+    @Test
+    fun `setLanguageTag with empty string delegates to repository`() = runTest {
+        mockkStatic("androidx.appcompat.app.AppCompatDelegate")
+
+        viewModel.setLanguageTag("")
+        advanceUntilIdle()
+
+        coVerify { settingsRepository.setLanguageTag("") }
+
+        unmockkStatic("androidx.appcompat.app.AppCompatDelegate")
+    }
+
+    // --- getSupportedLocales ---
+
+    @Test
+    fun `getSupportedLocales returns correct locale list`() {
+        val locales = viewModel.getSupportedLocales()
+
+        assertEquals(8, locales.size)
+        val allTags = locales.map { it.first }.toSet()
+        assertEquals(setOf("de", "en", "es", "fr", "hi", "in", "pt", "vi"), allTags)
+    }
+
+    @Test
+    fun `getSupportedLocales English display name starts with uppercase`() {
+        val locales = viewModel.getSupportedLocales()
+        val englishDisplayName = locales.first { it.first == "en" }.second
+
+        assertTrue(
+            "English display name should start with uppercase: $englishDisplayName",
+            englishDisplayName[0].isUpperCase(),
+        )
+    }
+
+    @Test
+    fun `getSupportedLocales Vietnamese display name starts with uppercase`() {
+        val locales = viewModel.getSupportedLocales()
+        val vietnameseDisplayName = locales.first { it.first == "vi" }.second
+
+        assertTrue(
+            "Vietnamese display name should start with uppercase: $vietnameseDisplayName",
+            vietnameseDisplayName[0].isUpperCase(),
+        )
+    }
+
+    // --- Backup & Restore (existing behavior) ---
+
+    @Test
+    fun `initial isLoading is false`() {
+        assertEquals(false, viewModel.isLoading.value)
+    }
+
+    @Test
+    fun `initial showImportConfirmation is false`() {
+        assertEquals(false, viewModel.showImportConfirmation.value)
+    }
+
+    @Test
+    fun `initial showErrorDialog is null`() {
+        assertEquals(null, viewModel.showErrorDialog.value)
+    }
+
+    @Test
+    fun `requestImport sets showImportConfirmation to true`() {
+        val uri = mockk<android.net.Uri>()
+        viewModel.requestImport(uri)
+
+        assertEquals(true, viewModel.showImportConfirmation.value)
+    }
+
+    @Test
+    fun `cancelImport resets showImportConfirmation`() {
+        val uri = mockk<android.net.Uri>()
+        viewModel.requestImport(uri)
+        viewModel.cancelImport()
+
+        assertEquals(false, viewModel.showImportConfirmation.value)
+    }
+
+    @Test
+    fun `dismissError resets showErrorDialog`() {
+        // Access private field indirectly by checking the flow
+        viewModel.dismissError()
+        assertEquals(null, viewModel.showErrorDialog.value)
+    }
+}

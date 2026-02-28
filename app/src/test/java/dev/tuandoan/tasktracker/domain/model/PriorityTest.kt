@@ -36,11 +36,4 @@ class PriorityTest {
         assertEquals(1, Priority.MEDIUM.value)
         assertEquals(2, Priority.HIGH.value)
     }
-
-    @Test
-    fun `each priority has non-empty displayName`() {
-        assertEquals("Low", Priority.LOW.displayName)
-        assertEquals("Medium", Priority.MEDIUM.displayName)
-        assertEquals("High", Priority.HIGH.displayName)
-    }
 }

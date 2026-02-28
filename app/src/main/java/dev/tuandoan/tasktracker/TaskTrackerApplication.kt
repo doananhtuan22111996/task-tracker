@@ -44,10 +44,10 @@ class TaskTrackerApplication :
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
                 TASK_REMINDER_CHANNEL_ID,
-                "Task Reminders",
+                getString(R.string.notification_channel_name),
                 NotificationManager.IMPORTANCE_DEFAULT,
             ).apply {
-                description = "Notifications for task due date reminders"
+                description = getString(R.string.notification_channel_description)
             }
 
             val notificationManager = getSystemService<NotificationManager>()

@@ -26,7 +26,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import dev.tuandoan.tasktracker.R
 import dev.tuandoan.tasktracker.domain.model.TaskSort
 
 /**
@@ -56,9 +58,9 @@ fun TaskListTopBar(
         title = {
             Text(
                 text = if (isSelectionMode) {
-                    "$selectedCount selected"
+                    stringResource(R.string.title_selected_count, selectedCount)
                 } else {
-                    "Task Tracker"
+                    stringResource(R.string.title_task_tracker)
                 },
                 style = MaterialTheme.typography.titleLarge,
                 color = MaterialTheme.colorScheme.onSurface,
@@ -74,7 +76,7 @@ fun TaskListTopBar(
                 ) {
                     Icon(
                         imageVector = Icons.Default.Close,
-                        contentDescription = "Clear selection",
+                        contentDescription = stringResource(R.string.cd_clear_selection),
                     )
                 }
             }
@@ -92,7 +94,7 @@ fun TaskListTopBar(
                 ) {
                     Icon(
                         imageVector = Icons.Default.CheckBoxOutlineBlank,
-                        contentDescription = "Mark as active",
+                        contentDescription = stringResource(R.string.cd_mark_active),
                     )
                 }
 
@@ -104,7 +106,7 @@ fun TaskListTopBar(
                 ) {
                     Icon(
                         imageVector = Icons.Default.CheckBox,
-                        contentDescription = "Mark as completed",
+                        contentDescription = stringResource(R.string.cd_mark_completed),
                     )
                 }
 
@@ -116,7 +118,7 @@ fun TaskListTopBar(
                 ) {
                     Icon(
                         imageVector = Icons.Default.Archive,
-                        contentDescription = "Archive selected",
+                        contentDescription = stringResource(R.string.cd_archive_selected),
                     )
                 }
 
@@ -130,7 +132,7 @@ fun TaskListTopBar(
                     ) {
                         Icon(
                             imageVector = Icons.Default.MoreVert,
-                            contentDescription = "More options",
+                            contentDescription = stringResource(R.string.cd_more_options),
                         )
                     }
 
@@ -143,7 +145,7 @@ fun TaskListTopBar(
                         DropdownMenuItem(
                             text = {
                                 Text(
-                                    "Select all",
+                                    stringResource(R.string.action_select_all),
                                     style = MaterialTheme.typography.labelLarge,
                                 )
                             },
@@ -171,7 +173,7 @@ fun TaskListTopBar(
                 ) {
                     Icon(
                         imageVector = Icons.Default.Sort,
-                        contentDescription = "Sort tasks",
+                        contentDescription = stringResource(R.string.cd_sort_tasks),
                     )
                 }
 
@@ -183,7 +185,7 @@ fun TaskListTopBar(
                 ) {
                     Icon(
                         imageVector = Icons.Default.BarChart,
-                        contentDescription = "Statistics",
+                        contentDescription = stringResource(R.string.cd_statistics),
                     )
                 }
 
@@ -195,7 +197,7 @@ fun TaskListTopBar(
                 ) {
                     Icon(
                         imageVector = Icons.Default.Archive,
-                        contentDescription = "View archived tasks",
+                        contentDescription = stringResource(R.string.cd_view_archived),
                     )
                 }
 
@@ -207,7 +209,7 @@ fun TaskListTopBar(
                 ) {
                     Icon(
                         imageVector = Icons.Default.Settings,
-                        contentDescription = "Settings",
+                        contentDescription = stringResource(R.string.cd_settings),
                     )
                 }
 

@@ -3,10 +3,10 @@ package dev.tuandoan.tasktracker.domain.model
 /**
  * Defines task priority levels
  */
-enum class Priority(val value: Int, val displayName: String) {
-    LOW(0, "Low"),
-    MEDIUM(1, "Medium"),
-    HIGH(2, "High"),
+enum class Priority(val value: Int) {
+    LOW(0),
+    MEDIUM(1),
+    HIGH(2),
     ;
 
     companion object {

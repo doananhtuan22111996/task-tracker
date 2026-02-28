@@ -32,10 +32,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import dev.tuandoan.tasktracker.R
 import dev.tuandoan.tasktracker.ui.viewmodel.StatsViewModel
 
 /**
@@ -59,12 +61,12 @@ fun StatsScreen(viewModel: StatsViewModel, onNavigateBack: () -> Unit, modifier:
         modifier = modifier.fillMaxSize(),
         topBar = {
             TopAppBar(
-                title = { Text("Stats") },
+                title = { Text(stringResource(R.string.title_stats)) },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
                         Icon(
                             imageVector = Icons.Default.ArrowBack,
-                            contentDescription = "Back",
+                            contentDescription = stringResource(R.string.cd_back),
                         )
                     }
                 },
@@ -81,41 +83,41 @@ fun StatsScreen(viewModel: StatsViewModel, onNavigateBack: () -> Unit, modifier:
         ) {
             // Active tasks
             StatCard(
-                title = "Active Tasks",
+                title = stringResource(R.string.stat_active_tasks),
                 count = uiState.activeCount,
-                description = "Tasks not yet completed",
+                description = stringResource(R.string.stat_desc_active),
                 icon = Icons.Default.PlayArrow,
             )
 
             // Completed tasks (overall)
             StatCard(
-                title = "Completed Tasks",
+                title = stringResource(R.string.stat_completed_tasks),
                 count = uiState.completedCount,
-                description = "All completed tasks",
+                description = stringResource(R.string.stat_desc_completed),
                 icon = Icons.Default.CheckCircle,
             )
 
             // Completed today
             StatCard(
-                title = "Completed Today",
+                title = stringResource(R.string.stat_completed_today),
                 count = uiState.completedTodayCount,
-                description = "Tasks completed today",
+                description = stringResource(R.string.stat_desc_completed_today),
                 icon = Icons.Default.Today,
             )
 
             // Due today
             StatCard(
-                title = "Due Today",
+                title = stringResource(R.string.stat_due_today),
                 count = uiState.dueTodayCount,
-                description = "Active tasks due today",
+                description = stringResource(R.string.stat_desc_due_today),
                 icon = Icons.Default.Schedule,
             )
 
             // Overdue tasks
             StatCard(
-                title = "Overdue",
+                title = stringResource(R.string.stat_overdue),
                 count = uiState.overdueCount,
-                description = "Active tasks past due date",
+                description = stringResource(R.string.stat_desc_overdue),
                 icon = Icons.Default.Error,
             )
 
@@ -138,7 +140,7 @@ fun StatsScreen(viewModel: StatsViewModel, onNavigateBack: () -> Unit, modifier:
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = "Archived tasks are excluded from all statistics",
+                        text = stringResource(R.string.stat_archived_note),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )

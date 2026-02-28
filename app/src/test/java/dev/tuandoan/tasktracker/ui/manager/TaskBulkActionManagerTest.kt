@@ -1,5 +1,7 @@
 package dev.tuandoan.tasktracker.ui.manager
 
+import android.content.Context
+import dev.tuandoan.tasktracker.R
 import dev.tuandoan.tasktracker.domain.TaskManager
 import dev.tuandoan.tasktracker.domain.usecase.TaskCrudUseCase
 import dev.tuandoan.tasktracker.domain.usecase.TaskFormUseCase
@@ -8,6 +10,8 @@ import dev.tuandoan.tasktracker.testutil.FakeTaskRepository
 import dev.tuandoan.tasktracker.testutil.TestTaskFactory
 import dev.tuandoan.tasktracker.ui.state.TaskFormStateManager
 import dev.tuandoan.tasktracker.ui.state.TaskSelectionStateManager
+import io.mockk.every
+import io.mockk.mockk
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
@@ -27,6 +31,7 @@ class TaskBulkActionManagerTest {
 
     private val testDispatcher = StandardTestDispatcher()
 
+    private lateinit var context: Context
     private lateinit var repository: FakeTaskRepository
     private lateinit var scheduler: FakeReminderScheduler
     private lateinit var selectionManager: TaskSelectionStateManager
@@ -37,15 +42,40 @@ class TaskBulkActionManagerTest {
     fun setup() {
         Dispatchers.setMain(testDispatcher)
 
+        context = mockk(relaxed = true)
+        // Mock getString with varargs (resId, Object... formatArgs)
+        // args[0] = resId (Int), args[1] = Object[] (the varargs array)
+        every { context.getString(any<Int>(), *anyVararg()) } answers {
+            val resId = firstArg<Int>()
+            val varargs = secondArg<Array<out Any?>>()
+            val firstFormatArg = varargs.firstOrNull()
+            when (resId) {
+                R.string.snackbar_tasks_marked_completed -> "$firstFormatArg tasks marked as completed"
+                R.string.snackbar_tasks_marked_active -> "$firstFormatArg tasks marked as active"
+                R.string.snackbar_failed_delete_tasks -> "Failed to delete tasks: $firstFormatArg"
+                R.string.snackbar_tasks_archived -> "$firstFormatArg tasks archived"
+                R.string.snackbar_failed_archive_tasks -> "Failed to archive tasks: $firstFormatArg"
+                R.string.snackbar_tasks_restored -> "$firstFormatArg tasks restored from archive"
+                R.string.snackbar_failed_restore_tasks -> "Failed to restore tasks: $firstFormatArg"
+                R.string.snackbar_failed_restore_archive -> "Failed to restore tasks from archive: $firstFormatArg"
+                R.string.snackbar_tasks_permanently_deleted -> "$firstFormatArg tasks permanently deleted"
+                R.string.snackbar_failed_permanent_delete -> "Failed to permanently delete tasks: $firstFormatArg"
+                else -> "unknown string $resId"
+            }
+        }
+        // Mock getString without varargs (single-arg overload)
+        every { context.getString(R.string.snackbar_failed_mark_completed) } returns "Failed to mark tasks as completed"
+        every { context.getString(R.string.snackbar_failed_mark_active) } returns "Failed to mark tasks as active"
+
         repository = FakeTaskRepository()
         scheduler = FakeReminderScheduler()
         val taskManager = TaskManager(repository, scheduler)
-        val crudUseCase = TaskCrudUseCase(taskManager)
-        val formUseCase = TaskFormUseCase()
-        val formStateManager = TaskFormStateManager(formUseCase)
+        val crudUseCase = TaskCrudUseCase(taskManager, context)
+        val formUseCase = TaskFormUseCase(context)
+        val formStateManager = TaskFormStateManager(formUseCase, context)
         selectionManager = TaskSelectionStateManager()
-        crudManager = TaskCrudManager(crudUseCase, formStateManager)
-        bulkManager = TaskBulkActionManager(crudManager, selectionManager)
+        crudManager = TaskCrudManager(crudUseCase, formStateManager, context)
+        bulkManager = TaskBulkActionManager(context, crudManager, selectionManager)
     }
 
     @After

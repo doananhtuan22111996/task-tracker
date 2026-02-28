@@ -1,5 +1,8 @@
 package dev.tuandoan.tasktracker.ui.manager
 
+import android.content.Context
+import dagger.hilt.android.qualifiers.ApplicationContext
+import dev.tuandoan.tasktracker.R
 import dev.tuandoan.tasktracker.data.database.Task
 import dev.tuandoan.tasktracker.domain.usecase.TaskCrudUseCase
 import dev.tuandoan.tasktracker.ui.state.FormValidationResult
@@ -63,6 +66,7 @@ import javax.inject.Inject
 class TaskCrudManager @Inject constructor(
     private val crudUseCase: TaskCrudUseCase,
     private val formStateManager: TaskFormStateManager,
+    @ApplicationContext private val context: Context,
 ) {
 
     /**
@@ -99,9 +103,10 @@ class TaskCrudManager @Inject constructor(
 
                 if (result.isSuccess) {
                     formStateManager.hideAddTaskDialog()
-                    TaskOperationResult.Success("Task created successfully")
+                    TaskOperationResult.Success(context.getString(R.string.op_task_created))
                 } else {
-                    val errorMessage = result.exceptionOrNull()?.message ?: "Failed to create task"
+                    val errorMessage =
+                        result.exceptionOrNull()?.message ?: context.getString(R.string.error_create_task)
                     TaskOperationResult.CrudError(errorMessage)
                 }
             }
@@ -119,7 +124,7 @@ class TaskCrudManager @Inject constructor(
             is FormValidationResult.Success -> {
                 val taskId = validation.formData.selectedTaskId
                 if (taskId == null) {
-                    val error = "No task selected for update"
+                    val error = context.getString(R.string.error_no_task_selected)
                     formStateManager.setError(error)
                     return TaskOperationResult.ValidationError(error)
                 }
@@ -135,9 +140,10 @@ class TaskCrudManager @Inject constructor(
 
                 if (result.isSuccess) {
                     formStateManager.hideAddTaskDialog()
-                    TaskOperationResult.Success("Task updated successfully")
+                    TaskOperationResult.Success(context.getString(R.string.op_task_updated))
                 } else {
-                    val errorMessage = result.exceptionOrNull()?.message ?: "Failed to update task"
+                    val errorMessage =
+                        result.exceptionOrNull()?.message ?: context.getString(R.string.error_update_task)
                     TaskOperationResult.CrudError(errorMessage)
                 }
             }
@@ -164,9 +170,9 @@ class TaskCrudManager @Inject constructor(
         val result = crudUseCase.deleteTask(task)
 
         return if (result.isSuccess) {
-            TaskOperationResult.Success("Task deleted successfully")
+            TaskOperationResult.Success(context.getString(R.string.snackbar_task_deleted))
         } else {
-            val errorMessage = result.exceptionOrNull()?.message ?: "Failed to delete task"
+            val errorMessage = result.exceptionOrNull()?.message ?: context.getString(R.string.error_delete_task)
             TaskOperationResult.CrudError(errorMessage)
         }
     }
@@ -178,10 +184,16 @@ class TaskCrudManager @Inject constructor(
         val result = crudUseCase.toggleTaskCompletion(task)
 
         return if (result.isSuccess) {
-            val status = if (task.isCompleted) "incomplete" else "complete"
-            TaskOperationResult.Success("Task marked as $status")
+            val message = if (task.isCompleted) {
+                context.getString(
+                    R.string.op_task_marked_incomplete,
+                )
+            } else {
+                context.getString(R.string.op_task_marked_complete)
+            }
+            TaskOperationResult.Success(message)
         } else {
-            val errorMessage = result.exceptionOrNull()?.message ?: "Failed to update task status"
+            val errorMessage = result.exceptionOrNull()?.message ?: context.getString(R.string.error_update_task_status)
             TaskOperationResult.CrudError(errorMessage)
         }
     }
@@ -193,9 +205,9 @@ class TaskCrudManager @Inject constructor(
         val result = crudUseCase.restoreTask(task)
 
         return if (result.isSuccess) {
-            TaskOperationResult.Success("Task restored successfully")
+            TaskOperationResult.Success(context.getString(R.string.op_task_restored))
         } else {
-            val errorMessage = result.exceptionOrNull()?.message ?: "Failed to restore task"
+            val errorMessage = result.exceptionOrNull()?.message ?: context.getString(R.string.error_restore_task)
             TaskOperationResult.CrudError(errorMessage)
         }
     }
@@ -208,11 +220,11 @@ class TaskCrudManager @Inject constructor(
     suspend fun bulkMarkCompleted(taskIds: List<Long>): TaskOperationResult = try {
         validateBulkOperationInput(taskIds, "mark as completed")
         crudUseCase.bulkSetCompleted(taskIds, true)
-        TaskOperationResult.Success("${taskIds.size} tasks marked as completed")
+        TaskOperationResult.Success(context.getString(R.string.snackbar_tasks_marked_completed, taskIds.size))
     } catch (e: IllegalArgumentException) {
-        TaskOperationResult.ValidationError(e.message ?: "Invalid input for bulk completion")
+        TaskOperationResult.ValidationError(e.message ?: context.getString(R.string.error_validation_failed))
     } catch (e: Exception) {
-        val errorMessage = e.message ?: "Failed to mark tasks as completed"
+        val errorMessage = e.message ?: context.getString(R.string.snackbar_failed_mark_completed)
         TaskOperationResult.CrudError(errorMessage)
     }
 
@@ -224,11 +236,11 @@ class TaskCrudManager @Inject constructor(
     suspend fun bulkMarkActive(taskIds: List<Long>): TaskOperationResult = try {
         validateBulkOperationInput(taskIds, "mark as active")
         crudUseCase.bulkSetCompleted(taskIds, false)
-        TaskOperationResult.Success("${taskIds.size} tasks marked as active")
+        TaskOperationResult.Success(context.getString(R.string.snackbar_tasks_marked_active, taskIds.size))
     } catch (e: IllegalArgumentException) {
-        TaskOperationResult.ValidationError(e.message ?: "Invalid input for bulk activation")
+        TaskOperationResult.ValidationError(e.message ?: context.getString(R.string.error_validation_failed))
     } catch (e: Exception) {
-        val errorMessage = e.message ?: "Failed to mark tasks as active"
+        val errorMessage = e.message ?: context.getString(R.string.snackbar_failed_mark_active)
         TaskOperationResult.CrudError(errorMessage)
     }
 
@@ -240,11 +252,11 @@ class TaskCrudManager @Inject constructor(
     suspend fun bulkDeleteTasks(taskIds: List<Long>): TaskOperationResult = try {
         validateBulkOperationInput(taskIds, "delete")
         crudUseCase.bulkDeleteTasks(taskIds)
-        TaskOperationResult.Success("${taskIds.size} tasks deleted successfully")
+        TaskOperationResult.Success(context.getString(R.string.snackbar_tasks_deleted, taskIds.size))
     } catch (e: IllegalArgumentException) {
-        TaskOperationResult.ValidationError(e.message ?: "Invalid input for bulk deletion")
+        TaskOperationResult.ValidationError(e.message ?: context.getString(R.string.error_validation_failed))
     } catch (e: Exception) {
-        val errorMessage = e.message ?: "Failed to delete tasks"
+        val errorMessage = e.message ?: context.getString(R.string.error_delete_tasks)
         TaskOperationResult.CrudError(errorMessage)
     }
 
@@ -256,11 +268,11 @@ class TaskCrudManager @Inject constructor(
     suspend fun restoreTasks(tasks: List<Task>): TaskOperationResult = try {
         validateTaskListInput(tasks, "restore")
         crudUseCase.restoreTasks(tasks)
-        TaskOperationResult.Success("${tasks.size} tasks restored successfully")
+        TaskOperationResult.Success(context.getString(R.string.snackbar_tasks_restored, tasks.size))
     } catch (e: IllegalArgumentException) {
-        TaskOperationResult.ValidationError(e.message ?: "Invalid input for task restoration")
+        TaskOperationResult.ValidationError(e.message ?: context.getString(R.string.error_validation_failed))
     } catch (e: Exception) {
-        val errorMessage = e.message ?: "Failed to restore tasks"
+        val errorMessage = e.message ?: context.getString(R.string.error_restore_tasks)
         TaskOperationResult.CrudError(errorMessage)
     }
 
@@ -271,10 +283,16 @@ class TaskCrudManager @Inject constructor(
         val result = crudUseCase.setPinned(task.id, !task.isPinned)
 
         return if (result.isSuccess) {
-            val status = if (task.isPinned) "unpinned" else "pinned"
-            TaskOperationResult.Success("Task $status successfully")
+            val message = if (task.isPinned) {
+                context.getString(
+                    R.string.op_task_unpinned,
+                )
+            } else {
+                context.getString(R.string.op_task_pinned)
+            }
+            TaskOperationResult.Success(message)
         } else {
-            val errorMessage = result.exceptionOrNull()?.message ?: "Failed to update pin status"
+            val errorMessage = result.exceptionOrNull()?.message ?: context.getString(R.string.error_pin_task)
             TaskOperationResult.CrudError(errorMessage)
         }
     }
@@ -286,9 +304,9 @@ class TaskCrudManager @Inject constructor(
         val result = crudUseCase.setPriority(taskId, priority)
 
         return if (result.isSuccess) {
-            TaskOperationResult.Success("Task priority updated successfully")
+            TaskOperationResult.Success(context.getString(R.string.op_task_priority_updated))
         } else {
-            val errorMessage = result.exceptionOrNull()?.message ?: "Failed to update priority"
+            val errorMessage = result.exceptionOrNull()?.message ?: context.getString(R.string.error_update_priority)
             TaskOperationResult.CrudError(errorMessage)
         }
     }
@@ -302,9 +320,9 @@ class TaskCrudManager @Inject constructor(
         val result = crudUseCase.archiveTask(task.id)
 
         return if (result.isSuccess) {
-            TaskOperationResult.Success("Task archived successfully")
+            TaskOperationResult.Success(context.getString(R.string.snackbar_task_archived))
         } else {
-            val errorMessage = result.exceptionOrNull()?.message ?: "Failed to archive task"
+            val errorMessage = result.exceptionOrNull()?.message ?: context.getString(R.string.error_archive_task)
             TaskOperationResult.CrudError(errorMessage)
         }
     }
@@ -316,9 +334,9 @@ class TaskCrudManager @Inject constructor(
         val result = crudUseCase.unarchiveTask(task.id)
 
         return if (result.isSuccess) {
-            TaskOperationResult.Success("Task restored successfully")
+            TaskOperationResult.Success(context.getString(R.string.op_task_restored))
         } else {
-            val errorMessage = result.exceptionOrNull()?.message ?: "Failed to restore task"
+            val errorMessage = result.exceptionOrNull()?.message ?: context.getString(R.string.error_restore_task)
             TaskOperationResult.CrudError(errorMessage)
         }
     }
@@ -331,11 +349,11 @@ class TaskCrudManager @Inject constructor(
     suspend fun bulkArchiveTasks(taskIds: List<Long>): TaskOperationResult = try {
         validateBulkOperationInput(taskIds, "archive")
         crudUseCase.bulkArchiveTasks(taskIds)
-        TaskOperationResult.Success("${taskIds.size} tasks archived successfully")
+        TaskOperationResult.Success(context.getString(R.string.snackbar_tasks_archived, taskIds.size))
     } catch (e: IllegalArgumentException) {
-        TaskOperationResult.ValidationError(e.message ?: "Invalid input for bulk archive")
+        TaskOperationResult.ValidationError(e.message ?: context.getString(R.string.error_validation_failed))
     } catch (e: Exception) {
-        val errorMessage = e.message ?: "Failed to archive tasks"
+        val errorMessage = e.message ?: context.getString(R.string.error_archive_tasks)
         TaskOperationResult.CrudError(errorMessage)
     }
 
@@ -347,11 +365,11 @@ class TaskCrudManager @Inject constructor(
     suspend fun bulkUnarchiveTasks(taskIds: List<Long>): TaskOperationResult = try {
         validateBulkOperationInput(taskIds, "unarchive")
         crudUseCase.bulkUnarchiveTasks(taskIds)
-        TaskOperationResult.Success("${taskIds.size} tasks restored successfully")
+        TaskOperationResult.Success(context.getString(R.string.snackbar_tasks_restored, taskIds.size))
     } catch (e: IllegalArgumentException) {
-        TaskOperationResult.ValidationError(e.message ?: "Invalid input for bulk unarchive")
+        TaskOperationResult.ValidationError(e.message ?: context.getString(R.string.error_validation_failed))
     } catch (e: Exception) {
-        val errorMessage = e.message ?: "Failed to restore tasks"
+        val errorMessage = e.message ?: context.getString(R.string.error_restore_tasks)
         TaskOperationResult.CrudError(errorMessage)
     }
 
@@ -362,9 +380,9 @@ class TaskCrudManager @Inject constructor(
         val result = crudUseCase.hardDeleteTask(task.id)
 
         return if (result.isSuccess) {
-            TaskOperationResult.Success("Task permanently deleted")
+            TaskOperationResult.Success(context.getString(R.string.snackbar_task_permanently_deleted))
         } else {
-            val errorMessage = result.exceptionOrNull()?.message ?: "Failed to permanently delete task"
+            val errorMessage = result.exceptionOrNull()?.message ?: context.getString(R.string.error_hard_delete_task)
             TaskOperationResult.CrudError(errorMessage)
         }
     }
@@ -377,11 +395,11 @@ class TaskCrudManager @Inject constructor(
     suspend fun bulkHardDeleteTasks(taskIds: List<Long>): TaskOperationResult = try {
         validateBulkOperationInput(taskIds, "permanently delete")
         crudUseCase.bulkHardDeleteTasks(taskIds)
-        TaskOperationResult.Success("${taskIds.size} tasks permanently deleted")
+        TaskOperationResult.Success(context.getString(R.string.snackbar_tasks_permanently_deleted, taskIds.size))
     } catch (e: IllegalArgumentException) {
-        TaskOperationResult.ValidationError(e.message ?: "Invalid input for bulk permanent deletion")
+        TaskOperationResult.ValidationError(e.message ?: context.getString(R.string.error_validation_failed))
     } catch (e: Exception) {
-        val errorMessage = e.message ?: "Failed to permanently delete tasks"
+        val errorMessage = e.message ?: context.getString(R.string.error_hard_delete_tasks)
         TaskOperationResult.CrudError(errorMessage)
     }
 

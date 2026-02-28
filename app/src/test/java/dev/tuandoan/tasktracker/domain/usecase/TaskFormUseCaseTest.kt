@@ -1,8 +1,12 @@
 package dev.tuandoan.tasktracker.domain.usecase
 
+import android.content.Context
 import app.cash.turbine.test
+import dev.tuandoan.tasktracker.R
 import dev.tuandoan.tasktracker.domain.model.ReminderOption
 import dev.tuandoan.tasktracker.testutil.TestTaskFactory
+import io.mockk.every
+import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -15,10 +19,24 @@ import org.junit.Test
 class TaskFormUseCaseTest {
 
     private lateinit var useCase: TaskFormUseCase
+    private lateinit var context: Context
 
     @Before
     fun setup() {
-        useCase = TaskFormUseCase()
+        context = mockk(relaxed = true)
+        every { context.getString(R.string.error_title_empty) } returns "Title cannot be empty"
+        every { context.getString(R.string.error_title_too_long, *anyVararg()) } answers {
+            val varargs = secondArg<Array<out Any?>>()
+            "Title must be \u2264 ${varargs.firstOrNull()} characters"
+        }
+        every { context.getString(R.string.error_due_date_future) } returns "Due date must be in the future"
+        every { context.getString(R.string.error_due_date_required) } returns "Due date is required for reminders"
+        every { context.getString(R.string.error_reminder_future) } returns "Reminder time must be in the future"
+        every { context.getString(R.string.error_tag_too_long, *anyVararg()) } answers {
+            val varargs = secondArg<Array<out Any?>>()
+            "Tag must be \u2264 ${varargs.firstOrNull()} characters"
+        }
+        useCase = TaskFormUseCase(context)
     }
 
     // === validateForm ===

@@ -24,8 +24,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import dev.tuandoan.tasktracker.R
 import dev.tuandoan.tasktracker.ui.theme.AppSpacing
 import dev.tuandoan.tasktracker.ui.viewmodel.TaskFilter
 
@@ -54,7 +56,7 @@ fun EmptyTaskList(modifier: Modifier = Modifier) {
             Spacer(modifier = Modifier.height(AppSpacing.large))
 
             Text(
-                text = "No tasks yet",
+                text = stringResource(R.string.empty_no_tasks),
                 style = MaterialTheme.typography.titleLarge,
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f),
                 textAlign = TextAlign.Center,
@@ -63,7 +65,7 @@ fun EmptyTaskList(modifier: Modifier = Modifier) {
             Spacer(modifier = Modifier.height(AppSpacing.small))
 
             Text(
-                text = "Tap the + button to add your first task",
+                text = stringResource(R.string.empty_add_first_task),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
                 textAlign = TextAlign.Center,
@@ -103,7 +105,7 @@ fun EmptySearchResults(
             Spacer(modifier = Modifier.height(AppSpacing.large))
 
             Text(
-                text = "No results found",
+                text = stringResource(R.string.empty_no_results),
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f),
                 textAlign = TextAlign.Center,
@@ -112,10 +114,10 @@ fun EmptySearchResults(
             Spacer(modifier = Modifier.height(AppSpacing.small))
 
             val suggestion = when {
-                hasQuery && filter != TaskFilter.ALL -> "Try clearing the search or changing the filter"
-                hasQuery -> "Try a different search term"
-                filter != TaskFilter.ALL -> "Try changing the filter to see more tasks"
-                else -> "No tasks match your criteria"
+                hasQuery && filter != TaskFilter.ALL -> stringResource(R.string.empty_try_clear_search_filter)
+                hasQuery -> stringResource(R.string.empty_try_different_search)
+                filter != TaskFilter.ALL -> stringResource(R.string.empty_try_change_filter)
+                else -> stringResource(R.string.empty_no_match)
             }
 
             Text(
@@ -145,7 +147,7 @@ fun EmptySearchResults(
                             )
                             Spacer(modifier = Modifier.width(AppSpacing.extraSmall))
                             Text(
-                                text = "Clear search",
+                                text = stringResource(R.string.action_clear_search),
                                 style = MaterialTheme.typography.labelLarge,
                             )
                         }
@@ -165,7 +167,7 @@ fun EmptySearchResults(
                             )
                             Spacer(modifier = Modifier.width(AppSpacing.extraSmall))
                             Text(
-                                text = "Show all",
+                                text = stringResource(R.string.action_show_all),
                                 style = MaterialTheme.typography.labelLarge,
                             )
                         }

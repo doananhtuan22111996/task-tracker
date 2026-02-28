@@ -15,8 +15,10 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import dev.tuandoan.tasktracker.R
 
 /**
  * Permission rationale dialog for notification permission
@@ -29,13 +31,13 @@ fun NotificationPermissionDialog(onConfirm: () -> Unit, onDismiss: () -> Unit, m
         icon = {
             Icon(
                 imageVector = Icons.Default.Notifications,
-                contentDescription = "Notification permission",
+                contentDescription = stringResource(R.string.cd_notification_permission),
                 tint = MaterialTheme.colorScheme.primary,
             )
         },
         title = {
             Text(
-                text = "Enable Notifications",
+                text = stringResource(R.string.notification_enable_title),
                 style = MaterialTheme.typography.headlineSmall,
                 fontWeight = FontWeight.SemiBold,
             )
@@ -43,14 +45,14 @@ fun NotificationPermissionDialog(onConfirm: () -> Unit, onDismiss: () -> Unit, m
         text = {
             Column {
                 Text(
-                    text = "Task Tracker needs notification permission to send you reminders when your tasks are due.",
+                    text = stringResource(R.string.notification_rationale),
                     style = MaterialTheme.typography.bodyMedium,
                 )
 
                 Spacer(modifier = Modifier.height(12.dp))
 
                 Text(
-                    text = "With notifications enabled, you can:",
+                    text = stringResource(R.string.notification_benefits_intro),
                     style = MaterialTheme.typography.bodyMedium,
                     fontWeight = FontWeight.Medium,
                 )
@@ -58,15 +60,15 @@ fun NotificationPermissionDialog(onConfirm: () -> Unit, onDismiss: () -> Unit, m
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Column(modifier = Modifier.padding(start = 16.dp)) {
-                    BulletPoint(text = "Receive reminders 1 minute, 5 minutes, 1 hour, or 1 day before tasks are due")
-                    BulletPoint(text = "Never miss important deadlines")
-                    BulletPoint(text = "Stay organized and productive")
+                    BulletPoint(text = stringResource(R.string.notification_benefit_reminders))
+                    BulletPoint(text = stringResource(R.string.notification_benefit_deadlines))
+                    BulletPoint(text = stringResource(R.string.notification_benefit_organized))
                 }
 
                 Spacer(modifier = Modifier.height(12.dp))
 
                 Text(
-                    text = "You can always change this setting later in your device's notification settings.",
+                    text = stringResource(R.string.notification_change_later),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -74,12 +76,12 @@ fun NotificationPermissionDialog(onConfirm: () -> Unit, onDismiss: () -> Unit, m
         },
         confirmButton = {
             TextButton(onClick = onConfirm) {
-                Text("Enable Notifications")
+                Text(stringResource(R.string.notification_enable_button))
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Not Now")
+                Text(stringResource(R.string.notification_not_now))
             }
         },
         modifier = modifier,
@@ -119,13 +121,13 @@ fun PermissionDeniedDialog(onOpenSettings: () -> Unit, onDismiss: () -> Unit, mo
         icon = {
             Icon(
                 imageVector = Icons.Default.Notifications,
-                contentDescription = "Notification permission denied",
+                contentDescription = stringResource(R.string.cd_notification_denied),
                 tint = MaterialTheme.colorScheme.error,
             )
         },
         title = {
             Text(
-                text = "Notifications Disabled",
+                text = stringResource(R.string.notification_disabled_title),
                 style = MaterialTheme.typography.headlineSmall,
                 fontWeight = FontWeight.SemiBold,
             )
@@ -133,14 +135,14 @@ fun PermissionDeniedDialog(onOpenSettings: () -> Unit, onDismiss: () -> Unit, mo
         text = {
             Column {
                 Text(
-                    text = "To enable task reminders, please allow notifications in your device settings.",
+                    text = stringResource(R.string.notification_denied_message),
                     style = MaterialTheme.typography.bodyMedium,
                 )
 
                 Spacer(modifier = Modifier.height(12.dp))
 
                 Text(
-                    text = "How to enable notifications:",
+                    text = stringResource(R.string.notification_how_to_enable),
                     style = MaterialTheme.typography.bodyMedium,
                     fontWeight = FontWeight.Medium,
                 )
@@ -148,15 +150,15 @@ fun PermissionDeniedDialog(onOpenSettings: () -> Unit, onDismiss: () -> Unit, mo
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Column(modifier = Modifier.padding(start = 16.dp)) {
-                    BulletPoint(text = "Tap 'Open Settings' below")
-                    BulletPoint(text = "Find 'Notifications' or 'App notifications'")
-                    BulletPoint(text = "Toggle notifications ON for Task Tracker")
+                    BulletPoint(text = stringResource(R.string.notification_step_open_settings))
+                    BulletPoint(text = stringResource(R.string.notification_step_find))
+                    BulletPoint(text = stringResource(R.string.notification_step_toggle))
                 }
 
                 Spacer(modifier = Modifier.height(12.dp))
 
                 Text(
-                    text = "Without notifications, reminders will not work.",
+                    text = stringResource(R.string.notification_without_warning),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.error,
                 )
@@ -164,12 +166,12 @@ fun PermissionDeniedDialog(onOpenSettings: () -> Unit, onDismiss: () -> Unit, mo
         },
         confirmButton = {
             TextButton(onClick = onOpenSettings) {
-                Text("Open Settings")
+                Text(stringResource(R.string.notification_open_settings))
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Maybe Later")
+                Text(stringResource(R.string.notification_maybe_later))
             }
         },
         modifier = modifier,

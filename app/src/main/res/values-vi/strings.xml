@@ -1,0 +1,287 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Task Tracker</string>
+
+    <!-- Navigation -->
+    <string name="nav_all">Tất cả</string>
+    <string name="nav_active">Đang thực hiện</string>
+    <string name="nav_completed">Hoàn thành</string>
+
+    <!-- Common Actions -->
+    <string name="action_cancel">Hủy</string>
+    <string name="action_delete">Xóa</string>
+    <string name="action_archive">Lưu trữ</string>
+    <string name="action_save">Lưu</string>
+    <string name="action_undo">HOÀN TÁC</string>
+    <string name="action_ok">OK</string>
+    <string name="action_replace">Thay thế</string>
+    <string name="action_select">Chọn</string>
+    <string name="action_clear_search">Xóa tìm kiếm</string>
+    <string name="action_show_all">Hiện tất cả</string>
+    <string name="action_select_all">Chọn tất cả</string>
+
+    <!-- Content Descriptions -->
+    <string name="cd_navigate_back">Quay lại</string>
+    <string name="cd_back">Quay lại</string>
+    <string name="cd_add_task">Thêm công việc</string>
+    <string name="cd_clear_selection">Bỏ chọn</string>
+    <string name="cd_mark_active">Đánh dấu đang thực hiện</string>
+    <string name="cd_mark_completed">Đánh dấu đã hoàn thành</string>
+    <string name="cd_archive_selected">Lưu trữ các mục đã chọn</string>
+    <string name="cd_more_options">Tùy chọn khác</string>
+    <string name="cd_sort_tasks">Sắp xếp công việc</string>
+    <string name="cd_statistics">Thống kê</string>
+    <string name="cd_view_archived">Xem công việc đã lưu trữ</string>
+    <string name="cd_settings">Cài đặt</string>
+    <string name="cd_search">Tìm kiếm</string>
+    <string name="cd_clear_search">Xóa tìm kiếm</string>
+    <string name="cd_clear_filter">Xóa bộ lọc</string>
+    <string name="cd_restore_selected">Khôi phục các mục đã chọn</string>
+    <string name="cd_permanently_delete_selected">Xóa vĩnh viễn các mục đã chọn</string>
+    <string name="cd_restore_task">Khôi phục công việc</string>
+    <string name="cd_permanently_delete_task">Xóa vĩnh viễn công việc</string>
+    <string name="cd_selected">Đã chọn</string>
+    <string name="cd_loading">Đang tải</string>
+    <string name="cd_export_json">Xuất bản sao lưu dạng JSON</string>
+    <string name="cd_import_json">Nhập bản sao lưu từ JSON</string>
+    <string name="cd_export_csv">Xuất bản sao lưu dạng CSV</string>
+    <string name="cd_notification_permission">Quyền thông báo</string>
+    <string name="cd_notification_denied">Đã từ chối quyền thông báo</string>
+
+    <!-- Task List Item Accessibility -->
+    <string name="pin_task">Ghim công việc</string>
+    <string name="unpin_task">Bỏ ghim công việc</string>
+    <string name="more_options">Tùy chọn khác</string>
+    <string name="mark_complete">Đánh dấu hoàn thành</string>
+    <string name="mark_incomplete">Đánh dấu chưa hoàn thành</string>
+    <string name="select_task">Chọn công việc</string>
+    <string name="task_completed">Công việc đã hoàn thành</string>
+    <string name="task_overdue">Công việc quá hạn</string>
+    <string name="high_priority_task">Công việc ưu tiên cao</string>
+
+    <!-- Top Bar -->
+    <string name="title_task_tracker">Task Tracker</string>
+    <string name="title_archived">Đã lưu trữ</string>
+    <string name="title_selected_count">%d mục đã chọn</string>
+
+    <!-- Task List Screen -->
+    <string name="snackbar_task_deleted">Đã xóa công việc</string>
+    <string name="snackbar_tasks_deleted">Đã xóa %d công việc</string>
+
+    <!-- Archive Dialogs -->
+    <string name="dialog_archive_task_title">Lưu trữ công việc</string>
+    <string name="dialog_archive_task_message">Bạn có chắc muốn lưu trữ &quot;%s&quot; không? Bạn có thể hoàn tác trong vài giây sau khi lưu trữ.</string>
+    <string name="dialog_archive_tasks_title">Lưu trữ các công việc</string>
+    <string name="dialog_archive_tasks_message">Lưu trữ %d công việc đã chọn? Bạn có thể hoàn tác trong một khoảng thời gian ngắn.</string>
+
+    <!-- Delete Dialogs -->
+    <string name="dialog_delete_tasks_title">Xóa các công việc</string>
+    <string name="dialog_delete_tasks_message">Xóa %d công việc đã chọn? Bạn có thể hoàn tác trong một khoảng thời gian ngắn.</string>
+
+    <!-- Archived Screen -->
+    <string name="snackbar_task_permanently_deleted">Đã xóa vĩnh viễn công việc</string>
+    <string name="snackbar_tasks_permanently_deleted">Đã xóa vĩnh viễn %d công việc</string>
+    <string name="dialog_permanent_delete_title">Xóa vĩnh viễn công việc</string>
+    <string name="dialog_permanent_delete_message">Bạn có chắc muốn xóa vĩnh viễn &quot;%s&quot; không? Thao tác này không thể hoàn tác.</string>
+    <string name="dialog_permanent_delete_tasks_title">Xóa vĩnh viễn các công việc</string>
+    <string name="dialog_permanent_delete_tasks_message">Xóa vĩnh viễn %d công việc đã chọn? Thao tác này không thể hoàn tác.</string>
+    <string name="action_delete_permanently">Xóa vĩnh viễn</string>
+
+    <!-- Stats Screen -->
+    <string name="title_stats">Thống kê</string>
+    <string name="stat_active_tasks">Công việc đang thực hiện</string>
+    <string name="stat_completed_tasks">Công việc đã hoàn thành</string>
+    <string name="stat_completed_today">Hoàn thành hôm nay</string>
+    <string name="stat_due_today">Đến hạn hôm nay</string>
+    <string name="stat_overdue">Quá hạn</string>
+    <string name="stat_desc_active">Các công việc chưa hoàn thành</string>
+    <string name="stat_desc_completed">Tất cả công việc đã hoàn thành</string>
+    <string name="stat_desc_completed_today">Các công việc hoàn thành hôm nay</string>
+    <string name="stat_desc_due_today">Các công việc đang thực hiện đến hạn hôm nay</string>
+    <string name="stat_desc_overdue">Các công việc đang thực hiện đã quá hạn</string>
+    <string name="stat_archived_note">Công việc đã lưu trữ sẽ không được tính trong thống kê</string>
+
+    <!-- Settings Screen -->
+    <string name="title_settings">Cài đặt</string>
+    <string name="settings_section_appearance">Giao diện</string>
+    <string name="settings_theme">Chủ đề</string>
+    <string name="settings_theme_light">Sáng</string>
+    <string name="settings_theme_dark">Tối</string>
+    <string name="settings_theme_system">Theo hệ thống</string>
+    <string name="settings_dynamic_color">Màu động</string>
+    <string name="settings_dynamic_color_description">Dùng màu theo hình nền (Android 12+)</string>
+    <string name="settings_dynamic_color_unavailable">Màu động chỉ khả dụng trên Android 12+</string>
+    <string name="settings_section_language">Ngôn ngữ</string>
+    <string name="settings_language">Ngôn ngữ</string>
+    <string name="settings_language_system">Theo hệ thống</string>
+    <string name="settings_section_backup">Sao lưu &amp; Khôi phục</string>
+    <string name="settings_export_backup">Xuất bản sao lưu</string>
+    <string name="settings_export_backup_desc">Lưu tất cả công việc thành tệp JSON</string>
+    <string name="settings_import_backup">Nhập bản sao lưu</string>
+    <string name="settings_import_backup_desc">Khôi phục công việc từ tệp sao lưu JSON</string>
+    <string name="settings_export_csv">Xuất dạng CSV</string>
+    <string name="settings_export_csv_desc">Lưu tất cả công việc thành bảng tính CSV</string>
+
+    <!-- Settings Dialogs -->
+    <string name="dialog_replace_tasks_title">Thay thế toàn bộ công việc?</string>
+    <string name="dialog_replace_tasks_message">Việc nhập bản sao lưu sẽ thay thế tất cả công việc hiện có. Thao tác này không thể hoàn tác. Bạn có chắc muốn tiếp tục không?</string>
+    <string name="dialog_error_title">Lỗi</string>
+
+    <!-- Settings Snackbars -->
+    <string name="snackbar_exported_tasks">Đã xuất %d công việc thành công</string>
+    <string name="snackbar_imported_tasks">Đã nhập %d công việc thành công</string>
+    <string name="snackbar_imported_skipped"> (%d mục bị bỏ qua)</string>
+
+    <!-- Task Editor Screen -->
+    <string name="title_edit_task">Sửa công việc</string>
+    <string name="title_new_task">Công việc mới</string>
+    <string name="label_title">Tiêu đề</string>
+    <string name="label_description">Mô tả</string>
+    <string name="label_tag">Nhãn</string>
+    <string name="label_priority">Mức ưu tiên</string>
+    <string name="label_due_date">Hạn hoàn thành</string>
+    <string name="label_reminder">Nhắc việc</string>
+    <string name="section_organization">Tổ chức</string>
+    <string name="section_due_date_reminder">Hạn hoàn thành &amp; Nhắc việc</string>
+    <string name="label_pin_task">Ghim công việc</string>
+    <string name="label_pin_task_description">Giữ công việc này ở trên cùng</string>
+
+    <!-- Priority -->
+    <string name="priority_low">Thấp</string>
+    <string name="priority_medium">Trung bình</string>
+    <string name="priority_high">Cao</string>
+
+    <!-- Reminder Options -->
+    <string name="reminder_none">Không</string>
+    <string name="reminder_1_minute">Trước 1 phút</string>
+    <string name="reminder_5_minutes">Trước 5 phút</string>
+    <string name="reminder_1_hour">Trước 1 giờ</string>
+    <string name="reminder_1_day">Trước 1 ngày</string>
+
+    <!-- Sort Menu -->
+    <string name="sort_header">Sắp xếp</string>
+    <string name="sort_created_newest">Ngày tạo: Mới nhất trước</string>
+    <string name="sort_created_oldest">Ngày tạo: Cũ nhất trước</string>
+    <string name="sort_title_az">Tiêu đề: A–Z</string>
+    <string name="sort_priority_high_low">Ưu tiên: Cao đến thấp</string>
+    <string name="sort_completed_last">Hoàn thành ở cuối</string>
+
+    <!-- Empty States -->
+    <string name="empty_no_tasks">Chưa có công việc nào</string>
+    <string name="empty_add_first_task">Nhấn nút + để thêm công việc đầu tiên</string>
+    <string name="empty_no_results">Không tìm thấy kết quả</string>
+    <string name="empty_try_clear_search_filter">Hãy thử xóa tìm kiếm hoặc thay đổi bộ lọc</string>
+    <string name="empty_try_different_search">Hãy thử từ khóa khác</string>
+    <string name="empty_try_change_filter">Hãy thử thay đổi bộ lọc để xem thêm công việc</string>
+    <string name="empty_no_match">Không có công việc nào phù hợp với tiêu chí</string>
+    <string name="empty_no_archived">Không có công việc đã lưu trữ</string>
+    <string name="empty_archived_hint">Các công việc bạn lưu trữ sẽ xuất hiện ở đây</string>
+    <string name="empty_no_archived_found">Không tìm thấy công việc đã lưu trữ</string>
+
+    <!-- Search -->
+    <string name="search_placeholder">Tìm kiếm công việc&#8230;</string>
+
+    <!-- Filter -->
+    <string name="filter_clear">Xóa</string>
+
+    <!-- Task Item -->
+    <string name="task_overdue_date">Quá hạn: %s</string>
+    <string name="task_due_date">Đến hạn: %s</string>
+    <string name="task_archived_date">Đã lưu trữ: %s</string>
+    <string name="task_created_date">Ngày tạo: %s</string>
+
+    <!-- Notification Permission Dialog -->
+    <string name="notification_enable_title">Bật thông báo</string>
+    <string name="notification_rationale">Task Tracker cần quyền thông báo để gửi nhắc việc khi công việc đến hạn.</string>
+    <string name="notification_benefits_intro">Khi bật thông báo, bạn có thể:</string>
+    <string name="notification_benefit_reminders">Nhận nhắc việc trước 1 phút, 5 phút, 1 giờ hoặc 1 ngày trước khi đến hạn</string>
+    <string name="notification_benefit_deadlines">Không bỏ lỡ các hạn quan trọng</string>
+    <string name="notification_benefit_organized">Giữ mọi thứ ngăn nắp và làm việc hiệu quả hơn</string>
+    <string name="notification_change_later">Bạn luôn có thể thay đổi sau trong phần cài đặt thông báo của thiết bị.</string>
+    <string name="notification_enable_button">Bật thông báo</string>
+    <string name="notification_not_now">Để sau</string>
+    <string name="notification_disabled_title">Thông báo đang tắt</string>
+    <string name="notification_denied_message">Để bật nhắc việc, vui lòng cho phép thông báo trong cài đặt thiết bị.</string>
+    <string name="notification_how_to_enable">Cách bật thông báo:</string>
+    <string name="notification_step_open_settings">Nhấn \'Mở cài đặt\' bên dưới</string>
+    <string name="notification_step_find">Tìm \'Thông báo\' hoặc \'Thông báo ứng dụng\'</string>
+    <string name="notification_step_toggle">Bật thông báo cho Task Tracker</string>
+    <string name="notification_without_warning">Nếu không có thông báo, nhắc việc sẽ không hoạt động.</string>
+    <string name="notification_open_settings">Mở cài đặt</string>
+    <string name="notification_maybe_later">Có thể để sau</string>
+
+    <!-- Notification Channel -->
+    <string name="notification_channel_name">Nhắc việc công việc</string>
+    <string name="notification_channel_description">Thông báo nhắc việc theo hạn công việc</string>
+    <string name="notification_title">Nhắc việc</string>
+    <string name="notification_due_soon">Sắp đến hạn: %s</string>
+    <string name="notification_default_task">Công việc</string>
+
+    <!-- Date Format Patterns (localizable) -->
+    <string name="date_format_short">dd/MM/yyyy</string>
+    <string name="date_format_due_time">dd/MM/yyyy \'lúc\' HH:mm</string>
+
+    <!-- Date Group Headers -->
+    <string name="date_today">Hôm nay</string>
+    <string name="date_yesterday">Hôm qua</string>
+    <string name="date_tomorrow">Ngày mai</string>
+
+    <!-- Validation Errors -->
+    <string name="error_title_empty">Tiêu đề không được để trống</string>
+    <string name="error_title_too_long">Tiêu đề phải &#8804; %d ký tự</string>
+    <string name="error_due_date_future">Hạn hoàn thành phải ở tương lai</string>
+    <string name="error_due_date_required">Cần có hạn hoàn thành để đặt nhắc việc</string>
+    <string name="error_reminder_future">Thời gian nhắc việc phải ở tương lai</string>
+    <string name="error_tag_too_long">Nhãn phải &#8804; %d ký tự</string>
+    <string name="error_failed_load_task">Không thể tải công việc: %s</string>
+    <string name="error_failed_save_task">Không thể lưu công việc: %s</string>
+
+    <!-- Operation Success Messages (used by managers/use cases) -->
+    <string name="op_task_created">Đã tạo công việc</string>
+    <string name="op_task_updated">Đã cập nhật công việc</string>
+    <string name="op_task_restored">Đã khôi phục công việc</string>
+    <string name="op_task_pinned">Đã ghim công việc</string>
+    <string name="op_task_unpinned">Đã bỏ ghim công việc</string>
+    <string name="op_task_priority_updated">Đã cập nhật mức ưu tiên</string>
+    <string name="op_task_marked_complete">Đã đánh dấu hoàn thành</string>
+    <string name="op_task_marked_incomplete">Đã đánh dấu chưa hoàn thành</string>
+
+    <!-- Operation Error Messages -->
+    <string name="error_create_task">Không thể tạo công việc</string>
+    <string name="error_update_task">Không thể cập nhật công việc</string>
+    <string name="error_schedule_reminder">Không thể lên lịch nhắc việc</string>
+    <string name="error_delete_task">Không thể xóa công việc</string>
+    <string name="error_restore_task">Không thể khôi phục công việc</string>
+    <string name="error_update_tasks">Không thể cập nhật các công việc</string>
+    <string name="error_delete_tasks">Không thể xóa các công việc</string>
+    <string name="error_restore_tasks">Không thể khôi phục các công việc</string>
+    <string name="error_pin_task">Không thể cập nhật trạng thái ghim</string>
+    <string name="error_update_priority">Không thể cập nhật mức ưu tiên</string>
+    <string name="error_archive_task">Không thể lưu trữ công việc</string>
+    <string name="error_archive_tasks">Không thể lưu trữ các công việc</string>
+    <string name="error_hard_delete_task">Không thể xóa vĩnh viễn công việc</string>
+    <string name="error_hard_delete_tasks">Không thể xóa vĩnh viễn các công việc</string>
+    <string name="error_no_task_selected">Chưa chọn công việc nào để cập nhật</string>
+    <string name="error_update_task_status">Không thể cập nhật trạng thái công việc</string>
+    <string name="error_invalid_task_for_update">Công việc được chọn không hợp lệ để cập nhật</string>
+    <string name="error_validation_failed">Xác thực thất bại</string>
+    <string name="error_export_backup">Không thể xuất bản sao lưu: %s</string>
+    <string name="error_import_backup">Không thể nhập bản sao lưu: %s</string>
+
+    <!-- Notification (additional) -->
+    <string name="notification_explanation_enabled">Đã bật thông báo cho nhắc việc</string>
+
+    <!-- Snackbar Messages -->
+    <string name="snackbar_task_archived">Đã lưu trữ công việc</string>
+    <string name="snackbar_tasks_marked_completed">Đã đánh dấu %d công việc là hoàn thành</string>
+    <string name="snackbar_tasks_marked_active">Đã đánh dấu %d công việc là đang thực hiện</string>
+    <string name="snackbar_tasks_archived">Đã lưu trữ %d công việc</string>
+    <string name="snackbar_tasks_restored">Đã khôi phục %d công việc từ lưu trữ</string>
+    <string name="snackbar_failed_mark_completed">Không thể đánh dấu công việc là hoàn thành</string>
+    <string name="snackbar_failed_mark_active">Không thể đánh dấu công việc là đang thực hiện</string>
+    <string name="snackbar_failed_delete_tasks">Không thể xóa các công việc: %s</string>
+    <string name="snackbar_failed_archive_tasks">Không thể lưu trữ các công việc: %s</string>
+    <string name="snackbar_failed_restore_tasks">Không thể khôi phục các công việc: %s</string>
+    <string name="snackbar_failed_restore_archive">Không thể khôi phục công việc từ lưu trữ: %s</string>
+    <string name="snackbar_failed_permanent_delete">Không thể xóa vĩnh viễn các công việc: %s</string>
+</resources>

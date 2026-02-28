@@ -1,6 +1,9 @@
 package dev.tuandoan.tasktracker.domain.backup
 
+import android.content.Context
 import android.net.Uri
+import dagger.hilt.android.qualifiers.ApplicationContext
+import dev.tuandoan.tasktracker.R
 import dev.tuandoan.tasktracker.data.backup.BackupFileProvider
 import dev.tuandoan.tasktracker.data.backup.BackupSerializer
 import dev.tuandoan.tasktracker.data.backup.dto.TaskBackupDto
@@ -20,6 +23,7 @@ class ExportBackupUseCase @Inject constructor(
     @JsonSerializer private val jsonSerializer: BackupSerializer,
     @CsvSerializer private val csvSerializer: BackupSerializer,
     private val fileProvider: BackupFileProvider,
+    @ApplicationContext private val context: Context,
 ) {
 
     /**
@@ -52,7 +56,7 @@ class ExportBackupUseCase @Inject constructor(
         ExportResult.Success(taskCount = tasks.size)
     } catch (e: Exception) {
         ExportResult.Error(
-            message = "Failed to export backup: ${e.message}",
+            message = context.getString(R.string.error_export_backup, e.message ?: ""),
             cause = e,
         )
     }

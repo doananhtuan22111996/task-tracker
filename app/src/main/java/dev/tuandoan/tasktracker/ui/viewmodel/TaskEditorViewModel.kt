@@ -1,9 +1,12 @@
 package dev.tuandoan.tasktracker.ui.viewmodel
 
+import android.content.Context
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
+import dev.tuandoan.tasktracker.R
 import dev.tuandoan.tasktracker.data.database.Task
 import dev.tuandoan.tasktracker.domain.ITaskManager
 import dev.tuandoan.tasktracker.domain.model.ReminderOption
@@ -26,6 +29,7 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class TaskEditorViewModel @Inject constructor(
+    @ApplicationContext private val context: Context,
     private val taskManager: ITaskManager,
     private val taskFormUseCase: TaskFormUseCase,
     savedStateHandle: SavedStateHandle,
@@ -138,16 +142,16 @@ class TaskEditorViewModel @Inject constructor(
     val titleError: Flow<String?> = _taskTitle.map { title ->
         val trimmed = title.trim()
         when {
-            trimmed.isEmpty() && title.isNotEmpty() -> "Title cannot be empty"
+            trimmed.isEmpty() && title.isNotEmpty() -> context.getString(R.string.error_title_empty)
             trimmed.length > TaskFormUseCase.MAX_TITLE_LENGTH ->
-                "Title must be ≤ ${TaskFormUseCase.MAX_TITLE_LENGTH} characters"
+                context.getString(R.string.error_title_too_long, TaskFormUseCase.MAX_TITLE_LENGTH)
             else -> null
         }
     }
 
     val dueDateError: Flow<String?> = _dueAt.map { dueAt ->
         when {
-            dueAt != null && dueAt <= System.currentTimeMillis() -> "Due date must be in the future"
+            dueAt != null && dueAt <= System.currentTimeMillis() -> context.getString(R.string.error_due_date_future)
             else -> null
         }
     }
@@ -155,8 +159,11 @@ class TaskEditorViewModel @Inject constructor(
     val reminderError: Flow<String?> = combine(_dueAt, _reminderOption) { dueAt, reminderOption ->
         when {
             reminderOption == ReminderOption.NONE -> null
-            dueAt == null -> "Due date is required for reminders"
-            !isReminderTimeValid(dueAt, reminderOption.offsetMinutes) -> "Reminder time must be in the future"
+            dueAt == null -> context.getString(R.string.error_due_date_required)
+            !isReminderTimeValid(
+                dueAt,
+                reminderOption.offsetMinutes,
+            ) -> context.getString(R.string.error_reminder_future)
             else -> null
         }
     }
@@ -165,7 +172,7 @@ class TaskEditorViewModel @Inject constructor(
         val trimmed = tag.trim()
         when {
             trimmed.length > TaskFormUseCase.MAX_TAG_LENGTH ->
-                "Tag must be ≤ ${TaskFormUseCase.MAX_TAG_LENGTH} characters"
+                context.getString(R.string.error_tag_too_long, TaskFormUseCase.MAX_TAG_LENGTH)
             else -> null
         }
     }
@@ -199,7 +206,7 @@ class TaskEditorViewModel @Inject constructor(
                     _events.emit(TaskEditorEvent.TaskNotFound)
                 }
             } catch (e: Exception) {
-                _errorMessage.value = "Failed to load task: ${e.message}"
+                _errorMessage.value = context.getString(R.string.error_failed_load_task, e.message ?: "")
             } finally {
                 _isLoading.value = false
             }
@@ -298,7 +305,7 @@ class TaskEditorViewModel @Inject constructor(
 
                 _events.emit(TaskEditorEvent.TaskSaved)
             } catch (e: Exception) {
-                _errorMessage.value = "Failed to save task: ${e.message}"
+                _errorMessage.value = context.getString(R.string.error_failed_save_task, e.message ?: "")
             } finally {
                 _isLoading.value = false
             }
@@ -318,19 +325,19 @@ class TaskEditorViewModel @Inject constructor(
      * Get priority display name
      */
     fun getPriorityName(priority: Int): String = when (priority) {
-        0 -> "Low"
-        1 -> "Medium"
-        2 -> "High"
-        else -> "Medium"
+        0 -> context.getString(R.string.priority_low)
+        1 -> context.getString(R.string.priority_medium)
+        2 -> context.getString(R.string.priority_high)
+        else -> context.getString(R.string.priority_medium)
     }
 
     /**
      * Get all available priorities
      */
     fun getAllPriorities(): List<Pair<Int, String>> = listOf(
-        0 to "Low",
-        1 to "Medium",
-        2 to "High",
+        0 to context.getString(R.string.priority_low),
+        1 to context.getString(R.string.priority_medium),
+        2 to context.getString(R.string.priority_high),
     )
 }
 

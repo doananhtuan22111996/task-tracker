@@ -22,6 +22,9 @@ A modern, offline-first task tracking Android app built with **Kotlin**, **Jetpa
 - 📝 **Production-Ready Validation** - Comprehensive form validation with required title, input trimming, length limits, and disabled save when no changes
 - 💾 **Offline First** - Works completely offline with Room database
 - 🎨 **Material 3 Design** - Modern UI following Material Design guidelines
+- 🌍 **Multi-Language Support** - Per-app language selection with system language follow option. Ships with 8 languages: English, Vietnamese, German, Spanish, French, Hindi, Indonesian, and Portuguese.
+- 🎨 **Theme System** - Light, Dark, and System default theme modes with dynamic color (Material You) on Android 12+
+- ⚙️ **Settings** - Dedicated settings screen for appearance, language, and backup preferences with DataStore persistence
 
 ### Backup & Restore
 - **Export as JSON** - Save all tasks (including archived) to a JSON backup file via the system file picker
@@ -104,6 +107,8 @@ Recent refactoring has separated concerns into focused, maintainable components:
 - **Room Database** - Local SQLite database with compile-time verification
 - **WorkManager** - Background task scheduling for reminder notifications
 - **Hilt** - Dependency injection for Android
+- **DataStore** - Persistent key-value preferences for theme, language, and settings
+- **AppCompat** - Per-app language support with backward compatibility (API 26+)
 
 ### Data & Persistence
 - **Room** - Offline-first local database
@@ -133,8 +138,13 @@ app/src/main/java/dev/tuandoan/tasktracker/
 │   │   ├── CsvBackupSerializer.kt       # CSV implementation (RFC 4180)
 │   │   ├── BackupFileProvider.kt        # File I/O interface
 │   │   └── AndroidBackupFileProvider.kt # ContentResolver implementation
-│   └── scheduler/
-│       └── WorkManagerTaskReminderScheduler.kt # WorkManager reminder implementation
+│   ├── scheduler/
+│   │   └── WorkManagerTaskReminderScheduler.kt # WorkManager reminder implementation
+│   └── preferences/
+│       ├── SettingsRepository.kt        # DataStore-backed settings persistence
+│       └── UserPreferences.kt           # Data class for theme, language, dynamic color prefs
+├── di/
+│   └── PreferencesModule.kt             # Hilt module for DataStore and settings DI
 ├── domain/
 │   ├── backup/
 │   │   ├── model/
@@ -185,8 +195,91 @@ app/src/main/java/dev/tuandoan/tasktracker/
 ├── work/
 │   └── TaskReminderWorker.kt     # WorkManager worker for notifications
 ├── TaskTrackerApplication.kt     # Application class with notification setup
-└── MainActivity.kt                # App entry point
+└── MainActivity.kt                # App entry point (AppCompatActivity for locale support)
+
+app/src/main/res/
+├── values/
+│   └── strings.xml                # Default (English) string resources
+├── values-de/
+│   └── strings.xml                # German (Deutsch) translations
+├── values-es/
+│   └── strings.xml                # Spanish (Español) translations
+├── values-fr/
+│   └── strings.xml                # French (Français) translations
+├── values-hi/
+│   └── strings.xml                # Hindi (हिन्दी) translations
+├── values-in/
+│   └── strings.xml                # Indonesian (Bahasa Indonesia) translations
+├── values-pt/
+│   └── strings.xml                # Portuguese (Português) translations
+├── values-vi/
+│   └── strings.xml                # Vietnamese (Tiếng Việt) translations
+└── xml/
+    └── locales_config.xml         # Registered locales for per-app language (Android 13+)
 ```
+
+## 🌍 Internationalization (i18n)
+
+### Supported Languages
+- **English** (default)
+- **German** (Deutsch)
+- **Spanish** (Español)
+- **French** (Français)
+- **Hindi** (हिन्दी)
+- **Indonesian** (Bahasa Indonesia)
+- **Portuguese** (Português)
+- **Vietnamese** (Tiếng Việt)
+
+### Per-App Language Selection
+The app supports per-app language selection on all supported Android versions:
+- **Android 13+ (API 33+)**: Native per-app language via `LocaleManager` and system App Languages settings
+- **Android 7-12 (API 26-32)**: In-app language override via `AppCompatDelegate.setApplicationLocales()`
+
+Users can change the language in **Settings → Language** without affecting other apps.
+
+### Adding a New Language
+
+To add support for a new locale (e.g., Japanese `ja`):
+
+1. **Create the resource directory:**
+   ```bash
+   mkdir -p app/src/main/res/values-ja
+   ```
+
+2. **Copy and translate `strings.xml`:**
+   ```bash
+   cp app/src/main/res/values/strings.xml app/src/main/res/values-ja/strings.xml
+   ```
+   Translate all `<string>` values in the new file. Keep the `name` attributes unchanged.
+
+3. **Register the locale** in `app/src/main/res/xml/locales_config.xml`:
+   ```xml
+   <locale-config xmlns:android="http://schemas.android.com/apk/res/android">
+       <locale android:name="en" />
+       <locale android:name="vi" />
+       <locale android:name="ja" />  <!-- Add this line -->
+   </locale-config>
+   ```
+
+4. **Build and test:**
+   ```bash
+   ./gradlew assembleDebug
+   ```
+   The new language will automatically appear in the Settings → Language picker.
+
+### Testing Translations
+- Change language in **Settings → Language** and verify all screens
+- Test with the system language set to the target locale
+- Verify date formats, number formats, and text direction
+- Check that no English strings appear when using the translated locale
+- Test on both API 26 (backward compat) and API 33+ (native)
+
+### String Resource Guidelines
+- All user-facing strings are in `app/src/main/res/values/strings.xml`
+- Zero hardcoded user-facing strings in Kotlin code
+- Use `stringResource(R.string.xxx)` in Compose UI
+- Use `context.getString(R.string.xxx)` in non-Compose code
+- Parameterized strings use `%s` (string), `%d` (integer) format specifiers
 
 ## 🚀 Getting Started
 
@@ -194,7 +287,7 @@ app/src/main/java/dev/tuandoan/tasktracker/
 - **Android Studio Hedgehog** (2023.1.1) or later
 - **JDK 17** or later
 - **Android SDK 34** (compileSdk)
-- **Minimum SDK 24** (Android 7.0)
+- **Minimum SDK 26** (Android 8.0)
 
 ### Installation
 
@@ -380,6 +473,22 @@ Add this step to your GitHub Actions workflow:
 - **Key-based LazyColumn** - Optimized list rendering with proper item keys
 
 ## 📚 Recent Updates
+
+### v3.2 - Localization Expansion (8 Languages)
+- 🌍 **6 New Languages** - Added German (Deutsch), Spanish (Español), French (Français), Hindi (हिन्दी), Indonesian (Bahasa Indonesia), and Portuguese (Português) translations
+- 🔧 **XML Escaping Fixes** - Corrected apostrophe and special character escaping across all translation files for crash-free string rendering
+- 📋 **Locale Registry Update** - Updated `locales_config.xml` to register all 8 supported locales for Android 13+ native language picker
+- ⚙️ **Settings Integration** - Language picker in Settings now lists all 8 languages with native display names and scrollable dialog
+
+### v3.1 - Global Language Support & Theme Polish
+- 🌍 **Per-App Language Selection** - Choose app language independently from system (English, Vietnamese), with backward compatibility for Android 7-12
+- 🎨 **Theme System** - Light/Dark/System mode with DataStore persistence
+- ✨ **Dynamic Color (Material You)** - Wallpaper-based color theming on Android 12+ with toggle and fallback
+- 🌐 **Full Internationalization** - All user-facing strings extracted to resources with Vietnamese translations
+- ⚙️ **Enhanced Settings Screen** - New Appearance (theme, dynamic color) and Language sections
+- 📱 **Android 13+ Native Language** - Integrated with system App Languages setting via `locales_config.xml`
+- 🔧 **DataStore Preferences** - Theme, dynamic color, and language preferences saved persistently
+- 🏗️ **AppCompat Migration** - MainActivity migrated to AppCompatActivity for per-app locale support
 
 ### v3.0 - Dedicated Task Editor Screen (Small Device Optimization)
 - 📱 **Full-Screen Task Editor** - Replaced modal dialog with dedicated screen optimized for small devices with better usability

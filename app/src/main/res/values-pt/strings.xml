@@ -1,0 +1,287 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Task Tracker</string>
+
+    <!-- Navigation -->
+    <string name="nav_all">Todas</string>
+    <string name="nav_active">Ativas</string>
+    <string name="nav_completed">Concluídas</string>
+
+    <!-- Common Actions -->
+    <string name="action_cancel">Cancelar</string>
+    <string name="action_delete">Eliminar</string>
+    <string name="action_archive">Arquivar</string>
+    <string name="action_save">Guardar</string>
+    <string name="action_undo">DESFAZER</string>
+    <string name="action_ok">OK</string>
+    <string name="action_replace">Substituir</string>
+    <string name="action_select">Selecionar</string>
+    <string name="action_clear_search">Limpar pesquisa</string>
+    <string name="action_show_all">Mostrar tudo</string>
+    <string name="action_select_all">Selecionar tudo</string>
+
+    <!-- Content Descriptions -->
+    <string name="cd_navigate_back">Voltar</string>
+    <string name="cd_back">Voltar</string>
+    <string name="cd_add_task">Adicionar tarefa</string>
+    <string name="cd_clear_selection">Limpar seleção</string>
+    <string name="cd_mark_active">Marcar como ativa</string>
+    <string name="cd_mark_completed">Marcar como concluída</string>
+    <string name="cd_archive_selected">Arquivar selecionadas</string>
+    <string name="cd_more_options">Mais opções</string>
+    <string name="cd_sort_tasks">Ordenar tarefas</string>
+    <string name="cd_statistics">Estatísticas</string>
+    <string name="cd_view_archived">Ver tarefas arquivadas</string>
+    <string name="cd_settings">Definições</string>
+    <string name="cd_search">Pesquisar</string>
+    <string name="cd_clear_search">Limpar pesquisa</string>
+    <string name="cd_clear_filter">Limpar filtro</string>
+    <string name="cd_restore_selected">Restaurar selecionadas</string>
+    <string name="cd_permanently_delete_selected">Eliminar permanentemente selecionadas</string>
+    <string name="cd_restore_task">Restaurar tarefa</string>
+    <string name="cd_permanently_delete_task">Eliminar tarefa permanentemente</string>
+    <string name="cd_selected">Selecionada</string>
+    <string name="cd_loading">A carregar</string>
+    <string name="cd_export_json">Exportar cópia de segurança em JSON</string>
+    <string name="cd_import_json">Importar cópia de segurança de JSON</string>
+    <string name="cd_export_csv">Exportar cópia de segurança em CSV</string>
+    <string name="cd_notification_permission">Permissão de notificações</string>
+    <string name="cd_notification_denied">Permissão de notificações negada</string>
+
+    <!-- Task List Item Accessibility -->
+    <string name="pin_task">Fixar tarefa</string>
+    <string name="unpin_task">Desafixar tarefa</string>
+    <string name="more_options">Mais opções</string>
+    <string name="mark_complete">Marcar como concluída</string>
+    <string name="mark_incomplete">Marcar como não concluída</string>
+    <string name="select_task">Selecionar tarefa</string>
+    <string name="task_completed">Tarefa concluída</string>
+    <string name="task_overdue">A tarefa está em atraso</string>
+    <string name="high_priority_task">Tarefa de alta prioridade</string>
+
+    <!-- Top Bar -->
+    <string name="title_task_tracker">Task Tracker</string>
+    <string name="title_archived">Arquivadas</string>
+    <string name="title_selected_count">%d selecionadas</string>
+
+    <!-- Task List Screen -->
+    <string name="snackbar_task_deleted">Tarefa eliminada</string>
+    <string name="snackbar_tasks_deleted">%d tarefas eliminadas</string>
+
+    <!-- Archive Dialogs -->
+    <string name="dialog_archive_task_title">Arquivar tarefa</string>
+    <string name="dialog_archive_task_message">Tem a certeza de que deseja arquivar &quot;%s&quot;? Esta ação pode ser desfeita durante alguns segundos após o arquivamento.</string>
+    <string name="dialog_archive_tasks_title">Arquivar tarefas</string>
+    <string name="dialog_archive_tasks_message">Arquivar %d tarefas selecionadas? Esta ação pode ser desfeita por um curto período.</string>
+
+    <!-- Delete Dialogs -->
+    <string name="dialog_delete_tasks_title">Eliminar tarefas</string>
+    <string name="dialog_delete_tasks_message">Eliminar %d tarefas selecionadas? Esta ação pode ser desfeita por um curto período.</string>
+
+    <!-- Archived Screen -->
+    <string name="snackbar_task_permanently_deleted">Tarefa eliminada permanentemente</string>
+    <string name="snackbar_tasks_permanently_deleted">%d tarefas eliminadas permanentemente</string>
+    <string name="dialog_permanent_delete_title">Eliminar tarefa permanentemente</string>
+    <string name="dialog_permanent_delete_message">Tem a certeza de que deseja eliminar permanentemente &quot;%s&quot;? Esta ação não pode ser desfeita.</string>
+    <string name="dialog_permanent_delete_tasks_title">Eliminar tarefas permanentemente</string>
+    <string name="dialog_permanent_delete_tasks_message">Eliminar permanentemente %d tarefas selecionadas? Esta ação não pode ser desfeita.</string>
+    <string name="action_delete_permanently">Eliminar permanentemente</string>
+
+    <!-- Stats Screen -->
+    <string name="title_stats">Estatísticas</string>
+    <string name="stat_active_tasks">Tarefas ativas</string>
+    <string name="stat_completed_tasks">Tarefas concluídas</string>
+    <string name="stat_completed_today">Concluídas hoje</string>
+    <string name="stat_due_today">Prazo hoje</string>
+    <string name="stat_overdue">Em atraso</string>
+    <string name="stat_desc_active">Tarefas ainda não concluídas</string>
+    <string name="stat_desc_completed">Todas as tarefas concluídas</string>
+    <string name="stat_desc_completed_today">Tarefas concluídas hoje</string>
+    <string name="stat_desc_due_today">Tarefas ativas com prazo hoje</string>
+    <string name="stat_desc_overdue">Tarefas ativas com prazo ultrapassado</string>
+    <string name="stat_archived_note">As tarefas arquivadas são excluídas de todas as estatísticas</string>
+
+    <!-- Settings Screen -->
+    <string name="title_settings">Definições</string>
+    <string name="settings_section_appearance">Aparência</string>
+    <string name="settings_theme">Tema</string>
+    <string name="settings_theme_light">Claro</string>
+    <string name="settings_theme_dark">Escuro</string>
+    <string name="settings_theme_system">Predefinição do sistema</string>
+    <string name="settings_dynamic_color">Cores dinâmicas</string>
+    <string name="settings_dynamic_color_description">Usar cores do papel de parede (Android 12+)</string>
+    <string name="settings_dynamic_color_unavailable">As cores dinâmicas só estão disponíveis no Android 12+</string>
+    <string name="settings_section_language">Idioma</string>
+    <string name="settings_language">Idioma</string>
+    <string name="settings_language_system">Seguir o sistema</string>
+    <string name="settings_section_backup">Cópia de segurança &amp; Restauro</string>
+    <string name="settings_export_backup">Exportar cópia de segurança</string>
+    <string name="settings_export_backup_desc">Guardar todas as tarefas num ficheiro JSON</string>
+    <string name="settings_import_backup">Importar cópia de segurança</string>
+    <string name="settings_import_backup_desc">Restaurar tarefas a partir de um ficheiro de cópia de segurança JSON</string>
+    <string name="settings_export_csv">Exportar como CSV</string>
+    <string name="settings_export_csv_desc">Guardar todas as tarefas numa folha de cálculo CSV</string>
+
+    <!-- Settings Dialogs -->
+    <string name="dialog_replace_tasks_title">Substituir todas as tarefas?</string>
+    <string name="dialog_replace_tasks_message">Importar uma cópia de segurança irá substituir todas as tarefas existentes. Esta ação não pode ser desfeita. Tem a certeza de que deseja continuar?</string>
+    <string name="dialog_error_title">Erro</string>
+
+    <!-- Settings Snackbars -->
+    <string name="snackbar_exported_tasks">Exportadas %d tarefas com sucesso</string>
+    <string name="snackbar_imported_tasks">Importadas %d tarefas com sucesso</string>
+    <string name="snackbar_imported_skipped"> (%d ignoradas)</string>
+
+    <!-- Task Editor Screen -->
+    <string name="title_edit_task">Editar tarefa</string>
+    <string name="title_new_task">Nova tarefa</string>
+    <string name="label_title">Título</string>
+    <string name="label_description">Descrição</string>
+    <string name="label_tag">Etiqueta</string>
+    <string name="label_priority">Prioridade</string>
+    <string name="label_due_date">Data limite</string>
+    <string name="label_reminder">Lembrete</string>
+    <string name="section_organization">Organização</string>
+    <string name="section_due_date_reminder">Data limite &amp; Lembrete</string>
+    <string name="label_pin_task">Fixar tarefa</string>
+    <string name="label_pin_task_description">Manter esta tarefa no topo</string>
+
+    <!-- Priority -->
+    <string name="priority_low">Baixa</string>
+    <string name="priority_medium">Média</string>
+    <string name="priority_high">Alta</string>
+
+    <!-- Reminder Options -->
+    <string name="reminder_none">Nenhum</string>
+    <string name="reminder_1_minute">1 minuto antes</string>
+    <string name="reminder_5_minutes">5 minutos antes</string>
+    <string name="reminder_1_hour">1 hora antes</string>
+    <string name="reminder_1_day">1 dia antes</string>
+
+    <!-- Sort Menu -->
+    <string name="sort_header">Ordenar</string>
+    <string name="sort_created_newest">Criada: mais recentes primeiro</string>
+    <string name="sort_created_oldest">Criada: mais antigas primeiro</string>
+    <string name="sort_title_az">Título: A–Z</string>
+    <string name="sort_priority_high_low">Prioridade: alta para baixa</string>
+    <string name="sort_completed_last">Concluídas no fim</string>
+
+    <!-- Empty States -->
+    <string name="empty_no_tasks">Ainda não há tarefas</string>
+    <string name="empty_add_first_task">Toque no botão + para adicionar a sua primeira tarefa</string>
+    <string name="empty_no_results">Nenhum resultado encontrado</string>
+    <string name="empty_try_clear_search_filter">Tente limpar a pesquisa ou alterar o filtro</string>
+    <string name="empty_try_different_search">Tente um termo de pesquisa diferente</string>
+    <string name="empty_try_change_filter">Tente alterar o filtro para ver mais tarefas</string>
+    <string name="empty_no_match">Nenhuma tarefa corresponde aos seus critérios</string>
+    <string name="empty_no_archived">Sem tarefas arquivadas</string>
+    <string name="empty_archived_hint">As tarefas que arquivar aparecerão aqui</string>
+    <string name="empty_no_archived_found">Não foram encontradas tarefas arquivadas</string>
+
+    <!-- Search -->
+    <string name="search_placeholder">Pesquisar tarefas&#8230;</string>
+
+    <!-- Filter -->
+    <string name="filter_clear">Limpar</string>
+
+    <!-- Task Item -->
+    <string name="task_overdue_date">Em atraso: %s</string>
+    <string name="task_due_date">Prazo: %s</string>
+    <string name="task_archived_date">Arquivada: %s</string>
+    <string name="task_created_date">Criada: %s</string>
+
+    <!-- Notification Permission Dialog -->
+    <string name="notification_enable_title">Ativar notificações</string>
+    <string name="notification_rationale">O Task Tracker precisa da permissão de notificações para lhe enviar lembretes quando as suas tarefas tiverem prazo.</string>
+    <string name="notification_benefits_intro">Com as notificações ativadas, pode:</string>
+    <string name="notification_benefit_reminders">Receber lembretes 1 minuto, 5 minutos, 1 hora ou 1 dia antes do prazo das tarefas</string>
+    <string name="notification_benefit_deadlines">Nunca perder prazos importantes</string>
+    <string name="notification_benefit_organized">Manter-se organizado e produtivo</string>
+    <string name="notification_change_later">Pode sempre alterar esta definição mais tarde nas definições de notificações do seu dispositivo.</string>
+    <string name="notification_enable_button">Ativar notificações</string>
+    <string name="notification_not_now">Agora não</string>
+    <string name="notification_disabled_title">Notificações desativadas</string>
+    <string name="notification_denied_message">Para ativar lembretes de tarefas, permita as notificações nas definições do seu dispositivo.</string>
+    <string name="notification_how_to_enable">Como ativar notificações:</string>
+    <string name="notification_step_open_settings">Toque em \'Abrir definições\' abaixo</string>
+    <string name="notification_step_find">Procure \'Notificações\' ou \'Notificações de aplicações\'</string>
+    <string name="notification_step_toggle">Ative as notificações para o Task Tracker</string>
+    <string name="notification_without_warning">Sem notificações, os lembretes não irão funcionar.</string>
+    <string name="notification_open_settings">Abrir definições</string>
+    <string name="notification_maybe_later">Talvez mais tarde</string>
+
+    <!-- Notification Channel -->
+    <string name="notification_channel_name">Lembretes de tarefas</string>
+    <string name="notification_channel_description">Notificações para lembretes de prazo das tarefas</string>
+    <string name="notification_title">Lembrete de tarefa</string>
+    <string name="notification_due_soon">Prazo em breve: %s</string>
+    <string name="notification_default_task">Tarefa</string>
+
+    <!-- Date Format Patterns (localizable) -->
+    <string name="date_format_short">dd/MM/yyyy</string>
+    <string name="date_format_due_time">dd/MM/yyyy \'às\' HH:mm</string>
+
+    <!-- Date Group Headers -->
+    <string name="date_today">Hoje</string>
+    <string name="date_yesterday">Ontem</string>
+    <string name="date_tomorrow">Amanhã</string>
+
+    <!-- Validation Errors -->
+    <string name="error_title_empty">O título não pode estar vazio</string>
+    <string name="error_title_too_long">O título deve ter &#8804; %d caracteres</string>
+    <string name="error_due_date_future">A data limite deve ser no futuro</string>
+    <string name="error_due_date_required">A data limite é obrigatória para lembretes</string>
+    <string name="error_reminder_future">A hora do lembrete deve ser no futuro</string>
+    <string name="error_tag_too_long">A etiqueta deve ter &#8804; %d caracteres</string>
+    <string name="error_failed_load_task">Falha ao carregar a tarefa: %s</string>
+    <string name="error_failed_save_task">Falha ao guardar a tarefa: %s</string>
+
+    <!-- Operation Success Messages (used by managers/use cases) -->
+    <string name="op_task_created">Tarefa criada</string>
+    <string name="op_task_updated">Tarefa atualizada</string>
+    <string name="op_task_restored">Tarefa restaurada</string>
+    <string name="op_task_pinned">Tarefa fixada</string>
+    <string name="op_task_unpinned">Tarefa desafixada</string>
+    <string name="op_task_priority_updated">Prioridade da tarefa atualizada</string>
+    <string name="op_task_marked_complete">Tarefa marcada como concluída</string>
+    <string name="op_task_marked_incomplete">Tarefa marcada como não concluída</string>
+
+    <!-- Operation Error Messages -->
+    <string name="error_create_task">Falha ao criar a tarefa</string>
+    <string name="error_update_task">Falha ao atualizar a tarefa</string>
+    <string name="error_schedule_reminder">Falha ao agendar o lembrete</string>
+    <string name="error_delete_task">Falha ao eliminar a tarefa</string>
+    <string name="error_restore_task">Falha ao restaurar a tarefa</string>
+    <string name="error_update_tasks">Falha ao atualizar tarefas</string>
+    <string name="error_delete_tasks">Falha ao eliminar tarefas</string>
+    <string name="error_restore_tasks">Falha ao restaurar tarefas</string>
+    <string name="error_pin_task">Falha ao atualizar o estado de fixação</string>
+    <string name="error_update_priority">Falha ao atualizar a prioridade</string>
+    <string name="error_archive_task">Falha ao arquivar a tarefa</string>
+    <string name="error_archive_tasks">Falha ao arquivar tarefas</string>
+    <string name="error_hard_delete_task">Falha ao eliminar a tarefa permanentemente</string>
+    <string name="error_hard_delete_tasks">Falha ao eliminar tarefas permanentemente</string>
+    <string name="error_no_task_selected">Nenhuma tarefa selecionada para atualização</string>
+    <string name="error_update_task_status">Falha ao atualizar o estado da tarefa</string>
+    <string name="error_invalid_task_for_update">Tarefa selecionada inválida para atualização</string>
+    <string name="error_validation_failed">Validação falhou</string>
+    <string name="error_export_backup">Falha ao exportar a cópia de segurança: %s</string>
+    <string name="error_import_backup">Falha ao importar a cópia de segurança: %s</string>
+
+    <!-- Notification (additional) -->
+    <string name="notification_explanation_enabled">As notificações estão ativadas para lembretes de tarefas</string>
+
+    <!-- Snackbar Messages -->
+    <string name="snackbar_task_archived">Tarefa arquivada</string>
+    <string name="snackbar_tasks_marked_completed">%d tarefas marcadas como concluídas</string>
+    <string name="snackbar_tasks_marked_active">%d tarefas marcadas como ativas</string>
+    <string name="snackbar_tasks_archived">%d tarefas arquivadas</string>
+    <string name="snackbar_tasks_restored">%d tarefas restauradas do arquivo</string>
+    <string name="snackbar_failed_mark_completed">Falha ao marcar tarefas como concluídas</string>
+    <string name="snackbar_failed_mark_active">Falha ao marcar tarefas como ativas</string>
+    <string name="snackbar_failed_delete_tasks">Falha ao eliminar tarefas: %s</string>
+    <string name="snackbar_failed_archive_tasks">Falha ao arquivar tarefas: %s</string>
+    <string name="snackbar_failed_restore_tasks">Falha ao restaurar tarefas: %s</string>
+    <string name="snackbar_failed_restore_archive">Falha ao restaurar tarefas do arquivo: %s</string>
+    <string name="snackbar_failed_permanent_delete">Falha ao eliminar tarefas permanentemente: %s</string>
+</resources>

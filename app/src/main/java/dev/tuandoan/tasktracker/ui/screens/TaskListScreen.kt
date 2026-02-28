@@ -30,9 +30,12 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import dev.tuandoan.tasktracker.R
 import dev.tuandoan.tasktracker.navigation.TaskTrackerRoutes
 import dev.tuandoan.tasktracker.ui.components.TaskListContent
 import dev.tuandoan.tasktracker.ui.components.TaskListTopBar
@@ -73,6 +76,7 @@ fun TaskListScreen(
 
     // Snackbar host state
     val snackbarHostState = remember { SnackbarHostState() }
+    val context = LocalContext.current
 
     // Handle UI events
     LaunchedEffect(viewModel) {
@@ -81,14 +85,14 @@ fun TaskListScreen(
                 is UiEvent.ShowUndoDelete -> {
                     val taskCount = event.tasks.size
                     val message = event.message ?: if (taskCount == 1) {
-                        "Task deleted"
+                        context.getString(R.string.snackbar_task_deleted)
                     } else {
-                        "$taskCount tasks deleted"
+                        context.getString(R.string.snackbar_tasks_deleted, taskCount)
                     }
 
                     val result = snackbarHostState.showSnackbar(
                         message = message,
-                        actionLabel = "UNDO",
+                        actionLabel = context.getString(R.string.action_undo),
                         duration = SnackbarDuration.Short,
                     )
                     if (result == SnackbarResult.ActionPerformed) {
@@ -146,7 +150,7 @@ fun TaskListScreen(
             ) {
                 Icon(
                     imageVector = Icons.Default.Add,
-                    contentDescription = "Add Task",
+                    contentDescription = stringResource(R.string.cd_add_task),
                     tint = MaterialTheme.colorScheme.onPrimary,
                 )
             }
@@ -160,10 +164,11 @@ fun TaskListScreen(
                     containerColor = MaterialTheme.colorScheme.surfaceContainer,
                 ) {
                     val navigationItems = listOf(
-                        TaskFilter.ALL to "All" to Pair(Icons.Outlined.List, Icons.Filled.List),
-                        TaskFilter.ACTIVE to "Active" to
+                        TaskFilter.ALL to stringResource(R.string.nav_all) to
+                            Pair(Icons.Outlined.List, Icons.Filled.List),
+                        TaskFilter.ACTIVE to stringResource(R.string.nav_active) to
                             Pair(Icons.Outlined.RadioButtonUnchecked, Icons.Filled.RadioButtonUnchecked),
-                        TaskFilter.COMPLETED to "Completed" to
+                        TaskFilter.COMPLETED to stringResource(R.string.nav_completed) to
                             Pair(Icons.Outlined.CheckCircle, Icons.Filled.CheckCircle),
                     )
 
@@ -221,24 +226,24 @@ fun TaskListScreen(
     pendingDeleteTask?.let { task ->
         AlertDialog(
             onDismissRequest = { viewModel.cancelDeleteTask() },
-            title = { Text("Archive Task") },
+            title = { Text(stringResource(R.string.dialog_archive_task_title)) },
             text = {
                 Text(
-                    "Are you sure you want to archive \"${task.title}\"? This action can be undone for a few seconds after archiving.",
+                    stringResource(R.string.dialog_archive_task_message, task.title),
                 )
             },
             confirmButton = {
                 TextButton(
                     onClick = { viewModel.confirmArchiveTask() },
                 ) {
-                    Text("Archive")
+                    Text(stringResource(R.string.action_archive))
                 }
             },
             dismissButton = {
                 TextButton(
                     onClick = { viewModel.cancelDeleteTask() },
                 ) {
-                    Text("Cancel")
+                    Text(stringResource(R.string.action_cancel))
                 }
             },
         )
@@ -249,22 +254,22 @@ fun TaskListScreen(
         val taskCount = pendingBulkDeleteTasks.size
         AlertDialog(
             onDismissRequest = { viewModel.cancelBulkDelete() },
-            title = { Text("Delete Tasks") },
+            title = { Text(stringResource(R.string.dialog_delete_tasks_title)) },
             text = {
-                Text("Delete $taskCount selected tasks? This action can be undone for a short time.")
+                Text(stringResource(R.string.dialog_delete_tasks_message, taskCount))
             },
             confirmButton = {
                 TextButton(
                     onClick = { viewModel.confirmBulkDelete() },
                 ) {
-                    Text("Delete")
+                    Text(stringResource(R.string.action_delete))
                 }
             },
             dismissButton = {
                 TextButton(
                     onClick = { viewModel.cancelBulkDelete() },
                 ) {
-                    Text("Cancel")
+                    Text(stringResource(R.string.action_cancel))
                 }
             },
         )
@@ -275,22 +280,22 @@ fun TaskListScreen(
         val taskCount = pendingBulkArchiveTasks.size
         AlertDialog(
             onDismissRequest = { viewModel.cancelBulkArchive() },
-            title = { Text("Archive Tasks") },
+            title = { Text(stringResource(R.string.dialog_archive_tasks_title)) },
             text = {
-                Text("Archive $taskCount selected tasks? This action can be undone for a short time.")
+                Text(stringResource(R.string.dialog_archive_tasks_message, taskCount))
             },
             confirmButton = {
                 TextButton(
                     onClick = { viewModel.confirmBulkArchive() },
                 ) {
-                    Text("Archive")
+                    Text(stringResource(R.string.action_archive))
                 }
             },
             dismissButton = {
                 TextButton(
                     onClick = { viewModel.cancelBulkArchive() },
                 ) {
-                    Text("Cancel")
+                    Text(stringResource(R.string.action_cancel))
                 }
             },
         )

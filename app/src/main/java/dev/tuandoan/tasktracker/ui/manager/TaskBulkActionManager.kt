@@ -1,5 +1,8 @@
 package dev.tuandoan.tasktracker.ui.manager
 
+import android.content.Context
+import dagger.hilt.android.qualifiers.ApplicationContext
+import dev.tuandoan.tasktracker.R
 import dev.tuandoan.tasktracker.data.database.Task
 import dev.tuandoan.tasktracker.ui.events.UiEvent
 import dev.tuandoan.tasktracker.ui.state.SelectionValidationResult
@@ -61,6 +64,7 @@ import javax.inject.Singleton
  */
 @Singleton
 class TaskBulkActionManager @Inject constructor(
+    @ApplicationContext private val context: Context,
     private val crudManager: TaskCrudManager,
     private val selectionStateManager: TaskSelectionStateManager,
 ) {
@@ -123,8 +127,8 @@ class TaskBulkActionManager @Inject constructor(
             operation = { taskIds ->
                 crudManager.bulkMarkCompleted(taskIds)
             },
-            successMessage = { count -> "$count tasks marked as completed" },
-            errorMessage = "Failed to mark tasks as completed",
+            successMessage = { count -> context.getString(R.string.snackbar_tasks_marked_completed, count) },
+            errorMessage = context.getString(R.string.snackbar_failed_mark_completed),
             clearSelectionOnSuccess = true,
             onSuccess = onSuccess,
             onError = onError,
@@ -143,8 +147,8 @@ class TaskBulkActionManager @Inject constructor(
             operation = { taskIds ->
                 crudManager.bulkMarkActive(taskIds)
             },
-            successMessage = { count -> "$count tasks marked as active" },
-            errorMessage = "Failed to mark tasks as active",
+            successMessage = { count -> context.getString(R.string.snackbar_tasks_marked_active, count) },
+            errorMessage = context.getString(R.string.snackbar_failed_mark_active),
             clearSelectionOnSuccess = true,
             onSuccess = onSuccess,
             onError = onError,
@@ -249,7 +253,7 @@ class TaskBulkActionManager @Inject constructor(
             } catch (e: Exception) {
                 _uiEvent.emit(
                     UiEvent.ShowSnackbar(
-                        message = "Failed to delete tasks: ${e.message}",
+                        message = context.getString(R.string.snackbar_failed_delete_tasks, e.message ?: ""),
                     ),
                 )
             }
@@ -340,7 +344,7 @@ class TaskBulkActionManager @Inject constructor(
                             UiEvent.ShowUndoDelete(
                                 tasks = tasksToArchive,
                                 onUndo = { restoreArchivedTasks(scope, tasksToArchive) },
-                                message = "${tasksToArchive.size} tasks archived",
+                                message = context.getString(R.string.snackbar_tasks_archived, tasksToArchive.size),
                             ),
                         )
                     }
@@ -362,7 +366,7 @@ class TaskBulkActionManager @Inject constructor(
             } catch (e: Exception) {
                 _uiEvent.emit(
                     UiEvent.ShowSnackbar(
-                        message = "Failed to archive tasks: ${e.message}",
+                        message = context.getString(R.string.snackbar_failed_archive_tasks, e.message ?: ""),
                     ),
                 )
             }
@@ -397,7 +401,7 @@ class TaskBulkActionManager @Inject constructor(
                     is TaskOperationResult.CrudError -> {
                         _uiEvent.emit(
                             UiEvent.ShowSnackbar(
-                                message = "Failed to restore tasks: ${result.message}",
+                                message = context.getString(R.string.snackbar_failed_restore_tasks, result.message),
                             ),
                         )
                     }
@@ -412,7 +416,7 @@ class TaskBulkActionManager @Inject constructor(
             } catch (e: Exception) {
                 _uiEvent.emit(
                     UiEvent.ShowSnackbar(
-                        message = "Failed to restore tasks: ${e.message}",
+                        message = context.getString(R.string.snackbar_failed_restore_tasks, e.message ?: ""),
                     ),
                 )
             }
@@ -434,14 +438,14 @@ class TaskBulkActionManager @Inject constructor(
                     is TaskOperationResult.Success -> {
                         _uiEvent.emit(
                             UiEvent.ShowSnackbar(
-                                message = "${tasks.size} tasks restored from archive",
+                                message = context.getString(R.string.snackbar_tasks_restored, tasks.size),
                             ),
                         )
                     }
                     is TaskOperationResult.CrudError -> {
                         _uiEvent.emit(
                             UiEvent.ShowSnackbar(
-                                message = "Failed to restore tasks from archive: ${result.message}",
+                                message = context.getString(R.string.snackbar_failed_restore_archive, result.message),
                             ),
                         )
                     }
@@ -456,7 +460,7 @@ class TaskBulkActionManager @Inject constructor(
             } catch (e: Exception) {
                 _uiEvent.emit(
                     UiEvent.ShowSnackbar(
-                        message = "Failed to restore tasks from archive: ${e.message}",
+                        message = context.getString(R.string.snackbar_failed_restore_archive, e.message ?: ""),
                     ),
                 )
             }
@@ -570,8 +574,8 @@ class TaskBulkActionManager @Inject constructor(
             operation = { taskIds ->
                 crudManager.bulkUnarchiveTasks(taskIds)
             },
-            successMessage = { count -> "$count tasks restored from archive" },
-            errorMessage = "Failed to restore archived tasks",
+            successMessage = { count -> context.getString(R.string.snackbar_tasks_restored, count) },
+            errorMessage = context.getString(R.string.snackbar_failed_restore_archive, ""),
             clearSelectionOnSuccess = true,
             onSuccess = onSuccess,
             onError = onError,
@@ -653,7 +657,10 @@ class TaskBulkActionManager @Inject constructor(
 
                         _uiEvent.emit(
                             UiEvent.ShowSnackbar(
-                                message = "${tasksToDelete.size} tasks permanently deleted",
+                                message = context.getString(
+                                    R.string.snackbar_tasks_permanently_deleted,
+                                    tasksToDelete.size,
+                                ),
                             ),
                         )
                     }
@@ -675,7 +682,7 @@ class TaskBulkActionManager @Inject constructor(
             } catch (e: Exception) {
                 _uiEvent.emit(
                     UiEvent.ShowSnackbar(
-                        message = "Failed to permanently delete tasks: ${e.message}",
+                        message = context.getString(R.string.snackbar_failed_permanent_delete, e.message ?: ""),
                     ),
                 )
             }

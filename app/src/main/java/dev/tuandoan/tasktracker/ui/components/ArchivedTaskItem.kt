@@ -40,9 +40,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import dev.tuandoan.tasktracker.R
 import dev.tuandoan.tasktracker.data.database.Task
 import dev.tuandoan.tasktracker.utils.formatDate
 import dev.tuandoan.tasktracker.utils.formatDueDate
@@ -205,21 +207,32 @@ fun ArchivedTaskItem(
                         verticalArrangement = Arrangement.spacedBy(6.dp),
                     ) {
                         if (task.dueAt != null) {
+                            val dueTimePattern = stringResource(R.string.date_format_due_time)
                             MetaRow(
                                 icon = Icons.Default.Event,
-                                text = "Due: ${formatDueDate(task.dueAt)}",
+                                text = stringResource(
+                                    R.string.task_due_date,
+                                    formatDueDate(task.dueAt, dueTimePattern),
+                                ),
                             )
                         }
 
+                        val shortDatePattern = stringResource(R.string.date_format_short)
                         val archiveDate = task.archivedAt ?: task.createdAt
                         MetaRow(
                             icon = Icons.Default.Archive,
-                            text = "Archived: ${formatDate(archiveDate)}",
+                            text = stringResource(
+                                R.string.task_archived_date,
+                                formatDate(archiveDate, shortDatePattern),
+                            ),
                         )
 
                         MetaRow(
                             icon = Icons.Default.AddCircle,
-                            text = "Created: ${formatDate(task.createdAt)}",
+                            text = stringResource(
+                                R.string.task_created_date,
+                                formatDate(task.createdAt, shortDatePattern),
+                            ),
                         )
                     }
                 }
@@ -238,7 +251,7 @@ fun ArchivedTaskItem(
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Unarchive,
-                                contentDescription = "Restore task",
+                                contentDescription = stringResource(R.string.cd_restore_task),
                                 tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
                                 modifier = Modifier.size(20.dp),
                             )
@@ -251,7 +264,7 @@ fun ArchivedTaskItem(
                         ) {
                             Icon(
                                 imageVector = Icons.Default.DeleteForever,
-                                contentDescription = "Permanently delete task",
+                                contentDescription = stringResource(R.string.cd_permanently_delete_task),
                                 tint = MaterialTheme.colorScheme.error.copy(alpha = 0.8f), // Use error color for delete
                                 modifier = Modifier.size(20.dp),
                             )
