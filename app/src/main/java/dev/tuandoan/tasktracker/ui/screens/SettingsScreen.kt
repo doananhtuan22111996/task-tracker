@@ -552,7 +552,9 @@ private fun LanguagePickerDialog(
         },
         text = {
             Column(
-                modifier = Modifier.selectableGroup(),
+                modifier = Modifier
+                    .selectableGroup()
+                    .verticalScroll(rememberScrollState()),
             ) {
                 // "Follow system" option
                 Row(

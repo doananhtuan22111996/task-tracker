@@ -171,18 +171,15 @@ class SettingsViewModelTest {
     fun `getSupportedLocales returns correct locale list`() {
         val locales = viewModel.getSupportedLocales()
 
-        assertEquals(2, locales.size)
-        assertEquals("en", locales[0].first)
-        assertEquals("vi", locales[1].first)
-        // Display names should not be empty
-        assertTrue(locales[0].second.isNotEmpty())
-        assertTrue(locales[1].second.isNotEmpty())
+        assertEquals(8, locales.size)
+        val allTags = locales.map { it.first }.toSet()
+        assertEquals(setOf("de", "en", "es", "fr", "hi", "in", "pt", "vi"), allTags)
     }
 
     @Test
     fun `getSupportedLocales English display name starts with uppercase`() {
         val locales = viewModel.getSupportedLocales()
-        val englishDisplayName = locales[0].second
+        val englishDisplayName = locales.first { it.first == "en" }.second
 
         assertTrue(
             "English display name should start with uppercase: $englishDisplayName",
@@ -193,7 +190,7 @@ class SettingsViewModelTest {
     @Test
     fun `getSupportedLocales Vietnamese display name starts with uppercase`() {
         val locales = viewModel.getSupportedLocales()
-        val vietnameseDisplayName = locales[1].second
+        val vietnameseDisplayName = locales.first { it.first == "vi" }.second
 
         assertTrue(
             "Vietnamese display name should start with uppercase: $vietnameseDisplayName",

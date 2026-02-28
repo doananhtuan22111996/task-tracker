@@ -89,7 +89,7 @@ class SettingsViewModel @Inject constructor(
      * The display name is shown in the locale's own language for clarity.
      */
     fun getSupportedLocales(): List<Pair<String, String>> {
-        val supportedTags = listOf("en", "vi")
+        val supportedTags = listOf("de", "en", "es", "fr", "hi", "in", "pt", "vi")
         return supportedTags.map { tag ->
             val locale = Locale.forLanguageTag(tag)
             val displayName = locale.getDisplayName(locale)

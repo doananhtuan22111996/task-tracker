@@ -1,0 +1,287 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Task Tracker</string>
+
+    <!-- Navigation -->
+    <string name="nav_all">Alle</string>
+    <string name="nav_active">Aktiv</string>
+    <string name="nav_completed">Erledigt</string>
+
+    <!-- Common Actions -->
+    <string name="action_cancel">Abbrechen</string>
+    <string name="action_delete">Löschen</string>
+    <string name="action_archive">Archivieren</string>
+    <string name="action_save">Speichern</string>
+    <string name="action_undo">RÜCKGÄNGIG</string>
+    <string name="action_ok">OK</string>
+    <string name="action_replace">Ersetzen</string>
+    <string name="action_select">Auswählen</string>
+    <string name="action_clear_search">Suche löschen</string>
+    <string name="action_show_all">Alle anzeigen</string>
+    <string name="action_select_all">Alle auswählen</string>
+
+    <!-- Content Descriptions -->
+    <string name="cd_navigate_back">Zurück navigieren</string>
+    <string name="cd_back">Zurück</string>
+    <string name="cd_add_task">Aufgabe hinzufügen</string>
+    <string name="cd_clear_selection">Auswahl aufheben</string>
+    <string name="cd_mark_active">Als aktiv markieren</string>
+    <string name="cd_mark_completed">Als erledigt markieren</string>
+    <string name="cd_archive_selected">Ausgewählte archivieren</string>
+    <string name="cd_more_options">Weitere Optionen</string>
+    <string name="cd_sort_tasks">Aufgaben sortieren</string>
+    <string name="cd_statistics">Statistiken</string>
+    <string name="cd_view_archived">Archivierte Aufgaben anzeigen</string>
+    <string name="cd_settings">Einstellungen</string>
+    <string name="cd_search">Suchen</string>
+    <string name="cd_clear_search">Suche löschen</string>
+    <string name="cd_clear_filter">Filter löschen</string>
+    <string name="cd_restore_selected">Ausgewählte wiederherstellen</string>
+    <string name="cd_permanently_delete_selected">Ausgewählte dauerhaft löschen</string>
+    <string name="cd_restore_task">Aufgabe wiederherstellen</string>
+    <string name="cd_permanently_delete_task">Aufgabe dauerhaft löschen</string>
+    <string name="cd_selected">Ausgewählt</string>
+    <string name="cd_loading">Wird geladen</string>
+    <string name="cd_export_json">Backup als JSON exportieren</string>
+    <string name="cd_import_json">Backup aus JSON importieren</string>
+    <string name="cd_export_csv">Backup als CSV exportieren</string>
+    <string name="cd_notification_permission">Benachrichtigungsberechtigung</string>
+    <string name="cd_notification_denied">Benachrichtigungsberechtigung verweigert</string>
+
+    <!-- Task List Item Accessibility -->
+    <string name="pin_task">Aufgabe anheften</string>
+    <string name="unpin_task">Aufgabe lösen</string>
+    <string name="more_options">Weitere Optionen</string>
+    <string name="mark_complete">Als erledigt markieren</string>
+    <string name="mark_incomplete">Als nicht erledigt markieren</string>
+    <string name="select_task">Aufgabe auswählen</string>
+    <string name="task_completed">Aufgabe erledigt</string>
+    <string name="task_overdue">Aufgabe ist überfällig</string>
+    <string name="high_priority_task">Aufgabe mit hoher Priorität</string>
+
+    <!-- Top Bar -->
+    <string name="title_task_tracker">Task Tracker</string>
+    <string name="title_archived">Archiviert</string>
+    <string name="title_selected_count">%d ausgewählt</string>
+
+    <!-- Task List Screen -->
+    <string name="snackbar_task_deleted">Aufgabe gelöscht</string>
+    <string name="snackbar_tasks_deleted">%d Aufgaben gelöscht</string>
+
+    <!-- Archive Dialogs -->
+    <string name="dialog_archive_task_title">Aufgabe archivieren</string>
+    <string name="dialog_archive_task_message">Möchten Sie \"%s\" wirklich archivieren? Diese Aktion kann wenige Sekunden nach dem Archivieren rückgängig gemacht werden.</string>
+    <string name="dialog_archive_tasks_title">Aufgaben archivieren</string>
+    <string name="dialog_archive_tasks_message">%d ausgewählte Aufgaben archivieren? Diese Aktion kann für kurze Zeit rückgängig gemacht werden.</string>
+
+    <!-- Delete Dialogs -->
+    <string name="dialog_delete_tasks_title">Aufgaben löschen</string>
+    <string name="dialog_delete_tasks_message">%d ausgewählte Aufgaben löschen? Diese Aktion kann für kurze Zeit rückgängig gemacht werden.</string>
+
+    <!-- Archived Screen -->
+    <string name="snackbar_task_permanently_deleted">Aufgabe dauerhaft gelöscht</string>
+    <string name="snackbar_tasks_permanently_deleted">%d Aufgaben dauerhaft gelöscht</string>
+    <string name="dialog_permanent_delete_title">Aufgabe dauerhaft löschen</string>
+    <string name="dialog_permanent_delete_message">Möchten Sie \"%s\" wirklich dauerhaft löschen? Diese Aktion kann nicht rückgängig gemacht werden.</string>
+    <string name="dialog_permanent_delete_tasks_title">Aufgaben dauerhaft löschen</string>
+    <string name="dialog_permanent_delete_tasks_message">%d ausgewählte Aufgaben dauerhaft löschen? Diese Aktion kann nicht rückgängig gemacht werden.</string>
+    <string name="action_delete_permanently">Dauerhaft löschen</string>
+
+    <!-- Stats Screen -->
+    <string name="title_stats">Statistiken</string>
+    <string name="stat_active_tasks">Aktive Aufgaben</string>
+    <string name="stat_completed_tasks">Erledigte Aufgaben</string>
+    <string name="stat_completed_today">Heute erledigt</string>
+    <string name="stat_due_today">Heute fällig</string>
+    <string name="stat_overdue">Überfällig</string>
+    <string name="stat_desc_active">Noch nicht erledigte Aufgaben</string>
+    <string name="stat_desc_completed">Alle erledigten Aufgaben</string>
+    <string name="stat_desc_completed_today">Heute erledigte Aufgaben</string>
+    <string name="stat_desc_due_today">Aktive Aufgaben, die heute fällig sind</string>
+    <string name="stat_desc_overdue">Aktive Aufgaben nach Fälligkeitsdatum</string>
+    <string name="stat_archived_note">Archivierte Aufgaben sind von allen Statistiken ausgeschlossen</string>
+
+    <!-- Settings Screen -->
+    <string name="title_settings">Einstellungen</string>
+    <string name="settings_section_appearance">Darstellung</string>
+    <string name="settings_theme">Theme</string>
+    <string name="settings_theme_light">Hell</string>
+    <string name="settings_theme_dark">Dunkel</string>
+    <string name="settings_theme_system">Systemstandard</string>
+    <string name="settings_dynamic_color">Dynamische Farben</string>
+    <string name="settings_dynamic_color_description">Hintergrundbildbasierte Farben verwenden (Android 12+)</string>
+    <string name="settings_dynamic_color_unavailable">Dynamische Farben sind nur auf Android 12+ verfügbar</string>
+    <string name="settings_section_language">Sprache</string>
+    <string name="settings_language">Sprache</string>
+    <string name="settings_language_system">System folgen</string>
+    <string name="settings_section_backup">Backup &amp; Wiederherstellung</string>
+    <string name="settings_export_backup">Backup exportieren</string>
+    <string name="settings_export_backup_desc">Alle Aufgaben als JSON-Datei speichern</string>
+    <string name="settings_import_backup">Backup importieren</string>
+    <string name="settings_import_backup_desc">Aufgaben aus einer JSON-Backupdatei wiederherstellen</string>
+    <string name="settings_export_csv">Als CSV exportieren</string>
+    <string name="settings_export_csv_desc">Alle Aufgaben als CSV-Tabelle speichern</string>
+
+    <!-- Settings Dialogs -->
+    <string name="dialog_replace_tasks_title">Alle Aufgaben ersetzen?</string>
+    <string name="dialog_replace_tasks_message">Beim Import eines Backups werden alle vorhandenen Aufgaben ersetzt. Diese Aktion kann nicht rückgängig gemacht werden. Möchten Sie fortfahren?</string>
+    <string name="dialog_error_title">Fehler</string>
+
+    <!-- Settings Snackbars -->
+    <string name="snackbar_exported_tasks">%d Aufgaben erfolgreich exportiert</string>
+    <string name="snackbar_imported_tasks">%d Aufgaben erfolgreich importiert</string>
+    <string name="snackbar_imported_skipped"> (%d übersprungen)</string>
+
+    <!-- Task Editor Screen -->
+    <string name="title_edit_task">Aufgabe bearbeiten</string>
+    <string name="title_new_task">Neue Aufgabe</string>
+    <string name="label_title">Titel</string>
+    <string name="label_description">Beschreibung</string>
+    <string name="label_tag">Tag</string>
+    <string name="label_priority">Priorität</string>
+    <string name="label_due_date">Fälligkeitsdatum</string>
+    <string name="label_reminder">Erinnerung</string>
+    <string name="section_organization">Organisation</string>
+    <string name="section_due_date_reminder">Fälligkeitsdatum &amp; Erinnerung</string>
+    <string name="label_pin_task">Aufgabe anheften</string>
+    <string name="label_pin_task_description">Diese Aufgabe oben halten</string>
+
+    <!-- Priority -->
+    <string name="priority_low">Niedrig</string>
+    <string name="priority_medium">Mittel</string>
+    <string name="priority_high">Hoch</string>
+
+    <!-- Reminder Options -->
+    <string name="reminder_none">Keine</string>
+    <string name="reminder_1_minute">1 Minute vorher</string>
+    <string name="reminder_5_minutes">5 Minuten vorher</string>
+    <string name="reminder_1_hour">1 Stunde vorher</string>
+    <string name="reminder_1_day">1 Tag vorher</string>
+
+    <!-- Sort Menu -->
+    <string name="sort_header">Sortieren</string>
+    <string name="sort_created_newest">Erstellt: Neueste zuerst</string>
+    <string name="sort_created_oldest">Erstellt: Älteste zuerst</string>
+    <string name="sort_title_az">Titel: A–Z</string>
+    <string name="sort_priority_high_low">Priorität: Hoch bis niedrig</string>
+    <string name="sort_completed_last">Erledigte zuletzt</string>
+
+    <!-- Empty States -->
+    <string name="empty_no_tasks">Noch keine Aufgaben</string>
+    <string name="empty_add_first_task">Tippen Sie auf +, um Ihre erste Aufgabe hinzuzufügen</string>
+    <string name="empty_no_results">Keine Ergebnisse gefunden</string>
+    <string name="empty_try_clear_search_filter">Versuchen Sie, die Suche zu löschen oder den Filter zu ändern</string>
+    <string name="empty_try_different_search">Versuchen Sie einen anderen Suchbegriff</string>
+    <string name="empty_try_change_filter">Versuchen Sie, den Filter zu ändern, um mehr Aufgaben zu sehen</string>
+    <string name="empty_no_match">Keine Aufgaben entsprechen Ihren Kriterien</string>
+    <string name="empty_no_archived">Keine archivierten Aufgaben</string>
+    <string name="empty_archived_hint">Archivierte Aufgaben werden hier angezeigt</string>
+    <string name="empty_no_archived_found">Keine archivierten Aufgaben gefunden</string>
+
+    <!-- Search -->
+    <string name="search_placeholder">Aufgaben suchen…</string>
+
+    <!-- Filter -->
+    <string name="filter_clear">Löschen</string>
+
+    <!-- Task Item -->
+    <string name="task_overdue_date">Überfällig: %s</string>
+    <string name="task_due_date">Fällig: %s</string>
+    <string name="task_archived_date">Archiviert: %s</string>
+    <string name="task_created_date">Erstellt: %s</string>
+
+    <!-- Notification Permission Dialog -->
+    <string name="notification_enable_title">Benachrichtigungen aktivieren</string>
+    <string name="notification_rationale">Task Tracker benötigt die Benachrichtigungsberechtigung, um Sie an fällige Aufgaben zu erinnern.</string>
+    <string name="notification_benefits_intro">Mit aktivierten Benachrichtigungen können Sie:</string>
+    <string name="notification_benefit_reminders">Erinnerungen 1 Minute, 5 Minuten, 1 Stunde oder 1 Tag vor Fälligkeit erhalten</string>
+    <string name="notification_benefit_deadlines">Wichtige Fristen nie verpassen</string>
+    <string name="notification_benefit_organized">Organisiert und produktiv bleiben</string>
+    <string name="notification_change_later">Sie können diese Einstellung später jederzeit in den Benachrichtigungseinstellungen Ihres Geräts ändern.</string>
+    <string name="notification_enable_button">Benachrichtigungen aktivieren</string>
+    <string name="notification_not_now">Jetzt nicht</string>
+    <string name="notification_disabled_title">Benachrichtigungen deaktiviert</string>
+    <string name="notification_denied_message">Um Aufgaben-Erinnerungen zu aktivieren, erlauben Sie bitte Benachrichtigungen in den Geräteeinstellungen.</string>
+    <string name="notification_how_to_enable">So aktivieren Sie Benachrichtigungen:</string>
+    <string name="notification_step_open_settings">Tippen Sie unten auf „Einstellungen öffnen“</string>
+    <string name="notification_step_find">Suchen Sie „Benachrichtigungen“ oder „App-Benachrichtigungen“</string>
+    <string name="notification_step_toggle">Schalten Sie Benachrichtigungen für Task Tracker ein</string>
+    <string name="notification_without_warning">Ohne Benachrichtigungen funktionieren Erinnerungen nicht.</string>
+    <string name="notification_open_settings">Einstellungen öffnen</string>
+    <string name="notification_maybe_later">Vielleicht später</string>
+
+    <!-- Notification Channel -->
+    <string name="notification_channel_name">Aufgaben-Erinnerungen</string>
+    <string name="notification_channel_description">Benachrichtigungen für Aufgaben-Fälligkeits-Erinnerungen</string>
+    <string name="notification_title">Aufgaben-Erinnerung</string>
+    <string name="notification_due_soon">Bald fällig: %s</string>
+    <string name="notification_default_task">Aufgabe</string>
+
+    <!-- Date Format Patterns (localizable) -->
+    <string name="date_format_short">dd. MMM yyyy</string>
+    <string name="date_format_due_time">dd. MMM \'um\' HH:mm</string>
+
+    <!-- Date Group Headers -->
+    <string name="date_today">Heute</string>
+    <string name="date_yesterday">Gestern</string>
+    <string name="date_tomorrow">Morgen</string>
+
+    <!-- Validation Errors -->
+    <string name="error_title_empty">Titel darf nicht leer sein</string>
+    <string name="error_title_too_long">Titel darf höchstens %d Zeichen haben</string>
+    <string name="error_due_date_future">Fälligkeitsdatum muss in der Zukunft liegen</string>
+    <string name="error_due_date_required">Fälligkeitsdatum ist für Erinnerungen erforderlich</string>
+    <string name="error_reminder_future">Erinnerungszeit muss in der Zukunft liegen</string>
+    <string name="error_tag_too_long">Tag darf höchstens %d Zeichen haben</string>
+    <string name="error_failed_load_task">Aufgabe konnte nicht geladen werden: %s</string>
+    <string name="error_failed_save_task">Aufgabe konnte nicht gespeichert werden: %s</string>
+
+    <!-- Operation Success Messages (used by managers/use cases) -->
+    <string name="op_task_created">Aufgabe erstellt</string>
+    <string name="op_task_updated">Aufgabe aktualisiert</string>
+    <string name="op_task_restored">Aufgabe wiederhergestellt</string>
+    <string name="op_task_pinned">Aufgabe angeheftet</string>
+    <string name="op_task_unpinned">Aufgabe gelöst</string>
+    <string name="op_task_priority_updated">Aufgabenpriorität aktualisiert</string>
+    <string name="op_task_marked_complete">Aufgabe als erledigt markiert</string>
+    <string name="op_task_marked_incomplete">Aufgabe als nicht erledigt markiert</string>
+
+    <!-- Operation Error Messages -->
+    <string name="error_create_task">Aufgabe konnte nicht erstellt werden</string>
+    <string name="error_update_task">Aufgabe konnte nicht aktualisiert werden</string>
+    <string name="error_schedule_reminder">Erinnerung konnte nicht geplant werden</string>
+    <string name="error_delete_task">Aufgabe konnte nicht gelöscht werden</string>
+    <string name="error_restore_task">Aufgabe konnte nicht wiederhergestellt werden</string>
+    <string name="error_update_tasks">Aufgaben konnten nicht aktualisiert werden</string>
+    <string name="error_delete_tasks">Aufgaben konnten nicht gelöscht werden</string>
+    <string name="error_restore_tasks">Aufgaben konnten nicht wiederhergestellt werden</string>
+    <string name="error_pin_task">Anheftstatus konnte nicht aktualisiert werden</string>
+    <string name="error_update_priority">Priorität konnte nicht aktualisiert werden</string>
+    <string name="error_archive_task">Aufgabe konnte nicht archiviert werden</string>
+    <string name="error_archive_tasks">Aufgaben konnten nicht archiviert werden</string>
+    <string name="error_hard_delete_task">Aufgabe konnte nicht dauerhaft gelöscht werden</string>
+    <string name="error_hard_delete_tasks">Aufgaben konnten nicht dauerhaft gelöscht werden</string>
+    <string name="error_no_task_selected">Keine Aufgabe für die Aktualisierung ausgewählt</string>
+    <string name="error_update_task_status">Aufgabenstatus konnte nicht aktualisiert werden</string>
+    <string name="error_invalid_task_for_update">Ungültige Aufgabe für die Aktualisierung ausgewählt</string>
+    <string name="error_validation_failed">Validierung fehlgeschlagen</string>
+    <string name="error_export_backup">Backup konnte nicht exportiert werden: %s</string>
+    <string name="error_import_backup">Backup konnte nicht importiert werden: %s</string>
+
+    <!-- Notification (additional) -->
+    <string name="notification_explanation_enabled">Benachrichtigungen sind für Aufgaben-Erinnerungen aktiviert</string>
+
+    <!-- Snackbar Messages -->
+    <string name="snackbar_task_archived">Aufgabe archiviert</string>
+    <string name="snackbar_tasks_marked_completed">%d Aufgaben als erledigt markiert</string>
+    <string name="snackbar_tasks_marked_active">%d Aufgaben als aktiv markiert</string>
+    <string name="snackbar_tasks_archived">%d Aufgaben archiviert</string>
+    <string name="snackbar_tasks_restored">%d Aufgaben aus dem Archiv wiederhergestellt</string>
+    <string name="snackbar_failed_mark_completed">Aufgaben konnten nicht als erledigt markiert werden</string>
+    <string name="snackbar_failed_mark_active">Aufgaben konnten nicht als aktiv markiert werden</string>
+    <string name="snackbar_failed_delete_tasks">Aufgaben konnten nicht gelöscht werden: %s</string>
+    <string name="snackbar_failed_archive_tasks">Aufgaben konnten nicht archiviert werden: %s</string>
+    <string name="snackbar_failed_restore_tasks">Aufgaben konnten nicht wiederhergestellt werden: %s</string>
+    <string name="snackbar_failed_restore_archive">Aufgaben konnten nicht aus dem Archiv wiederhergestellt werden: %s</string>
+    <string name="snackbar_failed_permanent_delete">Aufgaben konnten nicht dauerhaft gelöscht werden: %s</string>
+</resources>

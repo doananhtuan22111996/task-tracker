@@ -161,7 +161,7 @@
     <string name="sort_header">Sort</string>
     <string name="sort_created_newest">Created: Newest first</string>
     <string name="sort_created_oldest">Created: Oldest first</string>
-    <string name="sort_title_az">Title: A\u2013Z</string>
+    <string name="sort_title_az">Title: A&#8211;Z</string>
     <string name="sort_priority_high_low">Priority: High to Low</string>
     <string name="sort_completed_last">Completed last</string>
 
@@ -178,7 +178,7 @@
     <string name="empty_no_archived_found">No archived tasks found</string>
 
     <!-- Search -->
-    <string name="search_placeholder">Search tasks\u2026</string>
+    <string name="search_placeholder">Search tasks&#8230;</string>
 
     <!-- Filter -->
     <string name="filter_clear">Clear</string>
@@ -227,11 +227,11 @@
 
     <!-- Validation Errors -->
     <string name="error_title_empty">Title cannot be empty</string>
-    <string name="error_title_too_long">Title must be \u2264 %d characters</string>
+    <string name="error_title_too_long">Title must be &#8804; %d characters</string>
     <string name="error_due_date_future">Due date must be in the future</string>
     <string name="error_due_date_required">Due date is required for reminders</string>
     <string name="error_reminder_future">Reminder time must be in the future</string>
-    <string name="error_tag_too_long">Tag must be \u2264 %d characters</string>
+    <string name="error_tag_too_long">Tag must be &#8804; %d characters</string>
     <string name="error_failed_load_task">Failed to load task: %s</string>
     <string name="error_failed_save_task">Failed to save task: %s</string>
 

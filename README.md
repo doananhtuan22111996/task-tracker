@@ -22,7 +22,7 @@ A modern, offline-first task tracking Android app built with **Kotlin**, **Jetpa
 - 📝 **Production-Ready Validation** - Comprehensive form validation with required title, input trimming, length limits, and disabled save when no changes
 - 💾 **Offline First** - Works completely offline with Room database
 - 🎨 **Material 3 Design** - Modern UI following Material Design guidelines
-- 🌍 **Multi-Language Support** - Per-app language selection with system language follow option. Ships with English and Vietnamese.
+- 🌍 **Multi-Language Support** - Per-app language selection with system language follow option. Ships with 8 languages: English, Vietnamese, German, Spanish, French, Hindi, Indonesian, and Portuguese.
 - 🎨 **Theme System** - Light, Dark, and System default theme modes with dynamic color (Material You) on Android 12+
 - ⚙️ **Settings** - Dedicated settings screen for appearance, language, and backup preferences with DataStore persistence
 
@@ -200,6 +200,18 @@ app/src/main/java/dev/tuandoan/tasktracker/
 app/src/main/res/
 ├── values/
 │   └── strings.xml                # Default (English) string resources
+├── values-de/
+│   └── strings.xml                # German (Deutsch) translations
+├── values-es/
+│   └── strings.xml                # Spanish (Español) translations
+├── values-fr/
+│   └── strings.xml                # French (Français) translations
+├── values-hi/
+│   └── strings.xml                # Hindi (हिन्दी) translations
+├── values-in/
+│   └── strings.xml                # Indonesian (Bahasa Indonesia) translations
+├── values-pt/
+│   └── strings.xml                # Portuguese (Português) translations
 ├── values-vi/
 │   └── strings.xml                # Vietnamese (Tiếng Việt) translations
 └── xml/
@@ -210,6 +222,12 @@ app/src/main/res/
 
 ### Supported Languages
 - **English** (default)
+- **German** (Deutsch)
+- **Spanish** (Español)
+- **French** (Français)
+- **Hindi** (हिन्दी)
+- **Indonesian** (Bahasa Indonesia)
+- **Portuguese** (Português)
 - **Vietnamese** (Tiếng Việt)
 
 ### Per-App Language Selection
@@ -455,6 +473,12 @@ Add this step to your GitHub Actions workflow:
 - **Key-based LazyColumn** - Optimized list rendering with proper item keys
 
 ## 📚 Recent Updates
+
+### v3.2 - Localization Expansion (8 Languages)
+- 🌍 **6 New Languages** - Added German (Deutsch), Spanish (Español), French (Français), Hindi (हिन्दी), Indonesian (Bahasa Indonesia), and Portuguese (Português) translations
+- 🔧 **XML Escaping Fixes** - Corrected apostrophe and special character escaping across all translation files for crash-free string rendering
+- 📋 **Locale Registry Update** - Updated `locales_config.xml` to register all 8 supported locales for Android 13+ native language picker
+- ⚙️ **Settings Integration** - Language picker in Settings now lists all 8 languages with native display names and scrollable dialog
 
 ### v3.1 - Global Language Support & Theme Polish
 - 🌍 **Per-App Language Selection** - Choose app language independently from system (English, Vietnamese), with backward compatibility for Android 7-12

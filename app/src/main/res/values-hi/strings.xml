@@ -1,0 +1,287 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">टास्क ट्रैकर</string>
+
+    <!-- Navigation -->
+    <string name="nav_all">सभी</string>
+    <string name="nav_active">सक्रिय</string>
+    <string name="nav_completed">पूर्ण</string>
+
+    <!-- Common Actions -->
+    <string name="action_cancel">रद्द करें</string>
+    <string name="action_delete">हटाएँ</string>
+    <string name="action_archive">संग्रहित करें</string>
+    <string name="action_save">सहेजें</string>
+    <string name="action_undo">पूर्ववत करें</string>
+    <string name="action_ok">ठीक है</string>
+    <string name="action_replace">प्रतिस्थापित करें</string>
+    <string name="action_select">चयन करें</string>
+    <string name="action_clear_search">खोज साफ करें</string>
+    <string name="action_show_all">सभी दिखाएँ</string>
+    <string name="action_select_all">सभी चुनें</string>
+
+    <!-- Content Descriptions -->
+    <string name="cd_navigate_back">वापस जाएँ</string>
+    <string name="cd_back">वापस</string>
+    <string name="cd_add_task">कार्य जोड़ें</string>
+    <string name="cd_clear_selection">चयन हटाएँ</string>
+    <string name="cd_mark_active">सक्रिय के रूप में चिह्नित करें</string>
+    <string name="cd_mark_completed">पूर्ण के रूप में चिह्नित करें</string>
+    <string name="cd_archive_selected">चयनित संग्रहित करें</string>
+    <string name="cd_more_options">अधिक विकल्प</string>
+    <string name="cd_sort_tasks">कार्य क्रमबद्ध करें</string>
+    <string name="cd_statistics">आँकड़े</string>
+    <string name="cd_view_archived">संग्रहित कार्य देखें</string>
+    <string name="cd_settings">सेटिंग्स</string>
+    <string name="cd_search">खोजें</string>
+    <string name="cd_clear_search">खोज हटाएँ</string>
+    <string name="cd_clear_filter">फ़िल्टर हटाएँ</string>
+    <string name="cd_restore_selected">चयनित पुनर्स्थापित करें</string>
+    <string name="cd_permanently_delete_selected">चयनित स्थायी रूप से हटाएँ</string>
+    <string name="cd_restore_task">कार्य पुनर्स्थापित करें</string>
+    <string name="cd_permanently_delete_task">कार्य स्थायी रूप से हटाएँ</string>
+    <string name="cd_selected">चयनित</string>
+    <string name="cd_loading">लोड हो रहा है</string>
+    <string name="cd_export_json">JSON के रूप में बैकअप निर्यात करें</string>
+    <string name="cd_import_json">JSON से बैकअप आयात करें</string>
+    <string name="cd_export_csv">CSV के रूप में बैकअप निर्यात करें</string>
+    <string name="cd_notification_permission">सूचना अनुमति</string>
+    <string name="cd_notification_denied">सूचना अनुमति अस्वीकृत</string>
+
+    <!-- Task List Item Accessibility -->
+    <string name="pin_task">कार्य पिन करें</string>
+    <string name="unpin_task">कार्य अनपिन करें</string>
+    <string name="more_options">अधिक विकल्प</string>
+    <string name="mark_complete">पूर्ण चिह्नित करें</string>
+    <string name="mark_incomplete">अपूर्ण चिह्नित करें</string>
+    <string name="select_task">कार्य चुनें</string>
+    <string name="task_completed">कार्य पूर्ण</string>
+    <string name="task_overdue">कार्य विलंबित है</string>
+    <string name="high_priority_task">उच्च प्राथमिकता कार्य</string>
+
+    <!-- Top Bar -->
+    <string name="title_task_tracker">टास्क ट्रैकर</string>
+    <string name="title_archived">संग्रहित</string>
+    <string name="title_selected_count">%d चयनित</string>
+
+    <!-- Task List Screen -->
+    <string name="snackbar_task_deleted">कार्य हटाया गया</string>
+    <string name="snackbar_tasks_deleted">%d कार्य हटाए गए</string>
+
+    <!-- Archive Dialogs -->
+    <string name="dialog_archive_task_title">कार्य संग्रहित करें</string>
+    <string name="dialog_archive_task_message">क्या आप "%s" को संग्रहित करना चाहते हैं? यह कार्रवाई कुछ सेकंड के लिए पूर्ववत की जा सकती है।</string>
+    <string name="dialog_archive_tasks_title">कार्य संग्रहित करें</string>
+    <string name="dialog_archive_tasks_message">%d चयनित कार्य संग्रहित करें? यह कार्रवाई थोड़े समय के लिए पूर्ववत की जा सकती है।</string>
+
+    <!-- Delete Dialogs -->
+    <string name="dialog_delete_tasks_title">कार्य हटाएँ</string>
+    <string name="dialog_delete_tasks_message">%d चयनित कार्य हटाएँ? यह कार्रवाई थोड़े समय के लिए पूर्ववत की जा सकती है।</string>
+
+    <!-- Archived Screen -->
+    <string name="snackbar_task_permanently_deleted">कार्य स्थायी रूप से हटाया गया</string>
+    <string name="snackbar_tasks_permanently_deleted">%d कार्य स्थायी रूप से हटाए गए</string>
+    <string name="dialog_permanent_delete_title">कार्य स्थायी रूप से हटाएँ</string>
+    <string name="dialog_permanent_delete_message">क्या आप "%s" को स्थायी रूप से हटाना चाहते हैं? यह कार्रवाई पूर्ववत नहीं की जा सकती।</string>
+    <string name="dialog_permanent_delete_tasks_title">कार्य स्थायी रूप से हटाएँ</string>
+    <string name="dialog_permanent_delete_tasks_message">%d चयनित कार्य स्थायी रूप से हटाएँ? यह कार्रवाई पूर्ववत नहीं की जा सकती।</string>
+    <string name="action_delete_permanently">स्थायी रूप से हटाएँ</string>
+
+    <!-- Stats Screen -->
+    <string name="title_stats">आँकड़े</string>
+    <string name="stat_active_tasks">सक्रिय कार्य</string>
+    <string name="stat_completed_tasks">पूर्ण कार्य</string>
+    <string name="stat_completed_today">आज पूर्ण</string>
+    <string name="stat_due_today">आज की अंतिम तिथि</string>
+    <string name="stat_overdue">विलंबित</string>
+    <string name="stat_desc_active">अभी तक पूर्ण नहीं हुए कार्य</string>
+    <string name="stat_desc_completed">सभी पूर्ण कार्य</string>
+    <string name="stat_desc_completed_today">आज पूर्ण किए गए कार्य</string>
+    <string name="stat_desc_due_today">आज की अंतिम तिथि वाले सक्रिय कार्य</string>
+    <string name="stat_desc_overdue">अंतिम तिथि पार कर चुके सक्रिय कार्य</string>
+    <string name="stat_archived_note">संग्रहित कार्य आँकड़ों में शामिल नहीं हैं</string>
+
+    <!-- Settings Screen -->
+    <string name="title_settings">सेटिंग्स</string>
+    <string name="settings_section_appearance">रूप</string>
+    <string name="settings_theme">थीम</string>
+    <string name="settings_theme_light">हल्का</string>
+    <string name="settings_theme_dark">गहरा</string>
+    <string name="settings_theme_system">सिस्टम के अनुसार</string>
+    <string name="settings_dynamic_color">डायनेमिक रंग</string>
+    <string name="settings_dynamic_color_description">वॉलपेपर आधारित रंग उपयोग करें (Android 12+)</string>
+    <string name="settings_dynamic_color_unavailable">डायनेमिक रंग केवल Android 12+ पर उपलब्ध हैं</string>
+    <string name="settings_section_language">भाषा</string>
+    <string name="settings_language">भाषा</string>
+    <string name="settings_language_system">सिस्टम का अनुसरण करें</string>
+    <string name="settings_section_backup">बैकअप और पुनर्स्थापना</string>
+    <string name="settings_export_backup">बैकअप निर्यात करें</string>
+    <string name="settings_export_backup_desc">सभी कार्य JSON फ़ाइल में सहेजें</string>
+    <string name="settings_import_backup">बैकअप आयात करें</string>
+    <string name="settings_import_backup_desc">JSON बैकअप से कार्य पुनर्स्थापित करें</string>
+    <string name="settings_export_csv">CSV के रूप में निर्यात करें</string>
+    <string name="settings_export_csv_desc">सभी कार्य CSV स्प्रेडशीट में सहेजें</string>
+
+    <!-- Settings Dialogs -->
+    <string name="dialog_replace_tasks_title">सभी कार्य बदलें?</string>
+    <string name="dialog_replace_tasks_message">बैकअप आयात करने से सभी मौजूदा कार्य बदल दिए जाएंगे। यह कार्रवाई पूर्ववत नहीं की जा सकती। क्या आप जारी रखना चाहते हैं?</string>
+    <string name="dialog_error_title">त्रुटि</string>
+
+    <!-- Settings Snackbars -->
+    <string name="snackbar_exported_tasks">%d कार्य सफलतापूर्वक निर्यात किए गए</string>
+    <string name="snackbar_imported_tasks">%d कार्य सफलतापूर्वक आयात किए गए</string>
+    <string name="snackbar_imported_skipped"> (%d छोड़े गए)</string>
+
+    <!-- Task Editor Screen -->
+    <string name="title_edit_task">कार्य संपादित करें</string>
+    <string name="title_new_task">नया कार्य</string>
+    <string name="label_title">शीर्षक</string>
+    <string name="label_description">विवरण</string>
+    <string name="label_tag">टैग</string>
+    <string name="label_priority">प्राथमिकता</string>
+    <string name="label_due_date">अंतिम तिथि</string>
+    <string name="label_reminder">अनुस्मारक</string>
+    <string name="section_organization">संगठन</string>
+    <string name="section_due_date_reminder">अंतिम तिथि और अनुस्मारक</string>
+    <string name="label_pin_task">कार्य पिन करें</string>
+    <string name="label_pin_task_description">इस कार्य को शीर्ष पर रखें</string>
+
+    <!-- Priority -->
+    <string name="priority_low">कम</string>
+    <string name="priority_medium">मध्यम</string>
+    <string name="priority_high">उच्च</string>
+
+    <!-- Reminder Options -->
+    <string name="reminder_none">कोई नहीं</string>
+    <string name="reminder_1_minute">1 मिनट पहले</string>
+    <string name="reminder_5_minutes">5 मिनट पहले</string>
+    <string name="reminder_1_hour">1 घंटा पहले</string>
+    <string name="reminder_1_day">1 दिन पहले</string>
+
+    <!-- Sort Menu -->
+    <string name="sort_header">क्रमबद्ध करें</string>
+    <string name="sort_created_newest">निर्माण: नवीनतम पहले</string>
+    <string name="sort_created_oldest">निर्माण: पुराने पहले</string>
+    <string name="sort_title_az">शीर्षक: A–Z</string>
+    <string name="sort_priority_high_low">प्राथमिकता: उच्च से निम्न</string>
+    <string name="sort_completed_last">पूर्ण अंत में</string>
+
+    <!-- Empty States -->
+    <string name="empty_no_tasks">अभी कोई कार्य नहीं</string>
+    <string name="empty_add_first_task">अपना पहला कार्य जोड़ने के लिए + दबाएँ</string>
+    <string name="empty_no_results">कोई परिणाम नहीं मिला</string>
+    <string name="empty_try_clear_search_filter">खोज हटाने या फ़िल्टर बदलने का प्रयास करें</string>
+    <string name="empty_try_different_search">कोई अन्य खोज शब्द आज़माएँ</string>
+    <string name="empty_try_change_filter">अधिक कार्य देखने के लिए फ़िल्टर बदलें</string>
+    <string name="empty_no_match">कोई कार्य आपके मानदंड से मेल नहीं खाता</string>
+    <string name="empty_no_archived">कोई संग्रहित कार्य नहीं</string>
+    <string name="empty_archived_hint">आपके द्वारा संग्रहित कार्य यहाँ दिखाई देंगे</string>
+    <string name="empty_no_archived_found">कोई संग्रहित कार्य नहीं मिला</string>
+
+    <!-- Search -->
+    <string name="search_placeholder">कार्य खोजें…</string>
+
+    <!-- Filter -->
+    <string name="filter_clear">हटाएँ</string>
+
+    <!-- Task Item -->
+    <string name="task_overdue_date">विलंबित: %s</string>
+    <string name="task_due_date">अंतिम तिथि: %s</string>
+    <string name="task_archived_date">संग्रहित: %s</string>
+    <string name="task_created_date">निर्मित: %s</string>
+
+    <!-- Notification Permission Dialog -->
+    <string name="notification_enable_title">सूचनाएँ सक्षम करें</string>
+    <string name="notification_rationale">Task Tracker को आपकी कार्य अंतिम तिथि पर आपको अनुस्मारक भेजने के लिए सूचना अनुमति की आवश्यकता है।</string>
+    <string name="notification_benefits_intro">सूचनाएँ सक्षम होने पर आप:</string>
+    <string name="notification_benefit_reminders">1 मिनट, 5 मिनट, 1 घंटा या 1 दिन पहले अनुस्मारक प्राप्त कर सकते हैं</string>
+    <string name="notification_benefit_deadlines">महत्वपूर्ण अंतिम तिथियाँ नहीं चूकेंगे</string>
+    <string name="notification_benefit_organized">व्यवस्थित और उत्पादक रहेंगे</string>
+    <string name="notification_change_later">आप बाद में अपने डिवाइस सेटिंग्स में इसे बदल सकते हैं।</string>
+    <string name="notification_enable_button">सूचनाएँ सक्षम करें</string>
+    <string name="notification_not_now">अभी नहीं</string>
+    <string name="notification_disabled_title">सूचनाएँ अक्षम हैं</string>
+    <string name="notification_denied_message">अनुस्मारक सक्षम करने के लिए डिवाइस सेटिंग्स में सूचनाओं की अनुमति दें।</string>
+    <string name="notification_how_to_enable">सूचनाएँ सक्षम करने का तरीका:</string>
+    <string name="notification_step_open_settings">नीचे \'सेटिंग्स खोलें\' दबाएँ</string>
+    <string name="notification_step_find">\'सूचनाएँ\' या \'ऐप सूचनाएँ\' खोजें</string>
+    <string name="notification_step_toggle">Task Tracker के लिए सूचनाएँ चालू करें</string>
+    <string name="notification_without_warning">सूचनाओं के बिना अनुस्मारक काम नहीं करेंगे।</string>
+    <string name="notification_open_settings">सेटिंग्स खोलें</string>
+    <string name="notification_maybe_later">शायद बाद में</string>
+
+    <!-- Notification Channel -->
+    <string name="notification_channel_name">कार्य अनुस्मारक</string>
+    <string name="notification_channel_description">कार्य अंतिम तिथि अनुस्मारक के लिए सूचनाएँ</string>
+    <string name="notification_title">कार्य अनुस्मारक</string>
+    <string name="notification_due_soon">जल्द ही अंतिम तिथि: %s</string>
+    <string name="notification_default_task">कार्य</string>
+
+    <!-- Date Format Patterns -->
+    <string name="date_format_short">dd/MM/yyyy</string>
+    <string name="date_format_due_time">dd/MM/yyyy \'पर\' HH:mm</string>
+
+    <!-- Date Group Headers -->
+    <string name="date_today">आज</string>
+    <string name="date_yesterday">बीता कल</string>
+    <string name="date_tomorrow">आने वाला कल</string>
+
+    <!-- Validation Errors -->
+    <string name="error_title_empty">शीर्षक खाली नहीं हो सकता</string>
+    <string name="error_title_too_long">शीर्षक %d वर्णों से अधिक नहीं होना चाहिए</string>
+    <string name="error_due_date_future">अंतिम तिथि भविष्य में होनी चाहिए</string>
+    <string name="error_due_date_required">अनुस्मारक के लिए अंतिम तिथि आवश्यक है</string>
+    <string name="error_reminder_future">अनुस्मारक समय भविष्य में होना चाहिए</string>
+    <string name="error_tag_too_long">टैग %d वर्णों से अधिक नहीं होना चाहिए</string>
+    <string name="error_failed_load_task">कार्य लोड करने में विफल: %s</string>
+    <string name="error_failed_save_task">कार्य सहेजने में विफल: %s</string>
+
+    <!-- Operation Success Messages -->
+    <string name="op_task_created">कार्य बनाया गया</string>
+    <string name="op_task_updated">कार्य अपडेट किया गया</string>
+    <string name="op_task_restored">कार्य पुनर्स्थापित किया गया</string>
+    <string name="op_task_pinned">कार्य पिन किया गया</string>
+    <string name="op_task_unpinned">कार्य अनपिन किया गया</string>
+    <string name="op_task_priority_updated">कार्य प्राथमिकता अपडेट की गई</string>
+    <string name="op_task_marked_complete">कार्य पूर्ण चिह्नित किया गया</string>
+    <string name="op_task_marked_incomplete">कार्य अपूर्ण चिह्नित किया गया</string>
+
+    <!-- Operation Error Messages -->
+    <string name="error_create_task">कार्य बनाने में विफल</string>
+    <string name="error_update_task">कार्य अपडेट करने में विफल</string>
+    <string name="error_schedule_reminder">अनुस्मारक शेड्यूल करने में विफल</string>
+    <string name="error_delete_task">कार्य हटाने में विफल</string>
+    <string name="error_restore_task">कार्य पुनर्स्थापित करने में विफल</string>
+    <string name="error_update_tasks">कार्य अपडेट करने में विफल</string>
+    <string name="error_delete_tasks">कार्य हटाने में विफल</string>
+    <string name="error_restore_tasks">कार्य पुनर्स्थापित करने में विफल</string>
+    <string name="error_pin_task">पिन स्थिति अपडेट करने में विफल</string>
+    <string name="error_update_priority">प्राथमिकता अपडेट करने में विफल</string>
+    <string name="error_archive_task">कार्य संग्रहित करने में विफल</string>
+    <string name="error_archive_tasks">कार्य संग्रहित करने में विफल</string>
+    <string name="error_hard_delete_task">कार्य स्थायी रूप से हटाने में विफल</string>
+    <string name="error_hard_delete_tasks">कार्य स्थायी रूप से हटाने में विफल</string>
+    <string name="error_no_task_selected">अपडेट के लिए कोई कार्य चयनित नहीं</string>
+    <string name="error_update_task_status">कार्य स्थिति अपडेट करने में विफल</string>
+    <string name="error_invalid_task_for_update">अपडेट के लिए अमान्य कार्य चयनित</string>
+    <string name="error_validation_failed">मान्यता विफल</string>
+    <string name="error_export_backup">बैकअप निर्यात करने में विफल: %s</string>
+    <string name="error_import_backup">बैकअप आयात करने में विफल: %s</string>
+
+    <!-- Notification (additional) -->
+    <string name="notification_explanation_enabled">कार्य अनुस्मारक के लिए सूचनाएँ सक्षम हैं</string>
+
+    <!-- Snackbar Messages -->
+    <string name="snackbar_task_archived">कार्य संग्रहित किया गया</string>
+    <string name="snackbar_tasks_marked_completed">%d कार्य पूर्ण चिह्नित किए गए</string>
+    <string name="snackbar_tasks_marked_active">%d कार्य सक्रिय चिह्नित किए गए</string>
+    <string name="snackbar_tasks_archived">%d कार्य संग्रहित किए गए</string>
+    <string name="snackbar_tasks_restored">%d कार्य संग्रह से पुनर्स्थापित किए गए</string>
+    <string name="snackbar_failed_mark_completed">कार्य पूर्ण चिह्नित करने में विफल</string>
+    <string name="snackbar_failed_mark_active">कार्य सक्रिय चिह्नित करने में विफल</string>
+    <string name="snackbar_failed_delete_tasks">कार्य हटाने में विफल: %s</string>
+    <string name="snackbar_failed_archive_tasks">कार्य संग्रहित करने में विफल: %s</string>
+    <string name="snackbar_failed_restore_tasks">कार्य पुनर्स्थापित करने में विफल: %s</string>
+    <string name="snackbar_failed_restore_archive">संग्रह से कार्य पुनर्स्थापित करने में विफल: %s</string>
+    <string name="snackbar_failed_permanent_delete">कार्य स्थायी रूप से हटाने में विफल: %s</string>
+</resources>
