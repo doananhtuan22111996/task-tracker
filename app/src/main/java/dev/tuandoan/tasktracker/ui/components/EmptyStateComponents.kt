@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Assignment
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.ClearAll
@@ -84,6 +85,8 @@ fun EmptySearchResults(
     onClearSearch: () -> Unit,
     onChangeFilter: () -> Unit,
     modifier: Modifier = Modifier,
+    searchQuery: String = "",
+    onCreateFromSearch: ((String) -> Unit)? = null,
 ) {
     Box(
         modifier = modifier.fillMaxSize(),
@@ -172,6 +175,23 @@ fun EmptySearchResults(
                             )
                         }
                     }
+                }
+            }
+
+            // "Create as task" button - only when search has no results AND there's a query
+            if (searchQuery.isNotBlank() && onCreateFromSearch != null && filter == TaskFilter.ALL) {
+                Spacer(modifier = Modifier.height(AppSpacing.small))
+                OutlinedButton(onClick = { onCreateFromSearch(searchQuery) }) {
+                    Icon(
+                        imageVector = Icons.Default.Add,
+                        contentDescription = null,
+                        modifier = Modifier.size(18.dp),
+                    )
+                    Spacer(modifier = Modifier.width(AppSpacing.extraSmall))
+                    Text(
+                        text = "Create \"$searchQuery\" as task",
+                        style = MaterialTheme.typography.labelLarge,
+                    )
                 }
             }
         }

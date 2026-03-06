@@ -1,6 +1,7 @@
 package dev.tuandoan.tasktracker.ui.components
 
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,11 +15,22 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Archive
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.material3.SwipeToDismissBox
+import androidx.compose.material3.SwipeToDismissBoxState
+import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -47,10 +59,18 @@ fun TaskListContent(
     onToggleTaskComplete: (Task) -> Unit,
     onEditTask: (Task) -> Unit,
     onArchiveTask: (Task) -> Unit,
+    onDuplicateTask: (Long) -> Unit = {},
     onPinTask: (Task) -> Unit,
     onLongPressTask: (Long) -> Unit,
     onToggleSelection: (Long) -> Unit,
     modifier: Modifier = Modifier,
+    onCreateFromSearch: ((String) -> Unit)? = null,
+    onPriorityClick: (Long) -> Unit = {},
+    onSwipeComplete: (Task) -> Unit = {},
+    onSwipeArchive: (Task) -> Unit = {},
+    inlineEditingTaskId: Long? = null,
+    onStartInlineEdit: (Long) -> Unit = {},
+    onCommitInlineEdit: (Long, String) -> Unit = { _, _ -> },
 ) {
     Column(
         modifier = modifier
@@ -87,11 +107,19 @@ fun TaskListContent(
             onToggleTaskComplete = onToggleTaskComplete,
             onEditTask = onEditTask,
             onArchiveTask = onArchiveTask,
+            onDuplicateTask = onDuplicateTask,
             onPinTask = onPinTask,
             onLongPressTask = onLongPressTask,
             onToggleSelection = onToggleSelection,
             onClearSearch = onClearSearch,
             onChangeFilter = { /* Filter change now handled by bottom navigation */ },
+            onCreateFromSearch = onCreateFromSearch,
+            onPriorityClick = onPriorityClick,
+            onSwipeComplete = onSwipeComplete,
+            onSwipeArchive = onSwipeArchive,
+            inlineEditingTaskId = inlineEditingTaskId,
+            onStartInlineEdit = onStartInlineEdit,
+            onCommitInlineEdit = onCommitInlineEdit,
         )
     }
 }
@@ -111,11 +139,19 @@ private fun TaskListOrEmptyState(
     onToggleTaskComplete: (Task) -> Unit,
     onEditTask: (Task) -> Unit,
     onArchiveTask: (Task) -> Unit,
+    onDuplicateTask: (Long) -> Unit = {},
     onPinTask: (Task) -> Unit,
     onLongPressTask: (Long) -> Unit,
     onToggleSelection: (Long) -> Unit,
     onClearSearch: () -> Unit,
     onChangeFilter: () -> Unit,
+    onCreateFromSearch: ((String) -> Unit)? = null,
+    onPriorityClick: (Long) -> Unit = {},
+    onSwipeComplete: (Task) -> Unit = {},
+    onSwipeArchive: (Task) -> Unit = {},
+    inlineEditingTaskId: Long? = null,
+    onStartInlineEdit: (Long) -> Unit = {},
+    onCommitInlineEdit: (Long, String) -> Unit = { _, _ -> },
 ) {
     when {
         allTasks.isEmpty() -> {
@@ -128,6 +164,8 @@ private fun TaskListOrEmptyState(
                 filter = currentFilter,
                 onClearSearch = onClearSearch,
                 onChangeFilter = onChangeFilter,
+                searchQuery = searchQuery,
+                onCreateFromSearch = onCreateFromSearch,
             )
         }
 
@@ -139,9 +177,16 @@ private fun TaskListOrEmptyState(
                 onToggleTaskComplete = onToggleTaskComplete,
                 onEditTask = onEditTask,
                 onArchiveTask = onArchiveTask,
+                onDuplicateTask = onDuplicateTask,
                 onPinTask = onPinTask,
                 onLongPressTask = onLongPressTask,
                 onToggleSelection = onToggleSelection,
+                onPriorityClick = onPriorityClick,
+                onSwipeComplete = onSwipeComplete,
+                onSwipeArchive = onSwipeArchive,
+                inlineEditingTaskId = inlineEditingTaskId,
+                onStartInlineEdit = onStartInlineEdit,
+                onCommitInlineEdit = onCommitInlineEdit,
             )
         }
     }
@@ -150,7 +195,7 @@ private fun TaskListOrEmptyState(
 /**
  * Scrollable list of tasks grouped by day with sticky section headers
  */
-@OptIn(ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
 private fun GroupedTaskList(
     taskSections: List<TaskSection>,
@@ -159,9 +204,16 @@ private fun GroupedTaskList(
     onToggleTaskComplete: (Task) -> Unit,
     onEditTask: (Task) -> Unit,
     onArchiveTask: (Task) -> Unit,
+    onDuplicateTask: (Long) -> Unit = {},
     onPinTask: (Task) -> Unit,
     onLongPressTask: (Long) -> Unit,
     onToggleSelection: (Long) -> Unit,
+    onPriorityClick: (Long) -> Unit = {},
+    onSwipeComplete: (Task) -> Unit = {},
+    onSwipeArchive: (Task) -> Unit = {},
+    inlineEditingTaskId: Long? = null,
+    onStartInlineEdit: (Long) -> Unit = {},
+    onCommitInlineEdit: (Long, String) -> Unit = { _, _ -> },
 ) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
@@ -186,17 +238,46 @@ private fun GroupedTaskList(
                 items = section.tasks,
                 key = { task -> task.id },
             ) { task ->
-                TaskItem(
-                    task = task,
-                    isSelected = selectedIds.contains(task.id),
-                    isSelectionMode = isSelectionMode,
-                    onToggleComplete = { onToggleTaskComplete(task) },
-                    onEditClick = { onEditTask(task) },
-                    onArchiveClick = { onArchiveTask(task) },
-                    onPinClick = { onPinTask(task) },
-                    onLongPress = { onLongPressTask(task.id) },
-                    onToggleSelection = { onToggleSelection(task.id) },
+                val dismissState = rememberSwipeToDismissBoxState(
+                    confirmValueChange = { value ->
+                        when (value) {
+                            SwipeToDismissBoxValue.StartToEnd -> {
+                                onSwipeComplete(task)
+                                false
+                            }
+                            SwipeToDismissBoxValue.EndToStart -> {
+                                onSwipeArchive(task)
+                                false
+                            }
+                            else -> false
+                        }
+                    },
+                    positionalThreshold = { totalDistance -> totalDistance * 0.3f },
                 )
+
+                SwipeToDismissBox(
+                    state = dismissState,
+                    backgroundContent = { SwipeBackground(dismissState) },
+                    enableDismissFromStartToEnd = !isSelectionMode,
+                    enableDismissFromEndToStart = !isSelectionMode,
+                ) {
+                    TaskItem(
+                        task = task,
+                        isSelected = selectedIds.contains(task.id),
+                        isSelectionMode = isSelectionMode,
+                        onToggleComplete = { onToggleTaskComplete(task) },
+                        onEditClick = { onEditTask(task) },
+                        onArchiveClick = { onArchiveTask(task) },
+                        onDuplicateClick = onDuplicateTask,
+                        onPinClick = { onPinTask(task) },
+                        onLongPress = { onLongPressTask(task.id) },
+                        onToggleSelection = { onToggleSelection(task.id) },
+                        onPriorityClick = onPriorityClick,
+                        inlineEditingTaskId = inlineEditingTaskId,
+                        onStartInlineEdit = onStartInlineEdit,
+                        onCommitInlineEdit = onCommitInlineEdit,
+                    )
+                }
             }
         }
     }
@@ -281,5 +362,34 @@ fun TaskSectionHeader(modifier: Modifier = Modifier, header: String, itemCount: 
                 }
             }
         }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun SwipeBackground(state: SwipeToDismissBoxState) {
+    val direction = state.dismissDirection
+    val color = when (direction) {
+        SwipeToDismissBoxValue.StartToEnd -> MaterialTheme.colorScheme.primaryContainer
+        SwipeToDismissBoxValue.EndToStart -> MaterialTheme.colorScheme.errorContainer
+        else -> Color.Transparent
+    }
+    val icon = when (direction) {
+        SwipeToDismissBoxValue.StartToEnd -> Icons.Default.Check
+        SwipeToDismissBoxValue.EndToStart -> Icons.Default.Archive
+        else -> null
+    }
+    val alignment = when (direction) {
+        SwipeToDismissBoxValue.StartToEnd -> Alignment.CenterStart
+        else -> Alignment.CenterEnd
+    }
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(color)
+            .padding(horizontal = 20.dp),
+        contentAlignment = alignment,
+    ) {
+        icon?.let { Icon(it, contentDescription = null) }
     }
 }

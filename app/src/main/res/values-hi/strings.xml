@@ -11,6 +11,7 @@
     <string name="action_cancel">रद्द करें</string>
     <string name="action_delete">हटाएँ</string>
     <string name="action_archive">संग्रहित करें</string>
+    <string name="action_duplicate">प्रतिलिपि बनाएँ</string>
     <string name="action_save">सहेजें</string>
     <string name="action_undo">पूर्ववत करें</string>
     <string name="action_ok">ठीक है</string>
@@ -238,6 +239,7 @@
 
     <!-- Operation Success Messages -->
     <string name="op_task_created">कार्य बनाया गया</string>
+    <string name="op_task_duplicated">कार्य की प्रतिलिपि बनाई गई</string>
     <string name="op_task_updated">कार्य अपडेट किया गया</string>
     <string name="op_task_restored">कार्य पुनर्स्थापित किया गया</string>
     <string name="op_task_pinned">कार्य पिन किया गया</string>

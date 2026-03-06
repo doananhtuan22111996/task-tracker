@@ -26,6 +26,8 @@ class SettingsRepository @Inject constructor(@ApplicationContext private val con
         val THEME_MODE = stringPreferencesKey("theme_mode")
         val DYNAMIC_COLOR = booleanPreferencesKey("dynamic_color")
         val LANGUAGE_TAG = stringPreferencesKey("language_tag")
+        val OVERDUE_DIGEST_ENABLED = booleanPreferencesKey("overdue_digest_enabled")
+        val OVERDUE_DIGEST_HOUR = stringPreferencesKey("overdue_digest_hour")
     }
 
     /**
@@ -36,6 +38,8 @@ class SettingsRepository @Inject constructor(@ApplicationContext private val con
             themeMode = prefs[Keys.THEME_MODE]?.let { ThemeMode.valueOf(it) } ?: ThemeMode.SYSTEM,
             dynamicColor = prefs[Keys.DYNAMIC_COLOR] ?: true,
             languageTag = prefs[Keys.LANGUAGE_TAG] ?: "",
+            overdueDigestEnabled = prefs[Keys.OVERDUE_DIGEST_ENABLED] ?: false,
+            overdueDigestHour = prefs[Keys.OVERDUE_DIGEST_HOUR]?.toIntOrNull() ?: 9,
         )
     }
 
@@ -64,6 +68,24 @@ class SettingsRepository @Inject constructor(@ApplicationContext private val con
     suspend fun setLanguageTag(tag: String) {
         context.dataStore.edit { prefs ->
             prefs[Keys.LANGUAGE_TAG] = tag
+        }
+    }
+
+    /**
+     * Updates the overdue digest enabled preference.
+     */
+    suspend fun setOverdueDigestEnabled(enabled: Boolean) {
+        context.dataStore.edit { prefs ->
+            prefs[Keys.OVERDUE_DIGEST_ENABLED] = enabled
+        }
+    }
+
+    /**
+     * Updates the overdue digest hour preference.
+     */
+    suspend fun setOverdueDigestHour(hour: Int) {
+        context.dataStore.edit { prefs ->
+            prefs[Keys.OVERDUE_DIGEST_HOUR] = hour.toString()
         }
     }
 }

@@ -8,6 +8,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dev.tuandoan.tasktracker.R
 import dev.tuandoan.tasktracker.data.database.Task
 import dev.tuandoan.tasktracker.domain.model.CompletedGrouping
+import dev.tuandoan.tasktracker.domain.model.Priority
 import dev.tuandoan.tasktracker.domain.model.SortDirection
 import dev.tuandoan.tasktracker.domain.model.SortKey
 import dev.tuandoan.tasktracker.domain.model.TaskSort
@@ -28,6 +29,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.shareIn
@@ -72,14 +74,21 @@ class TaskViewModel @Inject constructor(
             initialValue = emptyList(),
         )
 
-    // Grouped tasks for day-based sections
-    val groupedVisibleTasks: StateFlow<List<TaskSection>> = visibleTasks
-        .map { tasks -> TaskDateGrouper.groupTasksByDay(tasks, context) }
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
-            initialValue = emptyList(),
-        )
+    // Grouped tasks for day-based sections (or priority-based when sorted by priority)
+    val groupedVisibleTasks: StateFlow<List<TaskSection>> = combine(
+        visibleTasks,
+        listState.taskSort,
+    ) { tasks, sort ->
+        if (sort.key == SortKey.PRIORITY) {
+            TaskDateGrouper.groupByPriority(tasks)
+        } else {
+            TaskDateGrouper.groupTasksByDay(tasks, context)
+        }
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = emptyList(),
+    )
 
     val searchQuery = listState.searchQuery
     val filter = listState.filter
@@ -264,10 +273,55 @@ class TaskViewModel @Inject constructor(
         )
     }
 
+    fun duplicateTask(taskId: Long) {
+        val task = allTasks.value.find { it.id == taskId } ?: return
+        crudManager.executeOperation(
+            scope = viewModelScope,
+            operation = { crudManager.duplicateTask(task) },
+            onSuccess = { message ->
+                viewModelScope.launch {
+                    _singleTaskUiEvent.emit(
+                        UiEvent.ShowSnackbar(message = message),
+                    )
+                }
+            },
+        )
+    }
+
+    fun quickCreateTask(title: String, priority: Priority, dueAt: Long?) {
+        crudManager.executeOperation(
+            scope = viewModelScope,
+            operation = { crudManager.quickCreateTask(title, priority.value, dueAt) },
+        )
+    }
+
     fun toggleTaskCompletion(task: Task) {
         crudManager.executeOperation(
             scope = viewModelScope,
             operation = { crudManager.toggleTaskCompletion(task) },
+            onSuccess = { message ->
+                viewModelScope.launch {
+                    _singleTaskUiEvent.emit(
+                        UiEvent.ShowSnackbar(
+                            message = message,
+                            actionLabel = context.getString(R.string.action_undo),
+                            onActionClick = {
+                                undoToggleCompletion(task)
+                            },
+                        ),
+                    )
+                }
+            },
+        )
+    }
+
+    private fun undoToggleCompletion(task: Task) {
+        // After the original toggle, the task's isCompleted has been flipped.
+        // To undo, we toggle again with the post-toggle state so it flips back.
+        val postToggleTask = task.copy(isCompleted = !task.isCompleted)
+        crudManager.executeOperation(
+            scope = viewModelScope,
+            operation = { crudManager.toggleTaskCompletion(postToggleTask) },
         )
     }
 
@@ -284,6 +338,37 @@ class TaskViewModel @Inject constructor(
             operation = { crudManager.updateTaskPriority(taskId, priority) },
         )
     }
+
+    fun cyclePriority(taskId: Long) {
+        viewModelScope.launch {
+            val tasks = allTasks.value
+            val task = tasks.find { it.id == taskId } ?: return@launch
+            val currentPriority = Priority.fromValue(task.priority)
+            val next = when (currentPriority) {
+                Priority.LOW -> Priority.MEDIUM
+                Priority.MEDIUM -> Priority.HIGH
+                Priority.HIGH -> Priority.LOW
+            }
+            updateTaskPriority(taskId, next.value)
+        }
+    }
+
+    // === Inline Editing ===
+
+    val inlineEditingTaskId: StateFlow<Long?> = listStateManager.inlineEditingTaskId
+
+    fun startInlineEdit(taskId: Long) = listStateManager.startInlineEdit(taskId)
+
+    fun commitInlineEdit(taskId: Long, newTitle: String) {
+        listStateManager.clearInlineEdit()
+        if (newTitle.isBlank()) return
+        crudManager.executeOperation(
+            scope = viewModelScope,
+            operation = { crudManager.updateTitle(taskId, newTitle.trim()) },
+        )
+    }
+
+    fun cancelInlineEdit() = listStateManager.clearInlineEdit()
 
     // === Selection Management ===
 

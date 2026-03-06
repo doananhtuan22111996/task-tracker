@@ -11,6 +11,7 @@
     <string name="action_cancel">Hủy</string>
     <string name="action_delete">Xóa</string>
     <string name="action_archive">Lưu trữ</string>
+    <string name="action_duplicate">Nhân bản</string>
     <string name="action_save">Lưu</string>
     <string name="action_undo">HOÀN TÁC</string>
     <string name="action_ok">OK</string>
@@ -238,6 +239,7 @@
 
     <!-- Operation Success Messages (used by managers/use cases) -->
     <string name="op_task_created">Đã tạo công việc</string>
+    <string name="op_task_duplicated">Đã nhân bản công việc</string>
     <string name="op_task_updated">Đã cập nhật công việc</string>
     <string name="op_task_restored">Đã khôi phục công việc</string>
     <string name="op_task_pinned">Đã ghim công việc</string>

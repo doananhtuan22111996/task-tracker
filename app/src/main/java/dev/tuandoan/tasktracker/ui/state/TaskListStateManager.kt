@@ -37,6 +37,18 @@ class TaskListStateManager @Inject constructor(
     private val _tagFilter = MutableStateFlow<String?>(null)
     val tagFilter: StateFlow<String?> = _tagFilter.asStateFlow()
 
+    // Inline editing state
+    private val _inlineEditingTaskId = MutableStateFlow<Long?>(null)
+    val inlineEditingTaskId: StateFlow<Long?> = _inlineEditingTaskId.asStateFlow()
+
+    fun startInlineEdit(taskId: Long) {
+        _inlineEditingTaskId.value = taskId
+    }
+
+    fun clearInlineEdit() {
+        _inlineEditingTaskId.value = null
+    }
+
     /**
      * Initialize state flows for a given coroutine scope (typically ViewModel scope)
      */

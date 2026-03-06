@@ -97,6 +97,10 @@ interface TaskDao {
     @Query("SELECT COUNT(*) FROM tasks WHERE isCompleted = 0 AND isArchived = 0 AND dueAt < :nowMillis")
     fun observeOverdueCount(nowMillis: Long): Flow<Int>
 
+    // Overdue tasks query (for digest notification)
+    @Query("SELECT * FROM tasks WHERE isArchived = 0 AND isCompleted = 0 AND dueAt IS NOT NULL AND dueAt < :nowMillis")
+    suspend fun getOverdueTasks(nowMillis: Long): List<Task>
+
     // Backup operations
     @Query("SELECT * FROM tasks ORDER BY createdAt DESC")
     suspend fun getAllTasksIncludingArchived(): List<Task>

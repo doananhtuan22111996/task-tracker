@@ -16,4 +16,6 @@ data class UserPreferences(
     val themeMode: ThemeMode = ThemeMode.SYSTEM,
     val dynamicColor: Boolean = true,
     val languageTag: String = "", // Empty string means "follow system"
+    val overdueDigestEnabled: Boolean = false,
+    val overdueDigestHour: Int = 9, // Default: 9 AM
 )

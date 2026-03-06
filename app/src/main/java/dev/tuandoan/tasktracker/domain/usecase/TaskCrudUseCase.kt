@@ -182,6 +182,78 @@ class TaskCrudUseCase @Inject constructor(
     }
 
     /**
+     * Duplicates a task, copying title, description, tag, and priority from the source.
+     * Resets completion, due date, reminder, pin, and archive state to defaults.
+     */
+    suspend fun duplicateTask(source: Task): Result<Long> = try {
+        _errorMessage.value = null
+        val newId = taskManager.createTask(
+            title = source.title,
+            description = source.description,
+            dueAt = null,
+            reminderOffsetMinutes = null,
+            tag = source.tag,
+        )
+        if (source.priority != 1) {
+            taskManager.setPriority(newId, source.priority)
+        }
+        _lastOperationSuccess.value = context.getString(R.string.op_task_duplicated)
+        Result.success(newId)
+    } catch (e: Exception) {
+        _errorMessage.value = e.message ?: context.getString(R.string.error_create_task)
+        Result.failure(e)
+    }
+
+    /**
+     * Creates a new task with a given priority, used by the quick-add flow.
+     * Returns the new task ID on success.
+     */
+    suspend fun quickCreateTask(
+        title: String,
+        description: String,
+        dueAt: Long?,
+        tag: String?,
+        priority: Int,
+    ): Result<Long> = try {
+        _isLoading.value = true
+        _errorMessage.value = null
+
+        val taskId = taskManager.createTask(
+            title = title,
+            description = description,
+            dueAt = dueAt,
+            reminderOffsetMinutes = null,
+            tag = tag,
+        )
+        if (priority != 1) {
+            taskManager.setPriority(taskId, priority)
+        }
+        _lastOperationSuccess.value = context.getString(R.string.op_task_created)
+        Result.success(taskId)
+    } catch (e: Exception) {
+        val errorMsg = e.message ?: context.getString(R.string.error_create_task)
+        _errorMessage.value = errorMsg
+        Result.failure(e)
+    } finally {
+        _isLoading.value = false
+    }
+
+    /**
+     * Updates only the title of an existing task
+     */
+    suspend fun updateTitle(taskId: Long, newTitle: String): Result<Unit> = try {
+        _errorMessage.value = null
+        val task = taskManager.getTaskById(taskId) ?: return Result.failure(
+            RuntimeException("Task not found"),
+        )
+        taskManager.updateTask(task.copy(title = newTitle))
+        Result.success(Unit)
+    } catch (e: Exception) {
+        _errorMessage.value = e.message ?: context.getString(R.string.error_update_task)
+        Result.failure(e)
+    }
+
+    /**
      * Clear error message
      */
     fun clearError() {

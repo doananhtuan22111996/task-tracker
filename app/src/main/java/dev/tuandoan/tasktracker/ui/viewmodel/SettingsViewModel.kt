@@ -98,6 +98,22 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
+    // --- Overdue Digest ---
+
+    /**
+     * Updates the overdue digest enabled preference.
+     */
+    fun setOverdueDigestEnabled(enabled: Boolean) {
+        viewModelScope.launch { settingsRepository.setOverdueDigestEnabled(enabled) }
+    }
+
+    /**
+     * Updates the overdue digest hour preference.
+     */
+    fun setOverdueDigestHour(hour: Int) {
+        viewModelScope.launch { settingsRepository.setOverdueDigestHour(hour) }
+    }
+
     // --- Backup & Restore ---
 
     private val _isLoading = MutableStateFlow(false)

@@ -11,6 +11,7 @@
     <string name="action_cancel">Abbrechen</string>
     <string name="action_delete">Löschen</string>
     <string name="action_archive">Archivieren</string>
+    <string name="action_duplicate">Duplizieren</string>
     <string name="action_save">Speichern</string>
     <string name="action_undo">RÜCKGÄNGIG</string>
     <string name="action_ok">OK</string>
@@ -238,6 +239,7 @@
 
     <!-- Operation Success Messages (used by managers/use cases) -->
     <string name="op_task_created">Aufgabe erstellt</string>
+    <string name="op_task_duplicated">Aufgabe dupliziert</string>
     <string name="op_task_updated">Aufgabe aktualisiert</string>
     <string name="op_task_restored">Aufgabe wiederhergestellt</string>
     <string name="op_task_pinned">Aufgabe angeheftet</string>

@@ -218,6 +218,58 @@ class TaskDateGrouperTest {
 
     // === dateKey format ===
 
+    // === Priority grouping ===
+
+    @Test
+    fun `groupByPriority returns High Medium Low order`() {
+        val tasks = listOf(
+            TestTaskFactory.createTask(id = 1, title = "Low", priority = 0),
+            TestTaskFactory.createTask(id = 2, title = "High", priority = 2),
+            TestTaskFactory.createTask(id = 3, title = "Medium", priority = 1),
+        )
+
+        val sections = TaskDateGrouper.groupByPriority(tasks)
+
+        assertEquals(3, sections.size)
+        assertEquals("\uD83D\uDD34 High", sections[0].header)
+        assertEquals("\uD83D\uDFE1 Medium", sections[1].header)
+        assertEquals("\uD83D\uDFE2 Low", sections[2].header)
+    }
+
+    @Test
+    fun `groupByPriority omits empty priority sections`() {
+        val tasks = listOf(
+            TestTaskFactory.createTask(id = 1, title = "High only", priority = 2),
+        )
+
+        val sections = TaskDateGrouper.groupByPriority(tasks)
+
+        assertEquals(1, sections.size)
+        assertEquals("\uD83D\uDD34 High", sections[0].header)
+    }
+
+    @Test
+    fun `groupByPriority pinned tasks appear first within each section`() {
+        val tasks = listOf(
+            TestTaskFactory.createTask(id = 1, title = "Unpinned High", priority = 2, isPinned = false),
+            TestTaskFactory.createTask(id = 2, title = "Pinned High", priority = 2, isPinned = true),
+        )
+
+        val sections = TaskDateGrouper.groupByPriority(tasks)
+
+        assertEquals(1, sections.size)
+        assertEquals("Pinned High", sections[0].tasks[0].title)
+        assertEquals("Unpinned High", sections[0].tasks[1].title)
+    }
+
+    @Test
+    fun `groupByPriority with empty list returns empty`() {
+        val result = TaskDateGrouper.groupByPriority(emptyList())
+        assertTrue(result.isEmpty())
+    }
+
+    // === dateKey format ===
+
     @Test
     fun `dateKey format is YYYY-MM-DD with zero padding`() {
         val cal = Calendar.getInstance()

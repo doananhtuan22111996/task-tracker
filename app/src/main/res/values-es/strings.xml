@@ -11,6 +11,7 @@
     <string name="action_cancel">Cancelar</string>
     <string name="action_delete">Eliminar</string>
     <string name="action_archive">Archivar</string>
+    <string name="action_duplicate">Duplicar</string>
     <string name="action_save">Guardar</string>
     <string name="action_undo">DESHACER</string>
     <string name="action_ok">OK</string>
@@ -238,6 +239,7 @@
 
     <!-- Operation Success Messages (used by managers/use cases) -->
     <string name="op_task_created">Tarea creada</string>
+    <string name="op_task_duplicated">Tarea duplicada</string>
     <string name="op_task_updated">Tarea actualizada</string>
     <string name="op_task_restored">Tarea restaurada</string>
     <string name="op_task_pinned">Tarea fijada</string>

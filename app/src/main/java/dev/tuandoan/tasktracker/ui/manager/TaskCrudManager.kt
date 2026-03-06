@@ -311,6 +311,49 @@ class TaskCrudManager @Inject constructor(
         }
     }
 
+    /**
+     * Duplicates a task, copying title, description, tag, and priority from the source.
+     */
+    suspend fun duplicateTask(task: Task): TaskOperationResult {
+        val result = crudUseCase.duplicateTask(task)
+        return if (result.isSuccess) {
+            TaskOperationResult.Success(context.getString(R.string.op_task_duplicated))
+        } else {
+            val errorMessage =
+                result.exceptionOrNull()?.message ?: context.getString(R.string.error_create_task)
+            TaskOperationResult.CrudError(errorMessage)
+        }
+    }
+
+    /**
+     * Creates a task quickly with title, priority, and optional due date.
+     * Used by the quick-add bottom sheet flow.
+     */
+    suspend fun quickCreateTask(title: String, priority: Int, dueAt: Long?): TaskOperationResult {
+        val result = crudUseCase.quickCreateTask(title, "", dueAt, null, priority)
+        return if (result.isSuccess) {
+            TaskOperationResult.Success(context.getString(R.string.op_task_created))
+        } else {
+            val errorMessage =
+                result.exceptionOrNull()?.message ?: context.getString(R.string.error_create_task)
+            TaskOperationResult.CrudError(errorMessage)
+        }
+    }
+
+    /**
+     * Updates only the title of an existing task (used for inline editing)
+     */
+    suspend fun updateTitle(taskId: Long, newTitle: String): TaskOperationResult {
+        val result = crudUseCase.updateTitle(taskId, newTitle)
+        return if (result.isSuccess) {
+            TaskOperationResult.Success(context.getString(R.string.op_task_updated))
+        } else {
+            val errorMessage =
+                result.exceptionOrNull()?.message ?: context.getString(R.string.error_update_task)
+            TaskOperationResult.CrudError(errorMessage)
+        }
+    }
+
     // === Archive Operations ===
 
     /**

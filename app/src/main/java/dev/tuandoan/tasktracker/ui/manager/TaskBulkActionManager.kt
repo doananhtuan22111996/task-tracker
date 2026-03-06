@@ -132,6 +132,11 @@ class TaskBulkActionManager @Inject constructor(
             clearSelectionOnSuccess = true,
             onSuccess = onSuccess,
             onError = onError,
+            undoOperation = { taskIds ->
+                scope.launch {
+                    crudManager.bulkMarkActive(taskIds)
+                }
+            },
         )
     }
 
@@ -152,6 +157,11 @@ class TaskBulkActionManager @Inject constructor(
             clearSelectionOnSuccess = true,
             onSuccess = onSuccess,
             onError = onError,
+            undoOperation = { taskIds ->
+                scope.launch {
+                    crudManager.bulkMarkCompleted(taskIds)
+                }
+            },
         )
     }
 
@@ -487,6 +497,7 @@ class TaskBulkActionManager @Inject constructor(
         clearSelectionOnSuccess: Boolean = true,
         onSuccess: (String) -> Unit = {},
         onError: (String) -> Unit = {},
+        undoOperation: ((List<Long>) -> Unit)? = null,
     ) {
         if (!scope.coroutineContext[kotlinx.coroutines.Job]?.isActive!!) {
             onError("Operation cancelled: scope is not active")
@@ -531,7 +542,17 @@ class TaskBulkActionManager @Inject constructor(
                         val message = successMessage(taskIds.size)
                         onSuccess(message)
 
-                        _uiEvent.emit(UiEvent.ShowSnackbar(message = message))
+                        if (undoOperation != null) {
+                            _uiEvent.emit(
+                                UiEvent.ShowSnackbar(
+                                    message = message,
+                                    actionLabel = context.getString(R.string.action_undo),
+                                    onActionClick = { undoOperation(taskIds) },
+                                ),
+                            )
+                        } else {
+                            _uiEvent.emit(UiEvent.ShowSnackbar(message = message))
+                        }
                     }
                     is TaskOperationResult.CrudError -> {
                         onError(result.message)

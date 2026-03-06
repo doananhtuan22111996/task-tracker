@@ -292,6 +292,71 @@ class TaskCrudUseCaseTest {
         assertEquals(2L, result[0].id)
     }
 
+    // === duplicateTask ===
+
+    @Test
+    fun `duplicateTask copies title description tag and priority from source`() = runTest {
+        val source = TestTaskFactory.createTask(
+            id = 1,
+            title = "Original",
+            description = "Some description",
+            tag = "work",
+            priority = 2,
+        )
+        repository.seed(source)
+
+        val result = useCase.duplicateTask(source)
+
+        assertTrue(result.isSuccess)
+        val newId = result.getOrThrow()
+        val copy = repository.getTaskById(newId)!!
+        assertEquals("Original", copy.title)
+        assertEquals("Some description", copy.description)
+        assertEquals("work", copy.tag)
+        assertEquals(2, copy.priority)
+    }
+
+    @Test
+    fun `duplicateTask resets completion archive pin and due date fields`() = runTest {
+        val source = TestTaskFactory.createTask(
+            id = 1,
+            title = "Completed Task",
+            isCompleted = true,
+            completedAt = TestTaskFactory.BASE_TIMESTAMP,
+            dueAt = TestTaskFactory.BASE_TIMESTAMP + TestTaskFactory.ONE_DAY_MS,
+            reminderOffsetMinutes = 60,
+            isPinned = true,
+            isArchived = true,
+            archivedAt = TestTaskFactory.BASE_TIMESTAMP,
+        )
+        repository.seed(source)
+
+        val result = useCase.duplicateTask(source)
+
+        assertTrue(result.isSuccess)
+        val newId = result.getOrThrow()
+        val copy = repository.getTaskById(newId)!!
+        assertFalse(copy.isCompleted)
+        assertNull(copy.completedAt)
+        assertNull(copy.dueAt)
+        assertNull(copy.reminderOffsetMinutes)
+        assertFalse(copy.isPinned)
+        assertFalse(copy.isArchived)
+        assertNull(copy.archivedAt)
+    }
+
+    @Test
+    fun `duplicateTask assigns a new id different from source`() = runTest {
+        val source = TestTaskFactory.createTask(id = 1, title = "Original")
+        repository.seed(source)
+
+        val result = useCase.duplicateTask(source)
+
+        assertTrue(result.isSuccess)
+        val newId = result.getOrThrow()
+        assertTrue(newId != source.id)
+    }
+
     // === error state ===
 
     @Test

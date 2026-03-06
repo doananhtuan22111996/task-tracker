@@ -202,6 +202,37 @@ fun SettingsScreen(viewModel: SettingsViewModel, onNavigateBack: () -> Unit) {
                 )
 
                 // =============================================
+                // Notifications Section
+                // =============================================
+                SectionHeader(text = stringResource(R.string.settings_section_notifications))
+
+                ListItem(
+                    headlineContent = {
+                        Text(
+                            text = stringResource(R.string.settings_overdue_digest),
+                            style = MaterialTheme.typography.bodyLarge,
+                        )
+                    },
+                    supportingContent = {
+                        Text(
+                            text = stringResource(R.string.settings_overdue_digest_desc),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    },
+                    trailingContent = {
+                        Switch(
+                            checked = userPreferences.overdueDigestEnabled,
+                            onCheckedChange = { viewModel.setOverdueDigestEnabled(it) },
+                        )
+                    },
+                    colors = ListItemDefaults.colors(
+                        containerColor = MaterialTheme.colorScheme.surface,
+                    ),
+                    modifier = Modifier.fillMaxWidth(),
+                )
+
+                // =============================================
                 // Backup & Restore Section
                 // =============================================
                 SectionHeader(text = stringResource(R.string.settings_section_backup))

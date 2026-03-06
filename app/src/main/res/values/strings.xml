@@ -10,6 +10,7 @@
     <string name="action_cancel">Cancel</string>
     <string name="action_delete">Delete</string>
     <string name="action_archive">Archive</string>
+    <string name="action_duplicate">Duplicate</string>
     <string name="action_save">Save</string>
     <string name="action_undo">UNDO</string>
     <string name="action_ok">OK</string>
@@ -113,6 +114,9 @@
     <string name="settings_section_language">Language</string>
     <string name="settings_language">Language</string>
     <string name="settings_language_system">Follow system</string>
+    <string name="settings_section_notifications">Notifications</string>
+    <string name="settings_overdue_digest">Daily overdue reminder</string>
+    <string name="settings_overdue_digest_desc">Get a daily notification when you have overdue tasks</string>
     <string name="settings_section_backup">Backup &amp; Restore</string>
     <string name="settings_export_backup">Export backup</string>
     <string name="settings_export_backup_desc">Save all tasks as a JSON file</string>
@@ -209,6 +213,9 @@
     <string name="notification_open_settings">Open Settings</string>
     <string name="notification_maybe_later">Maybe Later</string>
 
+    <!-- Overdue Digest Notification -->
+    <string name="notification_overdue_title">Overdue tasks</string>
+
     <!-- Notification Channel -->
     <string name="notification_channel_name">Task Reminders</string>
     <string name="notification_channel_description">Notifications for task due date reminders</string>
@@ -237,6 +244,7 @@
 
     <!-- Operation Success Messages (used by managers/use cases) -->
     <string name="op_task_created">Task created</string>
+    <string name="op_task_duplicated">Task duplicated</string>
     <string name="op_task_updated">Task updated</string>
     <string name="op_task_restored">Task restored</string>
     <string name="op_task_pinned">Task pinned</string>
@@ -283,4 +291,9 @@
     <string name="snackbar_failed_restore_tasks">Failed to restore tasks: %s</string>
     <string name="snackbar_failed_restore_archive">Failed to restore tasks from archive: %s</string>
     <string name="snackbar_failed_permanent_delete">Failed to permanently delete tasks: %s</string>
+
+    <!-- Quick Add Sheet -->
+    <string name="hint_quick_add">What needs to be done?</string>
+    <string name="action_add_details">Add details</string>
+    <string name="action_add">Add</string>
 </resources>

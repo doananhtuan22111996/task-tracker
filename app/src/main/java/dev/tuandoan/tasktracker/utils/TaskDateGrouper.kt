@@ -3,6 +3,7 @@ package dev.tuandoan.tasktracker.utils
 import android.content.Context
 import dev.tuandoan.tasktracker.R
 import dev.tuandoan.tasktracker.data.database.Task
+import dev.tuandoan.tasktracker.domain.model.Priority
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
@@ -64,6 +65,39 @@ object TaskDateGrouper {
                     isToday = dateKey == today,
                 )
             }
+    }
+
+    /**
+     * Group tasks by priority level with human-friendly headers.
+     * Returns sections in High -> Medium -> Low order.
+     * Empty priority sections are omitted.
+     * Pinned tasks appear first within each section.
+     *
+     * @param tasks List of tasks (should already be filtered/searched/sorted)
+     * @return List of TaskSection grouped by priority
+     */
+    fun groupByPriority(tasks: List<Task>): List<TaskSection> {
+        if (tasks.isEmpty()) return emptyList()
+
+        val grouped = tasks.groupBy { task ->
+            when (Priority.fromValue(task.priority)) {
+                Priority.HIGH -> "\uD83D\uDD34 High"
+                Priority.MEDIUM -> "\uD83D\uDFE1 Medium"
+                Priority.LOW -> "\uD83D\uDFE2 Low"
+            }
+        }
+
+        val orderedKeys = listOf("\uD83D\uDD34 High", "\uD83D\uDFE1 Medium", "\uD83D\uDFE2 Low")
+        return orderedKeys.mapNotNull { key ->
+            grouped[key]?.let { tasksInGroup ->
+                TaskSection(
+                    header = key,
+                    dateKey = key,
+                    tasks = applyPinnedFirstOrdering(tasksInGroup),
+                    isToday = false,
+                )
+            }
+        }
     }
 
     /**

@@ -9,6 +9,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dev.tuandoan.tasktracker.R
 import dev.tuandoan.tasktracker.data.database.Task
 import dev.tuandoan.tasktracker.domain.ITaskManager
+import dev.tuandoan.tasktracker.domain.model.DueDatePreset
 import dev.tuandoan.tasktracker.domain.model.ReminderOption
 import dev.tuandoan.tasktracker.domain.usecase.TaskFormUseCase
 import kotlinx.coroutines.flow.Flow
@@ -37,9 +38,11 @@ class TaskEditorViewModel @Inject constructor(
 
     companion object {
         private const val TASK_ID_ARG = "taskId"
+        private const val INITIAL_TITLE_ARG = "initialTitle"
     }
 
     private val taskId: Long? = savedStateHandle.get<Long>(TASK_ID_ARG)
+    private val initialTitle: String = savedStateHandle.get<String>(INITIAL_TITLE_ARG) ?: ""
 
     // Form fields
     private val _taskTitle = MutableStateFlow("")
@@ -184,6 +187,9 @@ class TaskEditorViewModel @Inject constructor(
     init {
         if (isEditMode && taskId != null) {
             loadTask(taskId)
+        } else if (initialTitle.isNotBlank()) {
+            _taskTitle.value = initialTitle
+            updateHasChanges()
         }
     }
 
@@ -230,6 +236,23 @@ class TaskEditorViewModel @Inject constructor(
 
     fun updateDueAt(dueAt: Long?) {
         _dueAt.value = dueAt
+        updateHasChanges()
+    }
+
+    fun setDueDatePreset(preset: DueDatePreset) {
+        _dueAt.value = preset.toEpochMillis()
+        // Clear reminder if it would now be in the past
+        if (_reminderOption.value != ReminderOption.NONE && _dueAt.value != null) {
+            if (!isReminderTimeValid(_dueAt.value!!, _reminderOption.value.offsetMinutes)) {
+                _reminderOption.value = ReminderOption.NONE
+            }
+        }
+        updateHasChanges()
+    }
+
+    fun clearDueDate() {
+        _dueAt.value = null
+        _reminderOption.value = ReminderOption.NONE
         updateHasChanges()
     }
 

@@ -1,10 +1,14 @@
 package dev.tuandoan.tasktracker.ui.components
 
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -16,6 +20,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.KeyboardArrowDown
@@ -31,20 +38,36 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.compositeOver
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -63,9 +86,14 @@ fun TaskItem(
     onToggleComplete: () -> Unit,
     onEditClick: () -> Unit,
     onArchiveClick: () -> Unit,
+    onDuplicateClick: (Long) -> Unit = {},
     onPinClick: () -> Unit,
     onLongPress: () -> Unit = {},
     onToggleSelection: () -> Unit = {},
+    onPriorityClick: (Long) -> Unit = {},
+    inlineEditingTaskId: Long? = null,
+    onStartInlineEdit: (Long) -> Unit = {},
+    onCommitInlineEdit: (Long, String) -> Unit = { _, _ -> },
 ) {
     // Unified interaction source for consistent ripple
     val interactionSource = remember { MutableInteractionSource() }
@@ -119,6 +147,8 @@ fun TaskItem(
         label = "elevation",
     )
 
+    val haptic = LocalHapticFeedback.current
+
     // Selected border
     val selectedBorder = if (isSelected) {
         BorderStroke(
@@ -128,6 +158,10 @@ fun TaskItem(
     } else {
         null
     }
+
+    val isInlineEditing = inlineEditingTaskId == task.id
+    var inlineTitle by remember(task.id) { mutableStateOf(task.title) }
+    val inlineEditFocusRequester = remember { FocusRequester() }
 
     Card(
         modifier = modifier
@@ -162,14 +196,33 @@ fun TaskItem(
             // LEFT: Checkbox (selection mode uses selection state; normal uses completed state)
             val checkboxChecked = if (isSelectionMode) isSelected else task.isCompleted
 
+            // Scale animation for checkbox
+            val checkboxScale by animateFloatAsState(
+                targetValue = if (task.isCompleted) 1f else 0.85f,
+                animationSpec = spring(
+                    dampingRatio = Spring.DampingRatioMediumBouncy,
+                    stiffness = Spring.StiffnessMedium,
+                ),
+                label = "checkboxScale",
+            )
+
             // Clickable checkbox area to handle completion without conflicting with card
             Box(
                 modifier = Modifier
+                    .graphicsLayer {
+                        scaleX = checkboxScale
+                        scaleY = checkboxScale
+                    }
                     .combinedClickable(
                         interactionSource = remember { MutableInteractionSource() },
                         indication = null, // No ripple for checkbox area
                         onClick = {
-                            if (!isSelectionMode) onToggleComplete()
+                            if (!isSelectionMode) {
+                                if (!task.isCompleted) {
+                                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                }
+                                onToggleComplete()
+                            }
                         },
                     ),
                 contentAlignment = Alignment.Center,
@@ -195,15 +248,75 @@ fun TaskItem(
                     .padding(top = 2.dp),
                 verticalArrangement = Arrangement.spacedBy(6.dp),
             ) {
-                // Title
-                Text(
-                    text = task.title,
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.SemiBold,
-                    textDecoration = titleTextDecoration,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                )
+                // Title with inline editing support
+                if (isInlineEditing && !isSelectionMode) {
+                    BasicTextField(
+                        value = inlineTitle,
+                        onValueChange = { inlineTitle = it },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .focusRequester(inlineEditFocusRequester)
+                            .onFocusChanged {
+                                if (!it.isFocused) {
+                                    onCommitInlineEdit(task.id, inlineTitle)
+                                }
+                            },
+                        textStyle = MaterialTheme.typography.titleMedium.copy(
+                            fontWeight = FontWeight.SemiBold,
+                            color = MaterialTheme.colorScheme.onSurface,
+                        ),
+                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                        keyboardActions = KeyboardActions(
+                            onDone = { onCommitInlineEdit(task.id, inlineTitle) },
+                        ),
+                        singleLine = true,
+                    )
+                    LaunchedEffect(Unit) { inlineEditFocusRequester.requestFocus() }
+                } else {
+                    // Animated strikethrough
+                    val strikethroughFraction by animateFloatAsState(
+                        targetValue = if (task.isCompleted) 1f else 0f,
+                        animationSpec = tween(durationMillis = 300),
+                        label = "strikethrough",
+                    )
+
+                    Text(
+                        text = task.title,
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.SemiBold,
+                        textDecoration = if (task.isCompleted && strikethroughFraction >= 1f) {
+                            TextDecoration.LineThrough
+                        } else {
+                            null
+                        },
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier
+                            .drawBehind {
+                                if (strikethroughFraction > 0f && strikethroughFraction < 1f) {
+                                    val y = size.height / 2f
+                                    drawLine(
+                                        color = Color.Gray,
+                                        start = Offset(0f, y),
+                                        end = Offset(
+                                            size.width * strikethroughFraction,
+                                            y,
+                                        ),
+                                        strokeWidth = 2.dp.toPx(),
+                                    )
+                                }
+                            }
+                            .pointerInput(Unit) {
+                                detectTapGestures(
+                                    onDoubleTap = {
+                                        if (!isSelectionMode) {
+                                            onStartInlineEdit(task.id)
+                                        }
+                                    },
+                                )
+                            },
+                    )
+                }
 
                 // Description (optional)
                 if (task.description.isNotBlank()) {
@@ -263,7 +376,11 @@ fun TaskItem(
                     ) {
                         chips.forEach { (label, type) ->
                             AssistChip(
-                                onClick = { },
+                                onClick = {
+                                    if (type == ChipType.Priority && !isSelectionMode) {
+                                        onPriorityClick(task.id)
+                                    }
+                                },
                                 label = {
                                     Text(
                                         text = label,
@@ -354,17 +471,39 @@ fun TaskItem(
                             modifier = Modifier.size(20.dp),
                         )
                     }
-                    IconButton(
-                        onClick = onArchiveClick,
-                        modifier = Modifier.size(40.dp),
-                        interactionSource = remember { MutableInteractionSource() },
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.MoreVert,
-                            contentDescription = stringResource(R.string.more_options),
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
-                            modifier = Modifier.size(20.dp),
-                        )
+                    Box {
+                        var showMenu by remember { mutableStateOf(false) }
+                        IconButton(
+                            onClick = { showMenu = true },
+                            modifier = Modifier.size(40.dp),
+                            interactionSource = remember { MutableInteractionSource() },
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.MoreVert,
+                                contentDescription = stringResource(R.string.more_options),
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
+                                modifier = Modifier.size(20.dp),
+                            )
+                        }
+                        DropdownMenu(
+                            expanded = showMenu,
+                            onDismissRequest = { showMenu = false },
+                        ) {
+                            DropdownMenuItem(
+                                text = { Text(stringResource(R.string.action_archive)) },
+                                onClick = {
+                                    showMenu = false
+                                    onArchiveClick()
+                                },
+                            )
+                            DropdownMenuItem(
+                                text = { Text(stringResource(R.string.action_duplicate)) },
+                                onClick = {
+                                    showMenu = false
+                                    onDuplicateClick(task.id)
+                                },
+                            )
+                        }
                     }
                 }
             }

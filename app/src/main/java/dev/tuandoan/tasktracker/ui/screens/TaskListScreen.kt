@@ -1,5 +1,6 @@
 package dev.tuandoan.tasktracker.ui.screens
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -28,7 +29,9 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -37,6 +40,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import dev.tuandoan.tasktracker.R
 import dev.tuandoan.tasktracker.navigation.TaskTrackerRoutes
+import dev.tuandoan.tasktracker.ui.components.QuickAddSheet
 import dev.tuandoan.tasktracker.ui.components.TaskListContent
 import dev.tuandoan.tasktracker.ui.components.TaskListTopBar
 import dev.tuandoan.tasktracker.ui.events.UiEvent
@@ -73,6 +77,16 @@ fun TaskListScreen(
     val selectedCount by viewModel.selectedCount.collectAsStateWithLifecycle()
     val pendingBulkDeleteTasks by viewModel.pendingBulkDeleteTasks.collectAsStateWithLifecycle()
     val pendingBulkArchiveTasks by viewModel.pendingBulkArchiveTasks.collectAsStateWithLifecycle()
+
+    // Inline editing state
+    val inlineEditingTaskId by viewModel.inlineEditingTaskId.collectAsStateWithLifecycle()
+
+    BackHandler(enabled = inlineEditingTaskId != null) {
+        viewModel.cancelInlineEdit()
+    }
+
+    // Quick-add sheet state
+    var showQuickAdd by remember { mutableStateOf(false) }
 
     // Snackbar host state
     val snackbarHostState = remember { SnackbarHostState() }
@@ -140,7 +154,7 @@ fun TaskListScreen(
         },
         floatingActionButton = {
             FloatingActionButton(
-                onClick = { navController.navigate(TaskTrackerRoutes.TASK_EDITOR_CREATE) },
+                onClick = { showQuickAdd = true },
                 containerColor = MaterialTheme.colorScheme.primary,
                 contentColor = MaterialTheme.colorScheme.onPrimary,
                 elevation = FloatingActionButtonDefaults.elevation(
@@ -215,10 +229,36 @@ fun TaskListScreen(
             onToggleTaskComplete = viewModel::toggleTaskCompletion,
             onEditTask = { task -> navController.navigate(TaskTrackerRoutes.taskEditorEdit(task.id)) },
             onArchiveTask = viewModel::archiveTask,
+            onDuplicateTask = viewModel::duplicateTask,
             onPinTask = viewModel::toggleTaskPin,
             onLongPressTask = viewModel::enterSelection,
             onToggleSelection = viewModel::toggleSelection,
             modifier = Modifier.padding(paddingValues),
+            onCreateFromSearch = { query ->
+                viewModel.clearSearch()
+                navController.navigate(TaskTrackerRoutes.taskEditorCreate(query))
+            },
+            onPriorityClick = viewModel::cyclePriority,
+            onSwipeComplete = { task -> viewModel.toggleTaskCompletion(task) },
+            onSwipeArchive = { task -> viewModel.archiveTask(task) },
+            inlineEditingTaskId = inlineEditingTaskId,
+            onStartInlineEdit = viewModel::startInlineEdit,
+            onCommitInlineEdit = viewModel::commitInlineEdit,
+        )
+    }
+
+    // Show quick-add bottom sheet
+    if (showQuickAdd) {
+        QuickAddSheet(
+            onSave = { title, priority, dueAt ->
+                viewModel.quickCreateTask(title, priority, dueAt)
+                showQuickAdd = false
+            },
+            onExpandToEditor = { title ->
+                showQuickAdd = false
+                navController.navigate(TaskTrackerRoutes.taskEditorCreate(title))
+            },
+            onDismiss = { showQuickAdd = false },
         )
     }
 

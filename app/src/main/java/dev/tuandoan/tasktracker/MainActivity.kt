@@ -145,7 +145,15 @@ fun TaskTrackerApp(notificationPermissionManager: NotificationPermissionManager?
                 )
             }
 
-            composable(TaskTrackerRoutes.TASK_EDITOR_CREATE) {
+            composable(
+                route = TaskTrackerRoutes.TASK_EDITOR_CREATE,
+                arguments = listOf(
+                    navArgument("initialTitle") {
+                        type = NavType.StringType
+                        defaultValue = ""
+                    },
+                ),
+            ) {
                 TaskEditorScreen(
                     navController = navController,
                     notificationPermissionManager = notificationPermissionManager,

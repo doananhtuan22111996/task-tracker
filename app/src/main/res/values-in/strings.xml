@@ -11,6 +11,7 @@
     <string name="action_cancel">Batal</string>
     <string name="action_delete">Hapus</string>
     <string name="action_archive">Arsipkan</string>
+    <string name="action_duplicate">Duplikat</string>
     <string name="action_save">Simpan</string>
     <string name="action_undo">BATALKAN</string>
     <string name="action_ok">OK</string>
@@ -238,6 +239,7 @@
 
     <!-- Operation Success Messages -->
     <string name="op_task_created">Tugas dibuat</string>
+    <string name="op_task_duplicated">Tugas diduplikasi</string>
     <string name="op_task_updated">Tugas diperbarui</string>
     <string name="op_task_restored">Tugas dipulihkan</string>
     <string name="op_task_pinned">Tugas disematkan</string>
