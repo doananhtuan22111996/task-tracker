@@ -311,6 +311,20 @@ class TaskCrudManager @Inject constructor(
         }
     }
 
+    /**
+     * Duplicates a task
+     */
+    suspend fun duplicateTask(task: Task): TaskOperationResult {
+        val result = crudUseCase.duplicateTask(task)
+
+        return if (result.isSuccess) {
+            TaskOperationResult.Success(context.getString(R.string.snackbar_task_duplicated))
+        } else {
+            val errorMessage = result.exceptionOrNull()?.message ?: context.getString(R.string.error_duplicate_task)
+            TaskOperationResult.CrudError(errorMessage)
+        }
+    }
+
     // === Archive Operations ===
 
     /**

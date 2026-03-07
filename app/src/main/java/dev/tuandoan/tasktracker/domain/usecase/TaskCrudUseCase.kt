@@ -182,6 +182,37 @@ class TaskCrudUseCase @Inject constructor(
     }
 
     /**
+     * Duplicates a task, copying title, description, tag, and priority.
+     * Resets completion, due date, reminder, pin, and archive state.
+     */
+    suspend fun duplicateTask(task: Task): Result<Long> = try {
+        _isLoading.value = true
+        _errorMessage.value = null
+
+        val newTaskId = taskManager.createTask(
+            title = task.title,
+            description = task.description,
+            dueAt = null,
+            reminderOffsetMinutes = null,
+            tag = task.tag,
+        )
+
+        // Set priority if different from default (MEDIUM = 1)
+        if (task.priority != 1) {
+            taskManager.setPriority(newTaskId, task.priority)
+        }
+
+        _lastOperationSuccess.value = context.getString(R.string.snackbar_task_duplicated)
+        Result.success(newTaskId)
+    } catch (e: Exception) {
+        val errorMsg = e.message ?: context.getString(R.string.error_duplicate_task)
+        _errorMessage.value = errorMsg
+        Result.failure(e)
+    } finally {
+        _isLoading.value = false
+    }
+
+    /**
      * Clear error message
      */
     fun clearError() {

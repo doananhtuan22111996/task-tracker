@@ -284,4 +284,9 @@
     <string name="snackbar_failed_restore_tasks">No se pudieron restaurar tareas: %s</string>
     <string name="snackbar_failed_restore_archive">No se pudieron restaurar tareas del archivo: %s</string>
     <string name="snackbar_failed_permanent_delete">No se pudieron eliminar tareas permanentemente: %s</string>
+
+    <!-- Task Duplication -->
+    <string name="action_duplicate">Duplicar</string>
+    <string name="snackbar_task_duplicated">Tarea duplicada</string>
+    <string name="error_duplicate_task">Error al duplicar la tarea</string>
 </resources>

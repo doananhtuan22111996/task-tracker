@@ -283,4 +283,9 @@
     <string name="snackbar_failed_restore_tasks">Failed to restore tasks: %s</string>
     <string name="snackbar_failed_restore_archive">Failed to restore tasks from archive: %s</string>
     <string name="snackbar_failed_permanent_delete">Failed to permanently delete tasks: %s</string>
+
+    <!-- Task Duplication -->
+    <string name="action_duplicate">Duplicate</string>
+    <string name="snackbar_task_duplicated">Task duplicated</string>
+    <string name="error_duplicate_task">Failed to duplicate task</string>
 </resources>

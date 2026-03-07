@@ -271,6 +271,18 @@ class TaskViewModel @Inject constructor(
         )
     }
 
+    fun duplicateTask(task: Task) {
+        crudManager.executeOperation(
+            scope = viewModelScope,
+            operation = { crudManager.duplicateTask(task) },
+            onSuccess = { message ->
+                viewModelScope.launch {
+                    _singleTaskUiEvent.emit(UiEvent.ShowSnackbar(message))
+                }
+            },
+        )
+    }
+
     fun toggleTaskPin(task: Task) {
         crudManager.executeOperation(
             scope = viewModelScope,

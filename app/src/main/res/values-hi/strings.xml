@@ -284,4 +284,9 @@
     <string name="snackbar_failed_restore_tasks">कार्य पुनर्स्थापित करने में विफल: %s</string>
     <string name="snackbar_failed_restore_archive">संग्रह से कार्य पुनर्स्थापित करने में विफल: %s</string>
     <string name="snackbar_failed_permanent_delete">कार्य स्थायी रूप से हटाने में विफल: %s</string>
+
+    <!-- Task Duplication -->
+    <string name="action_duplicate">डुप्लिकेट</string>
+    <string name="snackbar_task_duplicated">कार्य डुप्लिकेट किया गया</string>
+    <string name="error_duplicate_task">कार्य डुप्लिकेट करने में विफल</string>
 </resources>

@@ -49,6 +49,7 @@ fun TaskListContent(
     onArchiveTask: (Task) -> Unit,
     onPinTask: (Task) -> Unit,
     onLongPressTask: (Long) -> Unit,
+    onDuplicateTask: (Task) -> Unit,
     onToggleSelection: (Long) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -89,6 +90,7 @@ fun TaskListContent(
             onArchiveTask = onArchiveTask,
             onPinTask = onPinTask,
             onLongPressTask = onLongPressTask,
+            onDuplicateTask = onDuplicateTask,
             onToggleSelection = onToggleSelection,
             onClearSearch = onClearSearch,
             onChangeFilter = { /* Filter change now handled by bottom navigation */ },
@@ -113,6 +115,7 @@ private fun TaskListOrEmptyState(
     onArchiveTask: (Task) -> Unit,
     onPinTask: (Task) -> Unit,
     onLongPressTask: (Long) -> Unit,
+    onDuplicateTask: (Task) -> Unit,
     onToggleSelection: (Long) -> Unit,
     onClearSearch: () -> Unit,
     onChangeFilter: () -> Unit,
@@ -141,6 +144,7 @@ private fun TaskListOrEmptyState(
                 onArchiveTask = onArchiveTask,
                 onPinTask = onPinTask,
                 onLongPressTask = onLongPressTask,
+                onDuplicateTask = onDuplicateTask,
                 onToggleSelection = onToggleSelection,
             )
         }
@@ -161,6 +165,7 @@ private fun GroupedTaskList(
     onArchiveTask: (Task) -> Unit,
     onPinTask: (Task) -> Unit,
     onLongPressTask: (Long) -> Unit,
+    onDuplicateTask: (Task) -> Unit,
     onToggleSelection: (Long) -> Unit,
 ) {
     LazyColumn(
@@ -193,6 +198,7 @@ private fun GroupedTaskList(
                     onToggleComplete = { onToggleTaskComplete(task) },
                     onEditClick = { onEditTask(task) },
                     onArchiveClick = { onArchiveTask(task) },
+                    onDuplicateClick = { onDuplicateTask(task) },
                     onPinClick = { onPinTask(task) },
                     onLongPress = { onLongPressTask(task.id) },
                     onToggleSelection = { onToggleSelection(task.id) },
