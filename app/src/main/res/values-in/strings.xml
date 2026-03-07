@@ -284,4 +284,9 @@
     <string name="snackbar_failed_restore_tasks">Gagal memulihkan tugas: %s</string>
     <string name="snackbar_failed_restore_archive">Gagal memulihkan tugas dari arsip: %s</string>
     <string name="snackbar_failed_permanent_delete">Gagal menghapus tugas permanen: %s</string>
+
+    <!-- Task Duplication -->
+    <string name="action_duplicate">Duplikat</string>
+    <string name="snackbar_task_duplicated">Tugas diduplikasi</string>
+    <string name="error_duplicate_task">Gagal menduplikasi tugas</string>
 </resources>

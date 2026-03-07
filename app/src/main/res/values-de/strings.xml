@@ -284,4 +284,9 @@
     <string name="snackbar_failed_restore_tasks">Aufgaben konnten nicht wiederhergestellt werden: %s</string>
     <string name="snackbar_failed_restore_archive">Aufgaben konnten nicht aus dem Archiv wiederhergestellt werden: %s</string>
     <string name="snackbar_failed_permanent_delete">Aufgaben konnten nicht dauerhaft gelöscht werden: %s</string>
+
+    <!-- Task Duplication -->
+    <string name="action_duplicate">Duplizieren</string>
+    <string name="snackbar_task_duplicated">Aufgabe dupliziert</string>
+    <string name="error_duplicate_task">Aufgabe konnte nicht dupliziert werden</string>
 </resources>

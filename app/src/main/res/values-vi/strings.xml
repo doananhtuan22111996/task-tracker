@@ -284,4 +284,9 @@
     <string name="snackbar_failed_restore_tasks">Không thể khôi phục các công việc: %s</string>
     <string name="snackbar_failed_restore_archive">Không thể khôi phục công việc từ lưu trữ: %s</string>
     <string name="snackbar_failed_permanent_delete">Không thể xóa vĩnh viễn các công việc: %s</string>
+
+    <!-- Task Duplication -->
+    <string name="action_duplicate">Nhân bản</string>
+    <string name="snackbar_task_duplicated">Đã nhân bản công việc</string>
+    <string name="error_duplicate_task">Không thể nhân bản công việc</string>
 </resources>

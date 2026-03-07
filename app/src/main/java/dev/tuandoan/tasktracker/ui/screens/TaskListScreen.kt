@@ -215,6 +215,7 @@ fun TaskListScreen(
             onToggleTaskComplete = viewModel::toggleTaskCompletion,
             onEditTask = { task -> navController.navigate(TaskTrackerRoutes.taskEditorEdit(task.id)) },
             onArchiveTask = viewModel::archiveTask,
+            onDuplicateTask = viewModel::duplicateTask,
             onPinTask = viewModel::toggleTaskPin,
             onLongPressTask = viewModel::enterSelection,
             onToggleSelection = viewModel::toggleSelection,
