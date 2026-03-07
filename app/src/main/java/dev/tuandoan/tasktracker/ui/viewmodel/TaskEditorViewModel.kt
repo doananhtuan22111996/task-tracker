@@ -9,6 +9,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dev.tuandoan.tasktracker.R
 import dev.tuandoan.tasktracker.data.database.Task
 import dev.tuandoan.tasktracker.domain.ITaskManager
+import dev.tuandoan.tasktracker.domain.model.DueDatePreset
 import dev.tuandoan.tasktracker.domain.model.ReminderOption
 import dev.tuandoan.tasktracker.domain.usecase.TaskFormUseCase
 import kotlinx.coroutines.flow.Flow
@@ -230,6 +231,24 @@ class TaskEditorViewModel @Inject constructor(
 
     fun updateDueAt(dueAt: Long?) {
         _dueAt.value = dueAt
+        updateHasChanges()
+    }
+
+    fun setDueDatePreset(preset: DueDatePreset) {
+        _dueAt.value = preset.toEpochMillis()
+        // Clear reminder if it would now be in the past
+        if (_reminderOption.value != ReminderOption.NONE) {
+            val reminderTime = _dueAt.value!! - (_reminderOption.value.offsetMinutes * 60 * 1000L)
+            if (reminderTime <= System.currentTimeMillis()) {
+                _reminderOption.value = ReminderOption.NONE
+            }
+        }
+        updateHasChanges()
+    }
+
+    fun clearDueDate() {
+        _dueAt.value = null
+        _reminderOption.value = ReminderOption.NONE
         updateHasChanges()
     }
 

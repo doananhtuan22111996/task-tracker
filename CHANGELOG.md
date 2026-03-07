@@ -5,6 +5,7 @@ All notable changes to the Task Tracker app will be documented in this file.
 ## [Unreleased]
 
 ### Added
+- **Due Date Quick-Select Chips** (SPEC-05) - Three quick-select chips (Today / Tomorrow / Next Week) in the task editor for faster due date entry without opening the date picker.
 - **Theme system** - Light, Dark, and System default theme modes with persistence via DataStore preferences.
 - **Dynamic Color** - Material You wallpaper-based color support on Android 12+, with graceful fallback on older devices.
 - **Per-app language selection** - In-app language picker (English, Vietnamese) using AppCompatDelegate for all API levels.

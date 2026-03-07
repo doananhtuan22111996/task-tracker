@@ -24,6 +24,7 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -54,6 +55,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import dev.tuandoan.tasktracker.R
+import dev.tuandoan.tasktracker.domain.model.DueDatePreset
 import dev.tuandoan.tasktracker.domain.model.ReminderOption
 import dev.tuandoan.tasktracker.ui.components.NotificationPermissionDialog
 import dev.tuandoan.tasktracker.ui.components.PermissionDeniedDialog
@@ -291,6 +293,27 @@ fun TaskEditorScreen(
                 style = MaterialTheme.typography.titleSmall,
                 color = MaterialTheme.colorScheme.primary,
             )
+
+            // Due date quick-select chips
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                DueDatePreset.entries.forEach { preset ->
+                    val isSelected = dueAt == preset.toEpochMillis()
+                    FilterChip(
+                        selected = isSelected,
+                        onClick = {
+                            if (isSelected) {
+                                viewModel.clearDueDate()
+                            } else {
+                                viewModel.setDueDatePreset(preset)
+                            }
+                        },
+                        label = { Text(preset.label) },
+                    )
+                }
+            }
 
             // Due date field
             OutlinedTextField(
