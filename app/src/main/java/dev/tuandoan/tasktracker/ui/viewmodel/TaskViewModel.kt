@@ -7,10 +7,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dev.tuandoan.tasktracker.R
 import dev.tuandoan.tasktracker.data.database.Task
-import dev.tuandoan.tasktracker.domain.model.CompletedGrouping
-import dev.tuandoan.tasktracker.domain.model.SortDirection
-import dev.tuandoan.tasktracker.domain.model.SortKey
-import dev.tuandoan.tasktracker.domain.model.TaskSort
 import dev.tuandoan.tasktracker.ui.events.UiEvent
 import dev.tuandoan.tasktracker.ui.manager.TaskBulkActionManager
 import dev.tuandoan.tasktracker.ui.manager.TaskCrudManager
@@ -28,6 +24,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.shareIn
@@ -65,7 +62,37 @@ class TaskViewModel @Inject constructor(
     val visibleTasks = listState.visibleTasks
 
     // Archived tasks - get from domain layer
-    val archivedTasks: StateFlow<List<Task>> = crudManager.getArchivedTasks()
+    private val _allArchivedTasks: StateFlow<List<Task>> = crudManager.getArchivedTasks()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = emptyList(),
+        )
+
+    // Archived tag filter
+    private val _archivedTagFilter = MutableStateFlow<String?>(null)
+    val archivedTagFilter: StateFlow<String?> = _archivedTagFilter.asStateFlow()
+
+    // Archived tasks filtered by tag
+    val archivedTasks: StateFlow<List<Task>> = combine(
+        _allArchivedTasks,
+        _archivedTagFilter,
+    ) { tasks, tagFilter ->
+        if (tagFilter == null) tasks else tasks.filter { it.tag == tagFilter }
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = emptyList(),
+    )
+
+    // Available tags from archived tasks
+    val archivedAvailableTags: StateFlow<List<String>> = _allArchivedTasks
+        .map { tasks ->
+            tasks.mapNotNull { it.tag }
+                .filter { it.isNotEmpty() }
+                .distinct()
+                .sorted()
+        }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),
@@ -84,7 +111,6 @@ class TaskViewModel @Inject constructor(
     val searchQuery = listState.searchQuery
     val filter = listState.filter
     val tagFilter = listState.tagFilter
-    val taskSort = listState.taskSort
     val hasActiveSearch = listState.hasActiveSearch
     val hasActiveFilter = listState.hasActiveFilter
     val hasActiveTagFilter = listState.hasActiveTagFilter
@@ -333,17 +359,11 @@ class TaskViewModel @Inject constructor(
     fun setTagFilter(tag: String?) = listStateManager.setTagFilter(tag)
     fun clearTagFilter() = listStateManager.clearTagFilter()
 
-    // === Sort Operations ===
+    // === Archived Tag Filter Operations ===
 
-    fun setSort(sort: TaskSort) = listStateManager.setSort(sort)
-    fun setSortKey(key: SortKey, direction: SortDirection) = listStateManager.setSortKey(key, direction)
-    fun setCompletedGrouping(grouping: CompletedGrouping) = listStateManager.setCompletedGrouping(grouping)
-    fun toggleCompletedLast(enabled: Boolean) = listStateManager.toggleCompletedLast(enabled)
-
-    /**
-     * Get available sort options for UI
-     */
-    fun getAvailableSortOptions(): List<TaskSort> = listStateManager.getAvailableSortOptions()
+    fun setArchivedTagFilter(tag: String?) {
+        _archivedTagFilter.value = tag
+    }
 
     // === Error Management ===
 

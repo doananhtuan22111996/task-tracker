@@ -1,23 +1,16 @@
 package dev.tuandoan.tasktracker.ui.screens
 
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.List
-import androidx.compose.material.icons.filled.RadioButtonUnchecked
-import androidx.compose.material.icons.outlined.CheckCircle
-import androidx.compose.material.icons.outlined.List
-import androidx.compose.material.icons.outlined.RadioButtonUnchecked
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
@@ -38,6 +31,7 @@ import androidx.navigation.NavController
 import dev.tuandoan.tasktracker.R
 import dev.tuandoan.tasktracker.navigation.StatsFilter
 import dev.tuandoan.tasktracker.navigation.TaskTrackerRoutes
+import dev.tuandoan.tasktracker.ui.components.FilterChipRow
 import dev.tuandoan.tasktracker.ui.components.TaskListContent
 import dev.tuandoan.tasktracker.ui.components.TaskListTopBar
 import dev.tuandoan.tasktracker.ui.events.UiEvent
@@ -66,7 +60,6 @@ fun TaskListScreen(
     val currentFilter by viewModel.filter.collectAsStateWithLifecycle()
     val currentTagFilter by viewModel.tagFilter.collectAsStateWithLifecycle()
     val availableTags by viewModel.availableTags.collectAsStateWithLifecycle()
-    val currentSort by viewModel.taskSort.collectAsStateWithLifecycle()
     val pendingDeleteTask by viewModel.pendingDeleteTask.collectAsStateWithLifecycle()
 
     // Selection state
@@ -136,8 +129,6 @@ fun TaskListScreen(
         modifier = modifier.fillMaxSize(),
         topBar = {
             TaskListTopBar(
-                currentSort = currentSort,
-                onSortChanged = viewModel::setSort,
                 isSelectionMode = isSelectionMode,
                 selectedCount = selectedCount,
                 onBulkMarkCompleted = viewModel::bulkMarkCompleted,
@@ -170,69 +161,36 @@ fun TaskListScreen(
         snackbarHost = {
             SnackbarHost(hostState = snackbarHostState)
         },
-        bottomBar = {
-            if (!isSelectionMode) { // Hide bottom nav during selection mode
-                NavigationBar(
-                    containerColor = MaterialTheme.colorScheme.surfaceContainer,
-                ) {
-                    val navigationItems = listOf(
-                        TaskFilter.ALL to stringResource(R.string.nav_all) to
-                            Pair(Icons.Outlined.List, Icons.Filled.List),
-                        TaskFilter.ACTIVE to stringResource(R.string.nav_active) to
-                            Pair(Icons.Outlined.RadioButtonUnchecked, Icons.Filled.RadioButtonUnchecked),
-                        TaskFilter.COMPLETED to stringResource(R.string.nav_completed) to
-                            Pair(Icons.Outlined.CheckCircle, Icons.Filled.CheckCircle),
-                    )
-
-                    navigationItems.forEach { (filterData, icons) ->
-                        val (filter, label) = filterData
-                        val (unselectedIcon, selectedIcon) = icons
-
-                        NavigationBarItem(
-                            icon = {
-                                Icon(
-                                    imageVector = if (currentFilter == filter) selectedIcon else unselectedIcon,
-                                    contentDescription = label,
-                                )
-                            },
-                            label = {
-                                Text(
-                                    text = label,
-                                    style = MaterialTheme.typography.labelSmall,
-                                )
-                            },
-                            selected = currentFilter == filter,
-                            onClick = {
-                                viewModel.setFilter(filter)
-                            },
-                        )
-                    }
-                }
-            }
-        },
     ) { paddingValues ->
-        TaskListContent(
-            allTasks = allTasks,
-            visibleTasks = visibleTasks,
-            groupedVisibleTasks = groupedVisibleTasks,
-            searchQuery = searchQuery,
-            currentFilter = currentFilter,
-            currentTagFilter = currentTagFilter,
-            availableTags = availableTags,
-            selectedIds = selectedIds,
-            isSelectionMode = isSelectionMode,
-            onSearchQueryChange = viewModel::updateSearchQuery,
-            onClearSearch = viewModel::clearSearch,
-            onTagFilterChange = viewModel::setTagFilter,
-            onToggleTaskComplete = viewModel::toggleTaskCompletion,
-            onEditTask = { task -> navController.navigate(TaskTrackerRoutes.taskEditorEdit(task.id)) },
-            onArchiveTask = viewModel::archiveTask,
-            onDuplicateTask = viewModel::duplicateTask,
-            onPinTask = viewModel::toggleTaskPin,
-            onLongPressTask = viewModel::enterSelection,
-            onToggleSelection = viewModel::toggleSelection,
-            modifier = Modifier.padding(paddingValues),
-        )
+        Column(modifier = Modifier.padding(paddingValues)) {
+            FilterChipRow(
+                currentFilter = currentFilter,
+                currentTagFilter = currentTagFilter,
+                availableTags = availableTags,
+                onFilterChange = viewModel::setFilter,
+                onTagFilterChange = viewModel::setTagFilter,
+            )
+            TaskListContent(
+                allTasks = allTasks,
+                visibleTasks = visibleTasks,
+                groupedVisibleTasks = groupedVisibleTasks,
+                searchQuery = searchQuery,
+                currentFilter = currentFilter,
+                currentTagFilter = currentTagFilter,
+                availableTags = availableTags,
+                selectedIds = selectedIds,
+                isSelectionMode = isSelectionMode,
+                onSearchQueryChange = viewModel::updateSearchQuery,
+                onClearSearch = viewModel::clearSearch,
+                onToggleTaskComplete = viewModel::toggleTaskCompletion,
+                onEditTask = { task -> navController.navigate(TaskTrackerRoutes.taskEditorEdit(task.id)) },
+                onArchiveTask = viewModel::archiveTask,
+                onDuplicateTask = viewModel::duplicateTask,
+                onPinTask = viewModel::toggleTaskPin,
+                onLongPressTask = viewModel::enterSelection,
+                onToggleSelection = viewModel::toggleSelection,
+            )
+        }
     }
 
     // Show archive confirmation dialog

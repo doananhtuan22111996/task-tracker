@@ -10,7 +10,6 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.SelectAll
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.filled.Sort
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -29,7 +28,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import dev.tuandoan.tasktracker.R
-import dev.tuandoan.tasktracker.domain.model.TaskSort
 
 /**
  * Enhanced top app bar for the task list screen with improved Material 3 styling
@@ -38,8 +36,6 @@ import dev.tuandoan.tasktracker.domain.model.TaskSort
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TaskListTopBar(
-    currentSort: TaskSort,
-    onSortChanged: (TaskSort) -> Unit,
     isSelectionMode: Boolean = false,
     selectedCount: Int = 0,
     onBulkMarkCompleted: () -> Unit = {},
@@ -51,7 +47,6 @@ fun TaskListTopBar(
     onArchiveClick: () -> Unit = {},
     onSettingsClick: () -> Unit = {},
 ) {
-    var showSortMenu by remember { mutableStateOf(false) }
     var showMoreMenu by remember { mutableStateOf(false) }
 
     TopAppBar(
@@ -164,19 +159,7 @@ fun TaskListTopBar(
                     }
                 }
             } else {
-                // Normal mode actions with improved visual hierarchy
-                IconButton(
-                    onClick = { showSortMenu = true },
-                    colors = IconButtonDefaults.iconButtonColors(
-                        contentColor = MaterialTheme.colorScheme.onSurface,
-                    ),
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Sort,
-                        contentDescription = stringResource(R.string.cd_sort_tasks),
-                    )
-                }
-
+                // Normal mode actions
                 IconButton(
                     onClick = onStatsClick,
                     colors = IconButtonDefaults.iconButtonColors(
@@ -210,22 +193,6 @@ fun TaskListTopBar(
                     Icon(
                         imageVector = Icons.Default.Settings,
                         contentDescription = stringResource(R.string.cd_settings),
-                    )
-                }
-
-                // Sort menu dropdown
-                DropdownMenu(
-                    expanded = showSortMenu,
-                    onDismissRequest = { showSortMenu = false },
-                    containerColor = MaterialTheme.colorScheme.surface,
-                    tonalElevation = 8.dp,
-                ) {
-                    SortMenu(
-                        currentSort = currentSort,
-                        onSortSelected = { sort ->
-                            onSortChanged(sort)
-                            showSortMenu = false
-                        },
                     )
                 }
             }

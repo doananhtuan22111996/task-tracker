@@ -43,7 +43,6 @@ fun TaskListContent(
     isSelectionMode: Boolean,
     onSearchQueryChange: (String) -> Unit,
     onClearSearch: () -> Unit,
-    onTagFilterChange: (String?) -> Unit,
     onToggleTaskComplete: (Task) -> Unit,
     onEditTask: (Task) -> Unit,
     onArchiveTask: (Task) -> Unit,
@@ -63,15 +62,6 @@ fun TaskListContent(
             query = searchQuery,
             onQueryChange = onSearchQueryChange,
             onClearClick = onClearSearch,
-        )
-
-        Spacer(modifier = Modifier.height(AppSpacing.small))
-
-        // Tag Filter Chips - compact spacing for cohesive feel
-        TagFilterChips(
-            currentTagFilter = currentTagFilter,
-            availableTags = availableTags,
-            onTagFilterChange = onTagFilterChange,
         )
 
         Spacer(modifier = Modifier.height(AppSpacing.small))
@@ -173,7 +163,7 @@ private fun GroupedTaskList(
         // Increased spacing for Material 3 ListItem design
         verticalArrangement = Arrangement.spacedBy(AppSpacing.small),
         contentPadding = PaddingValues(
-            bottom = 104.dp, // FAB height (56dp) + bottom nav height (80dp) - overlap (32dp) = proper clearance
+            bottom = 80.dp, // FAB height (56dp) + padding
         ),
     ) {
         taskSections.forEach { section ->

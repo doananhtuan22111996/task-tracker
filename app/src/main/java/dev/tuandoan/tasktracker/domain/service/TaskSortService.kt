@@ -78,6 +78,14 @@ class TaskSortService @Inject constructor() {
                         .thenByDescending { it.createdAt } // Secondary sort for stability
                 }
             }
+            SortKey.DUE_DATE -> {
+                when (direction) {
+                    SortDirection.ASC -> compareBy<Task, Long?>(nullsLast()) { it.dueAt }
+                        .thenByDescending { it.createdAt }
+                    SortDirection.DESC -> compareByDescending<Task, Long?>(nullsLast()) { it.dueAt }
+                        .thenByDescending { it.createdAt }
+                }
+            }
         }
 
         return tasks.sortedWith(comparator)
