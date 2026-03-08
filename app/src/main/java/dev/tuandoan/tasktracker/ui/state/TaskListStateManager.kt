@@ -1,6 +1,8 @@
 package dev.tuandoan.tasktracker.ui.state
 
 import dev.tuandoan.tasktracker.data.database.Task
+import dev.tuandoan.tasktracker.domain.model.SortDirection
+import dev.tuandoan.tasktracker.domain.model.SortKey
 import dev.tuandoan.tasktracker.domain.model.TaskSort
 import dev.tuandoan.tasktracker.domain.service.TaskSortService
 import dev.tuandoan.tasktracker.domain.usecase.TaskCrudUseCase
@@ -29,10 +31,6 @@ class TaskListStateManager @Inject constructor(
     private val filterUseCase: TaskFilterUseCase,
     private val sortService: TaskSortService,
 ) {
-    // Sort state
-    private val _taskSort = MutableStateFlow(sortService.getDefaultSort())
-    val taskSort: StateFlow<TaskSort> = _taskSort.asStateFlow()
-
     // Tag filter state
     private val _tagFilter = MutableStateFlow<String?>(null)
     val tagFilter: StateFlow<String?> = _tagFilter.asStateFlow()
@@ -69,18 +67,20 @@ class TaskListStateManager @Inject constructor(
                 initialValue = false,
             )
 
+        // Fixed sort: always due date ascending (null due dates last)
+        val dueDateSort = TaskSort(key = SortKey.DUE_DATE, direction = SortDirection.ASC)
+
         // Combined filtered, searched, and sorted tasks
         val visibleTasks: StateFlow<List<Task>> = combine(
             allTasks,
             searchUseCase.debouncedSearchQuery,
             filterUseCase.filter,
             _tagFilter,
-            _taskSort,
-        ) { tasks, query, currentFilter, tagFilter, sort ->
+        ) { tasks, query, currentFilter, tagFilter ->
             val statusFiltered = filterUseCase.filterTasksByStatus(tasks, currentFilter)
             val searchFiltered = searchUseCase.filterTasksBySearch(statusFiltered, query)
             val tagFiltered = filterTasksByTag(searchFiltered, tagFilter)
-            sortService.sortTasks(tagFiltered, sort)
+            sortService.sortTasks(tagFiltered, dueDateSort)
         }.stateIn(
             scope = scope,
             started = SharingStarted.WhileSubscribed(5000),
@@ -93,44 +93,10 @@ class TaskListStateManager @Inject constructor(
             searchQuery = searchUseCase.searchQuery,
             filter = filterUseCase.filter,
             tagFilter = tagFilter,
-            taskSort = taskSort,
             hasActiveSearch = hasActiveSearch,
             hasActiveFilter = hasActiveFilter,
             hasActiveTagFilter = hasActiveTagFilter,
             isLoading = crudUseCase.isLoading,
-        )
-    }
-
-    // === Sort Operations ===
-    fun setSort(sort: TaskSort) {
-        if (sortService.isValidSort(sort)) {
-            _taskSort.value = sort
-        }
-    }
-
-    fun setSortKey(
-        key: dev.tuandoan.tasktracker.domain.model.SortKey,
-        direction: dev.tuandoan.tasktracker.domain.model.SortDirection,
-    ) {
-        _taskSort.value = _taskSort.value.copy(
-            key = key,
-            direction = direction,
-        )
-    }
-
-    fun setCompletedGrouping(grouping: dev.tuandoan.tasktracker.domain.model.CompletedGrouping) {
-        _taskSort.value = _taskSort.value.copy(
-            completedGrouping = grouping,
-        )
-    }
-
-    fun toggleCompletedLast(enabled: Boolean) {
-        _taskSort.value = _taskSort.value.copy(
-            completedGrouping = if (enabled) {
-                dev.tuandoan.tasktracker.domain.model.CompletedGrouping.COMPLETED_LAST
-            } else {
-                dev.tuandoan.tasktracker.domain.model.CompletedGrouping.NONE
-            },
         )
     }
 
@@ -159,11 +125,6 @@ class TaskListStateManager @Inject constructor(
     } else {
         tasks.filter { task -> task.tag == tagFilter }
     }
-
-    /**
-     * Get available sort options for UI
-     */
-    fun getAvailableSortOptions(): List<TaskSort> = sortService.getAvailableSortOptions()
 }
 
 /**
@@ -175,7 +136,6 @@ data class TaskListState(
     val searchQuery: StateFlow<String>,
     val filter: StateFlow<TaskFilter>,
     val tagFilter: StateFlow<String?>,
-    val taskSort: StateFlow<TaskSort>,
     val hasActiveSearch: StateFlow<Boolean>,
     val hasActiveFilter: StateFlow<Boolean>,
     val hasActiveTagFilter: StateFlow<Boolean>,

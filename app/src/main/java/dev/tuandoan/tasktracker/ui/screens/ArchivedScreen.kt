@@ -34,7 +34,6 @@ fun ArchivedScreen(viewModel: TaskViewModel, onNavigateBack: () -> Unit, modifie
     // Collect archived tasks state
     val archivedTasks by viewModel.archivedTasks.collectAsStateWithLifecycle()
     val searchQuery by viewModel.searchQuery.collectAsStateWithLifecycle()
-    val currentSort by viewModel.taskSort.collectAsStateWithLifecycle()
 
     // Selection state
     val selectedIds by viewModel.selectedIds.collectAsStateWithLifecycle()
@@ -93,8 +92,6 @@ fun ArchivedScreen(viewModel: TaskViewModel, onNavigateBack: () -> Unit, modifie
         modifier = modifier.fillMaxSize(),
         topBar = {
             ArchivedTaskListTopBar(
-                currentSort = currentSort,
-                onSortChanged = viewModel::setSort,
                 isSelectionMode = isSelectionMode,
                 selectedCount = selectedCount,
                 onBulkRestore = viewModel::bulkRestoreArchived,
