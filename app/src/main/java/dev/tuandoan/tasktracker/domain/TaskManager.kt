@@ -1,5 +1,6 @@
 package dev.tuandoan.tasktracker.domain
 
+import dev.tuandoan.tasktracker.data.database.DailyCount
 import dev.tuandoan.tasktracker.data.database.Task
 import dev.tuandoan.tasktracker.domain.repository.ITaskRepository
 import dev.tuandoan.tasktracker.domain.scheduler.TaskReminderScheduler
@@ -313,6 +314,9 @@ class TaskManager @Inject constructor(
         repository.observeDueTodayCount(startOfDayMillis, endOfDayMillis)
 
     override fun observeOverdueCount(nowMillis: Long): Flow<Int> = repository.observeOverdueCount(nowMillis)
+
+    override fun observeCompletedCountPerDay(startMillis: Long, endMillis: Long): Flow<List<DailyCount>> =
+        repository.observeCompletedCountPerDay(startMillis, endMillis)
 
     // Helper method for scheduling reminders
     private suspend fun scheduleReminderIfNeeded(

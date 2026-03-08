@@ -1,5 +1,6 @@
 package dev.tuandoan.tasktracker.domain.repository
 
+import dev.tuandoan.tasktracker.data.database.DailyCount
 import dev.tuandoan.tasktracker.data.database.Task
 import kotlinx.coroutines.flow.Flow
 
@@ -40,6 +41,7 @@ interface ITaskRepository {
     fun observeCompletedTodayCount(startOfDayMillis: Long, endOfDayMillis: Long): Flow<Int>
     fun observeDueTodayCount(startOfDayMillis: Long, endOfDayMillis: Long): Flow<Int>
     fun observeOverdueCount(nowMillis: Long): Flow<Int>
+    fun observeCompletedCountPerDay(startMillis: Long, endMillis: Long): Flow<List<DailyCount>>
 
     // Backup operations
     suspend fun getAllTasksIncludingArchived(): List<Task>

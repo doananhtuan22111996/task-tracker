@@ -1,6 +1,7 @@
 package dev.tuandoan.tasktracker.data.repository
 
 import androidx.room.withTransaction
+import dev.tuandoan.tasktracker.data.database.DailyCount
 import dev.tuandoan.tasktracker.data.database.Task
 import dev.tuandoan.tasktracker.data.database.TaskDao
 import dev.tuandoan.tasktracker.data.database.TaskDatabase
@@ -93,6 +94,9 @@ class TaskRepository @Inject constructor(private val taskDao: TaskDao, private v
         taskDao.observeDueTodayCount(startOfDayMillis, endOfDayMillis)
 
     override fun observeOverdueCount(nowMillis: Long): Flow<Int> = taskDao.observeOverdueCount(nowMillis)
+
+    override fun observeCompletedCountPerDay(startMillis: Long, endMillis: Long): Flow<List<DailyCount>> =
+        taskDao.observeCompletedCountPerDay(startMillis, endMillis)
 
     // Backup operations
     override suspend fun getAllTasksIncludingArchived(): List<Task> = taskDao.getAllTasksIncludingArchived()

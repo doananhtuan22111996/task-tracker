@@ -23,6 +23,7 @@ import androidx.navigation.navArgument
 import dagger.hilt.android.AndroidEntryPoint
 import dev.tuandoan.tasktracker.data.preferences.SettingsRepository
 import dev.tuandoan.tasktracker.data.preferences.UserPreferences
+import dev.tuandoan.tasktracker.navigation.StatsFilter
 import dev.tuandoan.tasktracker.navigation.TaskTrackerRoutes
 import dev.tuandoan.tasktracker.ui.manager.NotificationPermissionManager
 import dev.tuandoan.tasktracker.ui.screens.ArchivedScreen
@@ -98,8 +99,21 @@ fun TaskTrackerApp(notificationPermissionManager: NotificationPermissionManager?
             navController = navController,
             startDestination = TaskTrackerRoutes.TASK_LIST,
         ) {
-            composable(TaskTrackerRoutes.TASK_LIST) {
+            composable(
+                route = TaskTrackerRoutes.TASK_LIST,
+                arguments = listOf(
+                    navArgument("statsFilter") {
+                        type = NavType.StringType
+                        nullable = true
+                        defaultValue = null
+                    },
+                ),
+            ) { backStackEntry ->
                 val viewModel: TaskViewModel = hiltViewModel()
+                val statsFilterName = backStackEntry.arguments?.getString("statsFilter")
+                val statsFilter = statsFilterName?.let {
+                    runCatching { StatsFilter.valueOf(it) }.getOrNull()
+                }
                 TaskListScreen(
                     viewModel = viewModel,
                     navController = navController,
@@ -112,6 +126,7 @@ fun TaskTrackerApp(notificationPermissionManager: NotificationPermissionManager?
                     onSettingsClick = {
                         navController.navigate(TaskTrackerRoutes.SETTINGS)
                     },
+                    initialStatsFilter = statsFilter,
                 )
             }
 
@@ -131,6 +146,12 @@ fun TaskTrackerApp(notificationPermissionManager: NotificationPermissionManager?
                     viewModel = statsViewModel,
                     onNavigateBack = {
                         navController.popBackStack()
+                    },
+                    onNavigateToFilteredList = { statsFilter ->
+                        navController.navigate(TaskTrackerRoutes.taskListWithFilter(statsFilter.name))
+                    },
+                    onNavigateToCreateTask = {
+                        navController.navigate(TaskTrackerRoutes.TASK_EDITOR_CREATE)
                     },
                 )
             }
