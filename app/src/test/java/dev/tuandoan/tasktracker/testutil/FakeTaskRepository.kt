@@ -1,10 +1,14 @@
 package dev.tuandoan.tasktracker.testutil
 
+import dev.tuandoan.tasktracker.data.database.DailyCount
 import dev.tuandoan.tasktracker.data.database.Task
 import dev.tuandoan.tasktracker.domain.repository.ITaskRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
+import java.time.Instant
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 
 /**
  * In-memory fake implementation of [ITaskRepository] for JVM unit tests.
@@ -173,6 +177,23 @@ class FakeTaskRepository : ITaskRepository {
                 it.dueAt < nowMillis
         }
     }
+
+    override fun observeCompletedCountPerDay(startMillis: Long, endMillis: Long): Flow<List<DailyCount>> =
+        tasks.map { list ->
+            val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+            list.filter {
+                it.isCompleted &&
+                    !it.isArchived &&
+                    it.completedAt != null &&
+                    it.completedAt in startMillis until endMillis
+            }.groupBy { task ->
+                Instant.ofEpochMilli(task.completedAt!!)
+                    .atZone(ZoneId.systemDefault())
+                    .toLocalDate()
+                    .format(formatter)
+            }.map { (date, tasks) -> DailyCount(date = date, count = tasks.size) }
+                .sortedBy { it.date }
+        }
 
     override suspend fun getAllTasksIncludingArchived(): List<Task> = tasks.value
 

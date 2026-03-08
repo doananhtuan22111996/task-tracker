@@ -97,6 +97,15 @@ interface TaskDao {
     @Query("SELECT COUNT(*) FROM tasks WHERE isCompleted = 0 AND isArchived = 0 AND dueAt < :nowMillis")
     fun observeOverdueCount(nowMillis: Long): Flow<Int>
 
+    // Weekly breakdown query (completed tasks grouped by day)
+    @Query(
+        "SELECT date(completedAt / 1000, 'unixepoch', 'localtime') AS date, COUNT(*) AS count " +
+            "FROM tasks WHERE isCompleted = 1 AND isArchived = 0 " +
+            "AND completedAt BETWEEN :startMillis AND :endMillis " +
+            "GROUP BY date ORDER BY date ASC",
+    )
+    fun observeCompletedCountPerDay(startMillis: Long, endMillis: Long): Flow<List<DailyCount>>
+
     // Backup operations
     @Query("SELECT * FROM tasks ORDER BY createdAt DESC")
     suspend fun getAllTasksIncludingArchived(): List<Task>

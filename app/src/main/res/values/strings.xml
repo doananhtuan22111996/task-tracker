@@ -99,6 +99,21 @@
     <string name="stat_desc_due_today">Active tasks due today</string>
     <string name="stat_desc_overdue">Active tasks past due date</string>
     <string name="stat_archived_note">Archived tasks are excluded from all statistics</string>
+    <string name="stat_section_today">Today</string>
+    <string name="stat_section_all_time">All Time</string>
+    <string name="stat_daily_progress">%1$d of %2$d done today</string>
+    <string name="stat_all_caught_up">All caught up!</string>
+    <string name="stat_completion_rate">Completion Rate</string>
+    <string name="stat_this_week">This Week</string>
+    <string name="stat_empty_headline">No tasks yet</string>
+    <string name="stat_empty_cta">Create your first task</string>
+    <string name="stat_cd_active">%1$d active tasks</string>
+    <string name="stat_cd_completed">%1$d tasks completed in total</string>
+    <string name="stat_cd_completed_today">%1$d tasks completed today</string>
+    <string name="stat_cd_due_today">%1$d tasks due today</string>
+    <string name="stat_cd_overdue">%1$d overdue tasks, action required</string>
+    <string name="stat_cd_overdue_clear">No overdue tasks</string>
+    <string name="stat_cd_progress">Daily progress: %1$d of %2$d tasks done today</string>
 
     <!-- Settings Screen -->
     <string name="title_settings">Settings</string>

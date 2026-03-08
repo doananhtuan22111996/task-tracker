@@ -3,34 +3,22 @@ package dev.tuandoan.tasktracker.ui.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dev.tuandoan.tasktracker.data.database.DailyCount
 import dev.tuandoan.tasktracker.domain.ITaskManager
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import java.time.LocalDate
 import java.time.ZoneId
+import java.time.format.TextStyle
+import java.util.Locale
 import javax.inject.Inject
 
-/**
- * ViewModel for the Stats screen showing task statistics.
- *
- * Provides lightweight numeric stats for user progress tracking:
- * - Active tasks count
- * - Completed tasks count (overall)
- * - Completed today count
- * - Due today count (active tasks only)
- * - Overdue count
- *
- * All stats exclude archived tasks by default.
- * Uses local timezone for "today" calculations.
- */
 @HiltViewModel
 class StatsViewModel @Inject constructor(private val taskManager: ITaskManager) : ViewModel() {
 
-    /**
-     * UI state for stats screen containing all statistical counts
-     */
     data class StatsUiState(
         val activeCount: Int = 0,
         val completedCount: Int = 0,
@@ -39,9 +27,6 @@ class StatsViewModel @Inject constructor(private val taskManager: ITaskManager) 
         val overdueCount: Int = 0,
     )
 
-    /**
-     * Combined UI state that updates reactively when task data changes
-     */
     val uiState: StateFlow<StatsUiState> = combine(
         taskManager.observeActiveCount(),
         taskManager.observeCompletedCount(),
@@ -62,19 +47,63 @@ class StatsViewModel @Inject constructor(private val taskManager: ITaskManager) 
         initialValue = StatsUiState(),
     )
 
-    /**
-     * Get start of today in milliseconds (00:00:00) in local timezone
-     */
+    // SPEC-S03: Daily progress
+    val dailyProgress: StateFlow<Float> = uiState
+        .map { state ->
+            if (state.dueTodayCount == 0) {
+                1f
+            } else {
+                (state.completedTodayCount.toFloat() / state.dueTodayCount.toFloat()).coerceIn(0f, 1f)
+            }
+        }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0f)
+
+    // SPEC-S04: Weekly breakdown
+    val weeklyBreakdown: StateFlow<List<DailyCount>> = taskManager
+        .observeCompletedCountPerDay(getWeekStartMillis(), getTodayEndMillis())
+        .map { dbCounts -> fillMissingDays(dbCounts) }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
+    // SPEC-S05: Completion rate
+    val completionRate: StateFlow<Int?> = uiState
+        .map { state ->
+            val total = state.completedCount + state.activeCount
+            if (total == 0) {
+                null
+            } else {
+                (state.completedCount * 100 / total)
+            }
+        }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
+
+    // SPEC-S07: Empty state
+    val isEmpty: StateFlow<Boolean> = uiState
+        .map { state -> state.activeCount == 0 && state.completedCount == 0 }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), true)
+
     private fun getTodayStartMillis(): Long {
         val today = LocalDate.now()
         return today.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
     }
 
-    /**
-     * Get end of today in milliseconds (23:59:59.999) in local timezone
-     */
     private fun getTodayEndMillis(): Long {
         val tomorrow = LocalDate.now().plusDays(1)
         return tomorrow.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
+    }
+
+    private fun getWeekStartMillis(): Long {
+        val weekStart = LocalDate.now().minusDays(6)
+        return weekStart.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
+    }
+
+    private fun fillMissingDays(dbCounts: List<DailyCount>): List<DailyCount> {
+        val today = LocalDate.now()
+        val countMap = dbCounts.associate { it.date to it.count }
+        return (0..6).map { daysAgo ->
+            val date = today.minusDays((6 - daysAgo).toLong())
+            val dateStr = date.toString()
+            val dayLabel = date.dayOfWeek.getDisplayName(TextStyle.SHORT, Locale.getDefault())
+            DailyCount(date = dayLabel, count = countMap[dateStr] ?: 0)
+        }
     }
 }

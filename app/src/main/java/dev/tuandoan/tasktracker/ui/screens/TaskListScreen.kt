@@ -36,6 +36,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import dev.tuandoan.tasktracker.R
+import dev.tuandoan.tasktracker.navigation.StatsFilter
 import dev.tuandoan.tasktracker.navigation.TaskTrackerRoutes
 import dev.tuandoan.tasktracker.ui.components.TaskListContent
 import dev.tuandoan.tasktracker.ui.components.TaskListTopBar
@@ -55,6 +56,7 @@ fun TaskListScreen(
     onStatsClick: () -> Unit = {},
     onArchiveClick: () -> Unit = {},
     onSettingsClick: () -> Unit = {},
+    initialStatsFilter: StatsFilter? = null,
 ) {
     // Collect all required state
     val allTasks by viewModel.allTasks.collectAsStateWithLifecycle()
@@ -77,6 +79,16 @@ fun TaskListScreen(
     // Snackbar host state
     val snackbarHostState = remember { SnackbarHostState() }
     val context = LocalContext.current
+
+    // Apply initial filter from Stats screen navigation (SPEC-S01)
+    LaunchedEffect(initialStatsFilter) {
+        when (initialStatsFilter) {
+            StatsFilter.ACTIVE -> viewModel.setFilter(TaskFilter.ACTIVE)
+            StatsFilter.COMPLETED, StatsFilter.COMPLETED_TODAY -> viewModel.setFilter(TaskFilter.COMPLETED)
+            StatsFilter.DUE_TODAY, StatsFilter.OVERDUE -> viewModel.setFilter(TaskFilter.ACTIVE)
+            null -> {} // No filter to apply
+        }
+    }
 
     // Handle UI events
     LaunchedEffect(viewModel) {
