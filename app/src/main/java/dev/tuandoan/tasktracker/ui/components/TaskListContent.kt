@@ -43,7 +43,6 @@ fun TaskListContent(
     isSelectionMode: Boolean,
     onSearchQueryChange: (String) -> Unit,
     onClearSearch: () -> Unit,
-    onTagFilterChange: (String?) -> Unit,
     onToggleTaskComplete: (Task) -> Unit,
     onEditTask: (Task) -> Unit,
     onArchiveTask: (Task) -> Unit,
@@ -63,15 +62,6 @@ fun TaskListContent(
             query = searchQuery,
             onQueryChange = onSearchQueryChange,
             onClearClick = onClearSearch,
-        )
-
-        Spacer(modifier = Modifier.height(AppSpacing.small))
-
-        // Tag Filter Chips - compact spacing for cohesive feel
-        TagFilterChips(
-            currentTagFilter = currentTagFilter,
-            availableTags = availableTags,
-            onTagFilterChange = onTagFilterChange,
         )
 
         Spacer(modifier = Modifier.height(AppSpacing.small))

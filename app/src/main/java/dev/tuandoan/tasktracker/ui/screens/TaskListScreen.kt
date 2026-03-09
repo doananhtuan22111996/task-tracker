@@ -1,5 +1,6 @@
 package dev.tuandoan.tasktracker.ui.screens
 
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -38,6 +39,7 @@ import androidx.navigation.NavController
 import dev.tuandoan.tasktracker.R
 import dev.tuandoan.tasktracker.navigation.StatsFilter
 import dev.tuandoan.tasktracker.navigation.TaskTrackerRoutes
+import dev.tuandoan.tasktracker.ui.components.TagChipRow
 import dev.tuandoan.tasktracker.ui.components.TaskListContent
 import dev.tuandoan.tasktracker.ui.components.TaskListTopBar
 import dev.tuandoan.tasktracker.ui.events.UiEvent
@@ -211,28 +213,33 @@ fun TaskListScreen(
             }
         },
     ) { paddingValues ->
-        TaskListContent(
-            allTasks = allTasks,
-            visibleTasks = visibleTasks,
-            groupedVisibleTasks = groupedVisibleTasks,
-            searchQuery = searchQuery,
-            currentFilter = currentFilter,
-            currentTagFilter = currentTagFilter,
-            availableTags = availableTags,
-            selectedIds = selectedIds,
-            isSelectionMode = isSelectionMode,
-            onSearchQueryChange = viewModel::updateSearchQuery,
-            onClearSearch = viewModel::clearSearch,
-            onTagFilterChange = viewModel::setTagFilter,
-            onToggleTaskComplete = viewModel::toggleTaskCompletion,
-            onEditTask = { task -> navController.navigate(TaskTrackerRoutes.taskEditorEdit(task.id)) },
-            onArchiveTask = viewModel::archiveTask,
-            onDuplicateTask = viewModel::duplicateTask,
-            onPinTask = viewModel::toggleTaskPin,
-            onLongPressTask = viewModel::enterSelection,
-            onToggleSelection = viewModel::toggleSelection,
-            modifier = Modifier.padding(paddingValues),
-        )
+        Column(modifier = Modifier.padding(paddingValues)) {
+            TagChipRow(
+                currentTagFilter = currentTagFilter,
+                availableTags = availableTags,
+                onTagFilterChange = viewModel::setTagFilter,
+            )
+            TaskListContent(
+                allTasks = allTasks,
+                visibleTasks = visibleTasks,
+                groupedVisibleTasks = groupedVisibleTasks,
+                searchQuery = searchQuery,
+                currentFilter = currentFilter,
+                currentTagFilter = currentTagFilter,
+                availableTags = availableTags,
+                selectedIds = selectedIds,
+                isSelectionMode = isSelectionMode,
+                onSearchQueryChange = viewModel::updateSearchQuery,
+                onClearSearch = viewModel::clearSearch,
+                onToggleTaskComplete = viewModel::toggleTaskCompletion,
+                onEditTask = { task -> navController.navigate(TaskTrackerRoutes.taskEditorEdit(task.id)) },
+                onArchiveTask = viewModel::archiveTask,
+                onDuplicateTask = viewModel::duplicateTask,
+                onPinTask = viewModel::toggleTaskPin,
+                onLongPressTask = viewModel::enterSelection,
+                onToggleSelection = viewModel::toggleSelection,
+            )
+        }
     }
 
     // Show archive confirmation dialog
