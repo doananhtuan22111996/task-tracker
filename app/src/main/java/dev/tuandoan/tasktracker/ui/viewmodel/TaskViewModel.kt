@@ -7,10 +7,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dev.tuandoan.tasktracker.R
 import dev.tuandoan.tasktracker.data.database.Task
-import dev.tuandoan.tasktracker.domain.model.CompletedGrouping
-import dev.tuandoan.tasktracker.domain.model.SortDirection
-import dev.tuandoan.tasktracker.domain.model.SortKey
-import dev.tuandoan.tasktracker.domain.model.TaskSort
 import dev.tuandoan.tasktracker.ui.events.UiEvent
 import dev.tuandoan.tasktracker.ui.manager.TaskBulkActionManager
 import dev.tuandoan.tasktracker.ui.manager.TaskCrudManager
@@ -84,7 +80,6 @@ class TaskViewModel @Inject constructor(
     val searchQuery = listState.searchQuery
     val filter = listState.filter
     val tagFilter = listState.tagFilter
-    val taskSort = listState.taskSort
     val hasActiveSearch = listState.hasActiveSearch
     val hasActiveFilter = listState.hasActiveFilter
     val hasActiveTagFilter = listState.hasActiveTagFilter
@@ -332,18 +327,6 @@ class TaskViewModel @Inject constructor(
     fun setFilter(filter: TaskFilter) = listStateManager.setFilter(filter)
     fun setTagFilter(tag: String?) = listStateManager.setTagFilter(tag)
     fun clearTagFilter() = listStateManager.clearTagFilter()
-
-    // === Sort Operations ===
-
-    fun setSort(sort: TaskSort) = listStateManager.setSort(sort)
-    fun setSortKey(key: SortKey, direction: SortDirection) = listStateManager.setSortKey(key, direction)
-    fun setCompletedGrouping(grouping: CompletedGrouping) = listStateManager.setCompletedGrouping(grouping)
-    fun toggleCompletedLast(enabled: Boolean) = listStateManager.toggleCompletedLast(enabled)
-
-    /**
-     * Get available sort options for UI
-     */
-    fun getAvailableSortOptions(): List<TaskSort> = listStateManager.getAvailableSortOptions()
 
     // === Error Management ===
 

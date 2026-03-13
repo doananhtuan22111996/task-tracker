@@ -222,6 +222,66 @@ class TaskSortServiceTest {
         assertEquals(4, options.size)
     }
 
+    // === Sort by DUE_DATE ===
+
+    @Test
+    fun `sortTasks by dueDate ASC returns earliest due date first with nulls last`() {
+        val tasks = listOf(
+            TestTaskFactory.createTask(id = 1, title = "No due", dueAt = null, createdAt = 3000L),
+            TestTaskFactory.createTask(id = 2, title = "Later", dueAt = 2000L, createdAt = 2000L),
+            TestTaskFactory.createTask(id = 3, title = "Sooner", dueAt = 1000L, createdAt = 1000L),
+        )
+        val sort = TaskSort(SortKey.DUE_DATE, SortDirection.ASC)
+
+        val result = service.sortTasks(tasks, sort)
+
+        assertEquals(listOf(3L, 2L, 1L), result.map { it.id })
+    }
+
+    @Test
+    fun `sortTasks by dueDate DESC returns latest due date first with nulls last`() {
+        val tasks = listOf(
+            TestTaskFactory.createTask(id = 1, title = "No due", dueAt = null, createdAt = 3000L),
+            TestTaskFactory.createTask(id = 2, title = "Later", dueAt = 2000L, createdAt = 2000L),
+            TestTaskFactory.createTask(id = 3, title = "Sooner", dueAt = 1000L, createdAt = 1000L),
+        )
+        val sort = TaskSort(SortKey.DUE_DATE, SortDirection.DESC)
+
+        val result = service.sortTasks(tasks, sort)
+
+        assertEquals(listOf(2L, 3L, 1L), result.map { it.id })
+    }
+
+    @Test
+    fun `sortTasks by dueDate ASC uses createdAt as secondary key`() {
+        val tasks = listOf(
+            TestTaskFactory.createTask(id = 1, title = "First", dueAt = 5000L, createdAt = 1000L),
+            TestTaskFactory.createTask(id = 2, title = "Second", dueAt = 5000L, createdAt = 3000L),
+            TestTaskFactory.createTask(id = 3, title = "Third", dueAt = 5000L, createdAt = 2000L),
+        )
+        val sort = TaskSort(SortKey.DUE_DATE, SortDirection.ASC)
+
+        val result = service.sortTasks(tasks, sort)
+
+        // Same dueAt, secondary sort is thenByDescending { createdAt }
+        assertEquals(listOf(2L, 3L, 1L), result.map { it.id })
+    }
+
+    @Test
+    fun `sortTasks by dueDate with all nulls sorts by createdAt descending`() {
+        val tasks = listOf(
+            TestTaskFactory.createTask(id = 1, title = "Old", dueAt = null, createdAt = 1000L),
+            TestTaskFactory.createTask(id = 2, title = "New", dueAt = null, createdAt = 3000L),
+            TestTaskFactory.createTask(id = 3, title = "Mid", dueAt = null, createdAt = 2000L),
+        )
+        val sort = TaskSort(SortKey.DUE_DATE, SortDirection.ASC)
+
+        val result = service.sortTasks(tasks, sort)
+
+        // All nulls, so secondary sort by createdAt descending
+        assertEquals(listOf(2L, 3L, 1L), result.map { it.id })
+    }
+
     // === Single element list ===
 
     @Test

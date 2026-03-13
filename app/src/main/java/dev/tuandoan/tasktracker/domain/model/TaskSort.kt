@@ -26,6 +26,7 @@ enum class SortKey {
     CREATED_AT,
     TITLE,
     PRIORITY,
+    DUE_DATE,
 }
 
 /**
@@ -68,6 +69,10 @@ data class TaskSort(
         SortKey.PRIORITY -> when (direction) {
             SortDirection.DESC -> "Priority: High to Low"
             SortDirection.ASC -> "Priority: Low to High"
+        }
+        SortKey.DUE_DATE -> when (direction) {
+            SortDirection.ASC -> "Due Date: Earliest first"
+            SortDirection.DESC -> "Due Date: Latest first"
         }
     }
 
