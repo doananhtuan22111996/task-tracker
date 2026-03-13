@@ -68,7 +68,6 @@ fun TaskListScreen(
     val currentFilter by viewModel.filter.collectAsStateWithLifecycle()
     val currentTagFilter by viewModel.tagFilter.collectAsStateWithLifecycle()
     val availableTags by viewModel.availableTags.collectAsStateWithLifecycle()
-    val currentSort by viewModel.taskSort.collectAsStateWithLifecycle()
     val pendingDeleteTask by viewModel.pendingDeleteTask.collectAsStateWithLifecycle()
 
     // Selection state
@@ -138,8 +137,6 @@ fun TaskListScreen(
         modifier = modifier.fillMaxSize(),
         topBar = {
             TaskListTopBar(
-                currentSort = currentSort,
-                onSortChanged = viewModel::setSort,
                 isSelectionMode = isSelectionMode,
                 selectedCount = selectedCount,
                 onBulkMarkCompleted = viewModel::bulkMarkCompleted,
