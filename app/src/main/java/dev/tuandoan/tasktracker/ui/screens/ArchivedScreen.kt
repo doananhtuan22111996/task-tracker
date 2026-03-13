@@ -23,7 +23,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dev.tuandoan.tasktracker.R
 import dev.tuandoan.tasktracker.ui.components.ArchivedTaskListContent
 import dev.tuandoan.tasktracker.ui.components.ArchivedTaskListTopBar
-import dev.tuandoan.tasktracker.ui.components.FilterChipRow
+import dev.tuandoan.tasktracker.ui.components.TagChipRow
 import dev.tuandoan.tasktracker.ui.events.UiEvent
 import dev.tuandoan.tasktracker.ui.viewmodel.TaskViewModel
 
@@ -110,8 +110,7 @@ fun ArchivedScreen(viewModel: TaskViewModel, onNavigateBack: () -> Unit, modifie
         },
     ) { paddingValues ->
         Column(modifier = Modifier.padding(paddingValues)) {
-            FilterChipRow(
-                showStatusChips = false,
+            TagChipRow(
                 currentTagFilter = archivedTagFilter,
                 availableTags = archivedAvailableTags,
                 onTagFilterChange = viewModel::setArchivedTagFilter,
