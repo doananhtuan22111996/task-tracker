@@ -27,6 +27,8 @@ import dev.tuandoan.tasktracker.navigation.StatsFilter
 import dev.tuandoan.tasktracker.navigation.TaskTrackerRoutes
 import dev.tuandoan.tasktracker.ui.manager.NotificationPermissionManager
 import dev.tuandoan.tasktracker.ui.screens.ArchivedScreen
+import dev.tuandoan.tasktracker.ui.screens.HelpScreen
+import dev.tuandoan.tasktracker.ui.screens.OnboardingScreen
 import dev.tuandoan.tasktracker.ui.screens.SettingsScreen
 import dev.tuandoan.tasktracker.ui.screens.StatsScreen
 import dev.tuandoan.tasktracker.ui.screens.TaskEditorScreen
@@ -76,7 +78,10 @@ class MainActivity : AppCompatActivity() {
                 themeMode = userPreferences.themeMode,
                 dynamicColor = userPreferences.dynamicColor,
             ) {
-                TaskTrackerApp(notificationPermissionManager)
+                TaskTrackerApp(
+                    notificationPermissionManager = notificationPermissionManager,
+                    isOnboardingCompleted = userPreferences.onboardingCompleted,
+                )
             }
         }
     }
@@ -88,8 +93,16 @@ class MainActivity : AppCompatActivity() {
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TaskTrackerApp(notificationPermissionManager: NotificationPermissionManager? = null) {
+fun TaskTrackerApp(
+    notificationPermissionManager: NotificationPermissionManager? = null,
+    isOnboardingCompleted: Boolean = true,
+) {
     val navController = rememberNavController()
+    val startDestination = if (isOnboardingCompleted) {
+        TaskTrackerRoutes.TASK_LIST
+    } else {
+        TaskTrackerRoutes.ONBOARDING
+    }
 
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -97,8 +110,20 @@ fun TaskTrackerApp(notificationPermissionManager: NotificationPermissionManager?
     ) {
         NavHost(
             navController = navController,
-            startDestination = TaskTrackerRoutes.TASK_LIST,
+            startDestination = startDestination,
         ) {
+            composable(TaskTrackerRoutes.ONBOARDING) {
+                val settingsViewModel: SettingsViewModel = hiltViewModel()
+                OnboardingScreen(
+                    onFinish = {
+                        settingsViewModel.setOnboardingCompleted()
+                        navController.navigate(TaskTrackerRoutes.TASK_LIST) {
+                            popUpTo(TaskTrackerRoutes.ONBOARDING) { inclusive = true }
+                        }
+                    },
+                )
+            }
+
             composable(
                 route = TaskTrackerRoutes.TASK_LIST,
                 arguments = listOf(
@@ -160,6 +185,17 @@ fun TaskTrackerApp(notificationPermissionManager: NotificationPermissionManager?
                 val settingsViewModel: SettingsViewModel = hiltViewModel()
                 SettingsScreen(
                     viewModel = settingsViewModel,
+                    onNavigateBack = {
+                        navController.popBackStack()
+                    },
+                    onNavigateToHelp = {
+                        navController.navigate(TaskTrackerRoutes.HELP)
+                    },
+                )
+            }
+
+            composable(TaskTrackerRoutes.HELP) {
+                HelpScreen(
                     onNavigateBack = {
                         navController.popBackStack()
                     },

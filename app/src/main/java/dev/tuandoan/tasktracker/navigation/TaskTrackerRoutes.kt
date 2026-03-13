@@ -9,6 +9,8 @@ object TaskTrackerRoutes {
     const val ARCHIVED = "archived"
     const val STATS = "stats"
     const val SETTINGS = "settings"
+    const val ONBOARDING = "onboarding"
+    const val HELP = "help"
     const val TASK_EDITOR_CREATE = "task_editor"
     const val TASK_EDITOR_EDIT = "task_editor/{taskId}"
 

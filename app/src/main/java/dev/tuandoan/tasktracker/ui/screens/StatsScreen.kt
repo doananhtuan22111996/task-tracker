@@ -58,6 +58,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dev.tuandoan.tasktracker.R
 import dev.tuandoan.tasktracker.data.database.DailyCount
 import dev.tuandoan.tasktracker.navigation.StatsFilter
+import dev.tuandoan.tasktracker.ui.components.FeatureTip
 import dev.tuandoan.tasktracker.ui.viewmodel.StatsViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -74,6 +75,7 @@ fun StatsScreen(
     val weeklyBreakdown by viewModel.weeklyBreakdown.collectAsStateWithLifecycle()
     val completionRate by viewModel.completionRate.collectAsStateWithLifecycle()
     val isEmpty by viewModel.isEmpty.collectAsStateWithLifecycle()
+    val userPrefs by viewModel.userPreferences.collectAsStateWithLifecycle()
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -105,6 +107,13 @@ fun StatsScreen(
                     .verticalScroll(rememberScrollState()),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
+                // Feature tip (SPEC-O02)
+                FeatureTip(
+                    text = stringResource(R.string.tip_stats_cards),
+                    visible = !userPrefs.tipStatsCardsShown,
+                    onDismiss = viewModel::setTipStatsCardsShown,
+                )
+
                 // TODAY section (SPEC-S06)
                 Text(
                     text = stringResource(R.string.stat_section_today),

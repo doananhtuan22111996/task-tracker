@@ -26,6 +26,10 @@ class SettingsRepository @Inject constructor(@ApplicationContext private val con
         val THEME_MODE = stringPreferencesKey("theme_mode")
         val DYNAMIC_COLOR = booleanPreferencesKey("dynamic_color")
         val LANGUAGE_TAG = stringPreferencesKey("language_tag")
+        val ONBOARDING_COMPLETED = booleanPreferencesKey("onboarding_completed")
+        val TIP_FAB_SHOWN = booleanPreferencesKey("tip_fab_shown")
+        val TIP_TAG_CHIPS_SHOWN = booleanPreferencesKey("tip_tag_chips_shown")
+        val TIP_STATS_CARDS_SHOWN = booleanPreferencesKey("tip_stats_cards_shown")
     }
 
     /**
@@ -36,6 +40,10 @@ class SettingsRepository @Inject constructor(@ApplicationContext private val con
             themeMode = prefs[Keys.THEME_MODE]?.let { ThemeMode.valueOf(it) } ?: ThemeMode.SYSTEM,
             dynamicColor = prefs[Keys.DYNAMIC_COLOR] ?: true,
             languageTag = prefs[Keys.LANGUAGE_TAG] ?: "",
+            onboardingCompleted = prefs[Keys.ONBOARDING_COMPLETED] ?: false,
+            tipFabShown = prefs[Keys.TIP_FAB_SHOWN] ?: false,
+            tipTagChipsShown = prefs[Keys.TIP_TAG_CHIPS_SHOWN] ?: false,
+            tipStatsCardsShown = prefs[Keys.TIP_STATS_CARDS_SHOWN] ?: false,
         )
     }
 
@@ -65,5 +73,30 @@ class SettingsRepository @Inject constructor(@ApplicationContext private val con
         context.dataStore.edit { prefs ->
             prefs[Keys.LANGUAGE_TAG] = tag
         }
+    }
+
+    /**
+     * Marks onboarding as completed so the carousel is not shown again.
+     */
+    suspend fun setOnboardingCompleted() {
+        context.dataStore.edit { prefs ->
+            prefs[Keys.ONBOARDING_COMPLETED] = true
+        }
+    }
+
+    /**
+     * Marks a feature tip as shown so it won't appear again.
+     */
+    suspend fun setTipShown(key: Preferences.Key<Boolean>) {
+        context.dataStore.edit { prefs ->
+            prefs[key] = true
+        }
+    }
+
+    /** Expose tip keys for ViewModel usage. */
+    object TipKeys {
+        val FAB = Keys.TIP_FAB_SHOWN
+        val TAG_CHIPS = Keys.TIP_TAG_CHIPS_SHOWN
+        val STATS_CARDS = Keys.TIP_STATS_CARDS_SHOWN
     }
 }

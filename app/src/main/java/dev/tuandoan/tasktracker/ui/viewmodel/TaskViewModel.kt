@@ -7,6 +7,8 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dev.tuandoan.tasktracker.R
 import dev.tuandoan.tasktracker.data.database.Task
+import dev.tuandoan.tasktracker.data.preferences.SettingsRepository
+import dev.tuandoan.tasktracker.data.preferences.UserPreferences
 import dev.tuandoan.tasktracker.ui.events.UiEvent
 import dev.tuandoan.tasktracker.ui.manager.TaskBulkActionManager
 import dev.tuandoan.tasktracker.ui.manager.TaskCrudManager
@@ -49,6 +51,7 @@ class TaskViewModel @Inject constructor(
     private val crudManager: TaskCrudManager,
     private val selectionStateManager: TaskSelectionStateManager,
     private val bulkActionManager: TaskBulkActionManager,
+    private val settingsRepository: SettingsRepository,
 ) : ViewModel() {
 
     // Initialize state from managers
@@ -363,6 +366,19 @@ class TaskViewModel @Inject constructor(
 
     fun setArchivedTagFilter(tag: String?) {
         _archivedTagFilter.value = tag
+    }
+
+    // === Feature Tips ===
+
+    val userPreferences: StateFlow<UserPreferences> = settingsRepository.userPreferences
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), UserPreferences())
+
+    fun setTipFabShown() {
+        viewModelScope.launch { settingsRepository.setTipShown(SettingsRepository.TipKeys.FAB) }
+    }
+
+    fun setTipTagChipsShown() {
+        viewModelScope.launch { settingsRepository.setTipShown(SettingsRepository.TipKeys.TAG_CHIPS) }
     }
 
     // === Error Management ===

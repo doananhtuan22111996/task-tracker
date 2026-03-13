@@ -16,4 +16,8 @@ data class UserPreferences(
     val themeMode: ThemeMode = ThemeMode.SYSTEM,
     val dynamicColor: Boolean = true,
     val languageTag: String = "", // Empty string means "follow system"
+    val onboardingCompleted: Boolean = false,
+    val tipFabShown: Boolean = false,
+    val tipTagChipsShown: Boolean = false,
+    val tipStatsCardsShown: Boolean = false,
 )
