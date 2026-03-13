@@ -1,5 +1,6 @@
 package dev.tuandoan.tasktracker.ui.screens
 
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.AlertDialog
@@ -22,6 +23,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dev.tuandoan.tasktracker.R
 import dev.tuandoan.tasktracker.ui.components.ArchivedTaskListContent
 import dev.tuandoan.tasktracker.ui.components.ArchivedTaskListTopBar
+import dev.tuandoan.tasktracker.ui.components.TagChipRow
 import dev.tuandoan.tasktracker.ui.events.UiEvent
 import dev.tuandoan.tasktracker.ui.viewmodel.TaskViewModel
 
@@ -34,6 +36,8 @@ fun ArchivedScreen(viewModel: TaskViewModel, onNavigateBack: () -> Unit, modifie
     // Collect archived tasks state
     val archivedTasks by viewModel.archivedTasks.collectAsStateWithLifecycle()
     val searchQuery by viewModel.searchQuery.collectAsStateWithLifecycle()
+    val archivedTagFilter by viewModel.archivedTagFilter.collectAsStateWithLifecycle()
+    val archivedAvailableTags by viewModel.archivedAvailableTags.collectAsStateWithLifecycle()
 
     // Selection state
     val selectedIds by viewModel.selectedIds.collectAsStateWithLifecycle()
@@ -105,19 +109,25 @@ fun ArchivedScreen(viewModel: TaskViewModel, onNavigateBack: () -> Unit, modifie
             SnackbarHost(hostState = snackbarHostState)
         },
     ) { paddingValues ->
-        ArchivedTaskListContent(
-            archivedTasks = archivedTasks,
-            searchQuery = searchQuery,
-            selectedIds = selectedIds,
-            isSelectionMode = isSelectionMode,
-            onSearchQueryChange = viewModel::updateSearchQuery,
-            onClearSearch = viewModel::clearSearch,
-            onRestoreTask = viewModel::restoreArchivedTask,
-            onPermanentDeleteTask = viewModel::requestPermanentDeleteTask,
-            onLongPressTask = viewModel::enterSelection,
-            onToggleSelection = viewModel::toggleSelection,
-            modifier = Modifier.padding(paddingValues),
-        )
+        Column(modifier = Modifier.padding(paddingValues)) {
+            TagChipRow(
+                currentTagFilter = archivedTagFilter,
+                availableTags = archivedAvailableTags,
+                onTagFilterChange = viewModel::setArchivedTagFilter,
+            )
+            ArchivedTaskListContent(
+                archivedTasks = archivedTasks,
+                searchQuery = searchQuery,
+                selectedIds = selectedIds,
+                isSelectionMode = isSelectionMode,
+                onSearchQueryChange = viewModel::updateSearchQuery,
+                onClearSearch = viewModel::clearSearch,
+                onRestoreTask = viewModel::restoreArchivedTask,
+                onPermanentDeleteTask = viewModel::requestPermanentDeleteTask,
+                onLongPressTask = viewModel::enterSelection,
+                onToggleSelection = viewModel::toggleSelection,
+            )
+        }
     }
 
     // Show permanent delete confirmation dialog
