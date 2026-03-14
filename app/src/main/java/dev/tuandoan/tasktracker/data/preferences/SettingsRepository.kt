@@ -5,6 +5,7 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -30,6 +31,8 @@ class SettingsRepository @Inject constructor(@ApplicationContext private val con
         val TIP_FAB_SHOWN = booleanPreferencesKey("tip_fab_shown")
         val TIP_TAG_CHIPS_SHOWN = booleanPreferencesKey("tip_tag_chips_shown")
         val TIP_STATS_CARDS_SHOWN = booleanPreferencesKey("tip_stats_cards_shown")
+        val FIRST_LAUNCH_DATE = longPreferencesKey("first_launch_date")
+        val RATING_PROMPT_SHOWN = booleanPreferencesKey("rating_prompt_shown")
     }
 
     /**
@@ -44,6 +47,8 @@ class SettingsRepository @Inject constructor(@ApplicationContext private val con
             tipFabShown = prefs[Keys.TIP_FAB_SHOWN] ?: false,
             tipTagChipsShown = prefs[Keys.TIP_TAG_CHIPS_SHOWN] ?: false,
             tipStatsCardsShown = prefs[Keys.TIP_STATS_CARDS_SHOWN] ?: false,
+            firstLaunchDate = prefs[Keys.FIRST_LAUNCH_DATE] ?: 0L,
+            ratingPromptShown = prefs[Keys.RATING_PROMPT_SHOWN] ?: false,
         )
     }
 
@@ -98,5 +103,19 @@ class SettingsRepository @Inject constructor(@ApplicationContext private val con
         val FAB = Keys.TIP_FAB_SHOWN
         val TAG_CHIPS = Keys.TIP_TAG_CHIPS_SHOWN
         val STATS_CARDS = Keys.TIP_STATS_CARDS_SHOWN
+    }
+
+    suspend fun ensureFirstLaunchDate() {
+        context.dataStore.edit { prefs ->
+            if (prefs[Keys.FIRST_LAUNCH_DATE] == null) {
+                prefs[Keys.FIRST_LAUNCH_DATE] = System.currentTimeMillis()
+            }
+        }
+    }
+
+    suspend fun setRatingPromptShown(shown: Boolean) {
+        context.dataStore.edit { prefs ->
+            prefs[Keys.RATING_PROMPT_SHOWN] = shown
+        }
     }
 }

@@ -125,6 +125,9 @@ dependencies {
     // AppCompat (for per-app language support)
     implementation(libs.androidx.appcompat)
 
+    // Google Play In-App Review
+    implementation(libs.google.play.review.ktx)
+
     // WorkManager dependencies
     implementation(libs.androidx.work.runtime.ktx)
     implementation(libs.androidx.hilt.work)

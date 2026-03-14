@@ -360,4 +360,11 @@
     <string name="help_a_backup_tasks">Go to Settings → Backup &amp; Restore → Export Backup. A JSON file is saved to your chosen location.</string>
     <string name="help_q_export_csv">Can I export to a spreadsheet?</string>
     <string name="help_a_export_csv">Yes. Settings → Export as CSV produces a file compatible with Excel and Google Sheets.</string>
+
+    <!-- Feedback -->
+    <string name="settings_section_feedback">Feedback</string>
+    <string name="settings_send_feedback">Send Feedback</string>
+    <string name="settings_send_feedback_desc">Let us know how we can improve</string>
+    <string name="feedback_email_subject">Task Tracker Feedback</string>
+    <string name="cd_send_feedback">Send feedback via email</string>
 </resources>

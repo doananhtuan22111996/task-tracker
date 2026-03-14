@@ -21,4 +21,6 @@ sealed class UiEvent {
         val onUndo: () -> Unit,
         val message: String? = null, // Custom message, if null will generate default
     ) : UiEvent()
+
+    data object ShowRatingPrompt : UiEvent()
 }

@@ -116,6 +116,12 @@ fun TaskListScreen(
                         event.onUndo()
                     }
                 }
+                is UiEvent.ShowRatingPrompt -> {
+                    (context as? android.app.Activity)?.let { activity ->
+                        dev.tuandoan.tasktracker.ui.components.RatingPromptManager
+                            .maybeRequestReview(activity)
+                    }
+                }
                 is UiEvent.ShowSnackbar -> {
                     if (event.actionLabel != null) {
                         val result = snackbarHostState.showSnackbar(

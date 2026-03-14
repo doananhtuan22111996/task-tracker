@@ -88,6 +88,7 @@ fun ArchivedScreen(viewModel: TaskViewModel, onNavigateBack: () -> Unit, modifie
                         )
                     }
                 }
+                is UiEvent.ShowRatingPrompt -> { /* Not applicable on archive screen */ }
             }
         }
     }

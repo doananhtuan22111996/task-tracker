@@ -9,6 +9,7 @@ import dev.tuandoan.tasktracker.R
 import dev.tuandoan.tasktracker.data.database.Task
 import dev.tuandoan.tasktracker.data.preferences.SettingsRepository
 import dev.tuandoan.tasktracker.data.preferences.UserPreferences
+import dev.tuandoan.tasktracker.domain.ITaskManager
 import dev.tuandoan.tasktracker.ui.events.UiEvent
 import dev.tuandoan.tasktracker.ui.manager.TaskBulkActionManager
 import dev.tuandoan.tasktracker.ui.manager.TaskCrudManager
@@ -27,6 +28,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.shareIn
@@ -52,11 +54,16 @@ class TaskViewModel @Inject constructor(
     private val selectionStateManager: TaskSelectionStateManager,
     private val bulkActionManager: TaskBulkActionManager,
     private val settingsRepository: SettingsRepository,
+    private val taskManager: ITaskManager,
 ) : ViewModel() {
 
     // Initialize state from managers
     private val listState: TaskListState = listStateManager.initializeStateFlows(viewModelScope)
     private val selectionState: SelectionState = selectionStateManager.initializeStateFlows(viewModelScope)
+
+    init {
+        viewModelScope.launch { settingsRepository.ensureFirstLaunchDate() }
+    }
 
     // === Exposed State Flows ===
 
@@ -297,7 +304,33 @@ class TaskViewModel @Inject constructor(
         crudManager.executeOperation(
             scope = viewModelScope,
             operation = { crudManager.toggleTaskCompletion(task) },
+            onSuccess = {
+                if (!task.isCompleted) {
+                    viewModelScope.launch { checkAndEmitRatingPrompt() }
+                }
+            },
         )
+    }
+
+    private suspend fun checkAndEmitRatingPrompt() {
+        val prefs = settingsRepository.userPreferences.first()
+        if (prefs.ratingPromptShown) return
+
+        val completedCount = taskManager.observeCompletedCount().first()
+        if (completedCount < RATING_MIN_COMPLETED_TASKS) return
+
+        val daysSinceFirstLaunch =
+            (System.currentTimeMillis() - prefs.firstLaunchDate) / MILLIS_PER_DAY
+        if (daysSinceFirstLaunch < RATING_MIN_DAYS_SINCE_LAUNCH) return
+
+        settingsRepository.setRatingPromptShown(true)
+        _singleTaskUiEvent.emit(UiEvent.ShowRatingPrompt)
+    }
+
+    companion object {
+        private const val RATING_MIN_COMPLETED_TASKS = 3
+        private const val RATING_MIN_DAYS_SINCE_LAUNCH = 3L
+        private const val MILLIS_PER_DAY = 86_400_000L
     }
 
     fun duplicateTask(task: Task) {
