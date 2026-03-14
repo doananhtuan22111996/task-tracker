@@ -19,6 +19,8 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -228,7 +230,8 @@ fun TaskSectionHeader(modifier: Modifier = Modifier, header: String, itemCount: 
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .padding(vertical = 16.dp), // Add vertical spacing
+            .padding(vertical = 16.dp)
+            .semantics { heading() },
         contentAlignment = androidx.compose.ui.Alignment.Center,
     ) {
         Row(
