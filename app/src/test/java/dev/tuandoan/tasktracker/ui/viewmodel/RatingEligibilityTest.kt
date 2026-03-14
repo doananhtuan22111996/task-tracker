@@ -216,6 +216,26 @@ class RatingEligibilityTest {
     }
 
     @Test
+    fun `toggleTaskCompletion does not emit when firstLaunchDate is zero`() = runTest {
+        preferencesFlow.value = UserPreferences(
+            firstLaunchDate = 0L,
+            ratingPromptShown = false,
+        )
+        every { taskManager.observeCompletedCount() } returns flowOf(5)
+        mockCrudManagerToInvokeOnSuccess()
+
+        val activeTask = Task(id = 1, title = "Test", isCompleted = false)
+        val viewModel = createViewModel()
+
+        viewModel.uiEvent.test {
+            viewModel.toggleTaskCompletion(activeTask)
+            advanceUntilIdle()
+
+            expectNoEvents()
+        }
+    }
+
+    @Test
     fun `ensureFirstLaunchDate is called on ViewModel init`() = runTest {
         createViewModel()
         advanceUntilIdle()

@@ -1,5 +1,8 @@
 package dev.tuandoan.tasktracker.ui.screens
 
+import android.app.Activity
+import android.content.Context
+import android.content.ContextWrapper
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -117,7 +120,7 @@ fun TaskListScreen(
                     }
                 }
                 is UiEvent.ShowRatingPrompt -> {
-                    (context as? android.app.Activity)?.let { activity ->
+                    context.findActivity()?.let { activity ->
                         dev.tuandoan.tasktracker.ui.components.RatingPromptManager
                             .maybeRequestReview(activity)
                     }
@@ -337,4 +340,13 @@ fun TaskListScreen(
             },
         )
     }
+}
+
+private fun Context.findActivity(): Activity? {
+    var ctx = this
+    while (ctx is ContextWrapper) {
+        if (ctx is Activity) return ctx
+        ctx = ctx.baseContext
+    }
+    return null
 }

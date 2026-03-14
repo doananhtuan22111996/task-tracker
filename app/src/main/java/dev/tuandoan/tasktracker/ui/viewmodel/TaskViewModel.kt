@@ -315,6 +315,7 @@ class TaskViewModel @Inject constructor(
     private suspend fun checkAndEmitRatingPrompt() {
         val prefs = settingsRepository.userPreferences.first()
         if (prefs.ratingPromptShown) return
+        if (prefs.firstLaunchDate == 0L) return
 
         val completedCount = taskManager.observeCompletedCount().first()
         if (completedCount < RATING_MIN_COMPLETED_TASKS) return
@@ -323,8 +324,8 @@ class TaskViewModel @Inject constructor(
             (System.currentTimeMillis() - prefs.firstLaunchDate) / MILLIS_PER_DAY
         if (daysSinceFirstLaunch < RATING_MIN_DAYS_SINCE_LAUNCH) return
 
-        settingsRepository.setRatingPromptShown(true)
         _singleTaskUiEvent.emit(UiEvent.ShowRatingPrompt)
+        settingsRepository.setRatingPromptShown(true)
     }
 
     companion object {
