@@ -133,6 +133,48 @@ class StatsViewModelTest {
             assertFalse(awaitItem())
         }
     }
+
+    // uiState tests
+    @Test
+    fun `uiState combines all stat counts correctly`() = runTest {
+        fakeTaskManager.setStats(
+            activeCount = 10,
+            completedCount = 5,
+            completedTodayCount = 2,
+            dueTodayCount = 3,
+            overdueCount = 1,
+        )
+        viewModel = createViewModel()
+
+        viewModel.uiState.test {
+            val state = awaitItem()
+            assertEquals(10, state.activeCount)
+            assertEquals(5, state.completedCount)
+            assertEquals(2, state.completedTodayCount)
+            assertEquals(3, state.dueTodayCount)
+            assertEquals(1, state.overdueCount)
+        }
+    }
+
+    @Test
+    fun `completionRate is 50 when completedCount equals activeCount`() = runTest {
+        fakeTaskManager.setStats(completedCount = 4, activeCount = 4)
+        viewModel = createViewModel()
+
+        viewModel.completionRate.test {
+            assertEquals(50, awaitItem())
+        }
+    }
+
+    @Test
+    fun `dailyProgress is 0 when completedToday is 0 and dueToday is positive`() = runTest {
+        fakeTaskManager.setStats(completedTodayCount = 0, dueTodayCount = 10)
+        viewModel = createViewModel()
+
+        viewModel.dailyProgress.test {
+            assertEquals(0f, awaitItem(), 0.01f)
+        }
+    }
 }
 
 private class FakeStatsTaskManager : ITaskManager {
