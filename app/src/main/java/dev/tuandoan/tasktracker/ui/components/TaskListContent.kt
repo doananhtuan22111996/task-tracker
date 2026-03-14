@@ -245,7 +245,6 @@ fun TaskSectionHeader(modifier: Modifier = Modifier, header: String, itemCount: 
                     style = MaterialTheme.typography.labelSmall.copy(
                         fontWeight = FontWeight.Bold,
                         letterSpacing = 1.5.sp, // tracking-widest
-                        fontSize = 12.sp, // text-xs
                     ),
                     color = contentColor,
                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp), // px-4 py-1.5
@@ -268,7 +267,6 @@ fun TaskSectionHeader(modifier: Modifier = Modifier, header: String, itemCount: 
                                 text = count.toString(),
                                 style = MaterialTheme.typography.labelSmall.copy(
                                     fontWeight = FontWeight.Bold,
-                                    fontSize = 10.sp,
                                 ),
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
