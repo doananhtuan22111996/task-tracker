@@ -23,6 +23,7 @@ import androidx.compose.material.icons.filled.TaskAlt
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -59,88 +60,91 @@ fun OnboardingScreen(onFinish: () -> Unit) {
     val scope = rememberCoroutineScope()
     val isLastPage = pagerState.currentPage == pages.lastIndex
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.surface),
-    ) {
-        // Skip button (pages 1-3 only)
-        Row(
+    Scaffold { paddingValues ->
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 8.dp),
-            horizontalArrangement = Arrangement.End,
+                .fillMaxSize()
+                .padding(paddingValues)
+                .background(MaterialTheme.colorScheme.surface),
         ) {
-            if (!isLastPage) {
-                TextButton(onClick = onFinish) {
-                    Text(stringResource(R.string.onboarding_action_skip))
+            // Skip button (pages 1-3 only)
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                horizontalArrangement = Arrangement.End,
+            ) {
+                if (!isLastPage) {
+                    TextButton(onClick = onFinish) {
+                        Text(stringResource(R.string.onboarding_action_skip))
+                    }
+                } else {
+                    // Placeholder to keep layout stable
+                    Spacer(modifier = Modifier.height(48.dp))
                 }
-            } else {
-                // Placeholder to keep layout stable
-                Spacer(modifier = Modifier.height(48.dp))
             }
-        }
 
-        // Pager content
-        HorizontalPager(
-            state = pagerState,
-            modifier = Modifier.weight(1f),
-        ) { page ->
-            OnboardingPageContent(pages[page])
-        }
+            // Pager content
+            HorizontalPager(
+                state = pagerState,
+                modifier = Modifier.weight(1f),
+            ) { page ->
+                OnboardingPageContent(pages[page])
+            }
 
-        // Page indicator dots
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 16.dp)
-                .semantics {
-                    contentDescription = "Page ${pagerState.currentPage + 1} of ${pages.size}"
-                },
-            horizontalArrangement = Arrangement.Center,
-        ) {
-            repeat(pages.size) { index ->
-                val color by animateColorAsState(
-                    targetValue = if (index == pagerState.currentPage) {
-                        MaterialTheme.colorScheme.primary
-                    } else {
-                        MaterialTheme.colorScheme.outlineVariant
+            // Page indicator dots
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 16.dp)
+                    .semantics {
+                        contentDescription = "Page ${pagerState.currentPage + 1} of ${pages.size}"
                     },
-                    label = "dot_color",
-                )
-                Box(
-                    modifier = Modifier
-                        .padding(horizontal = 4.dp)
-                        .size(8.dp)
-                        .clip(CircleShape)
-                        .background(color),
+                horizontalArrangement = Arrangement.Center,
+            ) {
+                repeat(pages.size) { index ->
+                    val color by animateColorAsState(
+                        targetValue = if (index == pagerState.currentPage) {
+                            MaterialTheme.colorScheme.primary
+                        } else {
+                            MaterialTheme.colorScheme.outlineVariant
+                        },
+                        label = "dot_color",
+                    )
+                    Box(
+                        modifier = Modifier
+                            .padding(horizontal = 4.dp)
+                            .size(8.dp)
+                            .clip(CircleShape)
+                            .background(color),
+                    )
+                }
+            }
+
+            // Next / Get Started button
+            Button(
+                onClick = {
+                    if (isLastPage) {
+                        onFinish()
+                    } else {
+                        scope.launch { pagerState.animateScrollToPage(pagerState.currentPage + 1) }
+                    }
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 32.dp, vertical = 16.dp),
+            ) {
+                Text(
+                    text = if (isLastPage) {
+                        stringResource(R.string.onboarding_action_get_started)
+                    } else {
+                        stringResource(R.string.onboarding_action_next)
+                    },
                 )
             }
-        }
 
-        // Next / Get Started button
-        Button(
-            onClick = {
-                if (isLastPage) {
-                    onFinish()
-                } else {
-                    scope.launch { pagerState.animateScrollToPage(pagerState.currentPage + 1) }
-                }
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 32.dp, vertical = 16.dp),
-        ) {
-            Text(
-                text = if (isLastPage) {
-                    stringResource(R.string.onboarding_action_get_started)
-                } else {
-                    stringResource(R.string.onboarding_action_next)
-                },
-            )
+            Spacer(modifier = Modifier.height(16.dp))
         }
-
-        Spacer(modifier = Modifier.height(16.dp))
     }
 }
 
