@@ -331,4 +331,46 @@
     <string name="onboarding_action_next">अगला</string>
     <string name="onboarding_action_get_started">शुरू करें</string>
     <string name="cd_onboarding_page_indicator">पृष्ठ %1$d / %2$d</string>
+    <!-- Feature Tips (SPEC-O02) -->
+    <string name="tip_fab_create_task">अपना पहला कार्य बनाने के लिए + दबाएँ। व्यवस्थित रहने के लिए एक टैग और प्राथमिकता जोड़ें।</string>
+    <string name="tip_tag_chips_filter">अपने कार्यों को फ़िल्टर करने के लिए किसी टैग चिप पर टैप करें। फ़िल्टर हटाने के लिए फिर से टैप करें।</string>
+    <string name="tip_stats_cards">फ़िल्टर की गई कार्य सूची पर जाने के लिए किसी भी आँकड़ा कार्ड पर टैप करें।</string>
+    <string name="tip_action_got_it">समझ गया</string>
+
+    <!-- Help & FAQ (SPEC-O03) -->
+    <string name="settings_help_faq">सहायता &amp; FAQ</string>
+    <string name="settings_help_faq_desc">सामान्य प्रश्नों के उत्तर प्राप्त करें</string>
+    <string name="title_help_faq">सहायता &amp; FAQ</string>
+    <string name="help_section_getting_started">शुरू करें</string>
+    <string name="help_q_create_task">मैं अपना पहला कार्य कैसे बनाऊँ?</string>
+    <string name="help_a_create_task">होम स्क्रीन पर + बटन दबाएँ। एक शीर्षक, वैकल्पिक विवरण, टैग और प्राथमिकता जोड़ें, फिर सहेजें दबाएँ।</string>
+    <string name="help_q_need_account">क्या मुझे किसी खाते की आवश्यकता है?</string>
+    <string name="help_a_need_account">नहीं। Task Tracker पूरी तरह से ऑफ़लाइन काम करता है। कोई पंजीकरण नहीं, कोई लॉगिन नहीं, कोई सदस्यता नहीं।</string>
+    <string name="help_section_managing_tasks">कार्य प्रबंधन</string>
+    <string name="help_q_filter_by_tag">मैं टैग के अनुसार कार्य कैसे फ़िल्टर करूँ?</string>
+    <string name="help_a_filter_by_tag">शीर्ष पट्टी के नीचे पंक्ति में किसी टैग चिप पर टैप करें। फ़िल्टर हटाने के लिए फिर से टैप करें।</string>
+    <string name="help_q_change_priority">मैं किसी कार्य की प्राथमिकता कैसे बदलूँ?</string>
+    <string name="help_a_change_priority">कार्य संपादक खोलें (किसी कार्य पर टैप करें) और कम, मध्यम या उच्च चुनें।</string>
+    <string name="help_q_multi_select">क्या मैं एक साथ कई कार्य चुन सकता हूँ?</string>
+    <string name="help_a_multi_select">हाँ। बहु-चयन मोड में प्रवेश करने के लिए किसी भी कार्य को देर तक दबाएँ, फिर चयन करने के लिए कार्यों पर टैप करें।</string>
+    <string name="help_section_reminders">अनुस्मारक</string>
+    <string name="help_q_no_reminder">मुझे अनुस्मारक क्यों नहीं मिला?</string>
+    <string name="help_a_no_reminder">सुनिश्चित करें कि आपके डिवाइस सेटिंग्स में Task Tracker के लिए सूचनाएँ सक्षम हैं। अनुस्मारक केवल तभी सक्रिय होते हैं जब अंतिम तिथि और अनुस्मारक समय निर्धारित हों।</string>
+    <string name="help_q_reminder_no_due">क्या मैं बिना अंतिम तिथि के अनुस्मारक सेट कर सकता हूँ?</string>
+    <string name="help_a_reminder_no_due">नहीं। अनुस्मारक विकल्प दिखाई देने से पहले अंतिम तिथि आवश्यक है।</string>
+    <string name="help_section_archive">संग्रह</string>
+    <string name="help_q_archive_task">जब मैं किसी कार्य को संग्रहित करता हूँ तो क्या होता है?</string>
+    <string name="help_a_archive_task">संग्रहित कार्य आपकी मुख्य सूची से हटा दिए जाते हैं लेकिन हटाए नहीं जाते। उन्हें संग्रह स्क्रीन में खोजें।</string>
+    <string name="help_q_restore_archived">क्या मैं संग्रहित कार्य को पुनर्स्थापित कर सकता हूँ?</string>
+    <string name="help_a_restore_archived">हाँ। संग्रह खोलें, कार्य पर टैप करें और पुनर्स्थापित करें चुनें।</string>
+    <string name="help_section_stats">आँकड़े</string>
+    <string name="help_q_completion_rate">"पूर्णता दर" का क्या अर्थ है?</string>
+    <string name="help_a_completion_rate">यह सभी कार्यों (संग्रहित को छोड़कर) का वह प्रतिशत है जो पूर्ण चिह्नित हैं।</string>
+    <string name="help_q_tap_stat_card">क्या मैं किसी आँकड़ा कार्ड पर टैप कर सकता हूँ?</string>
+    <string name="help_a_tap_stat_card">हाँ। किसी कार्ड पर टैप करने से आप फ़िल्टर की गई कार्य सूची पर पहुँच जाते हैं (उदा., "विलंबित" पर टैप करने से केवल विलंबित कार्य दिखते हैं)।</string>
+    <string name="help_section_backup">बैकअप &amp; निर्यात</string>
+    <string name="help_q_backup_tasks">मैं अपने कार्यों का बैकअप कैसे लूँ?</string>
+    <string name="help_a_backup_tasks">सेटिंग्स → बैकअप और पुनर्स्थापना → बैकअप निर्यात करें पर जाएँ। एक JSON फ़ाइल आपके चुने गए स्थान पर सहेजी जाएगी।</string>
+    <string name="help_q_export_csv">क्या मैं स्प्रेडशीट में निर्यात कर सकता हूँ?</string>
+    <string name="help_a_export_csv">हाँ। सेटिंग्स → CSV के रूप में निर्यात करें Excel और Google Sheets के साथ संगत फ़ाइल बनाता है।</string>
 </resources>

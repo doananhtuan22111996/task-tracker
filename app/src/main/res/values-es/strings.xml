@@ -331,4 +331,46 @@
     <string name="onboarding_action_next">Siguiente</string>
     <string name="onboarding_action_get_started">Empezar</string>
     <string name="cd_onboarding_page_indicator">Página %1$d de %2$d</string>
+    <!-- Feature Tips (SPEC-O02) -->
+    <string name="tip_fab_create_task">Toca + para crear tu primera tarea. Agrega una etiqueta y prioridad para mantenerte organizado.</string>
+    <string name="tip_tag_chips_filter">Toca una etiqueta para filtrar tus tareas. Tócala de nuevo para quitar el filtro.</string>
+    <string name="tip_stats_cards">Toca cualquier tarjeta de estadísticas para ir a una lista de tareas filtrada.</string>
+    <string name="tip_action_got_it">Entendido</string>
+
+    <!-- Help & FAQ (SPEC-O03) -->
+    <string name="settings_help_faq">Ayuda &amp; FAQ</string>
+    <string name="settings_help_faq_desc">Obtén respuestas a preguntas frecuentes</string>
+    <string name="title_help_faq">Ayuda &amp; FAQ</string>
+    <string name="help_section_getting_started">Primeros pasos</string>
+    <string name="help_q_create_task">¿Cómo creo mi primera tarea?</string>
+    <string name="help_a_create_task">Toca el botón + en la pantalla principal. Agrega un título, descripción opcional, etiqueta y prioridad, luego toca Guardar.</string>
+    <string name="help_q_need_account">¿Necesito una cuenta?</string>
+    <string name="help_a_need_account">No. Task Tracker funciona completamente sin conexión. Sin registro, sin inicio de sesión, sin suscripción.</string>
+    <string name="help_section_managing_tasks">Gestión de tareas</string>
+    <string name="help_q_filter_by_tag">¿Cómo filtro tareas por etiqueta?</string>
+    <string name="help_a_filter_by_tag">Toca una etiqueta en la fila debajo de la barra superior. Tócala de nuevo para quitar el filtro.</string>
+    <string name="help_q_change_priority">¿Cómo cambio la prioridad de una tarea?</string>
+    <string name="help_a_change_priority">Abre el editor de tareas (toca una tarea) y selecciona Baja, Media o Alta.</string>
+    <string name="help_q_multi_select">¿Puedo seleccionar varias tareas a la vez?</string>
+    <string name="help_a_multi_select">Sí. Mantén presionada cualquier tarea para entrar en modo de selección múltiple y luego toca las tareas que desees seleccionar.</string>
+    <string name="help_section_reminders">Recordatorios</string>
+    <string name="help_q_no_reminder">¿Por qué no recibí un recordatorio?</string>
+    <string name="help_a_no_reminder">Asegúrate de que las notificaciones estén habilitadas para Task Tracker en los ajustes de tu dispositivo. Los recordatorios solo se activan si se han establecido una fecha límite y una hora de recordatorio.</string>
+    <string name="help_q_reminder_no_due">¿Puedo establecer un recordatorio sin fecha límite?</string>
+    <string name="help_a_reminder_no_due">No. Se necesita una fecha límite antes de que aparezca la opción de recordatorio.</string>
+    <string name="help_section_archive">Archivo</string>
+    <string name="help_q_archive_task">¿Qué pasa cuando archivo una tarea?</string>
+    <string name="help_a_archive_task">Las tareas archivadas se eliminan de tu lista principal pero no se borran. Encuéntralas en la pantalla de Archivo.</string>
+    <string name="help_q_restore_archived">¿Puedo restaurar una tarea archivada?</string>
+    <string name="help_a_restore_archived">Sí. Abre el Archivo, toca la tarea y elige Restaurar.</string>
+    <string name="help_section_stats">Estadísticas</string>
+    <string name="help_q_completion_rate">¿Qué significa "Tasa de finalización"?</string>
+    <string name="help_a_completion_rate">Es el porcentaje de todas las tareas (excluyendo las archivadas) que están marcadas como completadas.</string>
+    <string name="help_q_tap_stat_card">¿Puedo tocar una tarjeta de estadísticas?</string>
+    <string name="help_a_tap_stat_card">Sí. Al tocar una tarjeta te lleva a una lista de tareas filtrada (por ejemplo, al tocar "Vencidas" muestra solo las tareas vencidas).</string>
+    <string name="help_section_backup">Copia de seguridad &amp; Exportación</string>
+    <string name="help_q_backup_tasks">¿Cómo hago una copia de seguridad de mis tareas?</string>
+    <string name="help_a_backup_tasks">Ve a Ajustes → Copia de seguridad &amp; Restauración → Exportar copia de seguridad. Un archivo JSON se guardará en la ubicación que elijas.</string>
+    <string name="help_q_export_csv">¿Puedo exportar a una hoja de cálculo?</string>
+    <string name="help_a_export_csv">Sí. Ajustes → Exportar como CSV genera un archivo compatible con Excel y Google Sheets.</string>
 </resources>
