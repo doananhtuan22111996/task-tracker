@@ -8,9 +8,12 @@ import dev.tuandoan.tasktracker.domain.usecase.TaskCrudUseCase
 import dev.tuandoan.tasktracker.domain.usecase.TaskFilterUseCase
 import dev.tuandoan.tasktracker.domain.usecase.TaskFormUseCase
 import dev.tuandoan.tasktracker.domain.usecase.TaskSearchUseCase
+import dev.tuandoan.tasktracker.data.preferences.SettingsRepository
+import dev.tuandoan.tasktracker.data.preferences.UserPreferences
 import dev.tuandoan.tasktracker.testutil.FakeReminderScheduler
 import dev.tuandoan.tasktracker.testutil.FakeTaskRepository
 import dev.tuandoan.tasktracker.testutil.TestTaskFactory
+import kotlinx.coroutines.flow.flowOf
 import dev.tuandoan.tasktracker.ui.manager.TaskBulkActionManager
 import dev.tuandoan.tasktracker.ui.manager.TaskCrudManager
 import dev.tuandoan.tasktracker.ui.state.TaskFormStateManager
@@ -73,7 +76,11 @@ class TaskViewModelTest {
         val crudManager = TaskCrudManager(crudUseCase, formStateManager, context)
         val bulkActionManager = TaskBulkActionManager(context, crudManager, selectionStateManager)
 
-        return TaskViewModel(context, listStateManager, crudManager, selectionStateManager, bulkActionManager)
+        val settingsRepository = mockk<SettingsRepository>(relaxed = true) {
+            every { userPreferences } returns flowOf(UserPreferences())
+        }
+
+        return TaskViewModel(context, listStateManager, crudManager, selectionStateManager, bulkActionManager, settingsRepository)
     }
 
     // === Initial State Tests ===
