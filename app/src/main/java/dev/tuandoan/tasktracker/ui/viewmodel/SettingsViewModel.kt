@@ -186,4 +186,24 @@ class SettingsViewModel @Inject constructor(
     fun dismissError() {
         _showErrorDialog.value = null
     }
+
+    // --- Onboarding ---
+
+    fun setOnboardingCompleted() {
+        viewModelScope.launch { settingsRepository.setOnboardingCompleted() }
+    }
+
+    // --- Feature Tips ---
+
+    fun setTipFabShown() {
+        viewModelScope.launch { settingsRepository.setTipShown(SettingsRepository.TipKeys.FAB) }
+    }
+
+    fun setTipTagChipsShown() {
+        viewModelScope.launch { settingsRepository.setTipShown(SettingsRepository.TipKeys.TAG_CHIPS) }
+    }
+
+    fun setTipStatsCardsShown() {
+        viewModelScope.launch { settingsRepository.setTipShown(SettingsRepository.TipKeys.STATS_CARDS) }
+    }
 }

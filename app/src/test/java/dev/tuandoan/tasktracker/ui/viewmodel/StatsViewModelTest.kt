@@ -3,7 +3,11 @@ package dev.tuandoan.tasktracker.ui.viewmodel
 import app.cash.turbine.test
 import dev.tuandoan.tasktracker.data.database.DailyCount
 import dev.tuandoan.tasktracker.data.database.Task
+import dev.tuandoan.tasktracker.data.preferences.SettingsRepository
+import dev.tuandoan.tasktracker.data.preferences.UserPreferences
 import dev.tuandoan.tasktracker.domain.ITaskManager
+import io.mockk.every
+import io.mockk.mockk
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -27,6 +31,9 @@ class StatsViewModelTest {
 
     private lateinit var fakeTaskManager: FakeStatsTaskManager
     private lateinit var viewModel: StatsViewModel
+    private val fakeSettingsRepository: SettingsRepository = mockk(relaxed = true) {
+        every { userPreferences } returns MutableStateFlow(UserPreferences())
+    }
 
     @Before
     fun setup() {
@@ -39,7 +46,7 @@ class StatsViewModelTest {
         Dispatchers.resetMain()
     }
 
-    private fun createViewModel(): StatsViewModel = StatsViewModel(fakeTaskManager)
+    private fun createViewModel(): StatsViewModel = StatsViewModel(fakeTaskManager, fakeSettingsRepository)
 
     // SPEC-S03: Daily progress tests
     @Test

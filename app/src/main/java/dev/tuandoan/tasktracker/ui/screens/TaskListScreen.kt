@@ -39,6 +39,7 @@ import androidx.navigation.NavController
 import dev.tuandoan.tasktracker.R
 import dev.tuandoan.tasktracker.navigation.StatsFilter
 import dev.tuandoan.tasktracker.navigation.TaskTrackerRoutes
+import dev.tuandoan.tasktracker.ui.components.FeatureTip
 import dev.tuandoan.tasktracker.ui.components.TagChipRow
 import dev.tuandoan.tasktracker.ui.components.TaskListContent
 import dev.tuandoan.tasktracker.ui.components.TaskListTopBar
@@ -76,6 +77,9 @@ fun TaskListScreen(
     val selectedCount by viewModel.selectedCount.collectAsStateWithLifecycle()
     val pendingBulkDeleteTasks by viewModel.pendingBulkDeleteTasks.collectAsStateWithLifecycle()
     val pendingBulkArchiveTasks by viewModel.pendingBulkArchiveTasks.collectAsStateWithLifecycle()
+
+    // Feature tips state
+    val userPrefs by viewModel.userPreferences.collectAsStateWithLifecycle()
 
     // Snackbar host state
     val snackbarHostState = remember { SnackbarHostState() }
@@ -215,6 +219,16 @@ fun TaskListScreen(
                 currentTagFilter = currentTagFilter,
                 availableTags = availableTags,
                 onTagFilterChange = viewModel::setTagFilter,
+            )
+            FeatureTip(
+                text = stringResource(R.string.tip_fab_create_task),
+                visible = !userPrefs.tipFabShown && allTasks.isEmpty(),
+                onDismiss = viewModel::setTipFabShown,
+            )
+            FeatureTip(
+                text = stringResource(R.string.tip_tag_chips_filter),
+                visible = !userPrefs.tipTagChipsShown && availableTags.isNotEmpty(),
+                onDismiss = viewModel::setTipTagChipsShown,
             )
             TaskListContent(
                 allTasks = allTasks,

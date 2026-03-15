@@ -20,8 +20,10 @@ import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.outlined.CloudDownload
 import androidx.compose.material.icons.outlined.CloudUpload
+import androidx.compose.material.icons.outlined.HelpOutline
 import androidx.compose.material.icons.outlined.TableChart
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
@@ -79,7 +81,7 @@ private fun generateBackupFileName(): String {
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SettingsScreen(viewModel: SettingsViewModel, onNavigateBack: () -> Unit) {
+fun SettingsScreen(viewModel: SettingsViewModel, onNavigateBack: () -> Unit, onNavigateToHelp: () -> Unit = {}) {
     val context = LocalContext.current
     val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
     val showImportConfirmation by viewModel.showImportConfirmation.collectAsStateWithLifecycle()
@@ -313,6 +315,47 @@ fun SettingsScreen(viewModel: SettingsViewModel, onNavigateBack: () -> Unit) {
                         .semantics {
                             contentDescription = context.getString(R.string.cd_export_csv)
                         },
+                )
+
+                // =============================================
+                // Help & FAQ Section
+                // =============================================
+                SectionHeader(text = stringResource(R.string.settings_help_faq))
+
+                ListItem(
+                    headlineContent = {
+                        Text(
+                            text = stringResource(R.string.settings_help_faq),
+                            style = MaterialTheme.typography.bodyLarge,
+                        )
+                    },
+                    supportingContent = {
+                        Text(
+                            text = stringResource(R.string.settings_help_faq_desc),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    },
+                    leadingContent = {
+                        Icon(
+                            imageVector = Icons.Outlined.HelpOutline,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary,
+                        )
+                    },
+                    trailingContent = {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    },
+                    colors = ListItemDefaults.colors(
+                        containerColor = MaterialTheme.colorScheme.surface,
+                    ),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable(onClick = onNavigateToHelp),
                 )
             }
 

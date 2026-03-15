@@ -303,4 +303,61 @@
     <string name="action_duplicate">Duplicate</string>
     <string name="snackbar_task_duplicated">Task duplicated</string>
     <string name="error_duplicate_task">Failed to duplicate task</string>
+
+    <!-- Onboarding (SPEC-O01) -->
+    <string name="onboarding_title_welcome">Welcome to Task Tracker</string>
+    <string name="onboarding_desc_welcome">Stay on top of everything — simple, fast, private.</string>
+    <string name="onboarding_title_organize">Organize with Tags &amp; Priority</string>
+    <string name="onboarding_desc_organize">Create tasks with custom tags and priority levels. Filter your list in one tap.</string>
+    <string name="onboarding_title_reminders">Never Miss a Deadline</string>
+    <string name="onboarding_desc_reminders">Set due dates and reminders. Task Tracker notifies you even when closed.</string>
+    <string name="onboarding_title_ready">You\'re all set!</string>
+    <string name="onboarding_desc_ready">No account needed. Your tasks stay on your device.</string>
+    <string name="onboarding_action_skip">Skip</string>
+    <string name="onboarding_action_next">Next</string>
+    <string name="onboarding_action_get_started">Get Started</string>
+    <string name="cd_onboarding_page_indicator">Page %1$d of %2$d</string>
+
+    <!-- Feature Tips (SPEC-O02) -->
+    <string name="tip_fab_create_task">Tap + to create your first task. Add a tag and priority to stay organized.</string>
+    <string name="tip_tag_chips_filter">Tap a tag chip to filter your tasks. Tap again to clear the filter.</string>
+    <string name="tip_stats_cards">Tap any stat card to jump to a filtered task list.</string>
+    <string name="tip_action_got_it">Got it</string>
+
+    <!-- Help &amp; FAQ (SPEC-O03) -->
+    <string name="settings_help_faq">Help &amp; FAQ</string>
+    <string name="settings_help_faq_desc">Get answers to common questions</string>
+    <string name="title_help_faq">Help &amp; FAQ</string>
+    <string name="help_section_getting_started">Getting Started</string>
+    <string name="help_q_create_task">How do I create my first task?</string>
+    <string name="help_a_create_task">Tap the + button on the home screen. Add a title, optional description, tag, and priority, then tap Save.</string>
+    <string name="help_q_need_account">Do I need an account?</string>
+    <string name="help_a_need_account">No. Task Tracker works entirely offline. No sign-up, no login, no subscription.</string>
+    <string name="help_section_managing_tasks">Managing Tasks</string>
+    <string name="help_q_filter_by_tag">How do I filter tasks by tag?</string>
+    <string name="help_a_filter_by_tag">Tap a tag chip in the row below the top bar. Tap again to clear the filter.</string>
+    <string name="help_q_change_priority">How do I change a task\'s priority?</string>
+    <string name="help_a_change_priority">Open the task editor (tap a task) and select Low, Medium, or High.</string>
+    <string name="help_q_multi_select">Can I select multiple tasks at once?</string>
+    <string name="help_a_multi_select">Yes. Long-press any task to enter multi-select mode, then tap tasks to select them.</string>
+    <string name="help_section_reminders">Reminders</string>
+    <string name="help_q_no_reminder">Why didn\'t I receive a reminder?</string>
+    <string name="help_a_no_reminder">Ensure notifications are enabled for Task Tracker in your device Settings. Reminders only fire if a due date and reminder time are set.</string>
+    <string name="help_q_reminder_no_due">Can I set a reminder without a due date?</string>
+    <string name="help_a_reminder_no_due">No. A due date is required before a reminder option appears.</string>
+    <string name="help_section_archive">Archive</string>
+    <string name="help_q_archive_task">What happens when I archive a task?</string>
+    <string name="help_a_archive_task">Archived tasks are removed from your main list but not deleted. Find them in the Archive screen.</string>
+    <string name="help_q_restore_archived">Can I restore an archived task?</string>
+    <string name="help_a_restore_archived">Yes. Open Archive, tap the task, and choose Restore.</string>
+    <string name="help_section_stats">Stats</string>
+    <string name="help_q_completion_rate">What does "Completion Rate" mean?</string>
+    <string name="help_a_completion_rate">It\'s the percentage of all tasks (excluding archived) that are marked complete.</string>
+    <string name="help_q_tap_stat_card">Can I tap a stat card?</string>
+    <string name="help_a_tap_stat_card">Yes. Tapping a card takes you to a pre-filtered task list (e.g., tapping "Overdue" shows only overdue tasks).</string>
+    <string name="help_section_backup">Backup &amp; Export</string>
+    <string name="help_q_backup_tasks">How do I back up my tasks?</string>
+    <string name="help_a_backup_tasks">Go to Settings → Backup &amp; Restore → Export Backup. A JSON file is saved to your chosen location.</string>
+    <string name="help_q_export_csv">Can I export to a spreadsheet?</string>
+    <string name="help_a_export_csv">Yes. Settings → Export as CSV produces a file compatible with Excel and Google Sheets.</string>
 </resources>

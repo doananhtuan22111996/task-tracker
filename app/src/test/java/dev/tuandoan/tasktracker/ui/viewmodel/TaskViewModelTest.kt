@@ -2,6 +2,8 @@ package dev.tuandoan.tasktracker.ui.viewmodel
 
 import android.content.Context
 import app.cash.turbine.test
+import dev.tuandoan.tasktracker.data.preferences.SettingsRepository
+import dev.tuandoan.tasktracker.data.preferences.UserPreferences
 import dev.tuandoan.tasktracker.domain.TaskManager
 import dev.tuandoan.tasktracker.domain.service.TaskSortService
 import dev.tuandoan.tasktracker.domain.usecase.TaskCrudUseCase
@@ -20,6 +22,7 @@ import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
@@ -73,7 +76,18 @@ class TaskViewModelTest {
         val crudManager = TaskCrudManager(crudUseCase, formStateManager, context)
         val bulkActionManager = TaskBulkActionManager(context, crudManager, selectionStateManager)
 
-        return TaskViewModel(context, listStateManager, crudManager, selectionStateManager, bulkActionManager)
+        val settingsRepository = mockk<SettingsRepository>(relaxed = true) {
+            every { userPreferences } returns flowOf(UserPreferences())
+        }
+
+        return TaskViewModel(
+            context,
+            listStateManager,
+            crudManager,
+            selectionStateManager,
+            bulkActionManager,
+            settingsRepository,
+        )
     }
 
     // === Initial State Tests ===

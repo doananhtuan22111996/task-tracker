@@ -4,12 +4,15 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dev.tuandoan.tasktracker.data.database.DailyCount
+import dev.tuandoan.tasktracker.data.preferences.SettingsRepository
+import dev.tuandoan.tasktracker.data.preferences.UserPreferences
 import dev.tuandoan.tasktracker.domain.ITaskManager
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.format.TextStyle
@@ -17,7 +20,17 @@ import java.util.Locale
 import javax.inject.Inject
 
 @HiltViewModel
-class StatsViewModel @Inject constructor(private val taskManager: ITaskManager) : ViewModel() {
+class StatsViewModel @Inject constructor(
+    private val taskManager: ITaskManager,
+    private val settingsRepository: SettingsRepository,
+) : ViewModel() {
+
+    val userPreferences: StateFlow<UserPreferences> = settingsRepository.userPreferences
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), UserPreferences())
+
+    fun setTipStatsCardsShown() {
+        viewModelScope.launch { settingsRepository.setTipShown(SettingsRepository.TipKeys.STATS_CARDS) }
+    }
 
     data class StatsUiState(
         val activeCount: Int = 0,
