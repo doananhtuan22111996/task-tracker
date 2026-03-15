@@ -397,7 +397,7 @@ fun SettingsScreen(viewModel: SettingsViewModel, onNavigateBack: () -> Unit, onN
                                 data = Uri.parse("mailto:")
                                 putExtra(
                                     Intent.EXTRA_EMAIL,
-                                    arrayOf("feedback@tasktracker.app"),
+                                    arrayOf("doananhtuan22111996@gmail.com"),
                                 )
                                 putExtra(
                                     Intent.EXTRA_SUBJECT,
