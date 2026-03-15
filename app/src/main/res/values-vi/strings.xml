@@ -317,4 +317,18 @@
     <string name="a11y_chip_not_selected">Chưa chọn</string>
     <string name="a11y_checkbox_checked">Đã đánh dấu</string>
     <string name="a11y_checkbox_unchecked">Chưa đánh dấu</string>
+
+    <!-- Onboarding (SPEC-O01) -->
+    <string name="onboarding_title_welcome">Chào mừng đến với Task Tracker</string>
+    <string name="onboarding_desc_welcome">Quản lý mọi thứ — đơn giản, nhanh chóng, riêng tư.</string>
+    <string name="onboarding_title_organize">Sắp xếp với nhãn &amp; mức ưu tiên</string>
+    <string name="onboarding_desc_organize">Tạo công việc với nhãn tùy chỉnh và mức ưu tiên. Lọc danh sách chỉ với một chạm.</string>
+    <string name="onboarding_title_reminders">Không bỏ lỡ hạn nào</string>
+    <string name="onboarding_desc_reminders">Đặt hạn hoàn thành và nhắc việc. Task Tracker nhắc bạn ngay cả khi ứng dụng đã đóng.</string>
+    <string name="onboarding_title_ready">Bạn đã sẵn sàng!</string>
+    <string name="onboarding_desc_ready">Không cần tài khoản. Công việc của bạn được lưu trên thiết bị.</string>
+    <string name="onboarding_action_skip">Bỏ qua</string>
+    <string name="onboarding_action_next">Tiếp theo</string>
+    <string name="onboarding_action_get_started">Bắt đầu</string>
+    <string name="cd_onboarding_page_indicator">Trang %1$d / %2$d</string>
 </resources>

@@ -317,4 +317,18 @@
     <string name="a11y_chip_not_selected">Non sélectionné</string>
     <string name="a11y_checkbox_checked">Coché</string>
     <string name="a11y_checkbox_unchecked">Non coché</string>
+
+    <!-- Onboarding (SPEC-O01) -->
+    <string name="onboarding_title_welcome">Bienvenue dans Task Tracker</string>
+    <string name="onboarding_desc_welcome">Gardez le contrôle — simple, rapide, privé.</string>
+    <string name="onboarding_title_organize">Organisez avec des tags &amp; priorités</string>
+    <string name="onboarding_desc_organize">Créez des tâches avec des tags personnalisés et des niveaux de priorité. Filtrez votre liste en un geste.</string>
+    <string name="onboarding_title_reminders">Ne manquez aucune échéance</string>
+    <string name="onboarding_desc_reminders">Définissez des dates d\'échéance et des rappels. Task Tracker vous notifie même en arrière-plan.</string>
+    <string name="onboarding_title_ready">Vous êtes prêt !</string>
+    <string name="onboarding_desc_ready">Aucun compte nécessaire. Vos tâches restent sur votre appareil.</string>
+    <string name="onboarding_action_skip">Ignorer</string>
+    <string name="onboarding_action_next">Suivant</string>
+    <string name="onboarding_action_get_started">Commencer</string>
+    <string name="cd_onboarding_page_indicator">Page %1$d sur %2$d</string>
 </resources>
