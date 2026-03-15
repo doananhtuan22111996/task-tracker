@@ -100,6 +100,21 @@
     <string name="stat_desc_due_today">Tâches actives à échéance aujourd’hui</string>
     <string name="stat_desc_overdue">Tâches actives au-delà de l’échéance</string>
     <string name="stat_archived_note">Les tâches archivées sont exclues de toutes les statistiques</string>
+    <string name="stat_section_today">Aujourd\'hui</string>
+    <string name="stat_section_all_time">Depuis toujours</string>
+    <string name="stat_daily_progress">%1$d sur %2$d terminées aujourd\'hui</string>
+    <string name="stat_all_caught_up">Tout est à jour !</string>
+    <string name="stat_completion_rate">Taux d\'achèvement</string>
+    <string name="stat_this_week">Cette semaine</string>
+    <string name="stat_empty_headline">Aucune tâche pour le moment</string>
+    <string name="stat_empty_cta">Créez votre première tâche</string>
+    <string name="stat_cd_active">%1$d tâches actives</string>
+    <string name="stat_cd_completed">%1$d tâches terminées au total</string>
+    <string name="stat_cd_completed_today">%1$d tâches terminées aujourd\'hui</string>
+    <string name="stat_cd_due_today">%1$d tâches à échéance aujourd\'hui</string>
+    <string name="stat_cd_overdue">%1$d tâches en retard, action requise</string>
+    <string name="stat_cd_overdue_clear">Aucune tâche en retard</string>
+    <string name="stat_cd_progress">Progression du jour : %1$d sur %2$d tâches terminées aujourd\'hui</string>
 
     <!-- Settings Screen -->
     <string name="title_settings">Paramètres</string>

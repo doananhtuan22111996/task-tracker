@@ -100,6 +100,21 @@
     <string name="stat_desc_due_today">Tugas aktif dengan jatuh tempo hari ini</string>
     <string name="stat_desc_overdue">Tugas aktif yang melewati jatuh tempo</string>
     <string name="stat_archived_note">Tugas yang diarsipkan tidak termasuk dalam statistik</string>
+    <string name="stat_section_today">Hari Ini</string>
+    <string name="stat_section_all_time">Sepanjang Waktu</string>
+    <string name="stat_daily_progress">%1$d dari %2$d selesai hari ini</string>
+    <string name="stat_all_caught_up">Semua sudah beres!</string>
+    <string name="stat_completion_rate">Tingkat Penyelesaian</string>
+    <string name="stat_this_week">Minggu Ini</string>
+    <string name="stat_empty_headline">Belum ada tugas</string>
+    <string name="stat_empty_cta">Buat tugas pertama Anda</string>
+    <string name="stat_cd_active">%1$d tugas aktif</string>
+    <string name="stat_cd_completed">%1$d tugas selesai secara keseluruhan</string>
+    <string name="stat_cd_completed_today">%1$d tugas selesai hari ini</string>
+    <string name="stat_cd_due_today">%1$d tugas jatuh tempo hari ini</string>
+    <string name="stat_cd_overdue">%1$d tugas terlambat, perlu ditindaklanjuti</string>
+    <string name="stat_cd_overdue_clear">Tidak ada tugas yang terlambat</string>
+    <string name="stat_cd_progress">Progres harian: %1$d dari %2$d tugas selesai hari ini</string>
 
     <!-- Settings Screen -->
     <string name="title_settings">Pengaturan</string>

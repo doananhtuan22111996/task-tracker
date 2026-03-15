@@ -100,6 +100,21 @@
     <string name="stat_desc_due_today">Tarefas ativas com prazo hoje</string>
     <string name="stat_desc_overdue">Tarefas ativas com prazo ultrapassado</string>
     <string name="stat_archived_note">As tarefas arquivadas são excluídas de todas as estatísticas</string>
+    <string name="stat_section_today">Hoje</string>
+    <string name="stat_section_all_time">Desde sempre</string>
+    <string name="stat_daily_progress">%1$d de %2$d concluídas hoje</string>
+    <string name="stat_all_caught_up">Tudo em dia!</string>
+    <string name="stat_completion_rate">Taxa de conclusão</string>
+    <string name="stat_this_week">Esta semana</string>
+    <string name="stat_empty_headline">Ainda não há tarefas</string>
+    <string name="stat_empty_cta">Crie a sua primeira tarefa</string>
+    <string name="stat_cd_active">%1$d tarefas ativas</string>
+    <string name="stat_cd_completed">%1$d tarefas concluídas no total</string>
+    <string name="stat_cd_completed_today">%1$d tarefas concluídas hoje</string>
+    <string name="stat_cd_due_today">%1$d tarefas com prazo hoje</string>
+    <string name="stat_cd_overdue">%1$d tarefas em atraso, ação necessária</string>
+    <string name="stat_cd_overdue_clear">Nenhuma tarefa em atraso</string>
+    <string name="stat_cd_progress">Progresso diário: %1$d de %2$d tarefas concluídas hoje</string>
 
     <!-- Settings Screen -->
     <string name="title_settings">Definições</string>

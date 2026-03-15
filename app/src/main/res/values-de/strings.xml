@@ -100,6 +100,21 @@
     <string name="stat_desc_due_today">Aktive Aufgaben, die heute fällig sind</string>
     <string name="stat_desc_overdue">Aktive Aufgaben nach Fälligkeitsdatum</string>
     <string name="stat_archived_note">Archivierte Aufgaben sind von allen Statistiken ausgeschlossen</string>
+    <string name="stat_section_today">Heute</string>
+    <string name="stat_section_all_time">Gesamt</string>
+    <string name="stat_daily_progress">%1$d von %2$d heute erledigt</string>
+    <string name="stat_all_caught_up">Alles erledigt!</string>
+    <string name="stat_completion_rate">Abschlussrate</string>
+    <string name="stat_this_week">Diese Woche</string>
+    <string name="stat_empty_headline">Noch keine Aufgaben</string>
+    <string name="stat_empty_cta">Erstellen Sie Ihre erste Aufgabe</string>
+    <string name="stat_cd_active">%1$d aktive Aufgaben</string>
+    <string name="stat_cd_completed">%1$d Aufgaben insgesamt erledigt</string>
+    <string name="stat_cd_completed_today">%1$d Aufgaben heute erledigt</string>
+    <string name="stat_cd_due_today">%1$d Aufgaben heute fällig</string>
+    <string name="stat_cd_overdue">%1$d überfällige Aufgaben, Handlung erforderlich</string>
+    <string name="stat_cd_overdue_clear">Keine überfälligen Aufgaben</string>
+    <string name="stat_cd_progress">Tagesfortschritt: %1$d von %2$d Aufgaben heute erledigt</string>
 
     <!-- Settings Screen -->
     <string name="title_settings">Einstellungen</string>

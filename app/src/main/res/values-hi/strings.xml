@@ -100,6 +100,21 @@
     <string name="stat_desc_due_today">आज की अंतिम तिथि वाले सक्रिय कार्य</string>
     <string name="stat_desc_overdue">अंतिम तिथि पार कर चुके सक्रिय कार्य</string>
     <string name="stat_archived_note">संग्रहित कार्य आँकड़ों में शामिल नहीं हैं</string>
+    <string name="stat_section_today">आज</string>
+    <string name="stat_section_all_time">कुल मिलाकर</string>
+    <string name="stat_daily_progress">आज %2$d में से %1$d पूर्ण</string>
+    <string name="stat_all_caught_up">सब कुछ पूरा हो गया!</string>
+    <string name="stat_completion_rate">पूर्णता दर</string>
+    <string name="stat_this_week">इस सप्ताह</string>
+    <string name="stat_empty_headline">अभी कोई कार्य नहीं</string>
+    <string name="stat_empty_cta">अपना पहला कार्य बनाएँ</string>
+    <string name="stat_cd_active">%1$d सक्रिय कार्य</string>
+    <string name="stat_cd_completed">कुल %1$d कार्य पूर्ण</string>
+    <string name="stat_cd_completed_today">आज %1$d कार्य पूर्ण</string>
+    <string name="stat_cd_due_today">आज %1$d कार्य की अंतिम तिथि है</string>
+    <string name="stat_cd_overdue">%1$d विलंबित कार्य, कार्रवाई आवश्यक</string>
+    <string name="stat_cd_overdue_clear">कोई विलंबित कार्य नहीं</string>
+    <string name="stat_cd_progress">दैनिक प्रगति: आज %2$d में से %1$d कार्य पूर्ण</string>
 
     <!-- Settings Screen -->
     <string name="title_settings">सेटिंग्स</string>
