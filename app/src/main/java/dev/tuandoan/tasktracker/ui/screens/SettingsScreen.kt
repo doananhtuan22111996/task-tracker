@@ -1,6 +1,8 @@
 package dev.tuandoan.tasktracker.ui.screens
 
+import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -23,6 +25,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.outlined.CloudDownload
 import androidx.compose.material.icons.outlined.CloudUpload
+import androidx.compose.material.icons.outlined.Feedback
 import androidx.compose.material.icons.outlined.HelpOutline
 import androidx.compose.material.icons.outlined.TableChart
 import androidx.compose.material3.AlertDialog
@@ -356,6 +359,64 @@ fun SettingsScreen(viewModel: SettingsViewModel, onNavigateBack: () -> Unit, onN
                     modifier = Modifier
                         .fillMaxWidth()
                         .clickable(onClick = onNavigateToHelp),
+                )
+
+                // =============================================
+                // Feedback Section
+                // =============================================
+                SectionHeader(text = stringResource(R.string.settings_section_feedback))
+
+                ListItem(
+                    headlineContent = {
+                        Text(
+                            text = stringResource(R.string.settings_send_feedback),
+                            style = MaterialTheme.typography.bodyLarge,
+                        )
+                    },
+                    supportingContent = {
+                        Text(
+                            text = stringResource(R.string.settings_send_feedback_desc),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    },
+                    leadingContent = {
+                        Icon(
+                            imageVector = Icons.Outlined.Feedback,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary,
+                        )
+                    },
+                    colors = ListItemDefaults.colors(
+                        containerColor = MaterialTheme.colorScheme.surface,
+                    ),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable {
+                            val intent = Intent(Intent.ACTION_SENDTO).apply {
+                                data = Uri.parse("mailto:")
+                                putExtra(
+                                    Intent.EXTRA_EMAIL,
+                                    arrayOf("doananhtuan22111996@gmail.com"),
+                                )
+                                putExtra(
+                                    Intent.EXTRA_SUBJECT,
+                                    context.getString(R.string.feedback_email_subject),
+                                )
+                            }
+                            runCatching {
+                                context.startActivity(
+                                    Intent.createChooser(
+                                        intent,
+                                        context.getString(R.string.settings_send_feedback),
+                                    ),
+                                )
+                            }
+                        }
+                        .semantics {
+                            contentDescription =
+                                context.getString(R.string.cd_send_feedback)
+                        },
                 )
             }
 

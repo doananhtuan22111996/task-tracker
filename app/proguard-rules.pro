@@ -138,6 +138,9 @@
 # An annotation used for build tooling, won't be directly accessed.
 -dontwarn org.codehaus.mojo.animal_sniffer.IgnoreJRERequirement
 
+# ===== GOOGLE PLAY IN-APP REVIEW =====
+-dontwarn com.google.android.gms.common.annotation.NoNullnessRewrite
+
 # ===== GENERAL ANDROID RULES =====
 # Keep line numbers and source file names for better crash reports
 -keepattributes SourceFile,LineNumberTable

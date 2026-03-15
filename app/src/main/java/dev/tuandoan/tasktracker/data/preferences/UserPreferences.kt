@@ -20,4 +20,6 @@ data class UserPreferences(
     val tipFabShown: Boolean = false,
     val tipTagChipsShown: Boolean = false,
     val tipStatsCardsShown: Boolean = false,
+    val firstLaunchDate: Long = 0L, // Epoch millis, set once on first app run
+    val ratingPromptShown: Boolean = false,
 )
