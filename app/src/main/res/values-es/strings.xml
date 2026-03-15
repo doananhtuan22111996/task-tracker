@@ -100,6 +100,21 @@
     <string name="stat_desc_due_today">Tareas activas que vencen hoy</string>
     <string name="stat_desc_overdue">Tareas activas vencidas</string>
     <string name="stat_archived_note">Las tareas archivadas se excluyen de todas las estadísticas</string>
+    <string name="stat_section_today">Hoy</string>
+    <string name="stat_section_all_time">Histórico</string>
+    <string name="stat_daily_progress">%1$d de %2$d completadas hoy</string>
+    <string name="stat_all_caught_up">¡Todo al día!</string>
+    <string name="stat_completion_rate">Tasa de finalización</string>
+    <string name="stat_this_week">Esta semana</string>
+    <string name="stat_empty_headline">Aún no hay tareas</string>
+    <string name="stat_empty_cta">Crea tu primera tarea</string>
+    <string name="stat_cd_active">%1$d tareas activas</string>
+    <string name="stat_cd_completed">%1$d tareas completadas en total</string>
+    <string name="stat_cd_completed_today">%1$d tareas completadas hoy</string>
+    <string name="stat_cd_due_today">%1$d tareas vencen hoy</string>
+    <string name="stat_cd_overdue">%1$d tareas vencidas, acción requerida</string>
+    <string name="stat_cd_overdue_clear">No hay tareas vencidas</string>
+    <string name="stat_cd_progress">Progreso diario: %1$d de %2$d tareas completadas hoy</string>
 
     <!-- Settings Screen -->
     <string name="title_settings">Ajustes</string>

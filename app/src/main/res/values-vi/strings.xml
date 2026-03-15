@@ -100,6 +100,21 @@
     <string name="stat_desc_due_today">Các công việc đang thực hiện đến hạn hôm nay</string>
     <string name="stat_desc_overdue">Các công việc đang thực hiện đã quá hạn</string>
     <string name="stat_archived_note">Công việc đã lưu trữ sẽ không được tính trong thống kê</string>
+    <string name="stat_section_today">Hôm nay</string>
+    <string name="stat_section_all_time">Tổng cộng</string>
+    <string name="stat_daily_progress">%1$d trong %2$d hoàn thành hôm nay</string>
+    <string name="stat_all_caught_up">Đã hoàn thành tất cả!</string>
+    <string name="stat_completion_rate">Tỷ lệ hoàn thành</string>
+    <string name="stat_this_week">Tuần này</string>
+    <string name="stat_empty_headline">Chưa có công việc nào</string>
+    <string name="stat_empty_cta">Tạo công việc đầu tiên</string>
+    <string name="stat_cd_active">%1$d công việc đang thực hiện</string>
+    <string name="stat_cd_completed">%1$d công việc đã hoàn thành</string>
+    <string name="stat_cd_completed_today">%1$d công việc hoàn thành hôm nay</string>
+    <string name="stat_cd_due_today">%1$d công việc đến hạn hôm nay</string>
+    <string name="stat_cd_overdue">%1$d công việc quá hạn, cần xử lý</string>
+    <string name="stat_cd_overdue_clear">Không có công việc quá hạn</string>
+    <string name="stat_cd_progress">Tiến độ hôm nay: %1$d trong %2$d công việc đã hoàn thành</string>
 
     <!-- Settings Screen -->
     <string name="title_settings">Cài đặt</string>
