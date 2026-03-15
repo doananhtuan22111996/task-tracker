@@ -304,4 +304,17 @@
     <string name="action_duplicate">Nhân bản</string>
     <string name="snackbar_task_duplicated">Đã nhân bản công việc</string>
     <string name="error_duplicate_task">Không thể nhân bản công việc</string>
+
+    <!-- Feedback -->
+    <string name="settings_section_feedback">Phản hồi</string>
+    <string name="settings_send_feedback">Gửi phản hồi</string>
+    <string name="settings_send_feedback_desc">Cho chúng tôi biết cách cải thiện</string>
+    <string name="feedback_email_subject">Task Tracker Phản hồi</string>
+    <string name="cd_send_feedback">Gửi phản hồi qua email</string>
+
+    <!-- Accessibility -->
+    <string name="a11y_chip_selected">Đã chọn</string>
+    <string name="a11y_chip_not_selected">Chưa chọn</string>
+    <string name="a11y_checkbox_checked">Đã đánh dấu</string>
+    <string name="a11y_checkbox_unchecked">Chưa đánh dấu</string>
 </resources>

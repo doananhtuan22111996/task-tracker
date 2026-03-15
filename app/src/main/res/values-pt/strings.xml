@@ -304,4 +304,17 @@
     <string name="action_duplicate">Duplicar</string>
     <string name="snackbar_task_duplicated">Tarefa duplicada</string>
     <string name="error_duplicate_task">Falha ao duplicar tarefa</string>
+
+    <!-- Feedback -->
+    <string name="settings_section_feedback">Feedback</string>
+    <string name="settings_send_feedback">Enviar Feedback</string>
+    <string name="settings_send_feedback_desc">Diga-nos como podemos melhorar</string>
+    <string name="feedback_email_subject">Task Tracker Feedback</string>
+    <string name="cd_send_feedback">Enviar feedback por e-mail</string>
+
+    <!-- Accessibility -->
+    <string name="a11y_chip_selected">Selecionado</string>
+    <string name="a11y_chip_not_selected">Não selecionado</string>
+    <string name="a11y_checkbox_checked">Marcado</string>
+    <string name="a11y_checkbox_unchecked">Não marcado</string>
 </resources>
