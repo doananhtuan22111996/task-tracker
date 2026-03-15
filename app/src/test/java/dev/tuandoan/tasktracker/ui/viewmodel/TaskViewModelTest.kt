@@ -2,18 +2,17 @@ package dev.tuandoan.tasktracker.ui.viewmodel
 
 import android.content.Context
 import app.cash.turbine.test
+import dev.tuandoan.tasktracker.data.preferences.SettingsRepository
+import dev.tuandoan.tasktracker.data.preferences.UserPreferences
 import dev.tuandoan.tasktracker.domain.TaskManager
 import dev.tuandoan.tasktracker.domain.service.TaskSortService
 import dev.tuandoan.tasktracker.domain.usecase.TaskCrudUseCase
 import dev.tuandoan.tasktracker.domain.usecase.TaskFilterUseCase
 import dev.tuandoan.tasktracker.domain.usecase.TaskFormUseCase
 import dev.tuandoan.tasktracker.domain.usecase.TaskSearchUseCase
-import dev.tuandoan.tasktracker.data.preferences.SettingsRepository
-import dev.tuandoan.tasktracker.data.preferences.UserPreferences
 import dev.tuandoan.tasktracker.testutil.FakeReminderScheduler
 import dev.tuandoan.tasktracker.testutil.FakeTaskRepository
 import dev.tuandoan.tasktracker.testutil.TestTaskFactory
-import kotlinx.coroutines.flow.flowOf
 import dev.tuandoan.tasktracker.ui.manager.TaskBulkActionManager
 import dev.tuandoan.tasktracker.ui.manager.TaskCrudManager
 import dev.tuandoan.tasktracker.ui.state.TaskFormStateManager
@@ -23,6 +22,7 @@ import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
@@ -80,7 +80,14 @@ class TaskViewModelTest {
             every { userPreferences } returns flowOf(UserPreferences())
         }
 
-        return TaskViewModel(context, listStateManager, crudManager, selectionStateManager, bulkActionManager, settingsRepository)
+        return TaskViewModel(
+            context,
+            listStateManager,
+            crudManager,
+            selectionStateManager,
+            bulkActionManager,
+            settingsRepository,
+        )
     }
 
     // === Initial State Tests ===
