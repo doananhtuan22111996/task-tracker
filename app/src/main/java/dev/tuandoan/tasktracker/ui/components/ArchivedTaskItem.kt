@@ -41,6 +41,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -62,6 +67,10 @@ fun ArchivedTaskItem(
 ) {
     // Unified interaction source for consistent ripple
     val interactionSource = remember { MutableInteractionSource() }
+
+    // Accessibility state descriptions
+    val checkedDesc = stringResource(R.string.a11y_checkbox_checked)
+    val uncheckedDesc = stringResource(R.string.a11y_checkbox_unchecked)
 
     // Animated container color based on state
     val baseContainerColor = MaterialTheme.colorScheme.surfaceContainerLow
@@ -113,6 +122,7 @@ fun ArchivedTaskItem(
                         onLongPress()
                     }
                 },
+                role = Role.Button,
             ),
         shape = RoundedCornerShape(20.dp),
         border = selectedBorder,
@@ -133,7 +143,12 @@ fun ArchivedTaskItem(
                             interactionSource = remember { MutableInteractionSource() },
                             indication = null, // No ripple for checkbox area
                             onClick = onToggleSelection,
-                        ),
+                        )
+                        .semantics {
+                            contentDescription = task.title
+                            stateDescription = if (isSelected) checkedDesc else uncheckedDesc
+                            role = Role.Checkbox
+                        },
                     contentAlignment = Alignment.Center,
                 ) {
                     Checkbox(

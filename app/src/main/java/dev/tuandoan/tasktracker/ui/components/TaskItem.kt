@@ -50,6 +50,10 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
@@ -82,6 +86,10 @@ fun TaskItem(
 
     val titleTextDecoration = if (task.isCompleted) TextDecoration.LineThrough else null
     val supportingTextDecoration = if (task.isCompleted) TextDecoration.LineThrough else null
+
+    // Accessibility state descriptions
+    val checkedDesc = stringResource(R.string.a11y_checkbox_checked)
+    val uncheckedDesc = stringResource(R.string.a11y_checkbox_unchecked)
 
     // Localized priority label
     val priorityLabel = when (Priority.fromValue(task.priority)) {
@@ -178,7 +186,12 @@ fun TaskItem(
                         onClick = {
                             if (!isSelectionMode) onToggleComplete()
                         },
-                    ),
+                    )
+                    .semantics {
+                        contentDescription = task.title
+                        stateDescription = if (checkboxChecked) checkedDesc else uncheckedDesc
+                        role = Role.Checkbox
+                    },
                 contentAlignment = Alignment.Center,
             ) {
                 Checkbox(

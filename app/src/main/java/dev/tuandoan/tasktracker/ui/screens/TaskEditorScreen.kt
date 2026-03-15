@@ -50,6 +50,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.error
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
@@ -189,7 +192,14 @@ fun TaskEditorScreen(
                 label = { Text(stringResource(R.string.label_title)) },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .focusRequester(titleFocusRequester),
+                    .focusRequester(titleFocusRequester)
+                    .then(
+                        if (titleError != null) {
+                            Modifier.semantics { error(titleError!!) }
+                        } else {
+                            Modifier
+                        },
+                    ),
                 singleLine = true,
                 isError = titleError != null,
                 supportingText = titleError?.let { { Text(it) } },
@@ -238,7 +248,15 @@ fun TaskEditorScreen(
                     value = tag,
                     onValueChange = viewModel::updateTag,
                     label = { Text(stringResource(R.string.label_tag)) },
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier
+                        .weight(1f)
+                        .then(
+                            if (tagError != null) {
+                                Modifier.semantics { error(tagError!!) }
+                            } else {
+                                Modifier
+                            },
+                        ),
                     singleLine = true,
                     isError = tagError != null,
                     supportingText = tagError?.let { { Text(it) } },
@@ -300,6 +318,8 @@ fun TaskEditorScreen(
             )
 
             // Due date quick-select chips
+            val chipSelectedDesc = stringResource(R.string.a11y_chip_selected)
+            val chipUnselectedDesc = stringResource(R.string.a11y_chip_not_selected)
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -316,6 +336,9 @@ fun TaskEditorScreen(
                             }
                         },
                         label = { Text(preset.label) },
+                        modifier = Modifier.semantics {
+                            stateDescription = if (isSelected) chipSelectedDesc else chipUnselectedDesc
+                        },
                     )
                 }
             }
@@ -325,7 +348,15 @@ fun TaskEditorScreen(
                 value = dueAt?.let { formatDate(it, stringResource(R.string.date_format_short)) } ?: "",
                 onValueChange = {},
                 label = { Text(stringResource(R.string.label_due_date)) },
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .then(
+                        if (dueDateError != null) {
+                            Modifier.semantics { error(dueDateError!!) }
+                        } else {
+                            Modifier
+                        },
+                    ),
                 readOnly = true,
                 isError = dueDateError != null,
                 supportingText = dueDateError?.let { { Text(it) } },
@@ -366,7 +397,14 @@ fun TaskEditorScreen(
                     supportingText = reminderError?.let { { Text(it) } },
                     modifier = Modifier
                         .menuAnchor()
-                        .fillMaxWidth(),
+                        .fillMaxWidth()
+                        .then(
+                            if (reminderError != null) {
+                                Modifier.semantics { error(reminderError!!) }
+                            } else {
+                                Modifier
+                            },
+                        ),
                     trailingIcon = {
                         if (dueAt != null) {
                             ExposedDropdownMenuDefaults.TrailingIcon(expanded = showReminderDropdown)

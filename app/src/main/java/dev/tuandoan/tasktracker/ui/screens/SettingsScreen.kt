@@ -238,7 +238,7 @@ fun SettingsScreen(viewModel: SettingsViewModel, onNavigateBack: () -> Unit, onN
                     ),
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clickable(enabled = !isLoading) {
+                        .clickable(enabled = !isLoading, role = Role.Button) {
                             jsonExportLauncher.launch("${generateBackupFileName()}.json")
                         }
                         .semantics {
@@ -273,7 +273,7 @@ fun SettingsScreen(viewModel: SettingsViewModel, onNavigateBack: () -> Unit, onN
                     ),
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clickable(enabled = !isLoading) {
+                        .clickable(enabled = !isLoading, role = Role.Button) {
                             importLauncher.launch(arrayOf("application/json"))
                         }
                         .semantics {
@@ -312,7 +312,7 @@ fun SettingsScreen(viewModel: SettingsViewModel, onNavigateBack: () -> Unit, onN
                     ),
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clickable(enabled = !isLoading) {
+                        .clickable(enabled = !isLoading, role = Role.Button) {
                             csvExportLauncher.launch("${generateBackupFileName()}.csv")
                         }
                         .semantics {
@@ -632,7 +632,7 @@ private fun LanguageSelector(currentTag: String, onClick: () -> Unit, supportedL
         ),
         modifier = Modifier
             .fillMaxWidth()
-            .clickable(onClick = onClick),
+            .clickable(onClick = onClick, role = Role.Button),
     )
 }
 

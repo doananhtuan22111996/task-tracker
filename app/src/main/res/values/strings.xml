@@ -367,4 +367,10 @@
     <string name="settings_send_feedback_desc">Let us know how we can improve</string>
     <string name="feedback_email_subject">Task Tracker Feedback</string>
     <string name="cd_send_feedback">Send feedback via email</string>
+
+    <!-- Accessibility -->
+    <string name="a11y_chip_selected">Selected</string>
+    <string name="a11y_chip_not_selected">Not selected</string>
+    <string name="a11y_checkbox_checked">Checked</string>
+    <string name="a11y_checkbox_unchecked">Unchecked</string>
 </resources>
