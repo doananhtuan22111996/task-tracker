@@ -304,4 +304,17 @@
     <string name="action_duplicate">Duplikat</string>
     <string name="snackbar_task_duplicated">Tugas diduplikasi</string>
     <string name="error_duplicate_task">Gagal menduplikasi tugas</string>
+
+    <!-- Feedback -->
+    <string name="settings_section_feedback">Umpan Balik</string>
+    <string name="settings_send_feedback">Kirim Umpan Balik</string>
+    <string name="settings_send_feedback_desc">Beri tahu kami bagaimana kami dapat meningkatkan</string>
+    <string name="feedback_email_subject">Task Tracker Umpan Balik</string>
+    <string name="cd_send_feedback">Kirim umpan balik melalui email</string>
+
+    <!-- Accessibility -->
+    <string name="a11y_chip_selected">Dipilih</string>
+    <string name="a11y_chip_not_selected">Tidak dipilih</string>
+    <string name="a11y_checkbox_checked">Dicentang</string>
+    <string name="a11y_checkbox_unchecked">Tidak dicentang</string>
 </resources>
