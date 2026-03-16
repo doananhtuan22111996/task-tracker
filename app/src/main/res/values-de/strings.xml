@@ -331,4 +331,46 @@
     <string name="onboarding_action_next">Weiter</string>
     <string name="onboarding_action_get_started">Loslegen</string>
     <string name="cd_onboarding_page_indicator">Seite %1$d von %2$d</string>
+    <!-- Feature Tips (SPEC-O02) -->
+    <string name="tip_fab_create_task">Tippen Sie auf +, um Ihre erste Aufgabe zu erstellen. Fügen Sie ein Tag und eine Priorität hinzu, um organisiert zu bleiben.</string>
+    <string name="tip_tag_chips_filter">Tippen Sie auf einen Tag-Chip, um Ihre Aufgaben zu filtern. Tippen Sie erneut, um den Filter aufzuheben.</string>
+    <string name="tip_stats_cards">Tippen Sie auf eine Statistikkarte, um zur gefilterten Aufgabenliste zu springen.</string>
+    <string name="tip_action_got_it">Verstanden</string>
+
+    <!-- Help & FAQ (SPEC-O03) -->
+    <string name="settings_help_faq">Hilfe &amp; FAQ</string>
+    <string name="settings_help_faq_desc">Antworten auf häufige Fragen erhalten</string>
+    <string name="title_help_faq">Hilfe &amp; FAQ</string>
+    <string name="help_section_getting_started">Erste Schritte</string>
+    <string name="help_q_create_task">Wie erstelle ich meine erste Aufgabe?</string>
+    <string name="help_a_create_task">Tippen Sie auf den +-Button auf dem Startbildschirm. Geben Sie einen Titel, optional eine Beschreibung, ein Tag und eine Priorität ein und tippen Sie auf Speichern.</string>
+    <string name="help_q_need_account">Brauche ich ein Konto?</string>
+    <string name="help_a_need_account">Nein. Task Tracker funktioniert vollständig offline. Keine Registrierung, keine Anmeldung, kein Abonnement.</string>
+    <string name="help_section_managing_tasks">Aufgaben verwalten</string>
+    <string name="help_q_filter_by_tag">Wie filtere ich Aufgaben nach Tag?</string>
+    <string name="help_a_filter_by_tag">Tippen Sie auf einen Tag-Chip in der Reihe unter der oberen Leiste. Tippen Sie erneut, um den Filter aufzuheben.</string>
+    <string name="help_q_change_priority">Wie ändere ich die Priorität einer Aufgabe?</string>
+    <string name="help_a_change_priority">Öffnen Sie den Aufgaben-Editor (tippen Sie auf eine Aufgabe) und wählen Sie Niedrig, Mittel oder Hoch.</string>
+    <string name="help_q_multi_select">Kann ich mehrere Aufgaben gleichzeitig auswählen?</string>
+    <string name="help_a_multi_select">Ja. Halten Sie eine Aufgabe lange gedrückt, um den Mehrfachauswahlmodus zu aktivieren, und tippen Sie dann auf weitere Aufgaben.</string>
+    <string name="help_section_reminders">Erinnerungen</string>
+    <string name="help_q_no_reminder">Warum habe ich keine Erinnerung erhalten?</string>
+    <string name="help_a_no_reminder">Stellen Sie sicher, dass Benachrichtigungen für Task Tracker in Ihren Geräteeinstellungen aktiviert sind. Erinnerungen werden nur ausgelöst, wenn ein Fälligkeitsdatum und eine Erinnerungszeit festgelegt sind.</string>
+    <string name="help_q_reminder_no_due">Kann ich eine Erinnerung ohne Fälligkeitsdatum einstellen?</string>
+    <string name="help_a_reminder_no_due">Nein. Ein Fälligkeitsdatum ist erforderlich, bevor eine Erinnerungsoption angezeigt wird.</string>
+    <string name="help_section_archive">Archiv</string>
+    <string name="help_q_archive_task">Was passiert, wenn ich eine Aufgabe archiviere?</string>
+    <string name="help_a_archive_task">Archivierte Aufgaben werden aus Ihrer Hauptliste entfernt, aber nicht gelöscht. Sie finden sie im Archiv-Bildschirm.</string>
+    <string name="help_q_restore_archived">Kann ich eine archivierte Aufgabe wiederherstellen?</string>
+    <string name="help_a_restore_archived">Ja. Öffnen Sie das Archiv, tippen Sie auf die Aufgabe und wählen Sie Wiederherstellen.</string>
+    <string name="help_section_stats">Statistiken</string>
+    <string name="help_q_completion_rate">Was bedeutet „Abschlussrate"?</string>
+    <string name="help_a_completion_rate">Es ist der Prozentsatz aller Aufgaben (ohne archivierte), die als erledigt markiert sind.</string>
+    <string name="help_q_tap_stat_card">Kann ich auf eine Statistikkarte tippen?</string>
+    <string name="help_a_tap_stat_card">Ja. Durch Tippen auf eine Karte gelangen Sie zu einer vorgefilterten Aufgabenliste (z. B. zeigt „Überfällig" nur überfällige Aufgaben an).</string>
+    <string name="help_section_backup">Backup &amp; Export</string>
+    <string name="help_q_backup_tasks">Wie sichere ich meine Aufgaben?</string>
+    <string name="help_a_backup_tasks">Gehen Sie zu Einstellungen → Backup &amp; Wiederherstellung → Backup exportieren. Eine JSON-Datei wird an Ihrem gewählten Speicherort gespeichert.</string>
+    <string name="help_q_export_csv">Kann ich in eine Tabelle exportieren?</string>
+    <string name="help_a_export_csv">Ja. Einstellungen → Als CSV exportieren erzeugt eine Datei, die mit Excel und Google Tabellen kompatibel ist.</string>
 </resources>

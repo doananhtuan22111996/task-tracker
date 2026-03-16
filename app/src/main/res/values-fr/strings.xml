@@ -331,4 +331,46 @@
     <string name="onboarding_action_next">Suivant</string>
     <string name="onboarding_action_get_started">Commencer</string>
     <string name="cd_onboarding_page_indicator">Page %1$d sur %2$d</string>
+    <!-- Feature Tips (SPEC-O02) -->
+    <string name="tip_fab_create_task">Touchez + pour créer votre première tâche. Ajoutez un tag et une priorité pour rester organisé.</string>
+    <string name="tip_tag_chips_filter">Touchez un tag pour filtrer vos tâches. Touchez-le à nouveau pour effacer le filtre.</string>
+    <string name="tip_stats_cards">Touchez n\'importe quelle carte de statistiques pour accéder à une liste de tâches filtrée.</string>
+    <string name="tip_action_got_it">Compris</string>
+
+    <!-- Help & FAQ (SPEC-O03) -->
+    <string name="settings_help_faq">Aide &amp; FAQ</string>
+    <string name="settings_help_faq_desc">Obtenez des réponses aux questions fréquentes</string>
+    <string name="title_help_faq">Aide &amp; FAQ</string>
+    <string name="help_section_getting_started">Pour commencer</string>
+    <string name="help_q_create_task">Comment créer ma première tâche ?</string>
+    <string name="help_a_create_task">Touchez le bouton + sur l\'écran d\'accueil. Ajoutez un titre, une description facultative, un tag et une priorité, puis touchez Enregistrer.</string>
+    <string name="help_q_need_account">Ai-je besoin d\'un compte ?</string>
+    <string name="help_a_need_account">Non. Task Tracker fonctionne entièrement hors ligne. Pas d\'inscription, pas de connexion, pas d\'abonnement.</string>
+    <string name="help_section_managing_tasks">Gestion des tâches</string>
+    <string name="help_q_filter_by_tag">Comment filtrer les tâches par tag ?</string>
+    <string name="help_a_filter_by_tag">Touchez un tag dans la rangée sous la barre supérieure. Touchez-le à nouveau pour effacer le filtre.</string>
+    <string name="help_q_change_priority">Comment changer la priorité d\'une tâche ?</string>
+    <string name="help_a_change_priority">Ouvrez l\'éditeur de tâches (touchez une tâche) et sélectionnez Faible, Moyenne ou Élevée.</string>
+    <string name="help_q_multi_select">Puis-je sélectionner plusieurs tâches à la fois ?</string>
+    <string name="help_a_multi_select">Oui. Appuyez longuement sur une tâche pour activer le mode de sélection multiple, puis touchez les tâches à sélectionner.</string>
+    <string name="help_section_reminders">Rappels</string>
+    <string name="help_q_no_reminder">Pourquoi n\'ai-je pas reçu de rappel ?</string>
+    <string name="help_a_no_reminder">Vérifiez que les notifications sont activées pour Task Tracker dans les paramètres de votre appareil. Les rappels ne se déclenchent que si une date d\'échéance et une heure de rappel sont définies.</string>
+    <string name="help_q_reminder_no_due">Puis-je définir un rappel sans date d\'échéance ?</string>
+    <string name="help_a_reminder_no_due">Non. Une date d\'échéance est requise avant qu\'une option de rappel n\'apparaisse.</string>
+    <string name="help_section_archive">Archive</string>
+    <string name="help_q_archive_task">Que se passe-t-il quand j\'archive une tâche ?</string>
+    <string name="help_a_archive_task">Les tâches archivées sont retirées de votre liste principale mais ne sont pas supprimées. Retrouvez-les dans l\'écran Archives.</string>
+    <string name="help_q_restore_archived">Puis-je restaurer une tâche archivée ?</string>
+    <string name="help_a_restore_archived">Oui. Ouvrez les Archives, touchez la tâche et choisissez Restaurer.</string>
+    <string name="help_section_stats">Statistiques</string>
+    <string name="help_q_completion_rate">Que signifie « Taux d\'achèvement » ?</string>
+    <string name="help_a_completion_rate">C\'est le pourcentage de toutes les tâches (hors archivées) qui sont marquées comme terminées.</string>
+    <string name="help_q_tap_stat_card">Puis-je toucher une carte de statistiques ?</string>
+    <string name="help_a_tap_stat_card">Oui. Toucher une carte vous amène à une liste de tâches filtrée (par ex., toucher « En retard » affiche uniquement les tâches en retard).</string>
+    <string name="help_section_backup">Sauvegarde &amp; Export</string>
+    <string name="help_q_backup_tasks">Comment sauvegarder mes tâches ?</string>
+    <string name="help_a_backup_tasks">Allez dans Paramètres → Sauvegarde &amp; Restauration → Exporter la sauvegarde. Un fichier JSON est enregistré à l\'emplacement choisi.</string>
+    <string name="help_q_export_csv">Puis-je exporter vers un tableur ?</string>
+    <string name="help_a_export_csv">Oui. Paramètres → Exporter en CSV produit un fichier compatible avec Excel et Google Sheets.</string>
 </resources>

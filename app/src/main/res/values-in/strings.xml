@@ -331,4 +331,46 @@
     <string name="onboarding_action_next">Lanjut</string>
     <string name="onboarding_action_get_started">Mulai</string>
     <string name="cd_onboarding_page_indicator">Halaman %1$d dari %2$d</string>
+    <!-- Feature Tips (SPEC-O02) -->
+    <string name="tip_fab_create_task">Ketuk + untuk membuat tugas pertama Anda. Tambahkan label dan prioritas agar tetap teratur.</string>
+    <string name="tip_tag_chips_filter">Ketuk chip label untuk memfilter tugas Anda. Ketuk lagi untuk menghapus filter.</string>
+    <string name="tip_stats_cards">Ketuk kartu statistik mana pun untuk menuju ke daftar tugas yang difilter.</string>
+    <string name="tip_action_got_it">Mengerti</string>
+
+    <!-- Help & FAQ (SPEC-O03) -->
+    <string name="settings_help_faq">Bantuan &amp; FAQ</string>
+    <string name="settings_help_faq_desc">Dapatkan jawaban untuk pertanyaan umum</string>
+    <string name="title_help_faq">Bantuan &amp; FAQ</string>
+    <string name="help_section_getting_started">Memulai</string>
+    <string name="help_q_create_task">Bagaimana cara membuat tugas pertama saya?</string>
+    <string name="help_a_create_task">Ketuk tombol + di layar utama. Tambahkan judul, deskripsi opsional, label, dan prioritas, lalu ketuk Simpan.</string>
+    <string name="help_q_need_account">Apakah saya memerlukan akun?</string>
+    <string name="help_a_need_account">Tidak. Task Tracker berfungsi sepenuhnya secara offline. Tanpa pendaftaran, tanpa login, tanpa langganan.</string>
+    <string name="help_section_managing_tasks">Mengelola Tugas</string>
+    <string name="help_q_filter_by_tag">Bagaimana cara memfilter tugas berdasarkan label?</string>
+    <string name="help_a_filter_by_tag">Ketuk chip label di baris di bawah bilah atas. Ketuk lagi untuk menghapus filter.</string>
+    <string name="help_q_change_priority">Bagaimana cara mengubah prioritas tugas?</string>
+    <string name="help_a_change_priority">Buka editor tugas (ketuk tugas) dan pilih Rendah, Sedang, atau Tinggi.</string>
+    <string name="help_q_multi_select">Bisakah saya memilih beberapa tugas sekaligus?</string>
+    <string name="help_a_multi_select">Ya. Tekan lama pada tugas mana pun untuk masuk ke mode pilih ganda, lalu ketuk tugas untuk memilihnya.</string>
+    <string name="help_section_reminders">Pengingat</string>
+    <string name="help_q_no_reminder">Mengapa saya tidak menerima pengingat?</string>
+    <string name="help_a_no_reminder">Pastikan notifikasi diaktifkan untuk Task Tracker di pengaturan perangkat Anda. Pengingat hanya aktif jika tanggal jatuh tempo dan waktu pengingat telah ditetapkan.</string>
+    <string name="help_q_reminder_no_due">Bisakah saya mengatur pengingat tanpa tanggal jatuh tempo?</string>
+    <string name="help_a_reminder_no_due">Tidak. Tanggal jatuh tempo diperlukan sebelum opsi pengingat muncul.</string>
+    <string name="help_section_archive">Arsip</string>
+    <string name="help_q_archive_task">Apa yang terjadi saat saya mengarsipkan tugas?</string>
+    <string name="help_a_archive_task">Tugas yang diarsipkan dihapus dari daftar utama Anda tetapi tidak dihapus permanen. Temukan di layar Arsip.</string>
+    <string name="help_q_restore_archived">Bisakah saya memulihkan tugas yang diarsipkan?</string>
+    <string name="help_a_restore_archived">Ya. Buka Arsip, ketuk tugas, dan pilih Pulihkan.</string>
+    <string name="help_section_stats">Statistik</string>
+    <string name="help_q_completion_rate">Apa arti "Tingkat Penyelesaian"?</string>
+    <string name="help_a_completion_rate">Ini adalah persentase dari semua tugas (tidak termasuk yang diarsipkan) yang ditandai selesai.</string>
+    <string name="help_q_tap_stat_card">Bisakah saya mengetuk kartu statistik?</string>
+    <string name="help_a_tap_stat_card">Ya. Mengetuk kartu akan membawa Anda ke daftar tugas yang difilter (misalnya, mengetuk "Terlambat" menampilkan hanya tugas yang terlambat).</string>
+    <string name="help_section_backup">Cadangan &amp; Ekspor</string>
+    <string name="help_q_backup_tasks">Bagaimana cara mencadangkan tugas saya?</string>
+    <string name="help_a_backup_tasks">Buka Pengaturan → Cadangan &amp; Pemulihan → Ekspor cadangan. File JSON akan disimpan di lokasi yang Anda pilih.</string>
+    <string name="help_q_export_csv">Bisakah saya mengekspor ke spreadsheet?</string>
+    <string name="help_a_export_csv">Ya. Pengaturan → Ekspor sebagai CSV menghasilkan file yang kompatibel dengan Excel dan Google Sheets.</string>
 </resources>

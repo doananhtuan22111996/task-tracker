@@ -331,4 +331,46 @@
     <string name="onboarding_action_next">Tiếp theo</string>
     <string name="onboarding_action_get_started">Bắt đầu</string>
     <string name="cd_onboarding_page_indicator">Trang %1$d / %2$d</string>
+    <!-- Feature Tips (SPEC-O02) -->
+    <string name="tip_fab_create_task">Nhấn + để tạo công việc đầu tiên. Thêm nhãn và mức ưu tiên để luôn ngăn nắp.</string>
+    <string name="tip_tag_chips_filter">Nhấn vào chip nhãn để lọc công việc. Nhấn lại để xóa bộ lọc.</string>
+    <string name="tip_stats_cards">Nhấn vào bất kỳ thẻ thống kê nào để chuyển đến danh sách công việc đã lọc.</string>
+    <string name="tip_action_got_it">Đã hiểu</string>
+
+    <!-- Help & FAQ (SPEC-O03) -->
+    <string name="settings_help_faq">Trợ giúp &amp; FAQ</string>
+    <string name="settings_help_faq_desc">Tìm câu trả lời cho các câu hỏi thường gặp</string>
+    <string name="title_help_faq">Trợ giúp &amp; FAQ</string>
+    <string name="help_section_getting_started">Bắt đầu</string>
+    <string name="help_q_create_task">Làm thế nào để tạo công việc đầu tiên?</string>
+    <string name="help_a_create_task">Nhấn nút + trên màn hình chính. Thêm tiêu đề, mô tả tùy chọn, nhãn và mức ưu tiên, rồi nhấn Lưu.</string>
+    <string name="help_q_need_account">Tôi có cần tài khoản không?</string>
+    <string name="help_a_need_account">Không. Task Tracker hoạt động hoàn toàn ngoại tuyến. Không cần đăng ký, không cần đăng nhập, không cần thuê bao.</string>
+    <string name="help_section_managing_tasks">Quản lý công việc</string>
+    <string name="help_q_filter_by_tag">Làm thế nào để lọc công việc theo nhãn?</string>
+    <string name="help_a_filter_by_tag">Nhấn vào chip nhãn ở hàng bên dưới thanh trên cùng. Nhấn lại để xóa bộ lọc.</string>
+    <string name="help_q_change_priority">Làm thế nào để thay đổi mức ưu tiên của công việc?</string>
+    <string name="help_a_change_priority">Mở trình chỉnh sửa công việc (nhấn vào một công việc) và chọn Thấp, Trung bình hoặc Cao.</string>
+    <string name="help_q_multi_select">Tôi có thể chọn nhiều công việc cùng lúc không?</string>
+    <string name="help_a_multi_select">Có. Nhấn giữ bất kỳ công việc nào để vào chế độ chọn nhiều, rồi nhấn vào các công việc để chọn.</string>
+    <string name="help_section_reminders">Nhắc việc</string>
+    <string name="help_q_no_reminder">Tại sao tôi không nhận được nhắc việc?</string>
+    <string name="help_a_no_reminder">Hãy đảm bảo đã bật thông báo cho Task Tracker trong cài đặt thiết bị. Nhắc việc chỉ hoạt động khi đã đặt hạn hoàn thành và thời gian nhắc.</string>
+    <string name="help_q_reminder_no_due">Tôi có thể đặt nhắc việc mà không có hạn hoàn thành không?</string>
+    <string name="help_a_reminder_no_due">Không. Cần có hạn hoàn thành trước khi tùy chọn nhắc việc xuất hiện.</string>
+    <string name="help_section_archive">Lưu trữ</string>
+    <string name="help_q_archive_task">Điều gì xảy ra khi tôi lưu trữ công việc?</string>
+    <string name="help_a_archive_task">Công việc đã lưu trữ được xóa khỏi danh sách chính nhưng không bị xóa vĩnh viễn. Tìm chúng trong màn hình Lưu trữ.</string>
+    <string name="help_q_restore_archived">Tôi có thể khôi phục công việc đã lưu trữ không?</string>
+    <string name="help_a_restore_archived">Có. Mở Lưu trữ, nhấn vào công việc và chọn Khôi phục.</string>
+    <string name="help_section_stats">Thống kê</string>
+    <string name="help_q_completion_rate">"Tỷ lệ hoàn thành" nghĩa là gì?</string>
+    <string name="help_a_completion_rate">Đó là phần trăm tất cả công việc (không tính đã lưu trữ) được đánh dấu là hoàn thành.</string>
+    <string name="help_q_tap_stat_card">Tôi có thể nhấn vào thẻ thống kê không?</string>
+    <string name="help_a_tap_stat_card">Có. Nhấn vào một thẻ sẽ đưa bạn đến danh sách công việc đã lọc (ví dụ: nhấn "Quá hạn" chỉ hiển thị các công việc quá hạn).</string>
+    <string name="help_section_backup">Sao lưu &amp; Xuất</string>
+    <string name="help_q_backup_tasks">Làm thế nào để sao lưu công việc?</string>
+    <string name="help_a_backup_tasks">Vào Cài đặt → Sao lưu &amp; Khôi phục → Xuất bản sao lưu. Một tệp JSON sẽ được lưu tại vị trí bạn chọn.</string>
+    <string name="help_q_export_csv">Tôi có thể xuất sang bảng tính không?</string>
+    <string name="help_a_export_csv">Có. Cài đặt → Xuất dạng CSV tạo ra tệp tương thích với Excel và Google Sheets.</string>
 </resources>
