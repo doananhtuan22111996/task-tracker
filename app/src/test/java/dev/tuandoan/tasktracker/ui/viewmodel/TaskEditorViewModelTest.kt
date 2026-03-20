@@ -6,6 +6,7 @@ import app.cash.turbine.test
 import dev.tuandoan.tasktracker.data.database.DailyCount
 import dev.tuandoan.tasktracker.data.database.Task
 import dev.tuandoan.tasktracker.domain.ITaskManager
+import dev.tuandoan.tasktracker.domain.model.DueDatePreset
 import dev.tuandoan.tasktracker.domain.model.ReminderOption
 import dev.tuandoan.tasktracker.domain.usecase.TaskFormUseCase
 import dev.tuandoan.tasktracker.testutil.TestTaskFactory
@@ -294,6 +295,205 @@ class TaskEditorViewModelTest {
         assertNull(viewModel.errorMessage.value)
     }
 
+    // === dueAtHasTime Tests ===
+
+    @Test
+    fun `dueAtHasTime defaults to false`() {
+        val viewModel = createViewModel()
+        assertFalse(viewModel.dueAtHasTime.value)
+    }
+
+    @Test
+    fun `updateDueTime sets dueAtHasTime to true`() {
+        val viewModel = createViewModel()
+        val futureDate = System.currentTimeMillis() + 86400000L
+        viewModel.updateDueAt(futureDate)
+
+        viewModel.updateDueTime(14, 30)
+
+        assertTrue(viewModel.dueAtHasTime.value)
+    }
+
+    @Test
+    fun `updateDueTime updates dueAt with correct hour and minute`() {
+        val viewModel = createViewModel()
+        val futureDate = System.currentTimeMillis() + 86400000L
+        viewModel.updateDueAt(futureDate)
+
+        viewModel.updateDueTime(14, 30)
+
+        val calendar = java.util.Calendar.getInstance().apply {
+            timeInMillis = viewModel.dueAt.value!!
+        }
+        assertEquals(14, calendar.get(java.util.Calendar.HOUR_OF_DAY))
+        assertEquals(30, calendar.get(java.util.Calendar.MINUTE))
+        assertEquals(0, calendar.get(java.util.Calendar.SECOND))
+    }
+
+    @Test
+    fun `updateDueTime does nothing when dueAt is null`() {
+        val viewModel = createViewModel()
+        viewModel.updateDueTime(14, 30)
+
+        assertNull(viewModel.dueAt.value)
+        assertFalse(viewModel.dueAtHasTime.value)
+    }
+
+    @Test
+    fun `updateDueTime clears stale reminder`() {
+        val viewModel = createViewModel()
+        // Set due date far in the future so the 1-day reminder is valid initially
+        val futureDate = System.currentTimeMillis() + 86400000L * 3
+        viewModel.updateDueAt(futureDate)
+        viewModel.updateReminderOption(ReminderOption.DAYS_1)
+        assertEquals(ReminderOption.DAYS_1, viewModel.reminderOption.value)
+
+        // Now change the due date to today — a 1-day reminder offset would be in the past
+        val today = System.currentTimeMillis() + 60000L // 1 minute from now
+        viewModel.updateDueAt(today)
+        // Set time close to now — the 1-day (1440 min) offset puts reminder well in the past
+        val now = java.util.Calendar.getInstance()
+        viewModel.updateDueTime(now.get(java.util.Calendar.HOUR_OF_DAY), now.get(java.util.Calendar.MINUTE))
+
+        // Reminder should be cleared since 1-day offset would be in the past
+        assertEquals(ReminderOption.NONE, viewModel.reminderOption.value)
+    }
+
+    @Test
+    fun `clearDueTime resets to 23 59 and sets dueAtHasTime to false`() {
+        val viewModel = createViewModel()
+        val futureDate = System.currentTimeMillis() + 86400000L
+        viewModel.updateDueAt(futureDate)
+        viewModel.updateDueTime(14, 30)
+        assertTrue(viewModel.dueAtHasTime.value)
+
+        viewModel.clearDueTime()
+
+        assertFalse(viewModel.dueAtHasTime.value)
+        val calendar = java.util.Calendar.getInstance().apply {
+            timeInMillis = viewModel.dueAt.value!!
+        }
+        assertEquals(23, calendar.get(java.util.Calendar.HOUR_OF_DAY))
+        assertEquals(59, calendar.get(java.util.Calendar.MINUTE))
+    }
+
+    @Test
+    fun `clearDueTime does nothing when dueAt is null`() {
+        val viewModel = createViewModel()
+        viewModel.clearDueTime()
+        assertNull(viewModel.dueAt.value)
+        assertFalse(viewModel.dueAtHasTime.value)
+    }
+
+    @Test
+    fun `setDueDatePreset sets dueAtHasTime to false`() {
+        val viewModel = createViewModel()
+        // First set a time
+        val futureDate = System.currentTimeMillis() + 86400000L
+        viewModel.updateDueAt(futureDate)
+        viewModel.updateDueTime(14, 30)
+        assertTrue(viewModel.dueAtHasTime.value)
+
+        // Preset should clear hasTime
+        viewModel.setDueDatePreset(DueDatePreset.TOMORROW)
+        assertFalse(viewModel.dueAtHasTime.value)
+    }
+
+    @Test
+    fun `clearDueDate resets dueAtHasTime to false`() {
+        val viewModel = createViewModel()
+        val futureDate = System.currentTimeMillis() + 86400000L
+        viewModel.updateDueAt(futureDate)
+        viewModel.updateDueTime(14, 30)
+
+        viewModel.clearDueDate()
+
+        assertNull(viewModel.dueAt.value)
+        assertFalse(viewModel.dueAtHasTime.value)
+    }
+
+    @Test
+    fun `updateDueAt with null resets dueAtHasTime`() {
+        val viewModel = createViewModel()
+        val futureDate = System.currentTimeMillis() + 86400000L
+        viewModel.updateDueAt(futureDate)
+        viewModel.updateDueTime(14, 30)
+        assertTrue(viewModel.dueAtHasTime.value)
+
+        viewModel.updateDueAt(null)
+        assertFalse(viewModel.dueAtHasTime.value)
+    }
+
+    @Test
+    fun `edit mode - loads dueAtHasTime from existing task`() = runTest {
+        val task = TestTaskFactory.createTask(
+            id = 1,
+            title = "Meeting",
+            dueAt = System.currentTimeMillis() + 86400000L,
+            dueAtHasTime = true,
+        )
+        fakeTaskManager.taskToReturn = task
+
+        val viewModel = createViewModel(taskId = 1L)
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        assertTrue(viewModel.dueAtHasTime.value)
+    }
+
+    @Test
+    fun `edit mode - hasChanges detects dueAtHasTime change`() = runTest {
+        val task = TestTaskFactory.createTask(
+            id = 1,
+            title = "Meeting",
+            dueAt = System.currentTimeMillis() + 86400000L,
+            dueAtHasTime = false,
+        )
+        fakeTaskManager.taskToReturn = task
+
+        val viewModel = createViewModel(taskId = 1L)
+        testDispatcher.scheduler.advanceUntilIdle()
+        assertFalse(viewModel.hasChanges.value)
+
+        viewModel.updateDueTime(14, 30)
+        assertTrue(viewModel.hasChanges.value)
+    }
+
+    @Test
+    fun `saveTask passes dueAtHasTime in create mode`() = runTest {
+        val viewModel = createViewModel()
+        val futureDate = System.currentTimeMillis() + 86400000L
+        viewModel.updateTitle("Task")
+        viewModel.updateDueAt(futureDate)
+        viewModel.updateDueTime(14, 30)
+
+        viewModel.saveTask()
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        assertTrue(fakeTaskManager.createCalled)
+        assertTrue(fakeTaskManager.lastCreatedDueAtHasTime)
+    }
+
+    @Test
+    fun `saveTask passes dueAtHasTime in edit mode`() = runTest {
+        val task = TestTaskFactory.createTask(
+            id = 1,
+            title = "Meeting",
+            dueAt = System.currentTimeMillis() + 86400000L,
+            dueAtHasTime = false,
+        )
+        fakeTaskManager.taskToReturn = task
+
+        val viewModel = createViewModel(taskId = 1L)
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        viewModel.updateDueTime(14, 30)
+        viewModel.saveTask()
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        assertTrue(fakeTaskManager.updateCalled)
+        assertTrue(fakeTaskManager.lastUpdatedTask!!.dueAtHasTime)
+    }
+
     // === Validation Tests ===
 
     @Test
@@ -318,6 +518,7 @@ private class FakeEditorTaskManager : ITaskManager {
     var createCalled = false
     var updateCalled = false
     var lastCreatedTitle: String? = null
+    var lastCreatedDueAtHasTime: Boolean = false
     var lastUpdatedTask: Task? = null
 
     override suspend fun getTaskById(id: Long): Task? = taskToReturn
@@ -350,6 +551,7 @@ private class FakeEditorTaskManager : ITaskManager {
     ): Long {
         createCalled = true
         lastCreatedTitle = title
+        lastCreatedDueAtHasTime = dueAtHasTime
         return 1L
     }
 
