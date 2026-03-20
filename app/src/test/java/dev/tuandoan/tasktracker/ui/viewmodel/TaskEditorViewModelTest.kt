@@ -344,6 +344,7 @@ private class FakeEditorTaskManager : ITaskManager {
         title: String,
         description: String,
         dueAt: Long?,
+        dueAtHasTime: Boolean,
         reminderOffsetMinutes: Int?,
         tag: String?,
     ): Long {
@@ -371,6 +372,7 @@ private class FakeEditorTaskManager : ITaskManager {
         title: String,
         description: String,
         dueAt: Long?,
+        dueAtHasTime: Boolean,
         reminderOffsetMinutes: Int?,
         tag: String?,
     ): Boolean = true

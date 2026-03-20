@@ -41,7 +41,7 @@ class TaskCrudUseCaseTest {
 
     @Test
     fun `createTask with valid input succeeds`() = runTest {
-        val result = useCase.createTask("Buy milk", "From store", null, null, null)
+        val result = useCase.createTask("Buy milk", "From store", null, false, null, null)
 
         assertTrue(result.isSuccess)
         assertEquals(1, repository.getAllTasksSnapshot().size)
@@ -49,14 +49,14 @@ class TaskCrudUseCaseTest {
 
     @Test
     fun `createTask with blank title fails`() = runTest {
-        val result = useCase.createTask("   ", "", null, null, null)
+        val result = useCase.createTask("   ", "", null, false, null, null)
 
         assertTrue(result.isFailure)
     }
 
     @Test
     fun `createTask with tag stores tag`() = runTest {
-        val result = useCase.createTask("Task", "", null, null, "work")
+        val result = useCase.createTask("Task", "", null, false, null, "work")
 
         assertTrue(result.isSuccess)
         // Verify the task was created with the tag
@@ -72,7 +72,7 @@ class TaskCrudUseCaseTest {
         val task = TestTaskFactory.createTask(id = 1, title = "Old")
         repository.seed(task)
 
-        val result = useCase.updateTask(1L, "New", "New desc", null, null, null)
+        val result = useCase.updateTask(1L, "New", "New desc", null, false, null, null)
 
         assertTrue(result.isSuccess)
         assertEquals("New", repository.getTaskById(1)!!.title)
@@ -80,7 +80,7 @@ class TaskCrudUseCaseTest {
 
     @Test
     fun `updateTask with nonexistent id fails`() = runTest {
-        val result = useCase.updateTask(999L, "Title", "", null, null, null)
+        val result = useCase.updateTask(999L, "Title", "", null, false, null, null)
         assertTrue(result.isFailure)
     }
 

@@ -77,14 +77,14 @@ class TaskManagerTest {
 
     @Test
     fun `createTask with tag trims and stores tag`() = runTest {
-        val id = manager.createTask("Task", "", null, null, "  work  ")
+        val id = manager.createTask("Task", "", null, false, null, "  work  ")
         val task = repository.getTaskById(id)
         assertEquals("work", task!!.tag)
     }
 
     @Test
     fun `createTask with blank tag stores null`() = runTest {
-        val id = manager.createTask("Task", "", null, null, "   ")
+        val id = manager.createTask("Task", "", null, false, null, "   ")
         val task = repository.getTaskById(id)
         assertNull(task!!.tag)
     }

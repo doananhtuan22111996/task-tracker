@@ -47,7 +47,7 @@ class TaskCrudUseCase @Inject constructor(
         description: String,
         dueAt: Long?,
         reminderOffsetMinutes: Int?,
-    ): Result<Unit> = createTask(title, description, dueAt, reminderOffsetMinutes, null)
+    ): Result<Unit> = createTask(title, description, dueAt, false, reminderOffsetMinutes, null)
 
     /**
      * Creates a new task with the provided title, description, due date, reminder and tag
@@ -56,6 +56,7 @@ class TaskCrudUseCase @Inject constructor(
         title: String,
         description: String,
         dueAt: Long?,
+        dueAtHasTime: Boolean = false,
         reminderOffsetMinutes: Int?,
         tag: String?,
     ): Result<Unit> = try {
@@ -66,6 +67,7 @@ class TaskCrudUseCase @Inject constructor(
             title = title,
             description = description,
             dueAt = dueAt,
+            dueAtHasTime = dueAtHasTime,
             reminderOffsetMinutes = reminderOffsetMinutes,
             tag = tag,
         )
@@ -95,7 +97,7 @@ class TaskCrudUseCase @Inject constructor(
         description: String,
         dueAt: Long?,
         reminderOffsetMinutes: Int?,
-    ): Result<Unit> = updateTask(taskId, title, description, dueAt, reminderOffsetMinutes, null)
+    ): Result<Unit> = updateTask(taskId, title, description, dueAt, false, reminderOffsetMinutes, null)
 
     /**
      * Updates an existing task with new title, description, due date, reminder and tag
@@ -105,6 +107,7 @@ class TaskCrudUseCase @Inject constructor(
         title: String,
         description: String,
         dueAt: Long?,
+        dueAtHasTime: Boolean = false,
         reminderOffsetMinutes: Int?,
         tag: String?,
     ): Result<Unit> = try {
@@ -116,6 +119,7 @@ class TaskCrudUseCase @Inject constructor(
             title = title,
             description = description,
             dueAt = dueAt,
+            dueAtHasTime = dueAtHasTime,
             reminderOffsetMinutes = reminderOffsetMinutes,
             tag = tag,
         )

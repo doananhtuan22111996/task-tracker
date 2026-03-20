@@ -240,7 +240,11 @@ fun TaskItem(
 
                 // Due date row (optional)
                 task.dueAt?.let { dueDate ->
-                    val datePattern = stringResource(R.string.date_format_due_time)
+                    val datePattern = if (task.dueAtHasTime) {
+                        stringResource(R.string.date_format_due_time)
+                    } else {
+                        stringResource(R.string.date_format_due_date_only)
+                    }
                     val dueDateText = if (overdue) {
                         stringResource(R.string.task_overdue_date, formatDueDate(dueDate, datePattern))
                     } else {

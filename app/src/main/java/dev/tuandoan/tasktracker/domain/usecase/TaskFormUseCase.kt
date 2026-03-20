@@ -41,6 +41,9 @@ class TaskFormUseCase @Inject constructor(@ApplicationContext private val contex
     private val _dueAt = MutableStateFlow<Long?>(null)
     val dueAt: StateFlow<Long?> = _dueAt.asStateFlow()
 
+    private val _dueAtHasTime = MutableStateFlow(false)
+    val dueAtHasTime: StateFlow<Boolean> = _dueAtHasTime.asStateFlow()
+
     private val _reminderOption = MutableStateFlow(ReminderOption.NONE)
     val reminderOption: StateFlow<ReminderOption> = _reminderOption.asStateFlow()
 
@@ -64,6 +67,7 @@ class TaskFormUseCase @Inject constructor(@ApplicationContext private val contex
     private var originalTitle: String = ""
     private var originalDescription: String = ""
     private var originalDueAt: Long? = null
+    private var originalDueAtHasTime: Boolean = false
     private var originalReminderOption: ReminderOption = ReminderOption.NONE
     private var originalTag: String = ""
 
@@ -96,14 +100,15 @@ class TaskFormUseCase @Inject constructor(@ApplicationContext private val contex
     }
 
     val hasChanges: Flow<Boolean> = combine(
-        listOf(_taskTitle, _taskDescription, _dueAt, _reminderOption, _tag, _selectedTask),
+        listOf(_taskTitle, _taskDescription, _dueAt, _dueAtHasTime, _reminderOption, _tag, _selectedTask),
     ) { values ->
         val title = values[0] as String
         val description = values[1] as String
         val dueAt = values[2] as Long?
-        val reminderOption = values[3] as ReminderOption
-        val tag = values[4] as String
-        val selectedTask = values[5] as Task?
+        val dueAtHasTime = values[3] as Boolean
+        val reminderOption = values[4] as ReminderOption
+        val tag = values[5] as String
+        val selectedTask = values[6] as Task?
 
         if (selectedTask == null) {
             // Add mode - has changes if title is not blank or due date/reminder/tag is set
@@ -116,10 +121,16 @@ class TaskFormUseCase @Inject constructor(@ApplicationContext private val contex
             val titleChanged = title.trim() != originalTitle.trim()
             val descChanged = description.trim() != originalDescription.trim()
             val dueDateChanged = dueAt != originalDueAt
+            val dueAtHasTimeChanged = dueAtHasTime != originalDueAtHasTime
             val reminderChanged = reminderOption != originalReminderOption
             val tagChanged = tag.trim() != originalTag.trim()
 
-            titleChanged || descChanged || dueDateChanged || reminderChanged || tagChanged
+            titleChanged ||
+                descChanged ||
+                dueDateChanged ||
+                dueAtHasTimeChanged ||
+                reminderChanged ||
+                tagChanged
         }
     }
 
@@ -160,6 +171,7 @@ class TaskFormUseCase @Inject constructor(@ApplicationContext private val contex
         _taskTitle.value = task.title
         _taskDescription.value = task.description
         _dueAt.value = task.dueAt
+        _dueAtHasTime.value = task.dueAtHasTime
         _reminderOption.value = ReminderOption.fromOffsetMinutes(task.reminderOffsetMinutes)
         _tag.value = task.tag ?: ""
 
@@ -167,6 +179,7 @@ class TaskFormUseCase @Inject constructor(@ApplicationContext private val contex
         originalTitle = task.title
         originalDescription = task.description
         originalDueAt = task.dueAt
+        originalDueAtHasTime = task.dueAtHasTime
         originalReminderOption = ReminderOption.fromOffsetMinutes(task.reminderOffsetMinutes)
         originalTag = task.tag ?: ""
 
@@ -200,8 +213,15 @@ class TaskFormUseCase @Inject constructor(@ApplicationContext private val contex
 
     fun updateDueAt(dueAt: Long?) {
         _dueAt.value = dueAt
+        if (dueAt == null) {
+            _dueAtHasTime.value = false
+        }
         validateDueDate()
         validateReminder()
+    }
+
+    fun updateDueAtHasTime(hasTime: Boolean) {
+        _dueAtHasTime.value = hasTime
     }
 
     fun updateReminderOption(reminderOption: ReminderOption) {
@@ -221,11 +241,13 @@ class TaskFormUseCase @Inject constructor(@ApplicationContext private val contex
         _taskTitle.value = ""
         _taskDescription.value = ""
         _dueAt.value = null
+        _dueAtHasTime.value = false
         _reminderOption.value = ReminderOption.NONE
         _tag.value = ""
         originalTitle = ""
         originalDescription = ""
         originalDueAt = null
+        originalDueAtHasTime = false
         originalReminderOption = ReminderOption.NONE
         originalTag = ""
     }
@@ -312,6 +334,7 @@ class TaskFormUseCase @Inject constructor(@ApplicationContext private val contex
         description = _taskDescription.value.trim(),
         selectedTaskId = _selectedTask.value?.id,
         dueAt = _dueAt.value,
+        dueAtHasTime = _dueAtHasTime.value,
         reminderOffsetMinutes = if (_reminderOption.value ==
             ReminderOption.NONE
         ) {
@@ -345,25 +368,28 @@ class TaskFormUseCase @Inject constructor(@ApplicationContext private val contex
         val description: String,
         val selectedTaskId: Long?,
         val dueAt: Long?,
+        val dueAtHasTime: Boolean = false,
         val reminderOffsetMinutes: Int?,
         val tag: String?,
     )
 
     fun getFormData(): Flow<FormData> = combine(
-        listOf(_taskTitle, _taskDescription, _selectedTask, _dueAt, _reminderOption, _tag),
+        listOf(_taskTitle, _taskDescription, _selectedTask, _dueAt, _dueAtHasTime, _reminderOption, _tag),
     ) { values ->
         val title = values[0] as String
         val description = values[1] as String
         val selectedTask = values[2] as Task?
         val dueAt = values[3] as Long?
-        val reminderOption = values[4] as ReminderOption
-        val tag = values[5] as String
+        val dueAtHasTime = values[4] as Boolean
+        val reminderOption = values[5] as ReminderOption
+        val tag = values[6] as String
 
         FormData(
             title = title,
             description = description,
             selectedTaskId = selectedTask?.id,
             dueAt = dueAt,
+            dueAtHasTime = dueAtHasTime,
             reminderOffsetMinutes = if (reminderOption == ReminderOption.NONE) null else reminderOption.offsetMinutes,
             tag = tag.trim().takeIf { it.isNotEmpty() },
         )

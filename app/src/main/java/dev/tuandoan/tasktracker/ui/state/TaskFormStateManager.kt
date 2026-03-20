@@ -88,6 +88,7 @@ class TaskFormStateManager @Inject constructor(
             taskTitle = formUseCase.taskTitle,
             taskDescription = formUseCase.taskDescription,
             dueAt = formUseCase.dueAt,
+            dueAtHasTime = formUseCase.dueAtHasTime,
             reminderOption = formUseCase.reminderOption,
             tag = formUseCase.tag,
             isFormValid = isFormValid,
@@ -115,6 +116,7 @@ class TaskFormStateManager @Inject constructor(
     fun updateTaskTitle(title: String) = formUseCase.updateTaskTitle(title)
     fun updateTaskDescription(description: String) = formUseCase.updateTaskDescription(description)
     fun updateDueAt(dueAt: Long?) = formUseCase.updateDueAt(dueAt)
+    fun updateDueAtHasTime(hasTime: Boolean) = formUseCase.updateDueAtHasTime(hasTime)
     fun updateReminderOption(reminderOption: ReminderOption) = formUseCase.updateReminderOption(reminderOption)
     fun updateTag(tag: String) = formUseCase.updateTag(tag)
 
@@ -163,6 +165,7 @@ data class TaskFormState(
     val taskTitle: StateFlow<String>,
     val taskDescription: StateFlow<String>,
     val dueAt: StateFlow<Long?>,
+    val dueAtHasTime: StateFlow<Boolean>,
     val reminderOption: StateFlow<ReminderOption>,
     val tag: StateFlow<String>,
     val isFormValid: StateFlow<Boolean>,

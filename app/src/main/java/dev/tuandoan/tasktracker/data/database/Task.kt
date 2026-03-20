@@ -13,6 +13,7 @@ data class Task(
     val createdAt: Long = System.currentTimeMillis(),
     val completedAt: Long? = null, // Timestamp when task was completed (nullable)
     val dueAt: Long? = null, // Nullable epoch millis
+    val dueAtHasTime: Boolean = false, // Whether user explicitly set a time (vs default end-of-day)
     val reminderOffsetMinutes: Int? = null, // Nullable reminder offset in minutes (0 = none)
     val tag: String? = null, // Single optional tag for organizing tasks
     val isPinned: Boolean = false, // Pin/unpin tasks to keep important items on top
