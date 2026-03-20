@@ -333,7 +333,8 @@ fun TaskEditorScreen(
             ) {
                 DueDatePreset.entries.forEach { preset ->
                     // Compare date-only (presets always use 23:59, but user may have set a time)
-                    val isSelected = dueAt != null && !dueAtHasTime &&
+                    val isSelected = dueAt != null &&
+                        !dueAtHasTime &&
                         dueAt == preset.toEpochMillis()
                     FilterChip(
                         selected = isSelected,
