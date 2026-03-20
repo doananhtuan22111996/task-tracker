@@ -205,11 +205,9 @@ fun TaskEditorScreen(
                     .fillMaxWidth()
                     .focusRequester(titleFocusRequester)
                     .then(
-                        if (titleError != null) {
-                            Modifier.semantics { error(titleError!!) }
-                        } else {
-                            Modifier
-                        },
+                        titleError?.let { err ->
+                            Modifier.semantics { error(err) }
+                        } ?: Modifier,
                     ),
                 singleLine = true,
                 isError = titleError != null,
@@ -262,11 +260,9 @@ fun TaskEditorScreen(
                     modifier = Modifier
                         .weight(1f)
                         .then(
-                            if (tagError != null) {
-                                Modifier.semantics { error(tagError!!) }
-                            } else {
-                                Modifier
-                            },
+                            tagError?.let { err ->
+                                Modifier.semantics { error(err) }
+                            } ?: Modifier,
                         ),
                     singleLine = true,
                     isError = tagError != null,
@@ -369,11 +365,9 @@ fun TaskEditorScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .then(
-                        if (dueDateError != null) {
-                            Modifier.semantics { error(dueDateError!!) }
-                        } else {
-                            Modifier
-                        },
+                        dueDateError?.let { err ->
+                            Modifier.semantics { error(err) }
+                        } ?: Modifier,
                     ),
                 readOnly = true,
                 isError = dueDateError != null,
@@ -469,11 +463,9 @@ fun TaskEditorScreen(
                         .menuAnchor()
                         .fillMaxWidth()
                         .then(
-                            if (reminderError != null) {
-                                Modifier.semantics { error(reminderError!!) }
-                            } else {
-                                Modifier
-                            },
+                            reminderError?.let { err ->
+                                Modifier.semantics { error(err) }
+                            } ?: Modifier,
                         ),
                     trailingIcon = {
                         if (dueAt != null) {
