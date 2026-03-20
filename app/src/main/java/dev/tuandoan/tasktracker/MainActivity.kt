@@ -22,7 +22,6 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import dagger.hilt.android.AndroidEntryPoint
 import dev.tuandoan.tasktracker.data.preferences.SettingsRepository
-import dev.tuandoan.tasktracker.data.preferences.UserPreferences
 import dev.tuandoan.tasktracker.navigation.StatsFilter
 import dev.tuandoan.tasktracker.navigation.TaskTrackerRoutes
 import dev.tuandoan.tasktracker.ui.manager.NotificationPermissionManager
@@ -72,16 +71,19 @@ class MainActivity : AppCompatActivity() {
         enableEdgeToEdge()
         setContent {
             val userPreferences by settingsRepository.userPreferences
-                .collectAsStateWithLifecycle(initialValue = UserPreferences())
+                .collectAsStateWithLifecycle(initialValue = null)
 
-            TaskTrackerTheme(
-                themeMode = userPreferences.themeMode,
-                dynamicColor = userPreferences.dynamicColor,
-            ) {
-                TaskTrackerApp(
-                    notificationPermissionManager = notificationPermissionManager,
-                    isOnboardingCompleted = userPreferences.onboardingCompleted,
-                )
+            val prefs = userPreferences
+            if (prefs != null) {
+                TaskTrackerTheme(
+                    themeMode = prefs.themeMode,
+                    dynamicColor = prefs.dynamicColor,
+                ) {
+                    TaskTrackerApp(
+                        notificationPermissionManager = notificationPermissionManager,
+                        isOnboardingCompleted = prefs.onboardingCompleted,
+                    )
+                }
             }
         }
     }
