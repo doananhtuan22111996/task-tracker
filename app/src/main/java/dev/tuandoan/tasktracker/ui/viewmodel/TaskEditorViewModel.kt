@@ -52,6 +52,9 @@ class TaskEditorViewModel @Inject constructor(
     private val _dueAt = MutableStateFlow<Long?>(null)
     val dueAt: StateFlow<Long?> = _dueAt.asStateFlow()
 
+    private val _dueAtHasTime = MutableStateFlow(false)
+    val dueAtHasTime: StateFlow<Boolean> = _dueAtHasTime.asStateFlow()
+
     private val _reminderOption = MutableStateFlow(ReminderOption.NONE)
     val reminderOption: StateFlow<ReminderOption> = _reminderOption.asStateFlow()
 
@@ -121,6 +124,7 @@ class TaskEditorViewModel @Inject constructor(
                 _taskTitle.value.trim() != original.title ||
                     _taskDescription.value.trim() != original.description ||
                     _dueAt.value != original.dueAt ||
+                    _dueAtHasTime.value != original.dueAtHasTime ||
                     _reminderOption.value != ReminderOption.fromOffsetMinutes(original.reminderOffsetMinutes) ||
                     _tag.value.trim() != (original.tag ?: "") ||
                     _priority.value != original.priority ||
@@ -198,6 +202,7 @@ class TaskEditorViewModel @Inject constructor(
                     _taskTitle.value = task.title
                     _taskDescription.value = task.description
                     _dueAt.value = task.dueAt
+                    _dueAtHasTime.value = task.dueAtHasTime
                     _reminderOption.value = ReminderOption.fromOffsetMinutes(task.reminderOffsetMinutes)
                     _tag.value = task.tag ?: ""
                     _priority.value = task.priority
@@ -231,11 +236,50 @@ class TaskEditorViewModel @Inject constructor(
 
     fun updateDueAt(dueAt: Long?) {
         _dueAt.value = dueAt
+        if (dueAt == null) {
+            _dueAtHasTime.value = false
+        }
+        updateHasChanges()
+    }
+
+    fun updateDueTime(hour: Int, minute: Int) {
+        val current = _dueAt.value ?: return
+        val calendar = java.util.Calendar.getInstance().apply {
+            timeInMillis = current
+            set(java.util.Calendar.HOUR_OF_DAY, hour)
+            set(java.util.Calendar.MINUTE, minute)
+            set(java.util.Calendar.SECOND, 0)
+            set(java.util.Calendar.MILLISECOND, 0)
+        }
+        _dueAt.value = calendar.timeInMillis
+        _dueAtHasTime.value = true
+        // Clear reminder if it would now be in the past
+        if (_reminderOption.value != ReminderOption.NONE) {
+            val reminderTime = _dueAt.value!! - (_reminderOption.value.offsetMinutes * 60 * 1000L)
+            if (reminderTime <= System.currentTimeMillis()) {
+                _reminderOption.value = ReminderOption.NONE
+            }
+        }
+        updateHasChanges()
+    }
+
+    fun clearDueTime() {
+        val current = _dueAt.value ?: return
+        val calendar = java.util.Calendar.getInstance().apply {
+            timeInMillis = current
+            set(java.util.Calendar.HOUR_OF_DAY, 23)
+            set(java.util.Calendar.MINUTE, 59)
+            set(java.util.Calendar.SECOND, 0)
+            set(java.util.Calendar.MILLISECOND, 0)
+        }
+        _dueAt.value = calendar.timeInMillis
+        _dueAtHasTime.value = false
         updateHasChanges()
     }
 
     fun setDueDatePreset(preset: DueDatePreset) {
         _dueAt.value = preset.toEpochMillis()
+        _dueAtHasTime.value = false
         // Clear reminder if it would now be in the past
         if (_reminderOption.value != ReminderOption.NONE) {
             val reminderTime = _dueAt.value!! - (_reminderOption.value.offsetMinutes * 60 * 1000L)
@@ -248,6 +292,7 @@ class TaskEditorViewModel @Inject constructor(
 
     fun clearDueDate() {
         _dueAt.value = null
+        _dueAtHasTime.value = false
         _reminderOption.value = ReminderOption.NONE
         updateHasChanges()
     }
@@ -297,6 +342,7 @@ class TaskEditorViewModel @Inject constructor(
                         title = trimmedTitle,
                         description = trimmedDescription,
                         dueAt = _dueAt.value,
+                        dueAtHasTime = _dueAtHasTime.value,
                         reminderOffsetMinutes = reminderOffsetMinutes,
                         tag = trimmedTag,
                         priority = _priority.value,
@@ -309,6 +355,7 @@ class TaskEditorViewModel @Inject constructor(
                         title = trimmedTitle,
                         description = trimmedDescription,
                         dueAt = _dueAt.value,
+                        dueAtHasTime = _dueAtHasTime.value,
                         reminderOffsetMinutes = reminderOffsetMinutes,
                         tag = trimmedTag,
                     )

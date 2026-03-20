@@ -31,12 +31,13 @@ class TaskManager @Inject constructor(
         description: String,
         dueAt: Long?,
         reminderOffsetMinutes: Int?,
-    ): Long = createTask(title, description, dueAt, reminderOffsetMinutes, null)
+    ): Long = createTask(title, description, dueAt, false, reminderOffsetMinutes, null)
 
     override suspend fun createTask(
         title: String,
         description: String,
         dueAt: Long?,
+        dueAtHasTime: Boolean,
         reminderOffsetMinutes: Int?,
         tag: String?,
     ): Long {
@@ -46,6 +47,7 @@ class TaskManager @Inject constructor(
             title = title.trim(),
             description = description.trim(),
             dueAt = dueAt,
+            dueAtHasTime = dueAtHasTime,
             reminderOffsetMinutes = reminderOffsetMinutes,
             tag = tag?.trim()?.takeIf { it.isNotEmpty() },
         )
@@ -79,7 +81,7 @@ class TaskManager @Inject constructor(
     }
 
     override suspend fun updateTaskContent(taskId: Long, title: String, description: String) {
-        updateTaskContent(taskId, title, description, null, null, null)
+        updateTaskContent(taskId, title, description, null, false, null, null)
     }
 
     override suspend fun updateTaskContent(
@@ -88,13 +90,14 @@ class TaskManager @Inject constructor(
         description: String,
         dueAt: Long?,
         reminderOffsetMinutes: Int?,
-    ): Boolean = updateTaskContent(taskId, title, description, dueAt, reminderOffsetMinutes, null)
+    ): Boolean = updateTaskContent(taskId, title, description, dueAt, false, reminderOffsetMinutes, null)
 
     override suspend fun updateTaskContent(
         taskId: Long,
         title: String,
         description: String,
         dueAt: Long?,
+        dueAtHasTime: Boolean,
         reminderOffsetMinutes: Int?,
         tag: String?,
     ): Boolean {
@@ -107,6 +110,7 @@ class TaskManager @Inject constructor(
             title = title.trim(),
             description = description.trim(),
             dueAt = dueAt,
+            dueAtHasTime = dueAtHasTime,
             reminderOffsetMinutes = reminderOffsetMinutes,
             tag = tag?.trim()?.takeIf { it.isNotEmpty() },
         )

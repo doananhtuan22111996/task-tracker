@@ -234,7 +234,17 @@
 
     <!-- Date Format Patterns -->
     <string name="date_format_short">dd/MM/yyyy</string>
-    <string name="date_format_due_time">dd/MM/yyyy \'पर\' HH:mm</string>
+    <string name="date_format_short_with_time">dd/MM/yyyy \'पर\' h:mm a</string>
+    <string name="date_format_due_date_only">dd/MM</string>
+    <string name="date_format_due_time">dd/MM \'पर\' h:mm a</string>
+    <string name="date_format_time_only">h:mm a</string>
+
+    <!-- Time Picker -->
+    <string name="time_picker_title">समय चुनें</string>
+    <string name="action_add_time">समय जोड़ें</string>
+    <string name="cd_remove_time">समय हटाएं</string>
+    <string name="cd_add_time_to_due_date">नियत तिथि में समय जोड़ें</string>
+    <string name="cd_due_time">नियत समय: %s</string>
 
     <!-- Date Group Headers -->
     <string name="date_today">आज</string>

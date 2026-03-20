@@ -55,6 +55,7 @@ class CsvBackupSerializer @Inject constructor() : BackupSerializer {
             task.createdAt.toString(),
             task.completedAt?.toString() ?: "",
             task.dueAt?.toString() ?: "",
+            task.dueAtHasTime.toString(),
             task.reminderOffsetMinutes?.toString() ?: "",
             task.tag ?: "",
             task.isPinned.toString(),
@@ -66,11 +67,16 @@ class CsvBackupSerializer @Inject constructor() : BackupSerializer {
     }
 
     private fun parseCsvRowToDto(fields: List<String>): TaskBackupDto {
-        if (fields.size < EXPECTED_FIELD_COUNT) {
+        if (fields.size < LEGACY_FIELD_COUNT) {
             throw BackupParseException(
-                "Expected $EXPECTED_FIELD_COUNT fields but got ${fields.size}",
+                "Expected at least $LEGACY_FIELD_COUNT fields but got ${fields.size}",
             )
         }
+
+        // Support both legacy 13-column and new 14-column formats
+        val isLegacyFormat = fields.size < EXPECTED_FIELD_COUNT
+        val offset = if (isLegacyFormat) 0 else 1
+
         return TaskBackupDto(
             id = fields[0].toLong(),
             title = fields[1],
@@ -79,20 +85,22 @@ class CsvBackupSerializer @Inject constructor() : BackupSerializer {
             createdAt = fields[4].toLong(),
             completedAt = fields[5].toLongOrNull(),
             dueAt = fields[6].toLongOrNull(),
-            reminderOffsetMinutes = fields[7].toIntOrNull(),
-            tag = fields[8].ifBlank { null },
-            isPinned = fields[9].toBooleanStrict(),
-            priority = fields[10].toInt(),
-            isArchived = fields[11].toBooleanStrict(),
-            archivedAt = fields[12].toLongOrNull(),
+            dueAtHasTime = if (isLegacyFormat) false else fields[7].toBooleanStrictOrNull() ?: false,
+            reminderOffsetMinutes = fields[7 + offset].toIntOrNull(),
+            tag = fields[8 + offset].ifBlank { null },
+            isPinned = fields[9 + offset].toBooleanStrict(),
+            priority = fields[10 + offset].toInt(),
+            isArchived = fields[11 + offset].toBooleanStrict(),
+            archivedAt = fields[12 + offset].toLongOrNull(),
         )
     }
 
     companion object {
-        private const val EXPECTED_FIELD_COUNT = 13
+        private const val EXPECTED_FIELD_COUNT = 14
+        private const val LEGACY_FIELD_COUNT = 13
 
         private const val HEADER =
-            "id,title,description,isCompleted,createdAt,completedAt,dueAt," +
+            "id,title,description,isCompleted,createdAt,completedAt,dueAt,dueAtHasTime," +
                 "reminderOffsetMinutes,tag,isPinned,priority,isArchived,archivedAt"
 
         /**

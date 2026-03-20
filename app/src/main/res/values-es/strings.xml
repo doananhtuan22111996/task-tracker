@@ -234,7 +234,17 @@
 
     <!-- Date Format Patterns (localizable) -->
     <string name="date_format_short">dd MMM yyyy</string>
-    <string name="date_format_due_time">dd MMM \'a las\' HH:mm</string>
+    <string name="date_format_short_with_time">dd MMM yyyy \'a las\' h:mm a</string>
+    <string name="date_format_due_date_only">dd MMM</string>
+    <string name="date_format_due_time">dd MMM \'a las\' h:mm a</string>
+    <string name="date_format_time_only">h:mm a</string>
+
+    <!-- Time Picker -->
+    <string name="time_picker_title">Seleccionar hora</string>
+    <string name="action_add_time">Añadir hora</string>
+    <string name="cd_remove_time">Eliminar hora</string>
+    <string name="cd_add_time_to_due_date">Añadir hora a la fecha de vencimiento</string>
+    <string name="cd_due_time">Hora de vencimiento: %s</string>
 
     <!-- Date Group Headers -->
     <string name="date_today">Hoy</string>

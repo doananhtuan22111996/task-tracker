@@ -234,7 +234,17 @@
 
     <!-- Date Format Patterns (localizable) -->
     <string name="date_format_short">dd/MM/yyyy</string>
-    <string name="date_format_due_time">dd/MM/yyyy \'lúc\' HH:mm</string>
+    <string name="date_format_short_with_time">dd/MM/yyyy \'lúc\' h:mm a</string>
+    <string name="date_format_due_date_only">dd/MM</string>
+    <string name="date_format_due_time">dd/MM \'lúc\' h:mm a</string>
+    <string name="date_format_time_only">h:mm a</string>
+
+    <!-- Time Picker -->
+    <string name="time_picker_title">Chọn thời gian</string>
+    <string name="action_add_time">Thêm giờ</string>
+    <string name="cd_remove_time">Xóa giờ</string>
+    <string name="cd_add_time_to_due_date">Thêm giờ vào ngày hết hạn</string>
+    <string name="cd_due_time">Giờ hết hạn: %s</string>
 
     <!-- Date Group Headers -->
     <string name="date_today">Hôm nay</string>

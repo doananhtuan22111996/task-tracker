@@ -234,7 +234,17 @@
 
     <!-- Date Format Patterns (localizable) -->
     <string name="date_format_short">dd. MMM yyyy</string>
-    <string name="date_format_due_time">dd. MMM \'um\' HH:mm</string>
+    <string name="date_format_short_with_time">dd. MMM yyyy \'um\' h:mm a</string>
+    <string name="date_format_due_date_only">dd. MMM</string>
+    <string name="date_format_due_time">dd. MMM \'um\' h:mm a</string>
+    <string name="date_format_time_only">h:mm a</string>
+
+    <!-- Time Picker -->
+    <string name="time_picker_title">Zeit auswählen</string>
+    <string name="action_add_time">Zeit hinzufügen</string>
+    <string name="cd_remove_time">Zeit entfernen</string>
+    <string name="cd_add_time_to_due_date">Zeit zum Fälligkeitsdatum hinzufügen</string>
+    <string name="cd_due_time">Fällige Zeit: %s</string>
 
     <!-- Date Group Headers -->
     <string name="date_today">Heute</string>

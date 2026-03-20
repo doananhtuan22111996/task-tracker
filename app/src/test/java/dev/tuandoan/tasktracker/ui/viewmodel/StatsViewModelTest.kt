@@ -229,6 +229,7 @@ private class FakeStatsTaskManager : ITaskManager {
         title: String,
         description: String,
         dueAt: Long?,
+        dueAtHasTime: Boolean,
         reminderOffsetMinutes: Int?,
         tag: String?,
     ): Long = 0
@@ -246,6 +247,7 @@ private class FakeStatsTaskManager : ITaskManager {
         title: String,
         description: String,
         dueAt: Long?,
+        dueAtHasTime: Boolean,
         reminderOffsetMinutes: Int?,
         tag: String?,
     ): Boolean = true

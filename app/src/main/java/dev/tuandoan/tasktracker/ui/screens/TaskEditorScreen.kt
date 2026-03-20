@@ -1,6 +1,7 @@
 package dev.tuandoan.tasktracker.ui.screens
 
 import android.app.DatePickerDialog
+import android.text.format.DateFormat
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -17,6 +18,9 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Schedule
+import androidx.compose.material3.AssistChip
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -50,6 +54,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.error
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
@@ -63,6 +69,7 @@ import dev.tuandoan.tasktracker.domain.model.DueDatePreset
 import dev.tuandoan.tasktracker.domain.model.ReminderOption
 import dev.tuandoan.tasktracker.ui.components.NotificationPermissionDialog
 import dev.tuandoan.tasktracker.ui.components.PermissionDeniedDialog
+import dev.tuandoan.tasktracker.ui.components.TimePickerDialog
 import dev.tuandoan.tasktracker.ui.manager.NotificationPermissionManager
 import dev.tuandoan.tasktracker.ui.viewmodel.TaskEditorEvent
 import dev.tuandoan.tasktracker.ui.viewmodel.TaskEditorViewModel
@@ -89,6 +96,7 @@ fun TaskEditorScreen(
     val taskTitle by viewModel.taskTitle.collectAsState()
     val taskDescription by viewModel.taskDescription.collectAsState()
     val dueAt by viewModel.dueAt.collectAsState()
+    val dueAtHasTime by viewModel.dueAtHasTime.collectAsState()
     val reminderOption by viewModel.reminderOption.collectAsState()
     val tag by viewModel.tag.collectAsState()
     val priority by viewModel.priority.collectAsState()
@@ -105,6 +113,9 @@ fun TaskEditorScreen(
 
     // Date picker state
     var showDatePicker by remember { mutableStateOf(false) }
+
+    // Time picker state
+    var showTimePicker by remember { mutableStateOf(false) }
 
     // Priority dropdown state
     var showPriorityDropdown by remember { mutableStateOf(false) }
@@ -194,11 +205,9 @@ fun TaskEditorScreen(
                     .fillMaxWidth()
                     .focusRequester(titleFocusRequester)
                     .then(
-                        if (titleError != null) {
-                            Modifier.semantics { error(titleError!!) }
-                        } else {
-                            Modifier
-                        },
+                        titleError?.let { err ->
+                            Modifier.semantics { error(err) }
+                        } ?: Modifier,
                     ),
                 singleLine = true,
                 isError = titleError != null,
@@ -251,11 +260,9 @@ fun TaskEditorScreen(
                     modifier = Modifier
                         .weight(1f)
                         .then(
-                            if (tagError != null) {
-                                Modifier.semantics { error(tagError!!) }
-                            } else {
-                                Modifier
-                            },
+                            tagError?.let { err ->
+                                Modifier.semantics { error(err) }
+                            } ?: Modifier,
                         ),
                     singleLine = true,
                     isError = tagError != null,
@@ -325,7 +332,10 @@ fun TaskEditorScreen(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 DueDatePreset.entries.forEach { preset ->
-                    val isSelected = dueAt == preset.toEpochMillis()
+                    // Compare date-only (presets always use 23:59, but user may have set a time)
+                    val isSelected = dueAt != null &&
+                        !dueAtHasTime &&
+                        dueAt == preset.toEpochMillis()
                     FilterChip(
                         selected = isSelected,
                         onClick = {
@@ -344,18 +354,21 @@ fun TaskEditorScreen(
             }
 
             // Due date field
+            val dateDisplayFormat = if (dueAtHasTime) {
+                stringResource(R.string.date_format_short_with_time)
+            } else {
+                stringResource(R.string.date_format_short)
+            }
             OutlinedTextField(
-                value = dueAt?.let { formatDate(it, stringResource(R.string.date_format_short)) } ?: "",
+                value = dueAt?.let { formatDate(it, dateDisplayFormat) } ?: "",
                 onValueChange = {},
                 label = { Text(stringResource(R.string.label_due_date)) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .then(
-                        if (dueDateError != null) {
-                            Modifier.semantics { error(dueDateError!!) }
-                        } else {
-                            Modifier
-                        },
+                        dueDateError?.let { err ->
+                            Modifier.semantics { error(err) }
+                        } ?: Modifier,
                     ),
                 readOnly = true,
                 isError = dueDateError != null,
@@ -366,6 +379,58 @@ fun TaskEditorScreen(
                     }
                 },
             )
+
+            // Add time / time chip (visible only when due date is set)
+            if (dueAt != null) {
+                if (dueAtHasTime) {
+                    // Show time chip with close button
+                    val timeText = formatDate(dueAt!!, stringResource(R.string.date_format_time_only))
+                    val chipContentDesc = stringResource(R.string.cd_due_time, timeText)
+                    AssistChip(
+                        onClick = { showTimePicker = true },
+                        label = { Text(timeText) },
+                        leadingIcon = {
+                            Icon(
+                                imageVector = Icons.Default.Schedule,
+                                contentDescription = null,
+                                modifier = Modifier.size(18.dp),
+                            )
+                        },
+                        trailingIcon = {
+                            IconButton(
+                                onClick = { viewModel.clearDueTime() },
+                                modifier = Modifier.size(18.dp),
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Close,
+                                    contentDescription = stringResource(R.string.cd_remove_time),
+                                    modifier = Modifier.size(18.dp),
+                                )
+                            }
+                        },
+                        modifier = Modifier.semantics {
+                            contentDescription = chipContentDesc
+                        },
+                    )
+                } else {
+                    // Show "Add time" button
+                    TextButton(
+                        onClick = { showTimePicker = true },
+                        modifier = Modifier.clearAndSetSemantics {
+                            contentDescription =
+                                context.getString(R.string.cd_add_time_to_due_date)
+                        },
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Schedule,
+                            contentDescription = null,
+                            modifier = Modifier.size(18.dp),
+                        )
+                        Spacer(modifier = Modifier.size(4.dp))
+                        Text(stringResource(R.string.action_add_time))
+                    }
+                }
+            }
 
             // Reminder field (enabled only when due date is set)
             val reminderDisplayName = when (reminderOption) {
@@ -399,11 +464,9 @@ fun TaskEditorScreen(
                         .menuAnchor()
                         .fillMaxWidth()
                         .then(
-                            if (reminderError != null) {
-                                Modifier.semantics { error(reminderError!!) }
-                            } else {
-                                Modifier
-                            },
+                            reminderError?.let { err ->
+                                Modifier.semantics { error(err) }
+                            } ?: Modifier,
                         ),
                     trailingIcon = {
                         if (dueAt != null) {
@@ -504,8 +567,16 @@ fun TaskEditorScreen(
             context,
             { _, year, month, dayOfMonth ->
                 val selectedCalendar = Calendar.getInstance().apply {
-                    set(year, month, dayOfMonth, 23, 59, 59)
-                    set(Calendar.MILLISECOND, 999)
+                    if (dueAtHasTime && dueAt != null) {
+                        // Preserve existing time when user changes date
+                        timeInMillis = dueAt!!
+                        set(Calendar.YEAR, year)
+                        set(Calendar.MONTH, month)
+                        set(Calendar.DAY_OF_MONTH, dayOfMonth)
+                    } else {
+                        set(year, month, dayOfMonth, 23, 59, 0)
+                        set(Calendar.MILLISECOND, 0)
+                    }
                 }
                 viewModel.updateDueAt(selectedCalendar.timeInMillis)
                 showDatePicker = false
@@ -519,6 +590,36 @@ fun TaskEditorScreen(
             setOnDismissListener { showDatePicker = false }
             show()
         }
+    }
+
+    // Time picker dialog
+    if (showTimePicker && dueAt != null) {
+        val calendar = Calendar.getInstance().apply { timeInMillis = dueAt!! }
+        val defaultHour: Int
+        val defaultMinute: Int
+        if (dueAtHasTime) {
+            defaultHour = calendar.get(Calendar.HOUR_OF_DAY)
+            defaultMinute = calendar.get(Calendar.MINUTE)
+        } else {
+            // Default to next 30-minute mark
+            val now = Calendar.getInstance()
+            defaultMinute = if (now.get(Calendar.MINUTE) < 30) 30 else 0
+            defaultHour = if (defaultMinute == 0) {
+                (now.get(Calendar.HOUR_OF_DAY) + 1) % 24
+            } else {
+                now.get(Calendar.HOUR_OF_DAY)
+            }
+        }
+        TimePickerDialog(
+            initialHour = defaultHour,
+            initialMinute = defaultMinute,
+            is24Hour = DateFormat.is24HourFormat(context),
+            onConfirm = { hour, minute ->
+                viewModel.updateDueTime(hour, minute)
+                showTimePicker = false
+            },
+            onDismiss = { showTimePicker = false },
+        )
     }
 
     // Notification permission dialogs

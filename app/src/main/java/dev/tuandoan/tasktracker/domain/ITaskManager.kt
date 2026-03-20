@@ -21,6 +21,7 @@ interface ITaskManager {
         title: String,
         description: String = "",
         dueAt: Long? = null,
+        dueAtHasTime: Boolean = false,
         reminderOffsetMinutes: Int? = null,
         tag: String? = null,
     ): Long
@@ -38,6 +39,7 @@ interface ITaskManager {
         title: String,
         description: String,
         dueAt: Long?,
+        dueAtHasTime: Boolean = false,
         reminderOffsetMinutes: Int?,
         tag: String?,
     ): Boolean
