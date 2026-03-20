@@ -5,6 +5,7 @@ All notable changes to the Task Tracker app will be documented in this file.
 ## [Unreleased]
 
 ### Added
+- **Due Date Time Support** — Optional time picker for task due dates. New "Add time" button in task editor opens Material 3 TimePicker dialog. Displays date+time when explicitly set, date-only otherwise. Presets (Today/Tomorrow/Next Week) default to no time. Backward-compatible backup (CSV legacy 13-column import, JSON `ignoreUnknownKeys`). Room migration v6→v7 adds `dueAtHasTime` column. i18n for all 8 locales. 28 new unit tests.
 - **Due Date Quick-Select Chips** (SPEC-05)
 - **Task Duplication** (SPEC-08) - Duplicate a task from the overflow menu, copying title/description/tag/priority while resetting completion, due date, and archive state. Localized in 8 languages. - Three quick-select chips (Today / Tomorrow / Next Week) in the task editor for faster due date entry without opening the date picker.
 - **Theme system** - Light, Dark, and System default theme modes with persistence via DataStore preferences.
