@@ -106,6 +106,12 @@ interface TaskDao {
     )
     fun observeCompletedCountPerDay(startMillis: Long, endMillis: Long): Flow<List<DailyCount>>
 
+    // Recurrence queries
+    @Query(
+        "SELECT * FROM tasks WHERE parentRecurringTaskId = :parentId AND isCompleted = 0 AND isArchived = 0 ORDER BY createdAt DESC LIMIT 1",
+    )
+    suspend fun getLatestGeneratedTask(parentId: Long): Task?
+
     // Backup operations
     @Query("SELECT * FROM tasks ORDER BY createdAt DESC")
     suspend fun getAllTasksIncludingArchived(): List<Task>

@@ -82,6 +82,10 @@ class TaskRepository @Inject constructor(private val taskDao: TaskDao, private v
 
     override suspend fun hardDeleteTasks(ids: List<Long>) = taskDao.hardDeleteByIds(ids)
 
+    // Recurrence operations
+    override suspend fun getLatestGeneratedTask(parentRecurringTaskId: Long): Task? =
+        taskDao.getLatestGeneratedTask(parentRecurringTaskId)
+
     // Stats operations (exclude archived tasks)
     override fun observeActiveCount(): Flow<Int> = taskDao.observeActiveCount()
 

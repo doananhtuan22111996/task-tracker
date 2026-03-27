@@ -584,6 +584,7 @@ private class FakeEditorTaskManager : ITaskManager {
     override suspend fun toggleTaskCompletion(task: Task) {}
     override suspend fun markTaskComplete(task: Task) {}
     override suspend fun markTaskIncomplete(task: Task) {}
+    override suspend fun skipOccurrence(task: Task) {}
     override suspend fun setCompletedBulk(ids: List<Long>, completed: Boolean) {}
     override suspend fun deleteTasksByIds(ids: List<Long>) {}
     override suspend fun restoreTasks(tasks: List<Task>): Result<Unit> = Result.success(Unit)

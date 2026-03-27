@@ -195,6 +195,10 @@ class FakeTaskRepository : ITaskRepository {
                 .sortedBy { it.date }
         }
 
+    override suspend fun getLatestGeneratedTask(parentRecurringTaskId: Long): Task? = tasks.value
+        .filter { it.parentRecurringTaskId == parentRecurringTaskId && !it.isCompleted && !it.isArchived }
+        .maxByOrNull { it.createdAt }
+
     override suspend fun getAllTasksIncludingArchived(): List<Task> = tasks.value
 
     override suspend fun replaceAllTasks(tasks: List<Task>) {

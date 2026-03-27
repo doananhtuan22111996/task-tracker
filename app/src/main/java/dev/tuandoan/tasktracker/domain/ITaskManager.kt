@@ -48,6 +48,7 @@ interface ITaskManager {
     suspend fun toggleTaskCompletion(task: Task)
     suspend fun markTaskComplete(task: Task)
     suspend fun markTaskIncomplete(task: Task)
+    suspend fun skipOccurrence(task: Task)
 
     // Bulk operations
     suspend fun setCompletedBulk(ids: List<Long>, completed: Boolean)
