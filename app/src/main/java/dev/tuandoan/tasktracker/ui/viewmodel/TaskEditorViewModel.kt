@@ -10,6 +10,8 @@ import dev.tuandoan.tasktracker.R
 import dev.tuandoan.tasktracker.data.database.Task
 import dev.tuandoan.tasktracker.domain.ITaskManager
 import dev.tuandoan.tasktracker.domain.model.DueDatePreset
+import dev.tuandoan.tasktracker.domain.model.RecurrenceRule
+import dev.tuandoan.tasktracker.domain.model.RecurrenceType
 import dev.tuandoan.tasktracker.domain.model.ReminderOption
 import dev.tuandoan.tasktracker.domain.usecase.TaskFormUseCase
 import kotlinx.coroutines.flow.Flow
@@ -22,6 +24,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import java.time.DayOfWeek
 import javax.inject.Inject
 
 /**
@@ -66,6 +69,19 @@ class TaskEditorViewModel @Inject constructor(
 
     private val _isPinned = MutableStateFlow(false)
     val isPinned: StateFlow<Boolean> = _isPinned.asStateFlow()
+
+    // Recurrence fields
+    private val _recurrenceType = MutableStateFlow(RecurrenceType.NONE)
+    val recurrenceType: StateFlow<RecurrenceType> = _recurrenceType.asStateFlow()
+
+    private val _recurrenceInterval = MutableStateFlow(1)
+    val recurrenceInterval: StateFlow<Int> = _recurrenceInterval.asStateFlow()
+
+    private val _recurrenceDaysOfWeek = MutableStateFlow<Set<DayOfWeek>>(emptySet())
+    val recurrenceDaysOfWeek: StateFlow<Set<DayOfWeek>> = _recurrenceDaysOfWeek.asStateFlow()
+
+    private val _recurrenceEndDate = MutableStateFlow<Long?>(null)
+    val recurrenceEndDate: StateFlow<Long?> = _recurrenceEndDate.asStateFlow()
 
     // UI state
     private val _isLoading = MutableStateFlow(false)
@@ -116,11 +132,17 @@ class TaskEditorViewModel @Inject constructor(
                 _reminderOption.value != ReminderOption.NONE ||
                 _tag.value.trim().isNotBlank() ||
                 _priority.value != 1 ||
-                // Default is MEDIUM (1)
-                _isPinned.value
+                _isPinned.value ||
+                _recurrenceType.value != RecurrenceType.NONE
         } else {
             // Edit mode - compare with original values
             _hasChanges.value = originalTask?.let { original ->
+                val originalRule = RecurrenceRule.fromTaskFields(
+                    original.recurrenceType,
+                    original.recurrenceInterval,
+                    original.recurrenceDaysOfWeek,
+                    original.recurrenceEndDate,
+                )
                 _taskTitle.value.trim() != original.title ||
                     _taskDescription.value.trim() != original.description ||
                     _dueAt.value != original.dueAt ||
@@ -128,7 +150,11 @@ class TaskEditorViewModel @Inject constructor(
                     _reminderOption.value != ReminderOption.fromOffsetMinutes(original.reminderOffsetMinutes) ||
                     _tag.value.trim() != (original.tag ?: "") ||
                     _priority.value != original.priority ||
-                    _isPinned.value != original.isPinned
+                    _isPinned.value != original.isPinned ||
+                    _recurrenceType.value != originalRule.type ||
+                    _recurrenceInterval.value != originalRule.interval ||
+                    _recurrenceDaysOfWeek.value != originalRule.daysOfWeek ||
+                    _recurrenceEndDate.value != originalRule.endDate
             } ?: false
         }
     }
@@ -207,6 +233,16 @@ class TaskEditorViewModel @Inject constructor(
                     _tag.value = task.tag ?: ""
                     _priority.value = task.priority
                     _isPinned.value = task.isPinned
+                    val rule = RecurrenceRule.fromTaskFields(
+                        task.recurrenceType,
+                        task.recurrenceInterval,
+                        task.recurrenceDaysOfWeek,
+                        task.recurrenceEndDate,
+                    )
+                    _recurrenceType.value = rule.type
+                    _recurrenceInterval.value = rule.interval
+                    _recurrenceDaysOfWeek.value = rule.daysOfWeek
+                    _recurrenceEndDate.value = rule.endDate
                     updateHasChanges()
                 } else {
                     _events.emit(TaskEditorEvent.TaskNotFound)
@@ -294,6 +330,10 @@ class TaskEditorViewModel @Inject constructor(
         _dueAt.value = null
         _dueAtHasTime.value = false
         _reminderOption.value = ReminderOption.NONE
+        _recurrenceType.value = RecurrenceType.NONE
+        _recurrenceInterval.value = 1
+        _recurrenceDaysOfWeek.value = emptySet()
+        _recurrenceEndDate.value = null
         updateHasChanges()
     }
 
@@ -321,6 +361,39 @@ class TaskEditorViewModel @Inject constructor(
         updateHasChanges()
     }
 
+    fun updateRecurrenceType(type: RecurrenceType) {
+        _recurrenceType.value = type
+        if (type == RecurrenceType.NONE) {
+            _recurrenceInterval.value = 1
+            _recurrenceDaysOfWeek.value = emptySet()
+            _recurrenceEndDate.value = null
+        }
+        updateHasChanges()
+    }
+
+    fun updateRecurrenceInterval(interval: Int) {
+        if (interval in 1..99) {
+            _recurrenceInterval.value = interval
+            updateHasChanges()
+        }
+    }
+
+    fun toggleRecurrenceDayOfWeek(day: DayOfWeek) {
+        val current = _recurrenceDaysOfWeek.value.toMutableSet()
+        if (day in current) current.remove(day) else current.add(day)
+        _recurrenceDaysOfWeek.value = current
+        updateHasChanges()
+    }
+
+    fun updateRecurrenceEndDate(endDate: Long?) {
+        _recurrenceEndDate.value = endDate
+        updateHasChanges()
+    }
+
+    fun clearRecurrence() {
+        updateRecurrenceType(RecurrenceType.NONE)
+    }
+
     fun saveTask() {
         viewModelScope.launch {
             _isLoading.value = true
@@ -336,6 +409,13 @@ class TaskEditorViewModel @Inject constructor(
                     _reminderOption.value.offsetMinutes
                 }
 
+                val recurrenceRule = RecurrenceRule(
+                    type = _recurrenceType.value,
+                    interval = _recurrenceInterval.value,
+                    daysOfWeek = _recurrenceDaysOfWeek.value,
+                    endDate = _recurrenceEndDate.value,
+                )
+
                 if (isEditMode && originalTask != null) {
                     // Update existing task
                     val updatedTask = originalTask!!.copy(
@@ -347,6 +427,10 @@ class TaskEditorViewModel @Inject constructor(
                         tag = trimmedTag,
                         priority = _priority.value,
                         isPinned = _isPinned.value,
+                        recurrenceType = recurrenceRule.type.value,
+                        recurrenceInterval = recurrenceRule.interval,
+                        recurrenceDaysOfWeek = recurrenceRule.daysOfWeekBitmask(),
+                        recurrenceEndDate = recurrenceRule.endDate,
                     )
                     taskManager.updateTask(updatedTask)
                 } else {
@@ -358,6 +442,10 @@ class TaskEditorViewModel @Inject constructor(
                         dueAtHasTime = _dueAtHasTime.value,
                         reminderOffsetMinutes = reminderOffsetMinutes,
                         tag = trimmedTag,
+                        recurrenceType = recurrenceRule.type.value,
+                        recurrenceInterval = recurrenceRule.interval,
+                        recurrenceDaysOfWeek = recurrenceRule.daysOfWeekBitmask(),
+                        recurrenceEndDate = recurrenceRule.endDate,
                     )
 
                     // Set priority and pin status if different from defaults

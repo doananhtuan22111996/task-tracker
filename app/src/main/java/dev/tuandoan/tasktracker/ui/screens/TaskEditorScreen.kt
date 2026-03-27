@@ -69,6 +69,7 @@ import dev.tuandoan.tasktracker.domain.model.DueDatePreset
 import dev.tuandoan.tasktracker.domain.model.ReminderOption
 import dev.tuandoan.tasktracker.ui.components.NotificationPermissionDialog
 import dev.tuandoan.tasktracker.ui.components.PermissionDeniedDialog
+import dev.tuandoan.tasktracker.ui.components.RecurrencePicker
 import dev.tuandoan.tasktracker.ui.components.TimePickerDialog
 import dev.tuandoan.tasktracker.ui.manager.NotificationPermissionManager
 import dev.tuandoan.tasktracker.ui.viewmodel.TaskEditorEvent
@@ -101,6 +102,10 @@ fun TaskEditorScreen(
     val tag by viewModel.tag.collectAsState()
     val priority by viewModel.priority.collectAsState()
     val isPinned by viewModel.isPinned.collectAsState()
+    val recurrenceType by viewModel.recurrenceType.collectAsState()
+    val recurrenceInterval by viewModel.recurrenceInterval.collectAsState()
+    val recurrenceDaysOfWeek by viewModel.recurrenceDaysOfWeek.collectAsState()
+    val recurrenceEndDate by viewModel.recurrenceEndDate.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
     val errorMessage by viewModel.errorMessage.collectAsState()
     val isSaveEnabled by viewModel.isSaveEnabled.collectAsState(initial = false)
@@ -511,6 +516,19 @@ fun TaskEditorScreen(
                     }
                 }
             }
+
+            // Recurrence picker (enabled only when due date is set)
+            RecurrencePicker(
+                recurrenceType = recurrenceType,
+                recurrenceInterval = recurrenceInterval,
+                recurrenceDaysOfWeek = recurrenceDaysOfWeek,
+                recurrenceEndDate = recurrenceEndDate,
+                enabled = dueAt != null,
+                onTypeChanged = viewModel::updateRecurrenceType,
+                onIntervalChanged = viewModel::updateRecurrenceInterval,
+                onDayOfWeekToggled = viewModel::toggleRecurrenceDayOfWeek,
+                onEndDateChanged = viewModel::updateRecurrenceEndDate,
+            )
 
             // Pin toggle
             Row(

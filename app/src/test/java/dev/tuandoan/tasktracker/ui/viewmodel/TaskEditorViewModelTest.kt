@@ -555,6 +555,24 @@ private class FakeEditorTaskManager : ITaskManager {
         return 1L
     }
 
+    override suspend fun createTask(
+        title: String,
+        description: String,
+        dueAt: Long?,
+        dueAtHasTime: Boolean,
+        reminderOffsetMinutes: Int?,
+        tag: String?,
+        recurrenceType: Int,
+        recurrenceInterval: Int,
+        recurrenceDaysOfWeek: Int,
+        recurrenceEndDate: Long?,
+    ): Long {
+        createCalled = true
+        lastCreatedTitle = title
+        lastCreatedDueAtHasTime = dueAtHasTime
+        return 1L
+    }
+
     override suspend fun updateTask(task: Task) {
         updateCalled = true
         lastUpdatedTask = task

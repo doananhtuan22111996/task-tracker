@@ -172,6 +172,41 @@
     <string name="reminder_1_hour">1 hour before</string>
     <string name="reminder_1_day">1 day before</string>
 
+    <!-- Recurrence -->
+    <string name="recurrence_none">Does not repeat</string>
+    <string name="recurrence_daily">Daily</string>
+    <string name="recurrence_weekly">Weekly</string>
+    <string name="recurrence_monthly">Monthly</string>
+    <string name="recurrence_yearly">Yearly</string>
+    <string name="recurrence_custom">Custom</string>
+    <string name="label_recurrence">Repeat</string>
+    <string name="label_recurrence_interval">Every</string>
+    <string name="label_recurrence_end_date">End date</string>
+    <string name="label_recurrence_days_of_week">Repeat on</string>
+    <string name="recurrence_interval_days">days</string>
+    <string name="recurrence_interval_weeks">weeks</string>
+    <string name="recurrence_interval_months">months</string>
+    <string name="recurrence_interval_years">years</string>
+    <string name="recurrence_summary_daily">Every day</string>
+    <string name="recurrence_summary_daily_n">Every %d days</string>
+    <string name="recurrence_summary_weekly">Every week</string>
+    <string name="recurrence_summary_weekly_n">Every %d weeks</string>
+    <string name="recurrence_summary_monthly">Every month</string>
+    <string name="recurrence_summary_monthly_n">Every %d months</string>
+    <string name="recurrence_summary_yearly">Every year</string>
+    <string name="recurrence_summary_yearly_n">Every %d years</string>
+    <string name="recurrence_summary_until">until %s</string>
+    <string name="action_skip_occurrence">Skip this occurrence</string>
+    <string name="cd_recurrence">Recurring task</string>
+    <string name="cd_remove_recurrence_end_date">Remove end date</string>
+    <string name="day_mon">Mon</string>
+    <string name="day_tue">Tue</string>
+    <string name="day_wed">Wed</string>
+    <string name="day_thu">Thu</string>
+    <string name="day_fri">Fri</string>
+    <string name="day_sat">Sat</string>
+    <string name="day_sun">Sun</string>
+
     <!-- Sort Menu -->
     <string name="sort_header">Sort</string>
     <string name="sort_created_newest">Created: Newest first</string>

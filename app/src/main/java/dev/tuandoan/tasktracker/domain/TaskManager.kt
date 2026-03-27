@@ -42,6 +42,19 @@ class TaskManager @Inject constructor(
         dueAtHasTime: Boolean,
         reminderOffsetMinutes: Int?,
         tag: String?,
+    ): Long = createTask(title, description, dueAt, dueAtHasTime, reminderOffsetMinutes, tag, 0, 1, 0, null)
+
+    override suspend fun createTask(
+        title: String,
+        description: String,
+        dueAt: Long?,
+        dueAtHasTime: Boolean,
+        reminderOffsetMinutes: Int?,
+        tag: String?,
+        recurrenceType: Int,
+        recurrenceInterval: Int,
+        recurrenceDaysOfWeek: Int,
+        recurrenceEndDate: Long?,
     ): Long {
         require(title.isNotBlank()) { "Task title cannot be blank" }
 
@@ -52,6 +65,10 @@ class TaskManager @Inject constructor(
             dueAtHasTime = dueAtHasTime,
             reminderOffsetMinutes = reminderOffsetMinutes,
             tag = tag?.trim()?.takeIf { it.isNotEmpty() },
+            recurrenceType = recurrenceType,
+            recurrenceInterval = recurrenceInterval,
+            recurrenceDaysOfWeek = recurrenceDaysOfWeek,
+            recurrenceEndDate = recurrenceEndDate,
         )
         val taskId = repository.insertTask(task)
 
