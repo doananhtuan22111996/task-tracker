@@ -315,4 +315,79 @@ class TaskManagerRecurrenceTest {
 
         assertFalse(reminderScheduler.isScheduled(2L))
     }
+
+    // ── Atomicity: complete + generate is single logical operation ──
+
+    @Test
+    fun `completing recurring task without due date does not generate`() = runTest {
+        val task = TestTaskFactory.createTask(
+            id = 1L,
+            title = "No due date recurring",
+            dueAt = null,
+            recurrenceType = RecurrenceType.DAILY.value,
+            recurrenceInterval = 1,
+        )
+        repository.seed(task)
+
+        taskManager.toggleTaskCompletion(task)
+
+        val allTasks = repository.getAllTasksSnapshot()
+        assertEquals(1, allTasks.size)
+        assertTrue(allTasks.first().isCompleted)
+    }
+
+    @Test
+    fun `completing and un-completing recurring task returns to original state`() = runTest {
+        val task = TestTaskFactory.createTask(
+            id = 1L,
+            title = "Round trip",
+            dueAt = dateToEpoch(2026, 3, 27),
+            recurrenceType = RecurrenceType.DAILY.value,
+            recurrenceInterval = 1,
+        )
+        repository.seed(task)
+
+        // Complete → generates next
+        taskManager.toggleTaskCompletion(task)
+        assertEquals(2, repository.getAllTasksSnapshot().size)
+
+        // Un-complete → deletes generated, restores original
+        val completedTask = repository.getAllTasksSnapshot().find { it.id == 1L }!!
+        taskManager.toggleTaskCompletion(completedTask)
+
+        val remaining = repository.getAllTasksSnapshot()
+        assertEquals(1, remaining.size)
+        assertEquals(1L, remaining.first().id)
+        assertFalse(remaining.first().isCompleted)
+        assertNull(remaining.first().completedAt)
+    }
+
+    @Test
+    fun `skip then complete on generated task creates correct chain`() = runTest {
+        val task = TestTaskFactory.createTask(
+            id = 1L,
+            title = "Chain test",
+            dueAt = dateToEpoch(2026, 3, 27),
+            recurrenceType = RecurrenceType.DAILY.value,
+            recurrenceInterval = 1,
+        )
+        repository.seed(task)
+
+        // Skip first occurrence
+        taskManager.skipOccurrence(task)
+        val afterSkip = repository.getAllTasksSnapshot()
+        assertEquals(2, afterSkip.size)
+        val skippedGen = afterSkip.find { it.id != 1L }!!
+        assertEquals(dateToEpoch(2026, 3, 28), skippedGen.dueAt)
+        assertEquals(1L, skippedGen.parentRecurringTaskId)
+
+        // Complete the generated occurrence
+        taskManager.toggleTaskCompletion(skippedGen)
+        val afterComplete = repository.getAllTasksSnapshot()
+        assertEquals(3, afterComplete.size)
+
+        val finalGen = afterComplete.find { it.id != 1L && it.id != skippedGen.id }!!
+        assertEquals(dateToEpoch(2026, 3, 29), finalGen.dueAt)
+        assertEquals(1L, finalGen.parentRecurringTaskId) // Still points to original
+    }
 }
