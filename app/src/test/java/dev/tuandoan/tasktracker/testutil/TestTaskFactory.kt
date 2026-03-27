@@ -32,6 +32,11 @@ object TestTaskFactory {
         priority: Int = 1,
         isArchived: Boolean = false,
         archivedAt: Long? = null,
+        recurrenceType: Int = 0,
+        recurrenceInterval: Int = 1,
+        recurrenceDaysOfWeek: Int = 0,
+        recurrenceEndDate: Long? = null,
+        parentRecurringTaskId: Long? = null,
     ): Task = Task(
         id = id,
         title = title,
@@ -47,6 +52,11 @@ object TestTaskFactory {
         priority = priority,
         isArchived = isArchived,
         archivedAt = archivedAt,
+        recurrenceType = recurrenceType,
+        recurrenceInterval = recurrenceInterval,
+        recurrenceDaysOfWeek = recurrenceDaysOfWeek,
+        recurrenceEndDate = recurrenceEndDate,
+        parentRecurringTaskId = parentRecurringTaskId,
     )
 
     /**
