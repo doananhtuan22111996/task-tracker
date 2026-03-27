@@ -39,6 +39,13 @@ class FakeReminderScheduler : TaskReminderScheduler {
         _cancelled.add(taskId)
     }
 
+    /** Check if a task has a scheduled reminder that hasn't been cancelled */
+    fun isScheduled(taskId: Long): Boolean {
+        val wasScheduled = _scheduled.any { it.taskId == taskId }
+        val wasCancelled = _cancelled.contains(taskId)
+        return wasScheduled && !wasCancelled
+    }
+
     fun reset() {
         _scheduled.clear()
         _cancelled.clear()

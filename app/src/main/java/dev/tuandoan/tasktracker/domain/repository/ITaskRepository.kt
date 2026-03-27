@@ -43,6 +43,9 @@ interface ITaskRepository {
     fun observeOverdueCount(nowMillis: Long): Flow<Int>
     fun observeCompletedCountPerDay(startMillis: Long, endMillis: Long): Flow<List<DailyCount>>
 
+    // Recurrence operations
+    suspend fun getLatestGeneratedTask(parentRecurringTaskId: Long): Task?
+
     // Backup operations
     suspend fun getAllTasksIncludingArchived(): List<Task>
     suspend fun replaceAllTasks(tasks: List<Task>)

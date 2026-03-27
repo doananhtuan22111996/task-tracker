@@ -2,8 +2,10 @@ package dev.tuandoan.tasktracker.domain
 
 import dev.tuandoan.tasktracker.data.database.DailyCount
 import dev.tuandoan.tasktracker.data.database.Task
+import dev.tuandoan.tasktracker.domain.model.RecurrenceType
 import dev.tuandoan.tasktracker.domain.repository.ITaskRepository
 import dev.tuandoan.tasktracker.domain.scheduler.TaskReminderScheduler
+import dev.tuandoan.tasktracker.domain.service.RecurrenceCalculator
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
@@ -153,20 +155,35 @@ class TaskManager @Inject constructor(
 
     override suspend fun toggleTaskCompletion(task: Task) {
         val currentTime = System.currentTimeMillis()
+        val isCompleting = !task.isCompleted
         val updatedTask = task.copy(
-            isCompleted = !task.isCompleted,
-            completedAt = if (!task.isCompleted) currentTime else null,
+            isCompleted = isCompleting,
+            completedAt = if (isCompleting) currentTime else null,
         )
         repository.updateTask(updatedTask)
 
-        // Handle reminder based on completion status
-        if (updatedTask.isCompleted) {
+        if (isCompleting) {
             // Cancel reminder when task is completed
             reminderScheduler.cancel(task.id)
+            // Generate next occurrence for recurring tasks
+            generateNextOccurrence(task, currentTime)
         } else {
+            // Un-completing: delete auto-generated next instance
+            deleteGeneratedNextInstance(task)
             // Reschedule reminder when task is marked incomplete
             scheduleReminderIfNeeded(task.id, task.title, task.dueAt, task.reminderOffsetMinutes)
         }
+    }
+
+    override suspend fun skipOccurrence(task: Task) {
+        if (RecurrenceType.fromValue(task.recurrenceType) == RecurrenceType.NONE) return
+
+        val currentTime = System.currentTimeMillis()
+        // Archive the current instance
+        repository.archiveTask(task.id)
+        reminderScheduler.cancel(task.id)
+        // Generate next occurrence
+        generateNextOccurrence(task, currentTime)
     }
 
     override suspend fun markTaskComplete(task: Task) {
@@ -321,6 +338,40 @@ class TaskManager @Inject constructor(
 
     override fun observeCompletedCountPerDay(startMillis: Long, endMillis: Long): Flow<List<DailyCount>> =
         repository.observeCompletedCountPerDay(startMillis, endMillis)
+
+    // Recurrence helpers
+
+    private suspend fun generateNextOccurrence(task: Task, currentTime: Long) {
+        if (RecurrenceType.fromValue(task.recurrenceType) == RecurrenceType.NONE) return
+
+        val nextDueAt = RecurrenceCalculator.nextDueDate(task) ?: return
+
+        val newTask = task.copy(
+            id = 0,
+            isCompleted = false,
+            completedAt = null,
+            createdAt = currentTime,
+            dueAt = nextDueAt,
+            parentRecurringTaskId = task.parentRecurringTaskId ?: task.id,
+            isArchived = false,
+            archivedAt = null,
+        )
+        val newTaskId = repository.insertTask(newTask)
+
+        // Schedule reminder for the new instance
+        scheduleReminderIfNeeded(newTaskId, newTask.title, nextDueAt, newTask.reminderOffsetMinutes)
+    }
+
+    private suspend fun deleteGeneratedNextInstance(task: Task) {
+        if (RecurrenceType.fromValue(task.recurrenceType) == RecurrenceType.NONE) return
+
+        val parentId = task.parentRecurringTaskId ?: task.id
+        val generatedTask = repository.getLatestGeneratedTask(parentId)
+        if (generatedTask != null) {
+            reminderScheduler.cancel(generatedTask.id)
+            repository.deleteTask(generatedTask)
+        }
+    }
 
     // Helper method for scheduling reminders
     private suspend fun scheduleReminderIfNeeded(
