@@ -124,6 +124,29 @@ object DatabaseModule {
     }
 
     /**
+     * Migration from version 7 to 8: Add recurrence columns (idempotent)
+     */
+    private val MIGRATION_7_8 = object : Migration(7, 8) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            if (!hasColumn(database, "tasks", "recurrenceType")) {
+                database.execSQL("ALTER TABLE tasks ADD COLUMN recurrenceType INTEGER NOT NULL DEFAULT 0")
+            }
+            if (!hasColumn(database, "tasks", "recurrenceInterval")) {
+                database.execSQL("ALTER TABLE tasks ADD COLUMN recurrenceInterval INTEGER NOT NULL DEFAULT 1")
+            }
+            if (!hasColumn(database, "tasks", "recurrenceDaysOfWeek")) {
+                database.execSQL("ALTER TABLE tasks ADD COLUMN recurrenceDaysOfWeek INTEGER NOT NULL DEFAULT 0")
+            }
+            if (!hasColumn(database, "tasks", "recurrenceEndDate")) {
+                database.execSQL("ALTER TABLE tasks ADD COLUMN recurrenceEndDate INTEGER")
+            }
+            if (!hasColumn(database, "tasks", "parentRecurringTaskId")) {
+                database.execSQL("ALTER TABLE tasks ADD COLUMN parentRecurringTaskId INTEGER")
+            }
+        }
+    }
+
+    /**
      * Provides a singleton instance of TaskDatabase.
      * Uses Room.databaseBuilder for database creation with proper configuration.
      */
@@ -134,7 +157,15 @@ object DatabaseModule {
         klass = TaskDatabase::class.java,
         name = "task_database",
     )
-        .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7)
+        .addMigrations(
+            MIGRATION_1_2,
+            MIGRATION_2_3,
+            MIGRATION_3_4,
+            MIGRATION_4_5,
+            MIGRATION_5_6,
+            MIGRATION_6_7,
+            MIGRATION_7_8,
+        )
         .build()
 
     /**
