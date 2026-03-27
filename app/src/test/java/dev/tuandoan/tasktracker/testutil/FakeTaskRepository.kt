@@ -199,6 +199,29 @@ class FakeTaskRepository : ITaskRepository {
         .filter { it.parentRecurringTaskId == parentRecurringTaskId && !it.isCompleted && !it.isArchived }
         .maxByOrNull { it.createdAt }
 
+    override suspend fun completeAndGenerateNext(completedTask: Task, nextTask: Task): Long {
+        val id = if (nextTask.id == 0L) nextId++ else nextTask.id
+        val newTask = nextTask.copy(id = id)
+        tasks.value = tasks.value.map { if (it.id == completedTask.id) completedTask else it } + newTask
+        return id
+    }
+
+    override suspend fun uncompleteAndDeleteGenerated(reactivatedTask: Task, generatedTaskId: Long) {
+        tasks.value = tasks.value
+            .map { if (it.id == reactivatedTask.id) reactivatedTask else it }
+            .filter { it.id != generatedTaskId }
+    }
+
+    override suspend fun archiveAndGenerateNext(taskId: Long, nextTask: Task): Long {
+        val now = System.currentTimeMillis()
+        val id = if (nextTask.id == 0L) nextId++ else nextTask.id
+        val newTask = nextTask.copy(id = id)
+        tasks.value = tasks.value.map {
+            if (it.id == taskId) it.copy(isArchived = true, archivedAt = now) else it
+        } + newTask
+        return id
+    }
+
     override suspend fun getAllTasksIncludingArchived(): List<Task> = tasks.value
 
     override suspend fun replaceAllTasks(tasks: List<Task>) {

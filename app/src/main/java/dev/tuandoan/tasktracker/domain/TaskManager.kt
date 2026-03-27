@@ -160,16 +160,15 @@ class TaskManager @Inject constructor(
             isCompleted = isCompleting,
             completedAt = if (isCompleting) currentTime else null,
         )
-        repository.updateTask(updatedTask)
 
         if (isCompleting) {
             // Cancel reminder when task is completed
             reminderScheduler.cancel(task.id)
-            // Generate next occurrence for recurring tasks
-            generateNextOccurrence(task, currentTime)
+            // Atomically complete + generate next occurrence
+            completeAndGenerateNext(task, updatedTask, currentTime)
         } else {
-            // Un-completing: delete auto-generated next instance
-            deleteGeneratedNextInstance(task)
+            // Atomically un-complete + delete generated next instance
+            uncompleteAndDeleteGenerated(task, updatedTask)
             // Reschedule reminder when task is marked incomplete
             scheduleReminderIfNeeded(task.id, task.title, task.dueAt, task.reminderOffsetMinutes)
         }
@@ -179,11 +178,9 @@ class TaskManager @Inject constructor(
         if (RecurrenceType.fromValue(task.recurrenceType) == RecurrenceType.NONE) return
 
         val currentTime = System.currentTimeMillis()
-        // Archive the current instance
-        repository.archiveTask(task.id)
         reminderScheduler.cancel(task.id)
-        // Generate next occurrence
-        generateNextOccurrence(task, currentTime)
+        // Atomically archive + generate next occurrence
+        archiveAndGenerateNext(task, currentTime)
     }
 
     override suspend fun markTaskComplete(task: Task) {
@@ -341,12 +338,12 @@ class TaskManager @Inject constructor(
 
     // Recurrence helpers
 
-    private suspend fun generateNextOccurrence(task: Task, currentTime: Long) {
-        if (RecurrenceType.fromValue(task.recurrenceType) == RecurrenceType.NONE) return
+    private fun buildNextTask(task: Task, currentTime: Long): Task? {
+        if (RecurrenceType.fromValue(task.recurrenceType) == RecurrenceType.NONE) return null
 
-        val nextDueAt = RecurrenceCalculator.nextDueDate(task) ?: return
+        val nextDueAt = RecurrenceCalculator.nextDueDate(task) ?: return null
 
-        val newTask = task.copy(
+        return task.copy(
             id = 0,
             isCompleted = false,
             completedAt = null,
@@ -356,20 +353,41 @@ class TaskManager @Inject constructor(
             isArchived = false,
             archivedAt = null,
         )
-        val newTaskId = repository.insertTask(newTask)
-
-        // Schedule reminder for the new instance
-        scheduleReminderIfNeeded(newTaskId, newTask.title, nextDueAt, newTask.reminderOffsetMinutes)
     }
 
-    private suspend fun deleteGeneratedNextInstance(task: Task) {
-        if (RecurrenceType.fromValue(task.recurrenceType) == RecurrenceType.NONE) return
+    private suspend fun completeAndGenerateNext(task: Task, completedTask: Task, currentTime: Long) {
+        val nextTask = buildNextTask(task, currentTime)
+        if (nextTask != null) {
+            val newTaskId = repository.completeAndGenerateNext(completedTask, nextTask)
+            scheduleReminderIfNeeded(newTaskId, nextTask.title, nextTask.dueAt, nextTask.reminderOffsetMinutes)
+        } else {
+            repository.updateTask(completedTask)
+        }
+    }
+
+    private suspend fun uncompleteAndDeleteGenerated(task: Task, reactivatedTask: Task) {
+        if (RecurrenceType.fromValue(task.recurrenceType) == RecurrenceType.NONE) {
+            repository.updateTask(reactivatedTask)
+            return
+        }
 
         val parentId = task.parentRecurringTaskId ?: task.id
         val generatedTask = repository.getLatestGeneratedTask(parentId)
         if (generatedTask != null) {
             reminderScheduler.cancel(generatedTask.id)
-            repository.deleteTask(generatedTask)
+            repository.uncompleteAndDeleteGenerated(reactivatedTask, generatedTask.id)
+        } else {
+            repository.updateTask(reactivatedTask)
+        }
+    }
+
+    private suspend fun archiveAndGenerateNext(task: Task, currentTime: Long) {
+        val nextTask = buildNextTask(task, currentTime)
+        if (nextTask != null) {
+            val newTaskId = repository.archiveAndGenerateNext(task.id, nextTask)
+            scheduleReminderIfNeeded(newTaskId, nextTask.title, nextTask.dueAt, nextTask.reminderOffsetMinutes)
+        } else {
+            repository.archiveTask(task.id)
         }
     }
 

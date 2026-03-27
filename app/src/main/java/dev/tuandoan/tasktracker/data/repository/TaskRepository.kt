@@ -86,6 +86,27 @@ class TaskRepository @Inject constructor(private val taskDao: TaskDao, private v
     override suspend fun getLatestGeneratedTask(parentRecurringTaskId: Long): Task? =
         taskDao.getLatestGeneratedTask(parentRecurringTaskId)
 
+    override suspend fun completeAndGenerateNext(completedTask: Task, nextTask: Task): Long =
+        taskDatabase.withTransaction {
+            taskDao.updateTask(completedTask)
+            taskDao.insertTask(nextTask)
+        }
+
+    override suspend fun uncompleteAndDeleteGenerated(reactivatedTask: Task, generatedTaskId: Long) {
+        taskDatabase.withTransaction {
+            taskDao.updateTask(reactivatedTask)
+            taskDao.hardDeleteById(generatedTaskId)
+        }
+    }
+
+    override suspend fun archiveAndGenerateNext(taskId: Long, nextTask: Task): Long {
+        val currentTime = System.currentTimeMillis()
+        return taskDatabase.withTransaction {
+            taskDao.setArchived(taskId, archived = true, archivedAt = currentTime)
+            taskDao.insertTask(nextTask)
+        }
+    }
+
     // Stats operations (exclude archived tasks)
     override fun observeActiveCount(): Flow<Int> = taskDao.observeActiveCount()
 
