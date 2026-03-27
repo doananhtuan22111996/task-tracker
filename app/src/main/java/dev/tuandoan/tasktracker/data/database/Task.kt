@@ -20,4 +20,10 @@ data class Task(
     val priority: Int = 1, // Priority level: 0=LOW, 1=MEDIUM, 2=HIGH (default MEDIUM)
     val isArchived: Boolean = false, // Archive tasks instead of deleting (soft delete)
     val archivedAt: Long? = null, // Timestamp when task was archived (nullable)
+    // Recurrence fields (v1.4.0) — stored as RecurrenceType ordinal
+    val recurrenceType: Int = 0, // RecurrenceType: 0=NONE, 1=DAILY, 2=WEEKLY, 3=MONTHLY, 4=YEARLY
+    val recurrenceInterval: Int = 1, // Every N periods (e.g., every 2 weeks)
+    val recurrenceDaysOfWeek: Int = 0, // Bitmask: Mon=1, Tue=2, Wed=4, Thu=8, Fri=16, Sat=32, Sun=64
+    val recurrenceEndDate: Long? = null, // Optional end date epoch millis (null = repeat forever)
+    val parentRecurringTaskId: Long? = null, // Links to first task in recurring chain (null = origin)
 )
