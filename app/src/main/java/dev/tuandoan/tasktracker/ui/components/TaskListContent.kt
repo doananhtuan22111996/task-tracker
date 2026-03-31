@@ -51,6 +51,7 @@ fun TaskListContent(
     onPinTask: (Task) -> Unit,
     onLongPressTask: (Long) -> Unit,
     onDuplicateTask: (Task) -> Unit,
+    onSkipOccurrence: (Task) -> Unit = {},
     onToggleSelection: (Long) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -83,6 +84,7 @@ fun TaskListContent(
             onPinTask = onPinTask,
             onLongPressTask = onLongPressTask,
             onDuplicateTask = onDuplicateTask,
+            onSkipOccurrence = onSkipOccurrence,
             onToggleSelection = onToggleSelection,
             onClearSearch = onClearSearch,
             onChangeFilter = { /* Filter change now handled by bottom navigation */ },
@@ -108,6 +110,7 @@ private fun TaskListOrEmptyState(
     onPinTask: (Task) -> Unit,
     onLongPressTask: (Long) -> Unit,
     onDuplicateTask: (Task) -> Unit,
+    onSkipOccurrence: (Task) -> Unit = {},
     onToggleSelection: (Long) -> Unit,
     onClearSearch: () -> Unit,
     onChangeFilter: () -> Unit,
@@ -137,6 +140,7 @@ private fun TaskListOrEmptyState(
                 onPinTask = onPinTask,
                 onLongPressTask = onLongPressTask,
                 onDuplicateTask = onDuplicateTask,
+                onSkipOccurrence = onSkipOccurrence,
                 onToggleSelection = onToggleSelection,
             )
         }
@@ -158,6 +162,7 @@ private fun GroupedTaskList(
     onPinTask: (Task) -> Unit,
     onLongPressTask: (Long) -> Unit,
     onDuplicateTask: (Task) -> Unit,
+    onSkipOccurrence: (Task) -> Unit = {},
     onToggleSelection: (Long) -> Unit,
 ) {
     LazyColumn(
@@ -191,6 +196,7 @@ private fun GroupedTaskList(
                     onEditClick = { onEditTask(task) },
                     onArchiveClick = { onArchiveTask(task) },
                     onDuplicateClick = { onDuplicateTask(task) },
+                    onSkipOccurrence = { onSkipOccurrence(task) },
                     onPinClick = { onPinTask(task) },
                     onLongPress = { onLongPressTask(task.id) },
                     onToggleSelection = { onToggleSelection(task.id) },

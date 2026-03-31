@@ -346,6 +346,18 @@ class TaskViewModel @Inject constructor(
         )
     }
 
+    fun skipOccurrence(task: Task) {
+        crudManager.executeOperation(
+            scope = viewModelScope,
+            operation = { crudManager.skipOccurrence(task) },
+            onSuccess = { message ->
+                viewModelScope.launch {
+                    _singleTaskUiEvent.emit(UiEvent.ShowSnackbar(message))
+                }
+            },
+        )
+    }
+
     fun toggleTaskPin(task: Task) {
         crudManager.executeOperation(
             scope = viewModelScope,

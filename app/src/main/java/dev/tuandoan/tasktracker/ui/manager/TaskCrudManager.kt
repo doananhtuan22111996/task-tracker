@@ -332,6 +332,18 @@ class TaskCrudManager @Inject constructor(
     /**
      * Archives a task (soft delete)
      */
+    suspend fun skipOccurrence(task: Task): TaskOperationResult {
+        val result = crudUseCase.skipOccurrence(task)
+
+        return if (result.isSuccess) {
+            TaskOperationResult.Success(context.getString(R.string.snackbar_task_skipped))
+        } else {
+            val errorMessage =
+                result.exceptionOrNull()?.message ?: context.getString(R.string.error_skip_occurrence)
+            TaskOperationResult.CrudError(errorMessage)
+        }
+    }
+
     suspend fun archiveTask(task: Task): TaskOperationResult {
         val result = crudUseCase.archiveTask(task.id)
 

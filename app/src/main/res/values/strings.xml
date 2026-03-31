@@ -339,6 +339,8 @@
 
     <!-- Snackbar Messages -->
     <string name="snackbar_task_archived">Task archived</string>
+    <string name="snackbar_task_skipped">Occurrence skipped</string>
+    <string name="error_skip_occurrence">Failed to skip occurrence</string>
     <string name="snackbar_tasks_marked_completed">%d tasks marked as completed</string>
     <string name="snackbar_tasks_marked_active">%d tasks marked as active</string>
     <string name="snackbar_tasks_archived">%d tasks archived</string>
