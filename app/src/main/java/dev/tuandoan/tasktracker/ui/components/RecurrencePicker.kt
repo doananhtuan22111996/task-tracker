@@ -198,23 +198,45 @@ private fun DaysOfWeekSelector(selectedDays: Set<DayOfWeek>, onDayToggled: (DayO
         )
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(4.dp),
+            horizontalArrangement = Arrangement.spacedBy(2.dp),
         ) {
-            val dayLabels = listOf(
-                DayOfWeek.MONDAY to stringResource(R.string.day_mon),
-                DayOfWeek.TUESDAY to stringResource(R.string.day_tue),
-                DayOfWeek.WEDNESDAY to stringResource(R.string.day_wed),
-                DayOfWeek.THURSDAY to stringResource(R.string.day_thu),
-                DayOfWeek.FRIDAY to stringResource(R.string.day_fri),
-                DayOfWeek.SATURDAY to stringResource(R.string.day_sat),
-                DayOfWeek.SUNDAY to stringResource(R.string.day_sun),
+            // Single-letter labels for compact display; full names for TalkBack
+            val dayEntries = listOf(
+                Triple(DayOfWeek.MONDAY, stringResource(R.string.day_mon), stringResource(R.string.day_mon_full)),
+                Triple(DayOfWeek.TUESDAY, stringResource(R.string.day_tue), stringResource(R.string.day_tue_full)),
+                Triple(
+                    DayOfWeek.WEDNESDAY,
+                    stringResource(R.string.day_wed),
+                    stringResource(R.string.day_wed_full),
+                ),
+                Triple(
+                    DayOfWeek.THURSDAY,
+                    stringResource(R.string.day_thu),
+                    stringResource(R.string.day_thu_full),
+                ),
+                Triple(DayOfWeek.FRIDAY, stringResource(R.string.day_fri), stringResource(R.string.day_fri_full)),
+                Triple(
+                    DayOfWeek.SATURDAY,
+                    stringResource(R.string.day_sat),
+                    stringResource(R.string.day_sat_full),
+                ),
+                Triple(DayOfWeek.SUNDAY, stringResource(R.string.day_sun), stringResource(R.string.day_sun_full)),
             )
-            dayLabels.forEach { (day, label) ->
+            dayEntries.forEach { (day, shortLabel, fullLabel) ->
+                val isSelected = day in selectedDays
                 FilterChip(
-                    selected = day in selectedDays,
+                    selected = isSelected,
                     onClick = { onDayToggled(day) },
-                    label = { Text(label, style = MaterialTheme.typography.labelSmall) },
-                    modifier = Modifier.weight(1f),
+                    label = {
+                        Text(
+                            shortLabel,
+                            style = MaterialTheme.typography.labelSmall,
+                            maxLines = 1,
+                        )
+                    },
+                    modifier = Modifier
+                        .weight(1f)
+                        .semantics { contentDescription = fullLabel },
                 )
             }
         }

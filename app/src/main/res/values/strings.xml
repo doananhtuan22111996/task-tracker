@@ -199,13 +199,20 @@
     <string name="action_skip_occurrence">Skip this occurrence</string>
     <string name="cd_recurrence">Recurring task</string>
     <string name="cd_remove_recurrence_end_date">Remove end date</string>
-    <string name="day_mon">Mon</string>
-    <string name="day_tue">Tue</string>
-    <string name="day_wed">Wed</string>
-    <string name="day_thu">Thu</string>
-    <string name="day_fri">Fri</string>
-    <string name="day_sat">Sat</string>
-    <string name="day_sun">Sun</string>
+    <string name="day_mon">M</string>
+    <string name="day_tue">T</string>
+    <string name="day_wed">W</string>
+    <string name="day_thu">T</string>
+    <string name="day_fri">F</string>
+    <string name="day_sat">S</string>
+    <string name="day_sun">S</string>
+    <string name="day_mon_full">Monday</string>
+    <string name="day_tue_full">Tuesday</string>
+    <string name="day_wed_full">Wednesday</string>
+    <string name="day_thu_full">Thursday</string>
+    <string name="day_fri_full">Friday</string>
+    <string name="day_sat_full">Saturday</string>
+    <string name="day_sun_full">Sunday</string>
 
     <!-- Sort Menu -->
     <string name="sort_header">Sort</string>
