@@ -3,6 +3,7 @@ package dev.tuandoan.tasktracker.ui.components
 import android.app.DatePickerDialog
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
@@ -34,6 +35,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import dev.tuandoan.tasktracker.R
 import dev.tuandoan.tasktracker.domain.model.RecurrenceType
@@ -231,7 +233,9 @@ private fun DaysOfWeekSelector(selectedDays: Set<DayOfWeek>, onDayToggled: (DayO
                         Text(
                             shortLabel,
                             style = MaterialTheme.typography.labelSmall,
+                            softWrap = false,
                             maxLines = 1,
+                            overflow = TextOverflow.Visible,
                         )
                     },
                     modifier = Modifier
@@ -271,7 +275,10 @@ private fun RecurrenceEndDateField(endDate: Long?, onEndDateChanged: (Long?) -> 
             },
         )
     } else {
-        TextButton(onClick = { showDatePicker = true }) {
+        TextButton(
+            onClick = { showDatePicker = true },
+            contentPadding = PaddingValues(horizontal = 0.dp),
+        ) {
             Text(stringResource(R.string.label_recurrence_end_date))
         }
     }
