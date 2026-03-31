@@ -213,6 +213,8 @@
     <string name="day_fri_full">Friday</string>
     <string name="day_sat_full">Saturday</string>
     <string name="day_sun_full">Sunday</string>
+    <string name="snackbar_task_skipped">Occurrence skipped</string>
+    <string name="error_skip_occurrence">Failed to skip occurrence</string>
 
     <!-- Sort Menu -->
     <string name="sort_header">Sort</string>
