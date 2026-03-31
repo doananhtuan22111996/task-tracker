@@ -223,6 +223,79 @@ class TaskBackupValidatorTest {
         assertEquals("B".repeat(500), result.validTasks[0].description)
     }
 
+    // === Recurrence Field Validation ===
+
+    @Test
+    fun `recurrenceType is clamped to valid range 0-4`() {
+        val tasks = listOf(
+            Task(id = 1L, title = "Negative type", createdAt = 1700000000000L, recurrenceType = -1),
+            Task(id = 2L, title = "Too high type", createdAt = 1700000000000L, recurrenceType = 10),
+            Task(id = 3L, title = "Valid type", createdAt = 1700000000000L, recurrenceType = 2),
+        )
+
+        val result = validator.validate(tasks)
+
+        assertEquals(3, result.validTasks.size)
+        assertEquals(0, result.validTasks[0].recurrenceType)
+        assertEquals(4, result.validTasks[1].recurrenceType)
+        assertEquals(2, result.validTasks[2].recurrenceType)
+    }
+
+    @Test
+    fun `recurrenceInterval is clamped to minimum 1`() {
+        val tasks = listOf(
+            Task(id = 1L, title = "Zero interval", createdAt = 1700000000000L, recurrenceInterval = 0),
+            Task(id = 2L, title = "Negative interval", createdAt = 1700000000000L, recurrenceInterval = -5),
+            Task(id = 3L, title = "Valid interval", createdAt = 1700000000000L, recurrenceInterval = 3),
+        )
+
+        val result = validator.validate(tasks)
+
+        assertEquals(3, result.validTasks.size)
+        assertEquals(1, result.validTasks[0].recurrenceInterval)
+        assertEquals(1, result.validTasks[1].recurrenceInterval)
+        assertEquals(3, result.validTasks[2].recurrenceInterval)
+    }
+
+    @Test
+    fun `recurrenceDaysOfWeek is masked to valid 7-bit range`() {
+        val tasks = listOf(
+            Task(id = 1L, title = "Extra bits", createdAt = 1700000000000L, recurrenceDaysOfWeek = 0xFF),
+            Task(id = 2L, title = "Valid mask", createdAt = 1700000000000L, recurrenceDaysOfWeek = 21),
+        )
+
+        val result = validator.validate(tasks)
+
+        assertEquals(2, result.validTasks.size)
+        assertEquals(0x7F, result.validTasks[0].recurrenceDaysOfWeek) // Upper bit stripped
+        assertEquals(21, result.validTasks[1].recurrenceDaysOfWeek)
+    }
+
+    @Test
+    fun `valid recurrence fields pass through unchanged`() {
+        val tasks = listOf(
+            Task(
+                id = 1L,
+                title = "Weekly recurring",
+                createdAt = 1700000000000L,
+                recurrenceType = 2,
+                recurrenceInterval = 1,
+                recurrenceDaysOfWeek = 21,
+                recurrenceEndDate = 1700500000000L,
+                parentRecurringTaskId = 42L,
+            ),
+        )
+
+        val result = validator.validate(tasks)
+
+        val task = result.validTasks[0]
+        assertEquals(2, task.recurrenceType)
+        assertEquals(1, task.recurrenceInterval)
+        assertEquals(21, task.recurrenceDaysOfWeek)
+        assertEquals(1700500000000L, task.recurrenceEndDate)
+        assertEquals(42L, task.parentRecurringTaskId)
+    }
+
     @Test
     fun `title and description within limits are preserved`() {
         val title = "A".repeat(100)

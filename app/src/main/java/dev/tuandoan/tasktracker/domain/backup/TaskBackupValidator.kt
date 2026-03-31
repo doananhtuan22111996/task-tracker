@@ -34,6 +34,9 @@ class TaskBackupValidator @Inject constructor() : BackupValidator {
                 createdAt = if (task.createdAt <= 0L) System.currentTimeMillis() else task.createdAt,
                 completedAt = if (!task.isCompleted) null else task.completedAt,
                 archivedAt = if (!task.isArchived) null else task.archivedAt,
+                recurrenceType = task.recurrenceType.coerceIn(MIN_RECURRENCE_TYPE, MAX_RECURRENCE_TYPE),
+                recurrenceInterval = task.recurrenceInterval.coerceAtLeast(MIN_RECURRENCE_INTERVAL),
+                recurrenceDaysOfWeek = task.recurrenceDaysOfWeek and MAX_DAYS_OF_WEEK_BITMASK,
             )
             validTasks.add(sanitized)
         }
@@ -49,5 +52,9 @@ class TaskBackupValidator @Inject constructor() : BackupValidator {
         private const val MAX_PRIORITY = 2
         private const val MAX_TITLE_LENGTH = 100
         private const val MAX_DESCRIPTION_LENGTH = 500
+        private const val MIN_RECURRENCE_TYPE = 0
+        private const val MAX_RECURRENCE_TYPE = 4
+        private const val MIN_RECURRENCE_INTERVAL = 1
+        private const val MAX_DAYS_OF_WEEK_BITMASK = 0x7F // Mon-Sun = bits 0-6
     }
 }
