@@ -23,6 +23,11 @@ data class TaskBackupDto(
     val priority: Int = 1,
     val isArchived: Boolean = false,
     val archivedAt: Long? = null,
+    val recurrenceType: Int = 0,
+    val recurrenceInterval: Int = 1,
+    val recurrenceDaysOfWeek: Int = 0,
+    val recurrenceEndDate: Long? = null,
+    val parentRecurringTaskId: Long? = null,
 ) {
 
     fun toTask(): Task = Task(
@@ -40,6 +45,11 @@ data class TaskBackupDto(
         priority = priority,
         isArchived = isArchived,
         archivedAt = archivedAt,
+        recurrenceType = recurrenceType,
+        recurrenceInterval = recurrenceInterval,
+        recurrenceDaysOfWeek = recurrenceDaysOfWeek,
+        recurrenceEndDate = recurrenceEndDate,
+        parentRecurringTaskId = parentRecurringTaskId,
     )
 
     companion object {
@@ -58,6 +68,11 @@ data class TaskBackupDto(
             priority = task.priority,
             isArchived = task.isArchived,
             archivedAt = task.archivedAt,
+            recurrenceType = task.recurrenceType,
+            recurrenceInterval = task.recurrenceInterval,
+            recurrenceDaysOfWeek = task.recurrenceDaysOfWeek,
+            recurrenceEndDate = task.recurrenceEndDate,
+            parentRecurringTaskId = task.parentRecurringTaskId,
         )
     }
 }

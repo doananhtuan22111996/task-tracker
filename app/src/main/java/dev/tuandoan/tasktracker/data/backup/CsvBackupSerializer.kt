@@ -62,6 +62,11 @@ class CsvBackupSerializer @Inject constructor() : BackupSerializer {
             task.priority.toString(),
             task.isArchived.toString(),
             task.archivedAt?.toString() ?: "",
+            task.recurrenceType.toString(),
+            task.recurrenceInterval.toString(),
+            task.recurrenceDaysOfWeek.toString(),
+            task.recurrenceEndDate?.toString() ?: "",
+            task.parentRecurringTaskId?.toString() ?: "",
         )
         return fields.joinToString(",") { escapeCsvField(it) }
     }
@@ -73,9 +78,10 @@ class CsvBackupSerializer @Inject constructor() : BackupSerializer {
             )
         }
 
-        // Support both legacy 13-column and new 14-column formats
-        val isLegacyFormat = fields.size < EXPECTED_FIELD_COUNT
-        val offset = if (isLegacyFormat) 0 else 1
+        // Support legacy 13-column, v1 14-column, and current 19-column formats
+        val hasDueAtHasTime = fields.size >= V1_FIELD_COUNT
+        val offset = if (hasDueAtHasTime) 1 else 0
+        val hasRecurrence = fields.size >= EXPECTED_FIELD_COUNT
 
         return TaskBackupDto(
             id = fields[0].toLong(),
@@ -85,23 +91,31 @@ class CsvBackupSerializer @Inject constructor() : BackupSerializer {
             createdAt = fields[4].toLong(),
             completedAt = fields[5].toLongOrNull(),
             dueAt = fields[6].toLongOrNull(),
-            dueAtHasTime = if (isLegacyFormat) false else fields[7].toBooleanStrictOrNull() ?: false,
+            dueAtHasTime = if (hasDueAtHasTime) fields[7].toBooleanStrictOrNull() ?: false else false,
             reminderOffsetMinutes = fields[7 + offset].toIntOrNull(),
             tag = fields[8 + offset].ifBlank { null },
             isPinned = fields[9 + offset].toBooleanStrict(),
             priority = fields[10 + offset].toInt(),
             isArchived = fields[11 + offset].toBooleanStrict(),
             archivedAt = fields[12 + offset].toLongOrNull(),
+            recurrenceType = if (hasRecurrence) fields[13 + offset].toIntOrNull() ?: 0 else 0,
+            recurrenceInterval = if (hasRecurrence) fields[14 + offset].toIntOrNull() ?: 1 else 1,
+            recurrenceDaysOfWeek = if (hasRecurrence) fields[15 + offset].toIntOrNull() ?: 0 else 0,
+            recurrenceEndDate = if (hasRecurrence) fields[16 + offset].toLongOrNull() else null,
+            parentRecurringTaskId = if (hasRecurrence) fields[17 + offset].toLongOrNull() else null,
         )
     }
 
     companion object {
-        private const val EXPECTED_FIELD_COUNT = 14
+        private const val EXPECTED_FIELD_COUNT = 19
+        private const val V1_FIELD_COUNT = 14
         private const val LEGACY_FIELD_COUNT = 13
 
         private const val HEADER =
             "id,title,description,isCompleted,createdAt,completedAt,dueAt,dueAtHasTime," +
-                "reminderOffsetMinutes,tag,isPinned,priority,isArchived,archivedAt"
+                "reminderOffsetMinutes,tag,isPinned,priority,isArchived,archivedAt," +
+                "recurrenceType,recurrenceInterval,recurrenceDaysOfWeek,recurrenceEndDate," +
+                "parentRecurringTaskId"
 
         /**
          * Escapes a CSV field per RFC 4180: wrap in quotes if the field contains
