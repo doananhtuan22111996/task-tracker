@@ -233,6 +233,18 @@ private class FakeStatsTaskManager : ITaskManager {
         reminderOffsetMinutes: Int?,
         tag: String?,
     ): Long = 0
+    override suspend fun createTask(
+        title: String,
+        description: String,
+        dueAt: Long?,
+        dueAtHasTime: Boolean,
+        reminderOffsetMinutes: Int?,
+        tag: String?,
+        recurrenceType: Int,
+        recurrenceInterval: Int,
+        recurrenceDaysOfWeek: Int,
+        recurrenceEndDate: Long?,
+    ): Long = 0
     override suspend fun updateTask(task: Task) {}
     override suspend fun updateTaskContent(taskId: Long, title: String, description: String) {}
     override suspend fun updateTaskContent(

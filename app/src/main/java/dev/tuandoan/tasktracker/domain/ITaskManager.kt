@@ -25,6 +25,18 @@ interface ITaskManager {
         reminderOffsetMinutes: Int? = null,
         tag: String? = null,
     ): Long
+    suspend fun createTask(
+        title: String,
+        description: String = "",
+        dueAt: Long? = null,
+        dueAtHasTime: Boolean = false,
+        reminderOffsetMinutes: Int? = null,
+        tag: String? = null,
+        recurrenceType: Int = 0,
+        recurrenceInterval: Int = 1,
+        recurrenceDaysOfWeek: Int = 0,
+        recurrenceEndDate: Long? = null,
+    ): Long
     suspend fun updateTask(task: Task)
     suspend fun updateTaskContent(taskId: Long, title: String, description: String)
     suspend fun updateTaskContent(
