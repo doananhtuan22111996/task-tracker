@@ -24,7 +24,9 @@ import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Remove
+import androidx.compose.material.icons.filled.Repeat
 import androidx.compose.material.icons.filled.Schedule
+import androidx.compose.material.icons.filled.SkipNext
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.StarBorder
 import androidx.compose.material3.AssistChip
@@ -61,6 +63,7 @@ import androidx.compose.ui.unit.dp
 import dev.tuandoan.tasktracker.R
 import dev.tuandoan.tasktracker.data.database.Task
 import dev.tuandoan.tasktracker.domain.model.Priority
+import dev.tuandoan.tasktracker.domain.model.RecurrenceType
 import dev.tuandoan.tasktracker.utils.formatDueDate
 import dev.tuandoan.tasktracker.utils.isOverdue
 
@@ -75,6 +78,7 @@ fun TaskItem(
     onArchiveClick: () -> Unit,
     onPinClick: () -> Unit,
     onDuplicateClick: () -> Unit = {},
+    onSkipOccurrence: () -> Unit = {},
     onLongPress: () -> Unit = {},
     onToggleSelection: () -> Unit = {},
 ) {
@@ -275,6 +279,14 @@ fun TaskItem(
                             },
                             fontWeight = if (overdue) FontWeight.Medium else FontWeight.Normal,
                         )
+                        if (RecurrenceType.fromValue(task.recurrenceType) != RecurrenceType.NONE) {
+                            Icon(
+                                imageVector = Icons.Default.Repeat,
+                                contentDescription = stringResource(R.string.cd_recurrence),
+                                modifier = Modifier.size(14.dp),
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        }
                     }
                 }
 
@@ -396,6 +408,21 @@ fun TaskItem(
                             expanded = showMenu,
                             onDismissRequest = { showMenu = false },
                         ) {
+                            if (RecurrenceType.fromValue(task.recurrenceType) != RecurrenceType.NONE) {
+                                DropdownMenuItem(
+                                    text = { Text(stringResource(R.string.action_skip_occurrence)) },
+                                    onClick = {
+                                        showMenu = false
+                                        onSkipOccurrence()
+                                    },
+                                    leadingIcon = {
+                                        Icon(
+                                            Icons.Default.SkipNext,
+                                            contentDescription = null,
+                                        )
+                                    },
+                                )
+                            }
                             DropdownMenuItem(
                                 text = { Text(stringResource(R.string.action_archive)) },
                                 onClick = {

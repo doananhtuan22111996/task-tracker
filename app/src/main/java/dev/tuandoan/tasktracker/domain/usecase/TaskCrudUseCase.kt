@@ -313,6 +313,16 @@ class TaskCrudUseCase @Inject constructor(
     /**
      * Archives a task (soft delete)
      */
+    suspend fun skipOccurrence(task: Task): Result<Unit> = try {
+        _errorMessage.value = null
+        taskManager.skipOccurrence(task)
+        _lastOperationSuccess.value = context.getString(R.string.snackbar_task_skipped)
+        Result.success(Unit)
+    } catch (e: Exception) {
+        _errorMessage.value = e.message ?: context.getString(R.string.error_skip_occurrence)
+        Result.failure(e)
+    }
+
     suspend fun archiveTask(taskId: Long): Result<Unit> = try {
         _errorMessage.value = null
         taskManager.archiveTask(taskId)
