@@ -119,6 +119,13 @@ interface TaskDao {
     suspend fun getCompletedTasksByChain(rootId: Long): List<Task>
 
     @Query(
+        "SELECT * FROM tasks WHERE isCompleted = 1 " +
+            "AND (id IN (:rootIds) OR parentRecurringTaskId IN (:rootIds)) " +
+            "ORDER BY completedAt ASC",
+    )
+    suspend fun getCompletedTasksForChains(rootIds: List<Long>): List<Task>
+
+    @Query(
         "SELECT DISTINCT " +
             "CASE WHEN parentRecurringTaskId IS NOT NULL " +
             "THEN parentRecurringTaskId ELSE id END AS rootId " +

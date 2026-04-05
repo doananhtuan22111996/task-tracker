@@ -51,6 +51,7 @@ interface ITaskRepository {
 
     // Streak operations
     suspend fun getCompletedTasksByChain(rootId: Long): List<Task>
+    suspend fun getCompletedTasksForChains(rootIds: List<Long>): List<Task>
     suspend fun getActiveRecurringRootIds(): List<Long>
 
     // Backup operations

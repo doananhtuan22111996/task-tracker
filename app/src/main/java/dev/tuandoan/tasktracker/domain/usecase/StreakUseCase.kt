@@ -26,12 +26,14 @@ class StreakUseCase @Inject constructor(private val repository: ITaskRepository)
             )
         }
 
+        val allCompleted = repository.getCompletedTasksForChains(rootIds)
+        val grouped = allCompleted.groupBy { it.parentRecurringTaskId ?: it.id }
+
         var bestCurrent: TaskStreak? = null
         var allTimeBest: TaskStreak? = null
 
         for (rootId in rootIds) {
-            val completedTasks = repository.getCompletedTasksByChain(rootId)
-            if (completedTasks.isEmpty()) continue
+            val completedTasks = grouped[rootId] ?: continue
 
             val result = StreakCalculator.calculate(completedTasks)
             val representativeTask = completedTasks.last()
@@ -55,5 +57,27 @@ class StreakUseCase @Inject constructor(private val repository: ITaskRepository)
             bestCurrentStreak = bestCurrent,
             allTimeBestStreak = allTimeBest,
         )
+    }
+
+    /**
+     * Returns a map of rootChainId → currentStreak count for badge display.
+     * Only includes chains with currentStreak >= 2.
+     */
+    suspend fun getStreakMap(): Map<Long, Int> {
+        val rootIds = repository.getActiveRecurringRootIds()
+        if (rootIds.isEmpty()) return emptyMap()
+
+        val allCompleted = repository.getCompletedTasksForChains(rootIds)
+        val grouped = allCompleted.groupBy { it.parentRecurringTaskId ?: it.id }
+
+        val map = mutableMapOf<Long, Int>()
+        for (rootId in rootIds) {
+            val completedTasks = grouped[rootId] ?: continue
+            val result = StreakCalculator.calculate(completedTasks)
+            if (result.currentStreak >= 2) {
+                map[rootId] = result.currentStreak
+            }
+        }
+        return map
     }
 }

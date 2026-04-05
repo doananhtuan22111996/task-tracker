@@ -110,7 +110,15 @@ class StatsViewModel @Inject constructor(
 
     fun loadStreakStats() {
         viewModelScope.launch {
-            _streakStats.value = streakUseCase.getStreakStats()
+            try {
+                _streakStats.value = streakUseCase.getStreakStats()
+            } catch (_: Exception) {
+                _streakStats.value = StreakStats(
+                    activeRecurringCount = 0,
+                    bestCurrentStreak = null,
+                    allTimeBestStreak = null,
+                )
+            }
         }
     }
 

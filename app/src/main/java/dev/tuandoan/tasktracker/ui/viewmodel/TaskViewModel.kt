@@ -10,8 +10,7 @@ import dev.tuandoan.tasktracker.data.database.Task
 import dev.tuandoan.tasktracker.data.preferences.SettingsRepository
 import dev.tuandoan.tasktracker.data.preferences.UserPreferences
 import dev.tuandoan.tasktracker.domain.ITaskManager
-import dev.tuandoan.tasktracker.domain.repository.ITaskRepository
-import dev.tuandoan.tasktracker.domain.service.StreakCalculator
+import dev.tuandoan.tasktracker.domain.usecase.StreakUseCase
 import dev.tuandoan.tasktracker.ui.events.UiEvent
 import dev.tuandoan.tasktracker.ui.manager.TaskBulkActionManager
 import dev.tuandoan.tasktracker.ui.manager.TaskCrudManager
@@ -57,7 +56,7 @@ class TaskViewModel @Inject constructor(
     private val bulkActionManager: TaskBulkActionManager,
     private val settingsRepository: SettingsRepository,
     private val taskManager: ITaskManager,
-    private val repository: ITaskRepository,
+    private val streakUseCase: StreakUseCase,
 ) : ViewModel() {
 
     // Initialize state from managers
@@ -75,18 +74,11 @@ class TaskViewModel @Inject constructor(
 
     private fun loadStreakMap() {
         viewModelScope.launch {
-            val rootIds = repository.getActiveRecurringRootIds()
-            val map = mutableMapOf<Long, Int>()
-            for (rootId in rootIds) {
-                val completedTasks = repository.getCompletedTasksByChain(rootId)
-                if (completedTasks.isNotEmpty()) {
-                    val result = StreakCalculator.calculate(completedTasks)
-                    if (result.currentStreak >= 2) {
-                        map[rootId] = result.currentStreak
-                    }
-                }
+            try {
+                _streakMap.value = streakUseCase.getStreakMap()
+            } catch (_: Exception) {
+                _streakMap.value = emptyMap()
             }
-            _streakMap.value = map
         }
     }
 
@@ -231,6 +223,7 @@ class TaskViewModel @Inject constructor(
             scope = viewModelScope,
             operation = { crudManager.deleteTask(task) },
             onSuccess = {
+                loadStreakMap()
                 // Show undo snackbar after successful deletion
                 viewModelScope.launch {
                     _singleTaskUiEvent.emit(
@@ -262,6 +255,7 @@ class TaskViewModel @Inject constructor(
             scope = viewModelScope,
             operation = { crudManager.archiveTask(task) },
             onSuccess = {
+                loadStreakMap()
                 // Show undo snackbar after successful archive
                 viewModelScope.launch {
                     _singleTaskUiEvent.emit(
@@ -377,6 +371,7 @@ class TaskViewModel @Inject constructor(
             scope = viewModelScope,
             operation = { crudManager.skipOccurrence(task) },
             onSuccess = { message ->
+                loadStreakMap()
                 viewModelScope.launch {
                     _singleTaskUiEvent.emit(UiEvent.ShowSnackbar(message))
                 }
