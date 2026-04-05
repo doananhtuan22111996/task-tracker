@@ -72,6 +72,19 @@ class TaskReminderWorker @AssistedInject constructor(
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
         )
 
+        // "Mark Complete" action intent
+        val completeIntent = Intent(applicationContext, TaskCompleteReceiver::class.java).apply {
+            action = TaskCompleteReceiver.ACTION_COMPLETE_TASK
+            putExtra(TaskCompleteReceiver.EXTRA_TASK_ID, taskId)
+            putExtra(TaskCompleteReceiver.EXTRA_NOTIFICATION_ID, taskId.toInt())
+        }
+        val completePendingIntent = PendingIntent.getBroadcast(
+            applicationContext,
+            taskId.toInt(),
+            completeIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+        )
+
         // Use app icon instead of system icon for better reliability
         val notification = NotificationCompat.Builder(
             applicationContext,
@@ -87,6 +100,11 @@ class TaskReminderWorker @AssistedInject constructor(
             )
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setContentIntent(pendingIntent)
+            .addAction(
+                android.R.drawable.ic_menu_send,
+                applicationContext.getString(R.string.notification_action_complete),
+                completePendingIntent,
+            )
             .setAutoCancel(true)
             .setDefaults(NotificationCompat.DEFAULT_ALL)
             .build()

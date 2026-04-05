@@ -1,5 +1,6 @@
 package dev.tuandoan.tasktracker
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -69,6 +70,10 @@ class MainActivity : AppCompatActivity() {
         )
 
         enableEdgeToEdge()
+
+        // Check if launched from app shortcut deep-link
+        val deepLinkRoute = resolveDeepLinkRoute(intent)
+
         setContent {
             val userPreferences by settingsRepository.userPreferences
                 .collectAsStateWithLifecycle(initialValue = null)
@@ -82,10 +87,19 @@ class MainActivity : AppCompatActivity() {
                     TaskTrackerApp(
                         notificationPermissionManager = notificationPermissionManager,
                         isOnboardingCompleted = prefs.onboardingCompleted,
+                        deepLinkRoute = deepLinkRoute,
                     )
                 }
             }
         }
+    }
+
+    private fun resolveDeepLinkRoute(intent: Intent?): String? {
+        val data = intent?.data ?: return null
+        if (data.scheme == "tasktracker" && data.host == "task_editor") {
+            return TaskTrackerRoutes.TASK_EDITOR_CREATE
+        }
+        return null
     }
 }
 
@@ -98,12 +112,20 @@ class MainActivity : AppCompatActivity() {
 fun TaskTrackerApp(
     notificationPermissionManager: NotificationPermissionManager? = null,
     isOnboardingCompleted: Boolean = true,
+    deepLinkRoute: String? = null,
 ) {
     val navController = rememberNavController()
     val startDestination = if (isOnboardingCompleted) {
         TaskTrackerRoutes.TASK_LIST
     } else {
         TaskTrackerRoutes.ONBOARDING
+    }
+
+    // Handle deep-link navigation (e.g., from app shortcut)
+    androidx.compose.runtime.LaunchedEffect(deepLinkRoute) {
+        if (deepLinkRoute != null && isOnboardingCompleted) {
+            navController.navigate(deepLinkRoute)
+        }
     }
 
     Surface(
