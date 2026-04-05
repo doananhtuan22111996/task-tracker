@@ -272,6 +272,12 @@
     <string name="notification_title">Task Reminder</string>
     <string name="notification_due_soon">Due soon: %s</string>
     <string name="notification_default_task">Task</string>
+    <string name="notification_action_complete">Mark Complete</string>
+    <string name="notification_task_completed">Task completed</string>
+
+    <!-- App Shortcut -->
+    <string name="shortcut_new_task_short">New Task</string>
+    <string name="shortcut_new_task_long">Create a new task</string>
 
     <!-- Date Format Patterns (localizable) -->
     <string name="date_format_short">MMM dd, yyyy</string>
