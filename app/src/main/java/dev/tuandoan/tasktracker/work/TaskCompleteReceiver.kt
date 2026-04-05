@@ -4,6 +4,7 @@ import android.app.NotificationManager
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.util.Log
 import android.widget.Toast
 import androidx.core.content.getSystemService
 import dagger.hilt.android.AndroidEntryPoint
@@ -12,6 +13,7 @@ import dev.tuandoan.tasktracker.domain.ITaskManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 /**
@@ -25,6 +27,7 @@ class TaskCompleteReceiver : BroadcastReceiver() {
         const val ACTION_COMPLETE_TASK = "dev.tuandoan.tasktracker.ACTION_COMPLETE_TASK"
         const val EXTRA_TASK_ID = "extra_task_id"
         const val EXTRA_NOTIFICATION_ID = "extra_notification_id"
+        private const val TAG = "TaskCompleteReceiver"
     }
 
     @Inject
@@ -49,7 +52,7 @@ class TaskCompleteReceiver : BroadcastReceiver() {
                 val task = taskManager.getTaskById(taskId)
                 if (task != null && !task.isCompleted) {
                     taskManager.toggleTaskCompletion(task)
-                    CoroutineScope(Dispatchers.Main).launch {
+                    withContext(Dispatchers.Main) {
                         Toast.makeText(
                             context,
                             context.getString(R.string.notification_task_completed),
@@ -57,6 +60,8 @@ class TaskCompleteReceiver : BroadcastReceiver() {
                         ).show()
                     }
                 }
+            } catch (e: Exception) {
+                Log.e(TAG, "Failed to complete task $taskId from notification", e)
             } finally {
                 pendingResult.finish()
             }

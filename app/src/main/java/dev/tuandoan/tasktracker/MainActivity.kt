@@ -11,6 +11,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -122,7 +123,7 @@ fun TaskTrackerApp(
     }
 
     // Handle deep-link navigation (e.g., from app shortcut)
-    androidx.compose.runtime.LaunchedEffect(deepLinkRoute) {
+    LaunchedEffect(deepLinkRoute) {
         if (deepLinkRoute != null && isOnboardingCompleted) {
             navController.navigate(deepLinkRoute)
         }
