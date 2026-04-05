@@ -7,8 +7,12 @@ import dev.tuandoan.tasktracker.data.database.DailyCount
 import dev.tuandoan.tasktracker.data.preferences.SettingsRepository
 import dev.tuandoan.tasktracker.data.preferences.UserPreferences
 import dev.tuandoan.tasktracker.domain.ITaskManager
+import dev.tuandoan.tasktracker.domain.model.StreakStats
+import dev.tuandoan.tasktracker.domain.usecase.StreakUseCase
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
@@ -23,6 +27,7 @@ import javax.inject.Inject
 class StatsViewModel @Inject constructor(
     private val taskManager: ITaskManager,
     private val settingsRepository: SettingsRepository,
+    private val streakUseCase: StreakUseCase,
 ) : ViewModel() {
 
     val userPreferences: StateFlow<UserPreferences> = settingsRepository.userPreferences
@@ -93,6 +98,21 @@ class StatsViewModel @Inject constructor(
     val isEmpty: StateFlow<Boolean> = uiState
         .map { state -> state.activeCount == 0 && state.completedCount == 0 }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), true)
+
+    // Streak stats
+    private val _streakStats =
+        MutableStateFlow(StreakStats(activeRecurringCount = 0, bestCurrentStreak = null, allTimeBestStreak = null))
+    val streakStats: StateFlow<StreakStats> = _streakStats.asStateFlow()
+
+    init {
+        loadStreakStats()
+    }
+
+    fun loadStreakStats() {
+        viewModelScope.launch {
+            _streakStats.value = streakUseCase.getStreakStats()
+        }
+    }
 
     private fun getTodayStartMillis(): Long {
         val today = LocalDate.now()

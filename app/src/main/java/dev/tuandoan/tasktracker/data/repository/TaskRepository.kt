@@ -107,6 +107,11 @@ class TaskRepository @Inject constructor(private val taskDao: TaskDao, private v
         }
     }
 
+    // Streak operations
+    override suspend fun getCompletedTasksByChain(rootId: Long): List<Task> = taskDao.getCompletedTasksByChain(rootId)
+
+    override suspend fun getActiveRecurringRootIds(): List<Long> = taskDao.getActiveRecurringRootIds()
+
     // Stats operations (exclude archived tasks)
     override fun observeActiveCount(): Flow<Int> = taskDao.observeActiveCount()
 

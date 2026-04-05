@@ -71,6 +71,7 @@ import dev.tuandoan.tasktracker.utils.isOverdue
 fun TaskItem(
     modifier: Modifier = Modifier,
     task: Task,
+    streakCount: Int = 0,
     isSelected: Boolean = false,
     isSelectionMode: Boolean = false,
     onToggleComplete: () -> Unit,
@@ -287,6 +288,9 @@ fun TaskItem(
                                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
                         }
+                        if (streakCount >= 2) {
+                            StreakBadge(count = streakCount)
+                        }
                     }
                 }
 
@@ -454,6 +458,28 @@ fun TaskItem(
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun StreakBadge(count: Int, modifier: Modifier = Modifier) {
+    val badgeCd = stringResource(R.string.streak_badge_cd, count)
+    Row(
+        modifier = modifier
+            .semantics { contentDescription = badgeCd },
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(2.dp),
+    ) {
+        Text(
+            text = "\uD83D\uDD25",
+            style = MaterialTheme.typography.labelSmall,
+        )
+        Text(
+            text = count.toString(),
+            style = MaterialTheme.typography.labelSmall,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.primary,
+        )
     }
 }
 

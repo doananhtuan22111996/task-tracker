@@ -88,6 +88,7 @@ class TaskViewModelTest {
             bulkActionManager,
             settingsRepository,
             taskManager,
+            repository,
         )
     }
 

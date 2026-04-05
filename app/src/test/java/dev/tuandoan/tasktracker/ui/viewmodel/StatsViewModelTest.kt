@@ -6,6 +6,7 @@ import dev.tuandoan.tasktracker.data.database.Task
 import dev.tuandoan.tasktracker.data.preferences.SettingsRepository
 import dev.tuandoan.tasktracker.data.preferences.UserPreferences
 import dev.tuandoan.tasktracker.domain.ITaskManager
+import dev.tuandoan.tasktracker.domain.usecase.StreakUseCase
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.Dispatchers
@@ -46,7 +47,10 @@ class StatsViewModelTest {
         Dispatchers.resetMain()
     }
 
-    private fun createViewModel(): StatsViewModel = StatsViewModel(fakeTaskManager, fakeSettingsRepository)
+    private val fakeStreakUseCase: StreakUseCase = mockk(relaxed = true)
+
+    private fun createViewModel(): StatsViewModel =
+        StatsViewModel(fakeTaskManager, fakeSettingsRepository, fakeStreakUseCase)
 
     // SPEC-S03: Daily progress tests
     @Test

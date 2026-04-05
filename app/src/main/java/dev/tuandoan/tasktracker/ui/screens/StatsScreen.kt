@@ -22,6 +22,7 @@ import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Repeat
 import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material.icons.filled.Today
 import androidx.compose.material.icons.outlined.CheckCircle
@@ -54,10 +55,13 @@ import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dev.tuandoan.tasktracker.R
 import dev.tuandoan.tasktracker.data.database.DailyCount
+import dev.tuandoan.tasktracker.domain.model.StreakStats
+import dev.tuandoan.tasktracker.domain.model.TaskStreak
 import dev.tuandoan.tasktracker.navigation.StatsFilter
 import dev.tuandoan.tasktracker.ui.components.FeatureTip
 import dev.tuandoan.tasktracker.ui.viewmodel.StatsViewModel
@@ -76,6 +80,7 @@ fun StatsScreen(
     val weeklyBreakdown by viewModel.weeklyBreakdown.collectAsStateWithLifecycle()
     val completionRate by viewModel.completionRate.collectAsStateWithLifecycle()
     val isEmpty by viewModel.isEmpty.collectAsStateWithLifecycle()
+    val streakStats by viewModel.streakStats.collectAsStateWithLifecycle()
     val userPrefs by viewModel.userPreferences.collectAsStateWithLifecycle()
 
     Scaffold(
@@ -220,6 +225,10 @@ fun StatsScreen(
                 if (weeklyBreakdown.isNotEmpty()) {
                     WeeklyBreakdownSection(weeklyBreakdown = weeklyBreakdown)
                 }
+
+                // Streaks section
+                Spacer(Modifier.height(8.dp))
+                StreaksSection(streakStats = streakStats)
 
                 Spacer(Modifier.height(4.dp))
 
@@ -508,6 +517,130 @@ private fun StatCard(
                     } else {
                         MaterialTheme.colorScheme.onSurfaceVariant
                     },
+                )
+            }
+        }
+    }
+}
+
+// Streaks section
+@Composable
+private fun StreaksSection(streakStats: StreakStats, modifier: Modifier = Modifier) {
+    Column(modifier = modifier.fillMaxWidth()) {
+        Text(
+            text = stringResource(R.string.stat_section_streaks),
+            style = MaterialTheme.typography.labelLarge,
+            modifier = Modifier.padding(top = 4.dp),
+        )
+        HorizontalDivider()
+        Spacer(Modifier.height(8.dp))
+
+        if (streakStats.activeRecurringCount == 0) {
+            // Empty state
+            Surface(
+                modifier = Modifier.fillMaxWidth(),
+                color = MaterialTheme.colorScheme.surfaceVariant,
+                shape = MaterialTheme.shapes.medium,
+                tonalElevation = 1.dp,
+            ) {
+                Column(
+                    modifier = Modifier.padding(16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    Text(
+                        text = stringResource(R.string.stat_streak_empty),
+                        style = MaterialTheme.typography.bodyMedium,
+                    )
+                    Spacer(Modifier.height(4.dp))
+                    Text(
+                        text = stringResource(R.string.stat_streak_empty_hint),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+            }
+        } else {
+            // Active recurring count
+            StatCard(
+                title = stringResource(R.string.stat_active_recurring),
+                count = streakStats.activeRecurringCount,
+                description = stringResource(R.string.stat_desc_active_recurring),
+                icon = Icons.Default.Repeat,
+                contentDescriptionText = stringResource(
+                    R.string.stat_cd_active_recurring,
+                    streakStats.activeRecurringCount,
+                ),
+            )
+
+            // Best current streak
+            streakStats.bestCurrentStreak?.let { streak ->
+                if (streak.currentStreak > 0) {
+                    Spacer(Modifier.height(8.dp))
+                    StreakCard(
+                        title = stringResource(R.string.stat_best_current_streak),
+                        streak = streak,
+                        streakValue = streak.currentStreak,
+                    )
+                }
+            }
+
+            // All-time best streak
+            streakStats.allTimeBestStreak?.let { streak ->
+                if (streak.longestStreak > 0) {
+                    Spacer(Modifier.height(8.dp))
+                    StreakCard(
+                        title = stringResource(R.string.stat_all_time_best_streak),
+                        streak = streak,
+                        streakValue = streak.longestStreak,
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun StreakCard(title: String, streak: TaskStreak, streakValue: Int, modifier: Modifier = Modifier) {
+    val streakCd = stringResource(R.string.stat_cd_streak, streak.taskTitle, streakValue)
+    ElevatedCard(
+        modifier = modifier
+            .fillMaxWidth()
+            .semantics(mergeDescendants = true) { contentDescription = streakCd },
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(12.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Medium,
+                )
+                Text(
+                    text = streak.taskTitle,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+            }
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(4.dp),
+            ) {
+                Text(
+                    text = "\uD83D\uDD25", // fire emoji
+                    style = MaterialTheme.typography.titleMedium,
+                )
+                Text(
+                    text = stringResource(R.string.stat_streak_count, streakValue),
+                    style = MaterialTheme.typography.headlineSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary,
                 )
             }
         }

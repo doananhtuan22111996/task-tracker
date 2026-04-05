@@ -112,6 +112,21 @@ interface TaskDao {
     )
     suspend fun getLatestGeneratedTask(parentId: Long): Task?
 
+    // Streak queries
+    @Query(
+        "SELECT * FROM tasks WHERE isCompleted = 1 AND (id = :rootId OR parentRecurringTaskId = :rootId) ORDER BY completedAt ASC",
+    )
+    suspend fun getCompletedTasksByChain(rootId: Long): List<Task>
+
+    @Query(
+        "SELECT DISTINCT " +
+            "CASE WHEN parentRecurringTaskId IS NOT NULL " +
+            "THEN parentRecurringTaskId ELSE id END AS rootId " +
+            "FROM tasks " +
+            "WHERE recurrenceType != 0 AND isArchived = 0 AND isCompleted = 0",
+    )
+    suspend fun getActiveRecurringRootIds(): List<Long>
+
     // Backup operations
     @Query("SELECT * FROM tasks ORDER BY createdAt DESC")
     suspend fun getAllTasksIncludingArchived(): List<Task>

@@ -6,6 +6,7 @@ import dev.tuandoan.tasktracker.data.database.Task
 import dev.tuandoan.tasktracker.data.preferences.SettingsRepository
 import dev.tuandoan.tasktracker.data.preferences.UserPreferences
 import dev.tuandoan.tasktracker.domain.ITaskManager
+import dev.tuandoan.tasktracker.domain.repository.ITaskRepository
 import dev.tuandoan.tasktracker.ui.events.UiEvent
 import dev.tuandoan.tasktracker.ui.manager.TaskBulkActionManager
 import dev.tuandoan.tasktracker.ui.manager.TaskCrudManager
@@ -14,6 +15,7 @@ import dev.tuandoan.tasktracker.ui.state.SelectionState
 import dev.tuandoan.tasktracker.ui.state.TaskListState
 import dev.tuandoan.tasktracker.ui.state.TaskListStateManager
 import dev.tuandoan.tasktracker.ui.state.TaskSelectionStateManager
+import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
@@ -46,6 +48,7 @@ class RatingEligibilityTest {
     private lateinit var bulkActionManager: TaskBulkActionManager
     private lateinit var settingsRepository: SettingsRepository
     private lateinit var taskManager: ITaskManager
+    private lateinit var repository: ITaskRepository
     private lateinit var preferencesFlow: MutableStateFlow<UserPreferences>
 
     private fun createViewModel(): TaskViewModel = TaskViewModel(
@@ -56,6 +59,7 @@ class RatingEligibilityTest {
         bulkActionManager = bulkActionManager,
         settingsRepository = settingsRepository,
         taskManager = taskManager,
+        repository = repository,
     )
 
     private fun mockCrudManagerToInvokeOnSuccess() {
@@ -87,6 +91,9 @@ class RatingEligibilityTest {
         }
 
         taskManager = mockk(relaxed = true)
+        repository = mockk(relaxed = true) {
+            coEvery { getActiveRecurringRootIds() } returns emptyList()
+        }
 
         val emptyTasksFlow = MutableStateFlow<List<Task>>(emptyList())
         val taskListState = TaskListState(
