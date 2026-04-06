@@ -476,4 +476,20 @@ class TaskManagerTest {
         manager.restoreTasks(listOf(task))
         assertEquals(1, widgetUpdater.updateCount)
     }
+
+    @Test
+    fun `markTaskComplete triggers widget update`() = runTest {
+        val task = TestTaskFactory.createTask(id = 1)
+        repository.seed(task)
+        manager.markTaskComplete(task)
+        assertEquals(1, widgetUpdater.updateCount)
+    }
+
+    @Test
+    fun `markTaskIncomplete triggers widget update`() = runTest {
+        val task = TestTaskFactory.completedTask(id = 1)
+        repository.seed(task)
+        manager.markTaskIncomplete(task)
+        assertEquals(1, widgetUpdater.updateCount)
+    }
 }

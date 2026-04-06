@@ -218,6 +218,7 @@ class TaskManager @Inject constructor(
             repository.updateTask(completedTask)
             // Cancel reminder when marking as complete
             reminderScheduler.cancel(task.id)
+            widgetUpdater.requestUpdate()
         }
     }
 
@@ -227,6 +228,7 @@ class TaskManager @Inject constructor(
             repository.updateTask(incompleteTask)
             // Reschedule reminder when marking as incomplete
             scheduleReminderIfNeeded(task.id, task.title, task.dueAt, task.reminderOffsetMinutes)
+            widgetUpdater.requestUpdate()
         }
     }
 
