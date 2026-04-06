@@ -18,13 +18,15 @@ class TaskManagerTest {
 
     private lateinit var repository: FakeTaskRepository
     private lateinit var scheduler: FakeReminderScheduler
+    private lateinit var widgetUpdater: FakeWidgetUpdater
     private lateinit var manager: TaskManager
 
     @Before
     fun setup() {
         repository = FakeTaskRepository()
         scheduler = FakeReminderScheduler()
-        manager = TaskManager(repository, scheduler, FakeWidgetUpdater())
+        widgetUpdater = FakeWidgetUpdater()
+        manager = TaskManager(repository, scheduler, widgetUpdater)
     }
 
     // === createTask ===
@@ -355,5 +357,123 @@ class TaskManagerTest {
         scheduler.shouldScheduleSucceed = false
         val dueAt = TestTaskFactory.BASE_TIMESTAMP + TestTaskFactory.ONE_DAY_MS
         manager.createTask("Task", "", dueAt, 60)
+    }
+
+    // === Widget update triggers ===
+
+    @Test
+    fun `createTask triggers widget update`() = runTest {
+        manager.createTask("Task", "")
+        assertEquals(1, widgetUpdater.updateCount)
+    }
+
+    @Test
+    fun `updateTask triggers widget update`() = runTest {
+        val task = TestTaskFactory.createTask(id = 1)
+        repository.seed(task)
+        manager.updateTask(task.copy(title = "Updated"))
+        assertEquals(1, widgetUpdater.updateCount)
+    }
+
+    @Test
+    fun `updateTaskContent triggers widget update`() = runTest {
+        val task = TestTaskFactory.createTask(id = 1, title = "Original")
+        repository.seed(task)
+        manager.updateTaskContent(task.id, "Updated", "desc")
+        assertEquals(1, widgetUpdater.updateCount)
+    }
+
+    @Test
+    fun `deleteTask triggers widget update`() = runTest {
+        val task = TestTaskFactory.createTask(id = 1)
+        repository.seed(task)
+        manager.deleteTask(task)
+        assertEquals(1, widgetUpdater.updateCount)
+    }
+
+    @Test
+    fun `restoreTask triggers widget update`() = runTest {
+        val task = TestTaskFactory.createTask(id = 1)
+        manager.restoreTask(task)
+        assertEquals(1, widgetUpdater.updateCount)
+    }
+
+    @Test
+    fun `toggleTaskCompletion triggers widget update`() = runTest {
+        val task = TestTaskFactory.createTask(id = 1)
+        repository.seed(task)
+        manager.toggleTaskCompletion(task)
+        assertEquals(1, widgetUpdater.updateCount)
+    }
+
+    @Test
+    fun `setCompletedBulk triggers widget update`() = runTest {
+        val task = TestTaskFactory.createTask(id = 1)
+        repository.seed(task)
+        manager.setCompletedBulk(listOf(1L), true)
+        assertEquals(1, widgetUpdater.updateCount)
+    }
+
+    @Test
+    fun `deleteTasksByIds triggers widget update`() = runTest {
+        val task = TestTaskFactory.createTask(id = 1)
+        repository.seed(task)
+        manager.deleteTasksByIds(listOf(1L))
+        assertEquals(1, widgetUpdater.updateCount)
+    }
+
+    @Test
+    fun `setPinned triggers widget update`() = runTest {
+        val task = TestTaskFactory.createTask(id = 1)
+        repository.seed(task)
+        manager.setPinned(1L, true)
+        assertEquals(1, widgetUpdater.updateCount)
+    }
+
+    @Test
+    fun `setPriority triggers widget update`() = runTest {
+        val task = TestTaskFactory.createTask(id = 1)
+        repository.seed(task)
+        manager.setPriority(1L, 2)
+        assertEquals(1, widgetUpdater.updateCount)
+    }
+
+    @Test
+    fun `archiveTask triggers widget update`() = runTest {
+        val task = TestTaskFactory.createTask(id = 1)
+        repository.seed(task)
+        manager.archiveTask(1L)
+        assertEquals(1, widgetUpdater.updateCount)
+    }
+
+    @Test
+    fun `unarchiveTask triggers widget update`() = runTest {
+        val task = TestTaskFactory.archivedTask(id = 1)
+        repository.seed(task)
+        manager.unarchiveTask(1L)
+        assertEquals(1, widgetUpdater.updateCount)
+    }
+
+    @Test
+    fun `hardDeleteTask triggers widget update`() = runTest {
+        val task = TestTaskFactory.createTask(id = 1)
+        repository.seed(task)
+        manager.hardDeleteTask(1L)
+        assertEquals(1, widgetUpdater.updateCount)
+    }
+
+    @Test
+    fun `hardDeleteTasks triggers widget update`() = runTest {
+        val task = TestTaskFactory.createTask(id = 1)
+        repository.seed(task)
+        manager.hardDeleteTasks(listOf(1L))
+        assertEquals(1, widgetUpdater.updateCount)
+    }
+
+    @Test
+    fun `restoreTasks triggers widget update`() = runTest {
+        val task = TestTaskFactory.createTask(id = 1)
+        manager.restoreTasks(listOf(task))
+        assertEquals(1, widgetUpdater.updateCount)
     }
 }

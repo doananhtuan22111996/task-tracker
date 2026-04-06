@@ -29,11 +29,8 @@ import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
 import dev.tuandoan.tasktracker.MainActivity
+import dev.tuandoan.tasktracker.widget.formatDueDate
 import dev.tuandoan.tasktracker.widget.model.WidgetTask
-import java.text.SimpleDateFormat
-import java.util.Calendar
-import java.util.Date
-import java.util.Locale
 
 private fun createTaskAction(taskId: Long): Action {
     val intent = Intent(Intent.ACTION_VIEW, Uri.parse("tasktracker://task_editor/$taskId"))
@@ -202,28 +199,5 @@ private fun WidgetTaskRow(task: WidgetTask) {
                 ),
             )
         }
-    }
-}
-
-private fun formatDueDate(dueAt: Long?): String? {
-    if (dueAt == null) return null
-
-    val now = Calendar.getInstance()
-    val due = Calendar.getInstance().apply { timeInMillis = dueAt }
-
-    val today = Calendar.getInstance().apply {
-        set(Calendar.HOUR_OF_DAY, 0)
-        set(Calendar.MINUTE, 0)
-        set(Calendar.SECOND, 0)
-        set(Calendar.MILLISECOND, 0)
-    }
-    val tomorrow = (today.clone() as Calendar).apply { add(Calendar.DAY_OF_YEAR, 1) }
-    val dayAfterTomorrow = (today.clone() as Calendar).apply { add(Calendar.DAY_OF_YEAR, 2) }
-
-    return when {
-        dueAt < now.timeInMillis -> "Overdue"
-        due.timeInMillis >= today.timeInMillis && due.timeInMillis < tomorrow.timeInMillis -> "Today"
-        due.timeInMillis >= tomorrow.timeInMillis && due.timeInMillis < dayAfterTomorrow.timeInMillis -> "Tomorrow"
-        else -> SimpleDateFormat("MMM dd", Locale.getDefault()).format(Date(dueAt))
     }
 }
