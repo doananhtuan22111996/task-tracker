@@ -94,6 +94,9 @@ fun TaskListScreen(
     val pendingBulkDeleteTasks by viewModel.pendingBulkDeleteTasks.collectAsStateWithLifecycle()
     val pendingBulkArchiveTasks by viewModel.pendingBulkArchiveTasks.collectAsStateWithLifecycle()
 
+    // Streak data
+    val streakMap by viewModel.streakMap.collectAsStateWithLifecycle()
+
     // Feature tips state
     val userPrefs by viewModel.userPreferences.collectAsStateWithLifecycle()
 
@@ -274,6 +277,7 @@ fun TaskListScreen(
                 availableTags = availableTags,
                 selectedIds = selectedIds,
                 isSelectionMode = isSelectionMode,
+                streakMap = streakMap,
                 onSearchQueryChange = viewModel::updateSearchQuery,
                 onClearSearch = viewModel::clearSearch,
                 onToggleTaskComplete = viewModel::toggleTaskCompletion,

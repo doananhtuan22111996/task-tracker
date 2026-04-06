@@ -49,6 +49,11 @@ interface ITaskRepository {
     suspend fun uncompleteAndDeleteGenerated(reactivatedTask: Task, generatedTaskId: Long)
     suspend fun archiveAndGenerateNext(taskId: Long, nextTask: Task): Long
 
+    // Streak operations
+    suspend fun getCompletedTasksByChain(rootId: Long): List<Task>
+    suspend fun getCompletedTasksForChains(rootIds: List<Long>): List<Task>
+    suspend fun getActiveRecurringRootIds(): List<Long>
+
     // Backup operations
     suspend fun getAllTasksIncludingArchived(): List<Task>
     suspend fun replaceAllTasks(tasks: List<Task>)

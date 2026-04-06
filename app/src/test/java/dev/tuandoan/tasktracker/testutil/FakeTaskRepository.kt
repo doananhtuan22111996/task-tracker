@@ -222,6 +222,19 @@ class FakeTaskRepository : ITaskRepository {
         return id
     }
 
+    override suspend fun getCompletedTasksByChain(rootId: Long): List<Task> = tasks.value
+        .filter { it.isCompleted && (it.id == rootId || it.parentRecurringTaskId == rootId) }
+        .sortedBy { it.completedAt }
+
+    override suspend fun getCompletedTasksForChains(rootIds: List<Long>): List<Task> = tasks.value
+        .filter { it.isCompleted && (it.id in rootIds || it.parentRecurringTaskId in rootIds) }
+        .sortedBy { it.completedAt }
+
+    override suspend fun getActiveRecurringRootIds(): List<Long> = tasks.value
+        .filter { it.recurrenceType != 0 && !it.isArchived && !it.isCompleted }
+        .map { it.parentRecurringTaskId ?: it.id }
+        .distinct()
+
     override suspend fun getAllTasksIncludingArchived(): List<Task> = tasks.value
 
     override suspend fun replaceAllTasks(tasks: List<Task>) {

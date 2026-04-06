@@ -10,6 +10,7 @@ import dev.tuandoan.tasktracker.data.database.Task
 import dev.tuandoan.tasktracker.data.preferences.SettingsRepository
 import dev.tuandoan.tasktracker.data.preferences.UserPreferences
 import dev.tuandoan.tasktracker.domain.ITaskManager
+import dev.tuandoan.tasktracker.domain.usecase.StreakUseCase
 import dev.tuandoan.tasktracker.ui.events.UiEvent
 import dev.tuandoan.tasktracker.ui.manager.TaskBulkActionManager
 import dev.tuandoan.tasktracker.ui.manager.TaskCrudManager
@@ -55,14 +56,30 @@ class TaskViewModel @Inject constructor(
     private val bulkActionManager: TaskBulkActionManager,
     private val settingsRepository: SettingsRepository,
     private val taskManager: ITaskManager,
+    private val streakUseCase: StreakUseCase,
 ) : ViewModel() {
 
     // Initialize state from managers
     private val listState: TaskListState = listStateManager.initializeStateFlows(viewModelScope)
     private val selectionState: SelectionState = selectionStateManager.initializeStateFlows(viewModelScope)
 
+    // Streak map: rootChainId → currentStreak count (for badge display)
+    private val _streakMap = MutableStateFlow<Map<Long, Int>>(emptyMap())
+    val streakMap: StateFlow<Map<Long, Int>> = _streakMap.asStateFlow()
+
     init {
         viewModelScope.launch { settingsRepository.ensureFirstLaunchDate() }
+        loadStreakMap()
+    }
+
+    private fun loadStreakMap() {
+        viewModelScope.launch {
+            try {
+                _streakMap.value = streakUseCase.getStreakMap()
+            } catch (_: Exception) {
+                _streakMap.value = emptyMap()
+            }
+        }
     }
 
     // === Exposed State Flows ===
@@ -206,6 +223,7 @@ class TaskViewModel @Inject constructor(
             scope = viewModelScope,
             operation = { crudManager.deleteTask(task) },
             onSuccess = {
+                loadStreakMap()
                 // Show undo snackbar after successful deletion
                 viewModelScope.launch {
                     _singleTaskUiEvent.emit(
@@ -237,6 +255,7 @@ class TaskViewModel @Inject constructor(
             scope = viewModelScope,
             operation = { crudManager.archiveTask(task) },
             onSuccess = {
+                loadStreakMap()
                 // Show undo snackbar after successful archive
                 viewModelScope.launch {
                     _singleTaskUiEvent.emit(
@@ -305,6 +324,7 @@ class TaskViewModel @Inject constructor(
             scope = viewModelScope,
             operation = { crudManager.toggleTaskCompletion(task) },
             onSuccess = {
+                loadStreakMap()
                 if (!task.isCompleted) {
                     viewModelScope.launch { checkAndEmitRatingPrompt() }
                 }
@@ -351,6 +371,7 @@ class TaskViewModel @Inject constructor(
             scope = viewModelScope,
             operation = { crudManager.skipOccurrence(task) },
             onSuccess = { message ->
+                loadStreakMap()
                 viewModelScope.launch {
                     _singleTaskUiEvent.emit(UiEvent.ShowSnackbar(message))
                 }

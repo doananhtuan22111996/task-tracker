@@ -6,6 +6,7 @@ import dev.tuandoan.tasktracker.data.preferences.SettingsRepository
 import dev.tuandoan.tasktracker.data.preferences.UserPreferences
 import dev.tuandoan.tasktracker.domain.TaskManager
 import dev.tuandoan.tasktracker.domain.service.TaskSortService
+import dev.tuandoan.tasktracker.domain.usecase.StreakUseCase
 import dev.tuandoan.tasktracker.domain.usecase.TaskCrudUseCase
 import dev.tuandoan.tasktracker.domain.usecase.TaskFilterUseCase
 import dev.tuandoan.tasktracker.domain.usecase.TaskFormUseCase
@@ -88,6 +89,7 @@ class TaskViewModelTest {
             bulkActionManager,
             settingsRepository,
             taskManager,
+            StreakUseCase(repository),
         )
     }
 
