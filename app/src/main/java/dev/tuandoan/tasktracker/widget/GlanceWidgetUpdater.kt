@@ -5,28 +5,20 @@ import android.util.Log
 import androidx.glance.appwidget.updateAll
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dev.tuandoan.tasktracker.domain.scheduler.WidgetUpdater
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 /**
- * Glance widget updater that decouples from the calling coroutine scope.
- * Uses its own [CoroutineScope] so updates survive ViewModel scope cancellation.
- * Debounces rapid-fire updates (e.g., bulk operations) with a short delay.
+ * Glance widget updater that uses [NonCancellable] to guarantee the update
+ * completes even if the calling coroutine scope is cancelled (e.g., ViewModel
+ * scope on navigation). Runs on [Dispatchers.IO] to avoid blocking the main thread.
  */
 class GlanceWidgetUpdater @Inject constructor(@ApplicationContext private val context: Context) : WidgetUpdater {
 
-    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
-    private var pendingJob: Job? = null
-
     override suspend fun requestUpdate() {
-        pendingJob?.cancel()
-        pendingJob = scope.launch {
-            delay(DEBOUNCE_MS)
+        withContext(NonCancellable + Dispatchers.IO) {
             try {
                 TaskTrackerWidget().updateAll(context)
             } catch (e: Exception) {
@@ -37,6 +29,5 @@ class GlanceWidgetUpdater @Inject constructor(@ApplicationContext private val co
 
     companion object {
         private const val TAG = "GlanceWidgetUpdater"
-        private const val DEBOUNCE_MS = 300L
     }
 }
