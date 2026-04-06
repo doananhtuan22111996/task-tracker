@@ -17,10 +17,11 @@ fun WidgetTheme(
     val colors = if (dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
         GlanceTheme.colors
     } else {
-        ColorProviders(
-            light = lightSchemeColors,
-            dark = darkSchemeColors,
-        )
+        when (themeMode) {
+            ThemeMode.LIGHT -> ColorProviders(light = lightSchemeColors, dark = lightSchemeColors)
+            ThemeMode.DARK -> ColorProviders(light = darkSchemeColors, dark = darkSchemeColors)
+            ThemeMode.SYSTEM -> ColorProviders(light = lightSchemeColors, dark = darkSchemeColors)
+        }
     }
 
     GlanceTheme(colors = colors) {
