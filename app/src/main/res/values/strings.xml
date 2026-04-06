@@ -446,4 +446,17 @@
     <string name="a11y_chip_not_selected">Not selected</string>
     <string name="a11y_checkbox_checked">Checked</string>
     <string name="a11y_checkbox_unchecked">Unchecked</string>
+
+    <!-- Widget -->
+    <string name="widget_name">Task Tracker</string>
+    <string name="widget_description">See your top tasks at a glance</string>
+    <string name="widget_loading">Loading…</string>
+    <string name="widget_empty_title">No tasks yet</string>
+    <string name="widget_empty_subtitle">Tap + to create one</string>
+    <string name="widget_add_task">Create new task</string>
+    <string name="widget_task_row">%1$s, priority %2$s, %3$s</string>
+    <string name="widget_priority_high">high</string>
+    <string name="widget_priority_medium">medium</string>
+    <string name="widget_priority_low">low</string>
+    <string name="widget_due_overdue">Overdue</string>
 </resources>

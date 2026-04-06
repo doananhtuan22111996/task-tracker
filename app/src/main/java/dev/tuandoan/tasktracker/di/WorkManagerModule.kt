@@ -10,6 +10,8 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import dev.tuandoan.tasktracker.data.scheduler.WorkManagerTaskReminderScheduler
 import dev.tuandoan.tasktracker.domain.scheduler.TaskReminderScheduler
+import dev.tuandoan.tasktracker.domain.scheduler.WidgetUpdater
+import dev.tuandoan.tasktracker.widget.GlanceWidgetUpdater
 import javax.inject.Singleton
 
 @Module
@@ -21,6 +23,10 @@ abstract class WorkManagerModule {
     abstract fun bindTaskReminderScheduler(
         workManagerScheduler: WorkManagerTaskReminderScheduler,
     ): TaskReminderScheduler
+
+    @Binds
+    @Singleton
+    abstract fun bindWidgetUpdater(glanceWidgetUpdater: GlanceWidgetUpdater): WidgetUpdater
 
     companion object {
         @Provides

@@ -4,6 +4,7 @@ import dev.tuandoan.tasktracker.domain.TaskManager
 import dev.tuandoan.tasktracker.domain.model.RecurrenceType
 import dev.tuandoan.tasktracker.testutil.FakeReminderScheduler
 import dev.tuandoan.tasktracker.testutil.FakeTaskRepository
+import dev.tuandoan.tasktracker.testutil.FakeWidgetUpdater
 import dev.tuandoan.tasktracker.testutil.TestTaskFactory
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -27,7 +28,7 @@ class NotificationCompleteFlowTest {
     fun setup() {
         repository = FakeTaskRepository()
         scheduler = FakeReminderScheduler()
-        taskManager = TaskManager(repository, scheduler)
+        taskManager = TaskManager(repository, scheduler, FakeWidgetUpdater())
     }
 
     @Test

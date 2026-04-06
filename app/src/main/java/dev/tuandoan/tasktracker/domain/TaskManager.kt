@@ -5,6 +5,7 @@ import dev.tuandoan.tasktracker.data.database.Task
 import dev.tuandoan.tasktracker.domain.model.RecurrenceType
 import dev.tuandoan.tasktracker.domain.repository.ITaskRepository
 import dev.tuandoan.tasktracker.domain.scheduler.TaskReminderScheduler
+import dev.tuandoan.tasktracker.domain.scheduler.WidgetUpdater
 import dev.tuandoan.tasktracker.domain.service.RecurrenceCalculator
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
@@ -17,6 +18,7 @@ import javax.inject.Inject
 class TaskManager @Inject constructor(
     private val repository: ITaskRepository,
     private val reminderScheduler: TaskReminderScheduler,
+    private val widgetUpdater: WidgetUpdater,
 ) : ITaskManager {
 
     // Data access
@@ -74,6 +76,7 @@ class TaskManager @Inject constructor(
 
         // Schedule reminder if applicable
         scheduleReminderIfNeeded(taskId, title.trim(), dueAt, reminderOffsetMinutes)
+        widgetUpdater.requestUpdate()
 
         return taskId
     }
@@ -97,6 +100,7 @@ class TaskManager @Inject constructor(
                 }
             }
         }
+        widgetUpdater.requestUpdate()
     }
 
     override suspend fun updateTaskContent(taskId: Long, title: String, description: String) {
@@ -146,10 +150,13 @@ class TaskManager @Inject constructor(
 
             // Schedule new reminder if task is not completed
             if (!updatedTask.isCompleted) {
-                return scheduleReminderIfNeeded(taskId, title.trim(), dueAt, reminderOffsetMinutes)
+                val result = scheduleReminderIfNeeded(taskId, title.trim(), dueAt, reminderOffsetMinutes)
+                widgetUpdater.requestUpdate()
+                return result
             }
         }
 
+        widgetUpdater.requestUpdate()
         return true
     }
 
@@ -157,6 +164,7 @@ class TaskManager @Inject constructor(
         // Cancel any pending reminder before deleting
         reminderScheduler.cancel(task.id)
         repository.deleteTask(task)
+        widgetUpdater.requestUpdate()
     }
 
     override suspend fun restoreTask(task: Task): Result<Unit> = try {
@@ -165,6 +173,7 @@ class TaskManager @Inject constructor(
         if (!task.isCompleted) {
             scheduleReminderIfNeeded(task.id, task.title, task.dueAt, task.reminderOffsetMinutes)
         }
+        widgetUpdater.requestUpdate()
         Result.success(Unit)
     } catch (e: Exception) {
         Result.failure(e)
@@ -189,6 +198,7 @@ class TaskManager @Inject constructor(
             // Reschedule reminder when task is marked incomplete
             scheduleReminderIfNeeded(task.id, task.title, task.dueAt, task.reminderOffsetMinutes)
         }
+        widgetUpdater.requestUpdate()
     }
 
     override suspend fun skipOccurrence(task: Task) {
@@ -198,6 +208,7 @@ class TaskManager @Inject constructor(
         reminderScheduler.cancel(task.id)
         // Atomically archive + generate next occurrence
         archiveAndGenerateNext(task, currentTime)
+        widgetUpdater.requestUpdate()
     }
 
     override suspend fun markTaskComplete(task: Task) {
@@ -239,6 +250,7 @@ class TaskManager @Inject constructor(
                 }
             }
         }
+        widgetUpdater.requestUpdate()
     }
 
     override suspend fun deleteTasksByIds(ids: List<Long>) {
@@ -248,6 +260,7 @@ class TaskManager @Inject constructor(
                 reminderScheduler.cancel(taskId)
             }
             repository.deleteByIds(ids)
+            widgetUpdater.requestUpdate()
         }
     }
 
@@ -258,6 +271,7 @@ class TaskManager @Inject constructor(
             tasks.filter { !it.isCompleted }.forEach { task ->
                 scheduleReminderIfNeeded(task.id, task.title, task.dueAt, task.reminderOffsetMinutes)
             }
+            widgetUpdater.requestUpdate()
         }
         Result.success(Unit)
     } catch (e: Exception) {
@@ -272,10 +286,12 @@ class TaskManager @Inject constructor(
     // Pin/Priority operations
     override suspend fun setPinned(taskId: Long, pinned: Boolean) {
         repository.setPinned(taskId, pinned)
+        widgetUpdater.requestUpdate()
     }
 
     override suspend fun setPriority(taskId: Long, priority: Int) {
         repository.setPriority(taskId, priority)
+        widgetUpdater.requestUpdate()
     }
 
     // Archive operations
@@ -285,6 +301,7 @@ class TaskManager @Inject constructor(
         // Cancel any pending reminder before archiving
         reminderScheduler.cancel(taskId)
         repository.archiveTask(taskId)
+        widgetUpdater.requestUpdate()
     }
 
     override suspend fun unarchiveTask(taskId: Long) {
@@ -295,6 +312,7 @@ class TaskManager @Inject constructor(
         if (task != null && !task.isCompleted) {
             scheduleReminderIfNeeded(taskId, task.title, task.dueAt, task.reminderOffsetMinutes)
         }
+        widgetUpdater.requestUpdate()
     }
 
     override suspend fun archiveTasks(ids: List<Long>) {
@@ -304,6 +322,7 @@ class TaskManager @Inject constructor(
                 reminderScheduler.cancel(taskId)
             }
             repository.archiveTasks(ids)
+            widgetUpdater.requestUpdate()
         }
     }
 
@@ -318,6 +337,7 @@ class TaskManager @Inject constructor(
                     scheduleReminderIfNeeded(taskId, task.title, task.dueAt, task.reminderOffsetMinutes)
                 }
             }
+            widgetUpdater.requestUpdate()
         }
     }
 
@@ -325,6 +345,7 @@ class TaskManager @Inject constructor(
         // Cancel any pending reminder before permanently deleting
         reminderScheduler.cancel(taskId)
         repository.hardDeleteTask(taskId)
+        widgetUpdater.requestUpdate()
     }
 
     override suspend fun hardDeleteTasks(ids: List<Long>) {
@@ -334,6 +355,7 @@ class TaskManager @Inject constructor(
                 reminderScheduler.cancel(taskId)
             }
             repository.hardDeleteTasks(ids)
+            widgetUpdater.requestUpdate()
         }
     }
 

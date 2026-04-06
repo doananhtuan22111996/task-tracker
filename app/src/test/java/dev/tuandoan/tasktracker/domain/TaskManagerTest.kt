@@ -2,6 +2,7 @@ package dev.tuandoan.tasktracker.domain
 
 import dev.tuandoan.tasktracker.testutil.FakeReminderScheduler
 import dev.tuandoan.tasktracker.testutil.FakeTaskRepository
+import dev.tuandoan.tasktracker.testutil.FakeWidgetUpdater
 import dev.tuandoan.tasktracker.testutil.TestTaskFactory
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
@@ -23,7 +24,7 @@ class TaskManagerTest {
     fun setup() {
         repository = FakeTaskRepository()
         scheduler = FakeReminderScheduler()
-        manager = TaskManager(repository, scheduler)
+        manager = TaskManager(repository, scheduler, FakeWidgetUpdater())
     }
 
     // === createTask ===
