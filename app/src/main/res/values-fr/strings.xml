@@ -51,7 +51,7 @@
     <!-- Task List Item Accessibility -->
     <string name="pin_task">Épingler la tâche</string>
     <string name="unpin_task">Désépingler la tâche</string>
-    <string name="more_options">Plus d\’options</string>
+    <string name="more_options">Plus d’options</string>
     <string name="cd_more_options_for_task">Plus d\’options pour %1$s</string>
     <string name="mark_complete">Marquer comme terminée</string>
     <string name="mark_incomplete">Marquer comme non terminée</string>
