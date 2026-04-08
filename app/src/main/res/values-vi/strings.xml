@@ -116,6 +116,19 @@
     <string name="stat_cd_overdue_clear">Không có công việc quá hạn</string>
     <string name="stat_cd_progress">Tiến độ hôm nay: %1$d trong %2$d công việc đã hoàn thành</string>
 
+    <!-- Stats Screen — Streaks -->
+    <string name="stat_section_streaks">Chuỗi liên tiếp</string>
+    <string name="stat_active_recurring">Lặp lại đang hoạt động</string>
+    <string name="stat_desc_active_recurring">Các công việc lặp lại đang thực hiện</string>
+    <string name="stat_best_current_streak">Chuỗi hiện tại tốt nhất</string>
+    <string name="stat_all_time_best_streak">Chuỗi tốt nhất mọi thời đại</string>
+    <string name="stat_streak_count">%1$d liên tiếp</string>
+    <string name="stat_streak_empty">Chưa có công việc lặp lại</string>
+    <string name="stat_streak_empty_hint">Tạo công việc lặp lại để bắt đầu theo dõi chuỗi</string>
+    <string name="stat_cd_active_recurring">%1$d công việc lặp lại đang hoạt động</string>
+    <string name="stat_cd_streak">%1$s, %2$d lần hoàn thành đúng hạn liên tiếp</string>
+    <string name="streak_badge_cd">chuỗi %1$d</string>
+
     <!-- Settings Screen -->
     <string name="title_settings">Cài đặt</string>
     <string name="settings_section_appearance">Giao diện</string>
@@ -231,6 +244,12 @@
     <string name="notification_title">Nhắc việc</string>
     <string name="notification_due_soon">Sắp đến hạn: %s</string>
     <string name="notification_default_task">Công việc</string>
+    <string name="notification_action_complete">Đánh dấu hoàn thành</string>
+    <string name="notification_task_completed">Công việc đã hoàn thành</string>
+
+    <!-- App Shortcut -->
+    <string name="shortcut_new_task_short">Công việc mới</string>
+    <string name="shortcut_new_task_long">Tạo công việc mới</string>
 
     <!-- Date Format Patterns (localizable) -->
     <string name="date_format_short">dd/MM/yyyy</string>
@@ -427,4 +446,17 @@
     <string name="day_sun_full">Chủ Nhật</string>
     <string name="snackbar_task_skipped">Đã bỏ qua lần lặp</string>
     <string name="error_skip_occurrence">Không thể bỏ qua lần lặp</string>
+
+    <!-- Widget -->
+    <string name="widget_name">Task Tracker</string>
+    <string name="widget_description">Xem các công việc quan trọng trong nháy mắt</string>
+    <string name="widget_loading">Đang tải…</string>
+    <string name="widget_empty_title">Chưa có công việc</string>
+    <string name="widget_empty_subtitle">Nhấn + để tạo mới</string>
+    <string name="widget_add_task">Tạo công việc mới</string>
+    <string name="widget_task_row">%1$s, ưu tiên %2$s, %3$s</string>
+    <string name="widget_priority_high">cao</string>
+    <string name="widget_priority_medium">trung bình</string>
+    <string name="widget_priority_low">thấp</string>
+    <string name="widget_due_overdue">Quá hạn</string>
 </resources>

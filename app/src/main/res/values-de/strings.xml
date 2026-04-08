@@ -116,6 +116,19 @@
     <string name="stat_cd_overdue_clear">Keine überfälligen Aufgaben</string>
     <string name="stat_cd_progress">Tagesfortschritt: %1$d von %2$d Aufgaben heute erledigt</string>
 
+    <!-- Stats Screen — Streaks -->
+    <string name="stat_section_streaks">Serien</string>
+    <string name="stat_active_recurring">Aktive Wiederholungen</string>
+    <string name="stat_desc_active_recurring">Wiederkehrende Aufgaben in Bearbeitung</string>
+    <string name="stat_best_current_streak">Beste aktuelle Serie</string>
+    <string name="stat_all_time_best_streak">Allzeit-Bestleistung</string>
+    <string name="stat_streak_count">%1$d in Folge</string>
+    <string name="stat_streak_empty">Noch keine wiederkehrenden Aufgaben</string>
+    <string name="stat_streak_empty_hint">Erstellen Sie eine wiederkehrende Aufgabe, um Serien zu verfolgen</string>
+    <string name="stat_cd_active_recurring">%1$d aktive wiederkehrende Aufgaben</string>
+    <string name="stat_cd_streak">%1$s, %2$d aufeinanderfolgende pünktliche Erledigungen</string>
+    <string name="streak_badge_cd">%1$d Serie</string>
+
     <!-- Settings Screen -->
     <string name="title_settings">Einstellungen</string>
     <string name="settings_section_appearance">Darstellung</string>
@@ -231,6 +244,12 @@
     <string name="notification_title">Aufgaben-Erinnerung</string>
     <string name="notification_due_soon">Bald fällig: %s</string>
     <string name="notification_default_task">Aufgabe</string>
+    <string name="notification_action_complete">Als erledigt markieren</string>
+    <string name="notification_task_completed">Aufgabe erledigt</string>
+
+    <!-- App Shortcut -->
+    <string name="shortcut_new_task_short">Neue Aufgabe</string>
+    <string name="shortcut_new_task_long">Neue Aufgabe erstellen</string>
 
     <!-- Date Format Patterns (localizable) -->
     <string name="date_format_short">dd. MMM yyyy</string>
@@ -427,4 +446,17 @@
     <string name="day_sun_full">Sonntag</string>
     <string name="snackbar_task_skipped">Vorkommen übersprungen</string>
     <string name="error_skip_occurrence">Vorkommen konnte nicht übersprungen werden</string>
+
+    <!-- Widget -->
+    <string name="widget_name">Task Tracker</string>
+    <string name="widget_description">Ihre wichtigsten Aufgaben auf einen Blick</string>
+    <string name="widget_loading">Laden…</string>
+    <string name="widget_empty_title">Noch keine Aufgaben</string>
+    <string name="widget_empty_subtitle">Tippe +, um eine zu erstellen</string>
+    <string name="widget_add_task">Neue Aufgabe erstellen</string>
+    <string name="widget_task_row">%1$s, Priorität %2$s, %3$s</string>
+    <string name="widget_priority_high">hoch</string>
+    <string name="widget_priority_medium">mittel</string>
+    <string name="widget_priority_low">niedrig</string>
+    <string name="widget_due_overdue">Überfällig</string>
 </resources>
