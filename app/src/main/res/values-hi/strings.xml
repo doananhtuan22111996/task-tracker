@@ -52,6 +52,7 @@
     <string name="pin_task">कार्य पिन करें</string>
     <string name="unpin_task">कार्य अनपिन करें</string>
     <string name="more_options">अधिक विकल्प</string>
+    <string name="cd_more_options_for_task">%1$s के लिए अधिक विकल्प</string>
     <string name="mark_complete">पूर्ण चिह्नित करें</string>
     <string name="mark_incomplete">अपूर्ण चिह्नित करें</string>
     <string name="select_task">कार्य चुनें</string>
@@ -367,6 +368,8 @@
     <string name="tip_action_got_it">समझ गया</string>
 
     <!-- Help & FAQ (SPEC-O03) -->
+    <string name="cd_faq_expanded">विस्तारित</string>
+    <string name="cd_faq_collapsed">संक्षिप्त</string>
     <string name="settings_help_faq">सहायता &amp; FAQ</string>
     <string name="settings_help_faq_desc">सामान्य प्रश्नों के उत्तर प्राप्त करें</string>
     <string name="title_help_faq">सहायता &amp; FAQ</string>

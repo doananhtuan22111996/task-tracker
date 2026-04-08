@@ -52,6 +52,7 @@
     <string name="pin_task">Fixar tarefa</string>
     <string name="unpin_task">Desafixar tarefa</string>
     <string name="more_options">Mais opções</string>
+    <string name="cd_more_options_for_task">Mais opções para %1$s</string>
     <string name="mark_complete">Marcar como concluída</string>
     <string name="mark_incomplete">Marcar como não concluída</string>
     <string name="select_task">Selecionar tarefa</string>
@@ -367,6 +368,8 @@
     <string name="tip_action_got_it">Entendi</string>
 
     <!-- Help & FAQ (SPEC-O03) -->
+    <string name="cd_faq_expanded">expandido</string>
+    <string name="cd_faq_collapsed">recolhido</string>
     <string name="settings_help_faq">Ajuda &amp; FAQ</string>
     <string name="settings_help_faq_desc">Obtenha respostas a perguntas frequentes</string>
     <string name="title_help_faq">Ajuda &amp; FAQ</string>

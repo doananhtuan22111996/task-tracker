@@ -52,6 +52,7 @@
     <string name="pin_task">Ghim công việc</string>
     <string name="unpin_task">Bỏ ghim công việc</string>
     <string name="more_options">Tùy chọn khác</string>
+    <string name="cd_more_options_for_task">Tùy chọn khác cho %1$s</string>
     <string name="mark_complete">Đánh dấu hoàn thành</string>
     <string name="mark_incomplete">Đánh dấu chưa hoàn thành</string>
     <string name="select_task">Chọn công việc</string>
@@ -367,6 +368,8 @@
     <string name="tip_action_got_it">Đã hiểu</string>
 
     <!-- Help & FAQ (SPEC-O03) -->
+    <string name="cd_faq_expanded">đã mở rộng</string>
+    <string name="cd_faq_collapsed">đã thu gọn</string>
     <string name="settings_help_faq">Trợ giúp &amp; FAQ</string>
     <string name="settings_help_faq_desc">Tìm câu trả lời cho các câu hỏi thường gặp</string>
     <string name="title_help_faq">Trợ giúp &amp; FAQ</string>
