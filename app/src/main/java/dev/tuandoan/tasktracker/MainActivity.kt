@@ -98,7 +98,12 @@ class MainActivity : AppCompatActivity() {
     private fun resolveDeepLinkRoute(intent: Intent?): String? {
         val data = intent?.data ?: return null
         if (data.scheme == "tasktracker" && data.host == "task_editor") {
-            return TaskTrackerRoutes.TASK_EDITOR_CREATE
+            val taskId = data.pathSegments?.firstOrNull()?.toLongOrNull()
+            return if (taskId != null) {
+                TaskTrackerRoutes.taskEditorEdit(taskId)
+            } else {
+                TaskTrackerRoutes.TASK_EDITOR_CREATE
+            }
         }
         return null
     }

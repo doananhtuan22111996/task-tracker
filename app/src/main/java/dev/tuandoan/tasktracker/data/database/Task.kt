@@ -1,9 +1,16 @@
 package dev.tuandoan.tasktracker.data.database
 
 import androidx.room.Entity
+import androidx.room.Index
 import androidx.room.PrimaryKey
 
-@Entity(tableName = "tasks")
+@Entity(
+    tableName = "tasks",
+    indices = [
+        Index(value = ["isCompleted", "isArchived"]),
+        Index(value = ["parentRecurringTaskId"]),
+    ],
+)
 data class Task(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,

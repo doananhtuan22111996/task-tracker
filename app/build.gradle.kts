@@ -129,6 +129,10 @@ dependencies {
     // Google Play In-App Review
     implementation(libs.google.play.review.ktx)
 
+    // Glance (AppWidget)
+    implementation(libs.androidx.glance.appwidget)
+    implementation(libs.androidx.glance.material3)
+
     // WorkManager dependencies
     implementation(libs.androidx.work.runtime.ktx)
     implementation(libs.androidx.hilt.work)

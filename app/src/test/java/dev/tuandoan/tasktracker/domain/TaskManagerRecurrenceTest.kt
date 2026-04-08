@@ -3,6 +3,7 @@ package dev.tuandoan.tasktracker.domain
 import dev.tuandoan.tasktracker.domain.model.RecurrenceType
 import dev.tuandoan.tasktracker.testutil.FakeReminderScheduler
 import dev.tuandoan.tasktracker.testutil.FakeTaskRepository
+import dev.tuandoan.tasktracker.testutil.FakeWidgetUpdater
 import dev.tuandoan.tasktracker.testutil.TestTaskFactory
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -30,7 +31,7 @@ class TaskManagerRecurrenceTest {
     fun setUp() {
         repository = FakeTaskRepository()
         reminderScheduler = FakeReminderScheduler()
-        taskManager = TaskManager(repository, reminderScheduler)
+        taskManager = TaskManager(repository, reminderScheduler, FakeWidgetUpdater())
     }
 
     // ── Complete generates next occurrence ──

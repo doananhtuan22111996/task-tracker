@@ -1,0 +1,217 @@
+package dev.tuandoan.tasktracker.widget
+
+import dev.tuandoan.tasktracker.data.database.Task
+import dev.tuandoan.tasktracker.testutil.TestTaskFactory
+import dev.tuandoan.tasktracker.testutil.TestTaskFactory.ONE_DAY_MS
+import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
+import org.junit.Before
+import org.junit.Test
+
+class WidgetDataProviderTest {
+
+    private lateinit var fakeDao: FakeWidgetTaskDao
+    private lateinit var dataProvider: WidgetDataProvider
+
+    @Before
+    fun setup() {
+        fakeDao = FakeWidgetTaskDao()
+        dataProvider = WidgetDataProvider(fakeDao)
+    }
+
+    @Test
+    fun `empty database returns empty list`() = runTest {
+        val result = dataProvider.getWidgetTasks()
+        assertTrue(result.isEmpty())
+    }
+
+    @Test
+    fun `returns active tasks only, excludes completed`() = runTest {
+        fakeDao.tasks = listOf(
+            TestTaskFactory.createTask(id = 1, title = "Active"),
+            TestTaskFactory.completedTask(id = 2, title = "Completed"),
+        )
+
+        val result = dataProvider.getWidgetTasks()
+
+        assertEquals(1, result.size)
+        assertEquals("Active", result[0].title)
+    }
+
+    @Test
+    fun `excludes archived tasks`() = runTest {
+        fakeDao.tasks = listOf(
+            TestTaskFactory.createTask(id = 1, title = "Active"),
+            TestTaskFactory.archivedTask(id = 2, title = "Archived"),
+        )
+
+        val result = dataProvider.getWidgetTasks()
+
+        assertEquals(1, result.size)
+        assertEquals("Active", result[0].title)
+    }
+
+    @Test
+    fun `returns max 5 tasks`() = runTest {
+        fakeDao.tasks = (1..10).map { i ->
+            TestTaskFactory.createTask(id = i.toLong(), title = "Task $i")
+        }
+
+        val result = dataProvider.getWidgetTasks()
+
+        assertEquals(5, result.size)
+    }
+
+    @Test
+    fun `pinned tasks appear first`() = runTest {
+        fakeDao.tasks = listOf(
+            TestTaskFactory.createTask(
+                id = 1,
+                title = "Normal",
+                dueAt = TestTaskFactory.BASE_TIMESTAMP + ONE_DAY_MS,
+            ),
+            TestTaskFactory.createTask(
+                id = 2,
+                title = "Pinned",
+                isPinned = true,
+                dueAt = TestTaskFactory.BASE_TIMESTAMP + 2 * ONE_DAY_MS,
+            ),
+        )
+
+        val result = dataProvider.getWidgetTasks()
+
+        assertEquals("Pinned", result[0].title)
+        assertTrue(result[0].isPinned)
+    }
+
+    @Test
+    fun `tasks sorted by due date ascending after pin`() = runTest {
+        fakeDao.tasks = listOf(
+            TestTaskFactory.createTask(
+                id = 1,
+                title = "Later",
+                dueAt = TestTaskFactory.BASE_TIMESTAMP + 3 * ONE_DAY_MS,
+            ),
+            TestTaskFactory.createTask(
+                id = 2,
+                title = "Sooner",
+                dueAt = TestTaskFactory.BASE_TIMESTAMP + ONE_DAY_MS,
+            ),
+        )
+
+        val result = dataProvider.getWidgetTasks()
+
+        assertEquals("Sooner", result[0].title)
+        assertEquals("Later", result[1].title)
+    }
+
+    @Test
+    fun `tasks without due date appear last`() = runTest {
+        fakeDao.tasks = listOf(
+            TestTaskFactory.createTask(id = 1, title = "No date"),
+            TestTaskFactory.createTask(
+                id = 2,
+                title = "Has date",
+                dueAt = TestTaskFactory.BASE_TIMESTAMP + ONE_DAY_MS,
+            ),
+        )
+
+        val result = dataProvider.getWidgetTasks()
+
+        assertEquals("Has date", result[0].title)
+        assertEquals("No date", result[1].title)
+    }
+
+    @Test
+    fun `maps task fields correctly to WidgetTask`() = runTest {
+        fakeDao.tasks = listOf(
+            TestTaskFactory.createTask(
+                id = 42,
+                title = "Buy groceries",
+                dueAt = TestTaskFactory.BASE_TIMESTAMP + ONE_DAY_MS,
+                dueAtHasTime = true,
+                priority = 2,
+                isPinned = true,
+            ),
+        )
+
+        val result = dataProvider.getWidgetTasks()
+
+        assertEquals(1, result.size)
+        val task = result[0]
+        assertEquals(42L, task.id)
+        assertEquals("Buy groceries", task.title)
+        assertEquals(TestTaskFactory.BASE_TIMESTAMP + ONE_DAY_MS, task.dueAt)
+        assertTrue(task.dueAtHasTime)
+        assertEquals(2, task.priority)
+        assertTrue(task.isPinned)
+    }
+
+    @Test
+    fun `custom limit is respected`() = runTest {
+        fakeDao.tasks = (1..10).map { i ->
+            TestTaskFactory.createTask(id = i.toLong(), title = "Task $i")
+        }
+
+        val result = dataProvider.getWidgetTasks(limit = 3)
+
+        assertEquals(3, result.size)
+    }
+}
+
+/**
+ * Fake TaskDao that simulates the widget query behavior:
+ * filters active (non-completed, non-archived), sorts by isPinned DESC then dueAt ASC (nulls last),
+ * and limits results.
+ */
+private class FakeWidgetTaskDao : dev.tuandoan.tasktracker.data.database.TaskDao {
+
+    var tasks: List<Task> = emptyList()
+
+    override suspend fun getWidgetTasks(limit: Int): List<Task> = tasks
+        .filter { !it.isCompleted && !it.isArchived }
+        .sortedWith(
+            compareByDescending<Task> { it.isPinned }
+                .thenBy(nullsLast()) { it.dueAt },
+        )
+        .take(limit)
+
+    // Unused stubs — only getWidgetTasks matters for this test
+    override fun getAllTasks() = throw UnsupportedOperationException()
+    override suspend fun getTaskById(id: Long) = throw UnsupportedOperationException()
+    override suspend fun insertTask(task: Task) = throw UnsupportedOperationException()
+    override suspend fun updateTask(task: Task) = throw UnsupportedOperationException()
+    override suspend fun deleteTask(task: Task) = throw UnsupportedOperationException()
+    override suspend fun upsert(task: Task) = throw UnsupportedOperationException()
+    override fun getActiveTasks() = throw UnsupportedOperationException()
+    override fun getCompletedTasks() = throw UnsupportedOperationException()
+    override fun getArchivedTasks() = throw UnsupportedOperationException()
+    override suspend fun markCompleted(ids: List<Long>, completedAt: Long) = throw UnsupportedOperationException()
+    override suspend fun markActive(ids: List<Long>) = throw UnsupportedOperationException()
+    override suspend fun deleteByIds(ids: List<Long>) = throw UnsupportedOperationException()
+    override suspend fun getTasksByIds(ids: List<Long>) = throw UnsupportedOperationException()
+    override suspend fun upsertAll(tasks: List<Task>) = throw UnsupportedOperationException()
+    override suspend fun setArchived(id: Long, archived: Boolean, archivedAt: Long?) =
+        throw UnsupportedOperationException()
+    override suspend fun setArchivedBulk(ids: List<Long>, archived: Boolean, archivedAt: Long?) =
+        throw UnsupportedOperationException()
+    override suspend fun hardDeleteById(id: Long) = throw UnsupportedOperationException()
+    override suspend fun hardDeleteByIds(ids: List<Long>) = throw UnsupportedOperationException()
+    override suspend fun setPinned(id: Long, pinned: Boolean) = throw UnsupportedOperationException()
+    override suspend fun setPriority(id: Long, priority: Int) = throw UnsupportedOperationException()
+    override fun observeActiveCount() = throw UnsupportedOperationException()
+    override fun observeCompletedCount() = throw UnsupportedOperationException()
+    override fun observeCompletedTodayCount(startOfDayMillis: Long, endOfDayMillis: Long) =
+        throw UnsupportedOperationException()
+    override fun observeDueTodayCount(startOfDayMillis: Long, endOfDayMillis: Long) =
+        throw UnsupportedOperationException()
+    override fun observeOverdueCount(nowMillis: Long) = throw UnsupportedOperationException()
+    override fun observeCompletedCountPerDay(startMillis: Long, endMillis: Long) = throw UnsupportedOperationException()
+    override suspend fun getLatestGeneratedTask(parentId: Long) = throw UnsupportedOperationException()
+    override suspend fun getCompletedTasksByChain(rootId: Long) = throw UnsupportedOperationException()
+    override suspend fun getCompletedTasksForChains(rootIds: List<Long>) = throw UnsupportedOperationException()
+    override suspend fun getActiveRecurringRootIds() = throw UnsupportedOperationException()
+    override suspend fun getAllTasksIncludingArchived() = throw UnsupportedOperationException()
+    override suspend fun deleteAllTasks() = throw UnsupportedOperationException()
+}

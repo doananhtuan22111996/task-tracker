@@ -147,6 +147,20 @@ object DatabaseModule {
     }
 
     /**
+     * Migration from version 8 to 9: Add indexes for query performance (idempotent)
+     */
+    private val MIGRATION_8_9 = object : Migration(8, 9) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            database.execSQL(
+                "CREATE INDEX IF NOT EXISTS `index_tasks_isCompleted_isArchived` ON `tasks` (`isCompleted`, `isArchived`)",
+            )
+            database.execSQL(
+                "CREATE INDEX IF NOT EXISTS `index_tasks_parentRecurringTaskId` ON `tasks` (`parentRecurringTaskId`)",
+            )
+        }
+    }
+
+    /**
      * Provides a singleton instance of TaskDatabase.
      * Uses Room.databaseBuilder for database creation with proper configuration.
      */
@@ -165,6 +179,7 @@ object DatabaseModule {
             MIGRATION_5_6,
             MIGRATION_6_7,
             MIGRATION_7_8,
+            MIGRATION_8_9,
         )
         .build()
 

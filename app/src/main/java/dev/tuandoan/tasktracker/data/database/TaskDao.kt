@@ -134,6 +134,14 @@ interface TaskDao {
     )
     suspend fun getActiveRecurringRootIds(): List<Long>
 
+    // Widget query
+    @Query(
+        "SELECT * FROM tasks WHERE isCompleted = 0 AND isArchived = 0 " +
+            "ORDER BY isPinned DESC, CASE WHEN dueAt IS NULL THEN 1 ELSE 0 END, dueAt ASC " +
+            "LIMIT :limit",
+    )
+    suspend fun getWidgetTasks(limit: Int): List<Task>
+
     // Backup operations
     @Query("SELECT * FROM tasks ORDER BY createdAt DESC")
     suspend fun getAllTasksIncludingArchived(): List<Task>

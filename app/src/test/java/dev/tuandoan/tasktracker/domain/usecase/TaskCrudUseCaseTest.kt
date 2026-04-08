@@ -4,6 +4,7 @@ import android.content.Context
 import dev.tuandoan.tasktracker.domain.TaskManager
 import dev.tuandoan.tasktracker.testutil.FakeReminderScheduler
 import dev.tuandoan.tasktracker.testutil.FakeTaskRepository
+import dev.tuandoan.tasktracker.testutil.FakeWidgetUpdater
 import dev.tuandoan.tasktracker.testutil.TestTaskFactory
 import io.mockk.every
 import io.mockk.mockk
@@ -33,7 +34,7 @@ class TaskCrudUseCaseTest {
         }
         repository = FakeTaskRepository()
         scheduler = FakeReminderScheduler()
-        taskManager = TaskManager(repository, scheduler)
+        taskManager = TaskManager(repository, scheduler, FakeWidgetUpdater())
         useCase = TaskCrudUseCase(taskManager, context)
     }
 
