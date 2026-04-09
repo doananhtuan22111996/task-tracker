@@ -26,6 +26,7 @@ import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
@@ -131,7 +132,11 @@ fun HelpScreen(onNavigateBack: () -> Unit) {
                     val isExpanded = expandedItems[faqItem.questionRes] ?: false
                     val question = stringResource(faqItem.questionRes)
                     val answer = stringResource(faqItem.answerRes)
-                    val expandedLabel = if (isExpanded) "expanded" else "collapsed"
+                    val expandedLabel = if (isExpanded) {
+                        stringResource(R.string.cd_faq_expanded)
+                    } else {
+                        stringResource(R.string.cd_faq_collapsed)
+                    }
 
                     Column(
                         modifier = Modifier.semantics {
@@ -157,7 +162,7 @@ fun HelpScreen(onNavigateBack: () -> Unit) {
                             },
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .clickable {
+                                .clickable(role = Role.Button) {
                                     expandedItems[faqItem.questionRes] = !isExpanded
                                 },
                         )

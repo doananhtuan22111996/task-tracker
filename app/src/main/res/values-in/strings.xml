@@ -52,6 +52,7 @@
     <string name="pin_task">Sematkan tugas</string>
     <string name="unpin_task">Batalkan semat</string>
     <string name="more_options">Opsi lainnya</string>
+    <string name="cd_more_options_for_task">Opsi lainnya untuk %1$s</string>
     <string name="mark_complete">Tandai selesai</string>
     <string name="mark_incomplete">Tandai belum selesai</string>
     <string name="select_task">Pilih tugas</string>
@@ -367,6 +368,8 @@
     <string name="tip_action_got_it">Mengerti</string>
 
     <!-- Help & FAQ (SPEC-O03) -->
+    <string name="cd_faq_expanded">diperluas</string>
+    <string name="cd_faq_collapsed">diciutkan</string>
     <string name="settings_help_faq">Bantuan &amp; FAQ</string>
     <string name="settings_help_faq_desc">Dapatkan jawaban untuk pertanyaan umum</string>
     <string name="title_help_faq">Bantuan &amp; FAQ</string>

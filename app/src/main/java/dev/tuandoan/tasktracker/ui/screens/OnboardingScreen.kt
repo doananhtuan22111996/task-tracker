@@ -33,6 +33,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -56,6 +57,7 @@ private val pages = listOf(
 
 @Composable
 fun OnboardingScreen(onFinish: () -> Unit) {
+    val context = LocalContext.current
     val pagerState = rememberPagerState(pageCount = { pages.size })
     val scope = rememberCoroutineScope()
     val isLastPage = pagerState.currentPage == pages.lastIndex
@@ -98,7 +100,11 @@ fun OnboardingScreen(onFinish: () -> Unit) {
                     .fillMaxWidth()
                     .padding(bottom = 16.dp)
                     .semantics {
-                        contentDescription = "Page ${pagerState.currentPage + 1} of ${pages.size}"
+                        contentDescription = context.getString(
+                            R.string.cd_onboarding_page_indicator,
+                            pagerState.currentPage + 1,
+                            pages.size,
+                        )
                     },
                 horizontalArrangement = Arrangement.Center,
             ) {

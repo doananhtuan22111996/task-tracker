@@ -403,7 +403,7 @@ fun TaskItem(
                         ) {
                             Icon(
                                 imageVector = Icons.Default.MoreVert,
-                                contentDescription = stringResource(R.string.more_options),
+                                contentDescription = stringResource(R.string.cd_more_options_for_task, task.title),
                                 tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
                                 modifier = Modifier.size(20.dp),
                             )

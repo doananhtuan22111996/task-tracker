@@ -52,6 +52,7 @@
     <string name="pin_task">Aufgabe anheften</string>
     <string name="unpin_task">Aufgabe lösen</string>
     <string name="more_options">Weitere Optionen</string>
+    <string name="cd_more_options_for_task">Weitere Optionen für %1$s</string>
     <string name="mark_complete">Als erledigt markieren</string>
     <string name="mark_incomplete">Als nicht erledigt markieren</string>
     <string name="select_task">Aufgabe auswählen</string>
@@ -367,6 +368,8 @@
     <string name="tip_action_got_it">Verstanden</string>
 
     <!-- Help & FAQ (SPEC-O03) -->
+    <string name="cd_faq_expanded">ausgeklappt</string>
+    <string name="cd_faq_collapsed">eingeklappt</string>
     <string name="settings_help_faq">Hilfe &amp; FAQ</string>
     <string name="settings_help_faq_desc">Antworten auf häufige Fragen erhalten</string>
     <string name="title_help_faq">Hilfe &amp; FAQ</string>
