@@ -111,9 +111,10 @@ class TaskSortService @Inject constructor() {
      * Gets all available sort options for UI display.
      */
     fun getAvailableSortOptions(): List<TaskSort> = listOf(
+        TaskSort(SortKey.DUE_DATE, SortDirection.ASC, CompletedGrouping.NONE),
         TaskSort(SortKey.CREATED_AT, SortDirection.DESC, CompletedGrouping.NONE),
         TaskSort(SortKey.CREATED_AT, SortDirection.ASC, CompletedGrouping.NONE),
         TaskSort(SortKey.TITLE, SortDirection.ASC, CompletedGrouping.NONE),
-        TaskSort(SortKey.PRIORITY, SortDirection.DESC, CompletedGrouping.NONE), // Priority: High to Low
+        TaskSort(SortKey.PRIORITY, SortDirection.DESC, CompletedGrouping.NONE),
     )
 }

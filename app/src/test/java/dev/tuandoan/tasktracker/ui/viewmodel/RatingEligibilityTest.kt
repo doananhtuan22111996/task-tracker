@@ -6,6 +6,7 @@ import dev.tuandoan.tasktracker.data.database.Task
 import dev.tuandoan.tasktracker.data.preferences.SettingsRepository
 import dev.tuandoan.tasktracker.data.preferences.UserPreferences
 import dev.tuandoan.tasktracker.domain.ITaskManager
+import dev.tuandoan.tasktracker.domain.model.TaskSort
 import dev.tuandoan.tasktracker.domain.usecase.StreakUseCase
 import dev.tuandoan.tasktracker.ui.events.UiEvent
 import dev.tuandoan.tasktracker.ui.manager.TaskBulkActionManager
@@ -15,6 +16,7 @@ import dev.tuandoan.tasktracker.ui.state.SelectionState
 import dev.tuandoan.tasktracker.ui.state.TaskListState
 import dev.tuandoan.tasktracker.ui.state.TaskListStateManager
 import dev.tuandoan.tasktracker.ui.state.TaskSelectionStateManager
+import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
@@ -87,6 +89,7 @@ class RatingEligibilityTest {
 
         settingsRepository = mockk(relaxed = true) {
             every { userPreferences } returns preferencesFlow
+            coEvery { getSortPreference() } returns TaskSort()
         }
 
         taskManager = mockk(relaxed = true)
@@ -99,6 +102,7 @@ class RatingEligibilityTest {
             searchQuery = MutableStateFlow(""),
             filter = MutableStateFlow(TaskFilter.ALL),
             tagFilter = MutableStateFlow(null),
+            currentSort = MutableStateFlow(TaskSort()),
             hasActiveSearch = MutableStateFlow(false),
             hasActiveFilter = MutableStateFlow(false),
             hasActiveTagFilter = MutableStateFlow(false),

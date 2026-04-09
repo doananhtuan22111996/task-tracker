@@ -217,9 +217,9 @@ class TaskSortServiceTest {
     }
 
     @Test
-    fun `getAvailableSortOptions returns four options`() {
+    fun `getAvailableSortOptions returns five options`() {
         val options = service.getAvailableSortOptions()
-        assertEquals(4, options.size)
+        assertEquals(5, options.size)
     }
 
     // === Sort by DUE_DATE ===

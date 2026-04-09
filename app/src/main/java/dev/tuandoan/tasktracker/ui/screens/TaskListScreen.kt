@@ -56,13 +56,16 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import dev.tuandoan.tasktracker.BuildConfig
 import dev.tuandoan.tasktracker.R
+import dev.tuandoan.tasktracker.domain.service.TaskSortService
 import dev.tuandoan.tasktracker.navigation.StatsFilter
 import dev.tuandoan.tasktracker.navigation.TaskTrackerRoutes
 import dev.tuandoan.tasktracker.ui.components.FeatureTip
+import dev.tuandoan.tasktracker.ui.components.SortBottomSheet
 import dev.tuandoan.tasktracker.ui.components.TagChipRow
 import dev.tuandoan.tasktracker.ui.components.TaskListContent
 import dev.tuandoan.tasktracker.ui.components.TaskListTopBar
 import dev.tuandoan.tasktracker.ui.events.UiEvent
+import dev.tuandoan.tasktracker.ui.state.TaskListStateManager
 import dev.tuandoan.tasktracker.ui.viewmodel.TaskFilter
 import dev.tuandoan.tasktracker.ui.viewmodel.TaskViewModel
 
@@ -96,6 +99,12 @@ fun TaskListScreen(
     val selectedCount by viewModel.selectedCount.collectAsStateWithLifecycle()
     val pendingBulkDeleteTasks by viewModel.pendingBulkDeleteTasks.collectAsStateWithLifecycle()
     val pendingBulkArchiveTasks by viewModel.pendingBulkArchiveTasks.collectAsStateWithLifecycle()
+
+    // Sort state
+    val currentSort by viewModel.currentSort.collectAsStateWithLifecycle()
+    val sortOptions = remember { TaskSortService().getAvailableSortOptions() }
+    val isNonDefaultSort = currentSort != TaskListStateManager.DEFAULT_SORT
+    var showSortSheet by remember { mutableStateOf(false) }
 
     // Streak data
     val streakMap by viewModel.streakMap.collectAsStateWithLifecycle()
@@ -188,6 +197,8 @@ fun TaskListScreen(
                 onBulkArchive = viewModel::requestBulkArchive,
                 onClearSelection = viewModel::clearSelection,
                 onSelectAll = { viewModel.selectAll(visibleTasks.map { it.id }) },
+                hasNonDefaultSort = isNonDefaultSort,
+                onSortClick = { showSortSheet = true },
                 onStatsClick = onStatsClick,
                 onArchiveClick = onArchiveClick,
                 onSettingsClick = onSettingsClick,
@@ -374,6 +385,18 @@ fun TaskListScreen(
                     Text(stringResource(R.string.action_cancel))
                 }
             },
+        )
+    }
+
+    // Sort bottom sheet
+    if (showSortSheet) {
+        SortBottomSheet(
+            currentSort = currentSort,
+            sortOptions = sortOptions,
+            onSortSelected = { sort ->
+                viewModel.updateSort(sort)
+            },
+            onDismiss = { showSortSheet = false },
         )
     }
 }

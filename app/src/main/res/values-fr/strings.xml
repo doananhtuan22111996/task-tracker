@@ -462,4 +462,11 @@
     <string name="widget_priority_medium">moyenne</string>
     <string name="widget_priority_low">basse</string>
     <string name="widget_due_overdue">En retard</string>
+
+    <!-- New Accessibility & Sort -->
+    <string name="cd_completion_rate">Taux d\'achèvement : %1$d%%</string>
+    <string name="cd_completion_rate_empty">Taux d\'achèvement : aucune donnée</string>
+    <string name="cd_day_selected">sélectionné</string>
+    <string name="cd_day_not_selected">non sélectionné</string>
+    <string name="sort_due_date_earliest">Date d\'échéance : Plus proche en premier</string>
 </resources>

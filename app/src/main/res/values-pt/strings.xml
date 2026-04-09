@@ -462,4 +462,11 @@
     <string name="widget_priority_medium">média</string>
     <string name="widget_priority_low">baixa</string>
     <string name="widget_due_overdue">Atrasada</string>
+
+    <!-- New Accessibility & Sort -->
+    <string name="cd_completion_rate">Taxa de conclusão: %1$d%%</string>
+    <string name="cd_completion_rate_empty">Taxa de conclusão: sem dados</string>
+    <string name="cd_day_selected">selecionado</string>
+    <string name="cd_day_not_selected">não selecionado</string>
+    <string name="sort_due_date_earliest">Data de vencimento: Mais próxima primeiro</string>
 </resources>

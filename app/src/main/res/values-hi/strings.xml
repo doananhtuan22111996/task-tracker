@@ -462,4 +462,11 @@
     <string name="widget_priority_medium">मध्यम</string>
     <string name="widget_priority_low">निम्न</string>
     <string name="widget_due_overdue">अतिदेय</string>
+
+    <!-- New Accessibility & Sort -->
+    <string name="cd_completion_rate">पूर्णता दर: %1$d%%</string>
+    <string name="cd_completion_rate_empty">पूर्णता दर: कोई डेटा नहीं</string>
+    <string name="cd_day_selected">चयनित</string>
+    <string name="cd_day_not_selected">अचयनित</string>
+    <string name="sort_due_date_earliest">नियत तिथि: पहले सबसे पुरानी</string>
 </resources>

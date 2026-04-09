@@ -9,11 +9,14 @@ import dev.tuandoan.tasktracker.data.preferences.UserPreferences
 import dev.tuandoan.tasktracker.domain.ITaskManager
 import dev.tuandoan.tasktracker.domain.model.StreakStats
 import dev.tuandoan.tasktracker.domain.usecase.StreakUseCase
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -45,20 +48,34 @@ class StatsViewModel @Inject constructor(
         val overdueCount: Int = 0,
     )
 
-    val uiState: StateFlow<StatsUiState> = combine(
-        taskManager.observeActiveCount(),
-        taskManager.observeCompletedCount(),
-        taskManager.observeCompletedTodayCount(getTodayStartMillis(), getTodayEndMillis()),
-        taskManager.observeDueTodayCount(getTodayStartMillis(), getTodayEndMillis()),
-        taskManager.observeOverdueCount(System.currentTimeMillis()),
-    ) { activeCount, completedCount, completedTodayCount, dueTodayCount, overdueCount ->
-        StatsUiState(
-            activeCount = activeCount,
-            completedCount = completedCount,
-            completedTodayCount = completedTodayCount,
-            dueTodayCount = dueTodayCount,
-            overdueCount = overdueCount,
-        )
+    // Emits a tick whenever time-sensitive queries should refresh (initial + every minute)
+    private val refreshTicker = flow {
+        while (true) {
+            emit(Unit)
+            delay(REFRESH_INTERVAL_MS)
+        }
+    }
+
+    @OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
+    val uiState: StateFlow<StatsUiState> = refreshTicker.flatMapLatest {
+        val todayStart = getTodayStartMillis()
+        val todayEnd = getTodayEndMillis()
+        val now = System.currentTimeMillis()
+        combine(
+            taskManager.observeActiveCount(),
+            taskManager.observeCompletedCount(),
+            taskManager.observeCompletedTodayCount(todayStart, todayEnd),
+            taskManager.observeDueTodayCount(todayStart, todayEnd),
+            taskManager.observeOverdueCount(now),
+        ) { activeCount, completedCount, completedTodayCount, dueTodayCount, overdueCount ->
+            StatsUiState(
+                activeCount = activeCount,
+                completedCount = completedCount,
+                completedTodayCount = completedTodayCount,
+                dueTodayCount = dueTodayCount,
+                overdueCount = overdueCount,
+            )
+        }
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5000),
@@ -135,6 +152,10 @@ class StatsViewModel @Inject constructor(
     private fun getWeekStartMillis(): Long {
         val weekStart = LocalDate.now().minusDays(6)
         return weekStart.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
+    }
+
+    companion object {
+        const val REFRESH_INTERVAL_MS = 60_000L // Re-evaluate time boundaries every minute
     }
 
     private fun fillMissingDays(dbCounts: List<DailyCount>): List<DailyCount> {

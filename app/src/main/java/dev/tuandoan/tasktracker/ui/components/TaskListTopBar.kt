@@ -10,6 +10,7 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.SelectAll
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.SortByAlpha
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -43,6 +44,8 @@ fun TaskListTopBar(
     onBulkArchive: () -> Unit = {},
     onClearSelection: () -> Unit = {},
     onSelectAll: () -> Unit = {},
+    hasNonDefaultSort: Boolean = false,
+    onSortClick: () -> Unit = {},
     onStatsClick: () -> Unit = {},
     onArchiveClick: () -> Unit = {},
     onSettingsClick: () -> Unit = {},
@@ -160,6 +163,22 @@ fun TaskListTopBar(
                 }
             } else {
                 // Normal mode actions with improved visual hierarchy
+                IconButton(
+                    onClick = onSortClick,
+                    colors = IconButtonDefaults.iconButtonColors(
+                        contentColor = if (hasNonDefaultSort) {
+                            MaterialTheme.colorScheme.primary
+                        } else {
+                            MaterialTheme.colorScheme.onSurface
+                        },
+                    ),
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.SortByAlpha,
+                        contentDescription = stringResource(R.string.cd_sort_tasks),
+                    )
+                }
+
                 IconButton(
                     onClick = onStatsClick,
                     colors = IconButtonDefaults.iconButtonColors(

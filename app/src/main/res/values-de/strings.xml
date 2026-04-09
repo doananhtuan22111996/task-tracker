@@ -462,4 +462,11 @@
     <string name="widget_priority_medium">mittel</string>
     <string name="widget_priority_low">niedrig</string>
     <string name="widget_due_overdue">Überfällig</string>
+
+    <!-- New Accessibility & Sort -->
+    <string name="cd_completion_rate">Abschlussquote: %1$d%%</string>
+    <string name="cd_completion_rate_empty">Abschlussquote: keine Daten</string>
+    <string name="cd_day_selected">ausgewählt</string>
+    <string name="cd_day_not_selected">nicht ausgewählt</string>
+    <string name="sort_due_date_earliest">Fälligkeitsdatum: Früheste zuerst</string>
 </resources>

@@ -34,6 +34,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -224,6 +225,8 @@ private fun DaysOfWeekSelector(selectedDays: Set<DayOfWeek>, onDayToggled: (DayO
                 ),
                 Triple(DayOfWeek.SUNDAY, stringResource(R.string.day_sun), stringResource(R.string.day_sun_full)),
             )
+            val selectedLabel = stringResource(R.string.cd_day_selected)
+            val notSelectedLabel = stringResource(R.string.cd_day_not_selected)
             dayEntries.forEach { (day, shortLabel, fullLabel) ->
                 val isSelected = day in selectedDays
                 FilterChip(
@@ -240,7 +243,10 @@ private fun DaysOfWeekSelector(selectedDays: Set<DayOfWeek>, onDayToggled: (DayO
                     },
                     modifier = Modifier
                         .weight(1f)
-                        .semantics { contentDescription = fullLabel },
+                        .semantics {
+                            contentDescription = fullLabel
+                            stateDescription = if (isSelected) selectedLabel else notSelectedLabel
+                        },
                 )
             }
         }

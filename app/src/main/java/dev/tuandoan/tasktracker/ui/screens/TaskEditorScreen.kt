@@ -41,7 +41,6 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -63,6 +62,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import dev.tuandoan.tasktracker.R
 import dev.tuandoan.tasktracker.domain.model.DueDatePreset
@@ -94,27 +94,27 @@ fun TaskEditorScreen(
     val titleFocusRequester = remember { FocusRequester() }
 
     // Collect state
-    val taskTitle by viewModel.taskTitle.collectAsState()
-    val taskDescription by viewModel.taskDescription.collectAsState()
-    val dueAt by viewModel.dueAt.collectAsState()
-    val dueAtHasTime by viewModel.dueAtHasTime.collectAsState()
-    val reminderOption by viewModel.reminderOption.collectAsState()
-    val tag by viewModel.tag.collectAsState()
-    val priority by viewModel.priority.collectAsState()
-    val isPinned by viewModel.isPinned.collectAsState()
-    val recurrenceType by viewModel.recurrenceType.collectAsState()
-    val recurrenceInterval by viewModel.recurrenceInterval.collectAsState()
-    val recurrenceDaysOfWeek by viewModel.recurrenceDaysOfWeek.collectAsState()
-    val recurrenceEndDate by viewModel.recurrenceEndDate.collectAsState()
-    val isLoading by viewModel.isLoading.collectAsState()
-    val errorMessage by viewModel.errorMessage.collectAsState()
-    val isSaveEnabled by viewModel.isSaveEnabled.collectAsState(initial = false)
+    val taskTitle by viewModel.taskTitle.collectAsStateWithLifecycle()
+    val taskDescription by viewModel.taskDescription.collectAsStateWithLifecycle()
+    val dueAt by viewModel.dueAt.collectAsStateWithLifecycle()
+    val dueAtHasTime by viewModel.dueAtHasTime.collectAsStateWithLifecycle()
+    val reminderOption by viewModel.reminderOption.collectAsStateWithLifecycle()
+    val tag by viewModel.tag.collectAsStateWithLifecycle()
+    val priority by viewModel.priority.collectAsStateWithLifecycle()
+    val isPinned by viewModel.isPinned.collectAsStateWithLifecycle()
+    val recurrenceType by viewModel.recurrenceType.collectAsStateWithLifecycle()
+    val recurrenceInterval by viewModel.recurrenceInterval.collectAsStateWithLifecycle()
+    val recurrenceDaysOfWeek by viewModel.recurrenceDaysOfWeek.collectAsStateWithLifecycle()
+    val recurrenceEndDate by viewModel.recurrenceEndDate.collectAsStateWithLifecycle()
+    val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
+    val errorMessage by viewModel.errorMessage.collectAsStateWithLifecycle()
+    val isSaveEnabled by viewModel.isSaveEnabled.collectAsStateWithLifecycle(initialValue = false)
 
     // Validation errors
-    val titleError by viewModel.titleError.collectAsState(initial = null)
-    val dueDateError by viewModel.dueDateError.collectAsState(initial = null)
-    val reminderError by viewModel.reminderError.collectAsState(initial = null)
-    val tagError by viewModel.tagError.collectAsState(initial = null)
+    val titleError by viewModel.titleError.collectAsStateWithLifecycle(initialValue = null)
+    val dueDateError by viewModel.dueDateError.collectAsStateWithLifecycle(initialValue = null)
+    val reminderError by viewModel.reminderError.collectAsStateWithLifecycle(initialValue = null)
+    val tagError by viewModel.tagError.collectAsStateWithLifecycle(initialValue = null)
 
     // Date picker state
     var showDatePicker by remember { mutableStateOf(false) }

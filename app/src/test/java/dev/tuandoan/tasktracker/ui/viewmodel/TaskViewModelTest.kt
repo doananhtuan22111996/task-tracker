@@ -5,6 +5,7 @@ import app.cash.turbine.test
 import dev.tuandoan.tasktracker.data.preferences.SettingsRepository
 import dev.tuandoan.tasktracker.data.preferences.UserPreferences
 import dev.tuandoan.tasktracker.domain.TaskManager
+import dev.tuandoan.tasktracker.domain.model.TaskSort
 import dev.tuandoan.tasktracker.domain.service.TaskSortService
 import dev.tuandoan.tasktracker.domain.usecase.StreakUseCase
 import dev.tuandoan.tasktracker.domain.usecase.TaskCrudUseCase
@@ -20,6 +21,7 @@ import dev.tuandoan.tasktracker.ui.manager.TaskCrudManager
 import dev.tuandoan.tasktracker.ui.state.TaskFormStateManager
 import dev.tuandoan.tasktracker.ui.state.TaskListStateManager
 import dev.tuandoan.tasktracker.ui.state.TaskSelectionStateManager
+import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.Dispatchers
@@ -80,6 +82,7 @@ class TaskViewModelTest {
 
         val settingsRepository = mockk<SettingsRepository>(relaxed = true) {
             every { userPreferences } returns flowOf(UserPreferences())
+            coEvery { getSortPreference() } returns TaskSort()
         }
 
         return TaskViewModel(

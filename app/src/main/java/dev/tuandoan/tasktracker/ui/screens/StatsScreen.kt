@@ -319,8 +319,15 @@ private fun DailyProgressSection(completedToday: Int, dueToday: Int, progress: F
 // SPEC-S05: Completion rate card
 @Composable
 private fun CompletionRateCard(completionRate: Int?, modifier: Modifier = Modifier) {
+    val cardCd = if (completionRate != null) {
+        stringResource(R.string.cd_completion_rate, completionRate)
+    } else {
+        stringResource(R.string.cd_completion_rate_empty)
+    }
     ElevatedCard(
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier
+            .fillMaxWidth()
+            .semantics(mergeDescendants = true) { contentDescription = cardCd },
     ) {
         Row(
             modifier = Modifier

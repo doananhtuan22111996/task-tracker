@@ -9,7 +9,12 @@ import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import dagger.hilt.android.qualifiers.ApplicationContext
+import dev.tuandoan.tasktracker.domain.model.CompletedGrouping
+import dev.tuandoan.tasktracker.domain.model.SortDirection
+import dev.tuandoan.tasktracker.domain.model.SortKey
+import dev.tuandoan.tasktracker.domain.model.TaskSort
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -33,6 +38,9 @@ class SettingsRepository @Inject constructor(@ApplicationContext private val con
         val TIP_STATS_CARDS_SHOWN = booleanPreferencesKey("tip_stats_cards_shown")
         val FIRST_LAUNCH_DATE = longPreferencesKey("first_launch_date")
         val RATING_PROMPT_SHOWN = booleanPreferencesKey("rating_prompt_shown")
+        val SORT_KEY = stringPreferencesKey("sort_key")
+        val SORT_DIRECTION = stringPreferencesKey("sort_direction")
+        val COMPLETED_GROUPING = stringPreferencesKey("completed_grouping")
     }
 
     /**
@@ -117,5 +125,26 @@ class SettingsRepository @Inject constructor(@ApplicationContext private val con
         context.dataStore.edit { prefs ->
             prefs[Keys.RATING_PROMPT_SHOWN] = shown
         }
+    }
+
+    suspend fun setSortPreference(sort: TaskSort) {
+        context.dataStore.edit { prefs ->
+            prefs[Keys.SORT_KEY] = sort.key.name
+            prefs[Keys.SORT_DIRECTION] = sort.direction.name
+            prefs[Keys.COMPLETED_GROUPING] = sort.completedGrouping.name
+        }
+    }
+
+    suspend fun getSortPreference(): TaskSort {
+        val prefs = context.dataStore.data.first()
+        return TaskSort(
+            key = prefs[Keys.SORT_KEY]?.let { runCatching { SortKey.valueOf(it) }.getOrNull() }
+                ?: SortKey.DUE_DATE,
+            direction = prefs[Keys.SORT_DIRECTION]?.let { runCatching { SortDirection.valueOf(it) }.getOrNull() }
+                ?: SortDirection.ASC,
+            completedGrouping = prefs[Keys.COMPLETED_GROUPING]
+                ?.let { runCatching { CompletedGrouping.valueOf(it) }.getOrNull() }
+                ?: CompletedGrouping.COMPLETED_LAST,
+        )
     }
 }

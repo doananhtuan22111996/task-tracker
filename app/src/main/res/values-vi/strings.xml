@@ -462,4 +462,11 @@
     <string name="widget_priority_medium">trung bình</string>
     <string name="widget_priority_low">thấp</string>
     <string name="widget_due_overdue">Quá hạn</string>
+
+    <!-- New Accessibility & Sort -->
+    <string name="cd_completion_rate">Tỷ lệ hoàn thành: %1$d%%</string>
+    <string name="cd_completion_rate_empty">Tỷ lệ hoàn thành: không có dữ liệu</string>
+    <string name="cd_day_selected">đã chọn</string>
+    <string name="cd_day_not_selected">chưa chọn</string>
+    <string name="sort_due_date_earliest">Ngày hết hạn: Sớm nhất trước</string>
 </resources>
