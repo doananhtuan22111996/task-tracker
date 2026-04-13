@@ -55,9 +55,10 @@ data class TaskSort(
     val completedGrouping: CompletedGrouping = CompletedGrouping.NONE,
 ) {
     /**
-     * Returns a human-readable description of the current sort
+     * Returns a human-readable description of the current sort.
+     * Used for tests and debugging only — UI uses stringResource() via getSortLabel().
      */
-    fun getDisplayName(): String = when (key) {
+    internal fun getDisplayName(): String = when (key) {
         SortKey.CREATED_AT -> when (direction) {
             SortDirection.DESC -> "Created: Newest first"
             SortDirection.ASC -> "Created: Oldest first"
@@ -77,9 +78,10 @@ data class TaskSort(
     }
 
     /**
-     * Returns display name including completed grouping if applicable
+     * Returns display name including completed grouping if applicable.
+     * Used for tests and debugging only — UI uses stringResource() via getSortLabel().
      */
-    fun getFullDisplayName(): String {
+    internal fun getFullDisplayName(): String {
         val baseName = getDisplayName()
         return when (completedGrouping) {
             CompletedGrouping.NONE -> baseName

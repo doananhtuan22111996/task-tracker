@@ -125,10 +125,7 @@ fun SortBottomSheet(
 
 @Composable
 private fun getSortLabel(sort: TaskSort): String = when (sort.key) {
-    SortKey.DUE_DATE -> when (sort.direction) {
-        SortDirection.ASC -> stringResource(R.string.sort_due_date_earliest)
-        SortDirection.DESC -> stringResource(R.string.sort_due_date_earliest) // Only ASC offered
-    }
+    SortKey.DUE_DATE -> stringResource(R.string.sort_due_date_earliest)
     SortKey.CREATED_AT -> when (sort.direction) {
         SortDirection.DESC -> stringResource(R.string.sort_created_newest)
         SortDirection.ASC -> stringResource(R.string.sort_created_oldest)

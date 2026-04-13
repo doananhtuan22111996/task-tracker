@@ -56,7 +56,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import dev.tuandoan.tasktracker.BuildConfig
 import dev.tuandoan.tasktracker.R
-import dev.tuandoan.tasktracker.domain.service.TaskSortService
 import dev.tuandoan.tasktracker.navigation.StatsFilter
 import dev.tuandoan.tasktracker.navigation.TaskTrackerRoutes
 import dev.tuandoan.tasktracker.ui.components.FeatureTip
@@ -102,7 +101,7 @@ fun TaskListScreen(
 
     // Sort state
     val currentSort by viewModel.currentSort.collectAsStateWithLifecycle()
-    val sortOptions = remember { TaskSortService().getAvailableSortOptions() }
+    val sortOptions = viewModel.sortOptions
     val isNonDefaultSort = currentSort != TaskListStateManager.DEFAULT_SORT
     var showSortSheet by remember { mutableStateOf(false) }
 

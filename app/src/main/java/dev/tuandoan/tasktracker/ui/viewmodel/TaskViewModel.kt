@@ -11,6 +11,7 @@ import dev.tuandoan.tasktracker.data.preferences.SettingsRepository
 import dev.tuandoan.tasktracker.data.preferences.UserPreferences
 import dev.tuandoan.tasktracker.domain.ITaskManager
 import dev.tuandoan.tasktracker.domain.model.TaskSort
+import dev.tuandoan.tasktracker.domain.service.TaskSortService
 import dev.tuandoan.tasktracker.domain.usecase.StreakUseCase
 import dev.tuandoan.tasktracker.ui.events.UiEvent
 import dev.tuandoan.tasktracker.ui.manager.TaskBulkActionManager
@@ -58,6 +59,7 @@ class TaskViewModel @Inject constructor(
     private val settingsRepository: SettingsRepository,
     private val taskManager: ITaskManager,
     private val streakUseCase: StreakUseCase,
+    private val sortService: TaskSortService,
 ) : ViewModel() {
 
     // Initialize state from managers
@@ -144,6 +146,7 @@ class TaskViewModel @Inject constructor(
     val filter = listState.filter
     val tagFilter = listState.tagFilter
     val currentSort = listState.currentSort
+    val sortOptions: List<TaskSort> = sortService.getAvailableSortOptions()
     val hasActiveSearch = listState.hasActiveSearch
     val hasActiveFilter = listState.hasActiveFilter
     val hasActiveTagFilter = listState.hasActiveTagFilter

@@ -94,6 +94,7 @@ class TaskViewModelTest {
             settingsRepository,
             taskManager,
             StreakUseCase(repository),
+            TaskSortService(),
         )
     }
 

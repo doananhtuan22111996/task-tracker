@@ -61,6 +61,7 @@ class RatingEligibilityTest {
         settingsRepository = settingsRepository,
         taskManager = taskManager,
         streakUseCase = streakUseCase,
+        sortService = dev.tuandoan.tasktracker.domain.service.TaskSortService(),
     )
 
     private fun mockCrudManagerToInvokeOnSuccess() {
