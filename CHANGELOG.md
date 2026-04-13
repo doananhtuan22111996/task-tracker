@@ -3,7 +3,7 @@
 All notable changes to the Task Tracker app will be documented in this file.
 Format follows [Keep a Changelog](https://keepachangelog.com).
 
-## [Unreleased]
+## [1.7.0] - 2026-04-13
 
 ### Added
 - Custom sort picker with bottom sheet UI (due date, created, title, priority)
