@@ -2,6 +2,11 @@
 <resources>
     <string name="app_name">Task Tracker</string>
 
+    <!-- Bottom Navigation Tabs -->
+    <string name="nav_tab_tasks">Tarefas</string>
+    <string name="nav_tab_stats">Estatísticas</string>
+    <string name="nav_tab_archived">Arquivadas</string>
+
     <!-- Navigation -->
     <string name="nav_all">Todas</string>
     <string name="nav_active">Ativas</string>

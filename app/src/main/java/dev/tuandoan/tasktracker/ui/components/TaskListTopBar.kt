@@ -3,7 +3,6 @@ package dev.tuandoan.tasktracker.ui.components
 import androidx.compose.foundation.layout.Box
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Archive
-import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material.icons.filled.CheckBox
 import androidx.compose.material.icons.filled.CheckBoxOutlineBlank
 import androidx.compose.material.icons.filled.Close
@@ -46,8 +45,6 @@ fun TaskListTopBar(
     onSelectAll: () -> Unit = {},
     hasNonDefaultSort: Boolean = false,
     onSortClick: () -> Unit = {},
-    onStatsClick: () -> Unit = {},
-    onArchiveClick: () -> Unit = {},
     onSettingsClick: () -> Unit = {},
 ) {
     var showMoreMenu by remember { mutableStateOf(false) }
@@ -176,30 +173,6 @@ fun TaskListTopBar(
                     Icon(
                         imageVector = Icons.Default.SortByAlpha,
                         contentDescription = stringResource(R.string.cd_sort_tasks),
-                    )
-                }
-
-                IconButton(
-                    onClick = onStatsClick,
-                    colors = IconButtonDefaults.iconButtonColors(
-                        contentColor = MaterialTheme.colorScheme.primary,
-                    ),
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.BarChart,
-                        contentDescription = stringResource(R.string.cd_statistics),
-                    )
-                }
-
-                IconButton(
-                    onClick = onArchiveClick,
-                    colors = IconButtonDefaults.iconButtonColors(
-                        contentColor = MaterialTheme.colorScheme.onSurface,
-                    ),
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Archive,
-                        contentDescription = stringResource(R.string.cd_view_archived),
                     )
                 }
 

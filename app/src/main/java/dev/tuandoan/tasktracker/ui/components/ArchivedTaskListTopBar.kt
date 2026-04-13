@@ -2,7 +2,6 @@ package dev.tuandoan.tasktracker.ui.components
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.DeleteForever
 import androidx.compose.material.icons.filled.MoreVert
@@ -40,7 +39,6 @@ fun ArchivedTaskListTopBar(
     onBulkPermanentDelete: () -> Unit = {},
     onClearSelection: () -> Unit = {},
     onSelectAll: () -> Unit = {},
-    onNavigateBack: () -> Unit,
 ) {
     var showMoreMenu by remember { mutableStateOf(false) }
 
@@ -67,18 +65,6 @@ fun ArchivedTaskListTopBar(
                     Icon(
                         imageVector = Icons.Default.Close,
                         contentDescription = stringResource(R.string.cd_clear_selection),
-                    )
-                }
-            } else {
-                IconButton(
-                    onClick = onNavigateBack,
-                    colors = IconButtonDefaults.iconButtonColors(
-                        contentColor = MaterialTheme.colorScheme.onSurface,
-                    ),
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.ArrowBack,
-                        contentDescription = stringResource(R.string.cd_navigate_back),
                     )
                 }
             }

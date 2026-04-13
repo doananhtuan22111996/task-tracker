@@ -2,6 +2,11 @@
 <resources>
     <string name="app_name">Task Tracker</string>
 
+    <!-- Bottom Navigation Tabs -->
+    <string name="nav_tab_tasks">Công việc</string>
+    <string name="nav_tab_stats">Thống kê</string>
+    <string name="nav_tab_archived">Đã lưu trữ</string>
+
     <!-- Navigation -->
     <string name="nav_all">Tất cả</string>
     <string name="nav_active">Đang thực hiện</string>

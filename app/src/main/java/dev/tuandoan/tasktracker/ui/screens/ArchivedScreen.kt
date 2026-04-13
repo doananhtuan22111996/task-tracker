@@ -35,7 +35,7 @@ import dev.tuandoan.tasktracker.ui.viewmodel.TaskViewModel
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ArchivedScreen(viewModel: TaskViewModel, onNavigateBack: () -> Unit, modifier: Modifier = Modifier) {
+fun ArchivedScreen(viewModel: TaskViewModel, modifier: Modifier = Modifier) {
     // Collect archived tasks state
     val archivedTasks by viewModel.archivedTasks.collectAsStateWithLifecycle()
     val searchQuery by viewModel.searchQuery.collectAsStateWithLifecycle()
@@ -106,7 +106,6 @@ fun ArchivedScreen(viewModel: TaskViewModel, onNavigateBack: () -> Unit, modifie
                 onBulkPermanentDelete = viewModel::requestBulkPermanentDelete,
                 onClearSelection = viewModel::clearSelection,
                 onSelectAll = { viewModel.selectAll(archivedTasks.map { it.id }) },
-                onNavigateBack = onNavigateBack,
             )
         },
         snackbarHost = {

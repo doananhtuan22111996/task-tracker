@@ -2,6 +2,11 @@
 <resources>
     <string name="app_name">Task Tracker</string>
 
+    <!-- Bottom Navigation Tabs -->
+    <string name="nav_tab_tasks">Tugas</string>
+    <string name="nav_tab_stats">Statistik</string>
+    <string name="nav_tab_archived">Diarsipkan</string>
+
     <!-- Navigation -->
     <string name="nav_all">Semua</string>
     <string name="nav_active">Aktif</string>

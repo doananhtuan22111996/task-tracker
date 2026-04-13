@@ -14,14 +14,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.List
-import androidx.compose.material.icons.filled.RadioButtonUnchecked
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.StarBorder
-import androidx.compose.material.icons.outlined.CheckCircle
-import androidx.compose.material.icons.outlined.List
-import androidx.compose.material.icons.outlined.RadioButtonUnchecked
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -29,8 +23,6 @@ import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
@@ -61,6 +53,7 @@ import dev.tuandoan.tasktracker.navigation.TaskTrackerRoutes
 import dev.tuandoan.tasktracker.ui.components.FeatureTip
 import dev.tuandoan.tasktracker.ui.components.SortBottomSheet
 import dev.tuandoan.tasktracker.ui.components.TagChipRow
+import dev.tuandoan.tasktracker.ui.components.TaskFilterChipRow
 import dev.tuandoan.tasktracker.ui.components.TaskListContent
 import dev.tuandoan.tasktracker.ui.components.TaskListTopBar
 import dev.tuandoan.tasktracker.ui.events.UiEvent
@@ -77,8 +70,6 @@ fun TaskListScreen(
     modifier: Modifier = Modifier,
     viewModel: TaskViewModel,
     navController: NavController,
-    onStatsClick: () -> Unit = {},
-    onArchiveClick: () -> Unit = {},
     onSettingsClick: () -> Unit = {},
     initialStatsFilter: StatsFilter? = null,
 ) {
@@ -198,8 +189,6 @@ fun TaskListScreen(
                 onSelectAll = { viewModel.selectAll(visibleTasks.map { it.id }) },
                 hasNonDefaultSort = isNonDefaultSort,
                 onSortClick = { showSortSheet = true },
-                onStatsClick = onStatsClick,
-                onArchiveClick = onArchiveClick,
                 onSettingsClick = onSettingsClick,
             )
         },
@@ -226,48 +215,12 @@ fun TaskListScreen(
                 modifier = Modifier.semantics { liveRegion = LiveRegionMode.Polite },
             )
         },
-        bottomBar = {
-            if (!isSelectionMode) { // Hide bottom nav during selection mode
-                NavigationBar(
-                    containerColor = MaterialTheme.colorScheme.surfaceContainer,
-                ) {
-                    val navigationItems = listOf(
-                        TaskFilter.ALL to stringResource(R.string.nav_all) to
-                            Pair(Icons.Outlined.List, Icons.Filled.List),
-                        TaskFilter.ACTIVE to stringResource(R.string.nav_active) to
-                            Pair(Icons.Outlined.RadioButtonUnchecked, Icons.Filled.RadioButtonUnchecked),
-                        TaskFilter.COMPLETED to stringResource(R.string.nav_completed) to
-                            Pair(Icons.Outlined.CheckCircle, Icons.Filled.CheckCircle),
-                    )
-
-                    navigationItems.forEach { (filterData, icons) ->
-                        val (filter, label) = filterData
-                        val (unselectedIcon, selectedIcon) = icons
-
-                        NavigationBarItem(
-                            icon = {
-                                Icon(
-                                    imageVector = if (currentFilter == filter) selectedIcon else unselectedIcon,
-                                    contentDescription = label,
-                                )
-                            },
-                            label = {
-                                Text(
-                                    text = label,
-                                    style = MaterialTheme.typography.labelSmall,
-                                )
-                            },
-                            selected = currentFilter == filter,
-                            onClick = {
-                                viewModel.setFilter(filter)
-                            },
-                        )
-                    }
-                }
-            }
-        },
     ) { paddingValues ->
         Column(modifier = Modifier.padding(paddingValues)) {
+            TaskFilterChipRow(
+                currentFilter = currentFilter,
+                onFilterChange = viewModel::setFilter,
+            )
             TagChipRow(
                 currentTagFilter = currentTagFilter,
                 availableTags = availableTags,

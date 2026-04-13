@@ -2,6 +2,11 @@
 <resources>
     <string name="app_name">टास्क ट्रैकर</string>
 
+    <!-- Bottom Navigation Tabs -->
+    <string name="nav_tab_tasks">कार्य</string>
+    <string name="nav_tab_stats">आँकड़े</string>
+    <string name="nav_tab_archived">संग्रहीत</string>
+
     <!-- Navigation -->
     <string name="nav_all">सभी</string>
     <string name="nav_active">सक्रिय</string>
