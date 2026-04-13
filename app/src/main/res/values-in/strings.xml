@@ -462,4 +462,11 @@
     <string name="widget_priority_medium">sedang</string>
     <string name="widget_priority_low">rendah</string>
     <string name="widget_due_overdue">Terlambat</string>
+
+    <!-- New Accessibility & Sort -->
+    <string name="cd_completion_rate">Tingkat penyelesaian: %1$d%%</string>
+    <string name="cd_completion_rate_empty">Tingkat penyelesaian: tidak ada data</string>
+    <string name="cd_day_selected">dipilih</string>
+    <string name="cd_day_not_selected">tidak dipilih</string>
+    <string name="sort_due_date_earliest">Tanggal jatuh tempo: Terdekat lebih dulu</string>
 </resources>

@@ -1,38 +1,107 @@
 # Changelog
 
 All notable changes to the Task Tracker app will be documented in this file.
+Format follows [Keep a Changelog](https://keepachangelog.com).
 
 ## [Unreleased]
 
 ### Added
-- **Due Date Time Support** — Optional time picker for task due dates. New "Add time" button in task editor opens Material 3 TimePicker dialog. Displays date+time when explicitly set, date-only otherwise. Presets (Today/Tomorrow/Next Week) default to no time. Backward-compatible backup (CSV legacy 13-column import, JSON `ignoreUnknownKeys`). Room migration v6→v7 adds `dueAtHasTime` column. i18n for all 8 locales. 28 new unit tests.
-- **Due Date Quick-Select Chips** (SPEC-05)
-- **Task Duplication** (SPEC-08) - Duplicate a task from the overflow menu, copying title/description/tag/priority while resetting completion, due date, and archive state. Localized in 8 languages. - Three quick-select chips (Today / Tomorrow / Next Week) in the task editor for faster due date entry without opening the date picker.
-- **Theme system** - Light, Dark, and System default theme modes with persistence via DataStore preferences.
-- **Dynamic Color** - Material You wallpaper-based color support on Android 12+, with graceful fallback on older devices.
-- **Per-app language selection** - In-app language picker (English, Vietnamese) using AppCompatDelegate for all API levels.
-- **Settings screen redesign** - Appearance, Language, and Backup sections with full localization (no hardcoded strings).
-- **Unit tests** - Added SettingsViewModel tests covering theme, dynamic color, language, and backup/restore state management.
+- Custom sort picker with bottom sheet UI (due date, created, title, priority)
+- Sort preference persistence via DataStore
+- "Completed last" toggle for sort grouping
+- Sort indicator icon in top bar highlights when non-default sort active
+- Room schema export enabled with KSP schema location
+- 49 new unit tests (TaskListStateManagerTest, TaskRepositoryTest, SortPersistenceTest)
 
 ### Changed
-- **Localized UI strings** - Replaced all hardcoded user-facing strings in 14 Compose UI files with `stringResource(R.string.xxx)` calls to enable full multi-language support. Covers screens (TaskList, Archived, Stats, TaskEditor) and components (TopBars, SortMenu, EmptyStates, SearchField, FilterTabs, TaskItem, ArchivedTaskItem, ArchivedTaskListContent, NotificationPermissionDialog).
-- **Localized non-UI strings** - Replaced hardcoded strings in domain/ViewModel/utility files that lack Compose context, using `context.getString(R.string.xxx)` pattern. Covers TaskTrackerApplication, TaskReminderWorker, TaskDateGrouper, TaskFormUseCase, TaskEditorViewModel, TaskViewModel, TaskBulkActionManager, and SettingsViewModel. Injected `@ApplicationContext Context` where needed; updated TaskDateGrouper to accept Context parameter.
-- **Localized CRUD/backup strings** - Replaced all remaining hardcoded user-facing strings in TaskCrudUseCase, TaskCrudManager, TaskFormStateManager, ExportBackupUseCase, ImportBackupUseCase, and NotificationPermissionManager with `context.getString(R.string.xxx)` calls. Injected `@ApplicationContext Context` into classes that needed it. Updated corresponding unit tests (TaskCrudUseCaseTest, TaskCrudManagerValidationTest, TaskBulkActionManagerTest) to provide mock Context.
-- **MainActivity** - Switched from ComponentActivity to AppCompatActivity to support per-app locale changes.
-- **TaskTrackerTheme** - Now accepts ThemeMode enum instead of Boolean darkTheme parameter.
-- **SettingsViewModel** - Extended with theme, dynamic color, and language management alongside existing backup functionality.
-- **XML theme** - Updated parent theme to Theme.AppCompat.Light.NoActionBar for AppCompatActivity compatibility.
+- Migrated `collectAsState()` to `collectAsStateWithLifecycle()` in TaskEditorScreen
+- StatsViewModel now refreshes timestamp-dependent counts every 60 seconds
+- Backup exclusion rules updated to exclude Room DB from cloud backup
 
-### Removed
-- **Unused color utilities** - Removed ColorFamily data class and unspecified_scheme from Theme.kt (were generated scaffolding, unused).
+### Fixed
+- CompletionRateCard now announces rate via TalkBack (merged semantics)
+- RecurrencePicker day chips announce selected/unselected state for screen readers
+- Sort options count test updated for new DUE_DATE entry
 
----
+## [1.6.0] - 2025-04-07
 
-- **Backup & Restore** - Export all tasks (including archived) to JSON or CSV files via Android Storage Access Framework.
-- **Import backup** - Restore tasks from a JSON backup file with validation and confirmation dialog.
-- **Settings screen** - New settings screen accessible from the main task list top bar with a gear icon.
-- **CSV export** - Export tasks as RFC 4180 compliant CSV spreadsheet for use in external tools.
-- **Backup validation** - Imported tasks are sanitized (blank titles skipped, priority clamped, timestamps corrected).
-- **kotlinx-serialization** - Added kotlinx-serialization-json dependency for structured JSON backup format.
-- **ProGuard rules** - Added rules for kotlinx-serialization to ensure release builds work correctly.
-- **Unit tests** - Added tests for JsonBackupSerializer, CsvBackupSerializer, and TaskBackupValidator.
+### Fixed
+- Comprehensive accessibility fixes for TalkBack support (A11Y-01 to A11Y-13)
+
+## [1.5.0] - 2025-04-06
+
+### Added
+- Quick-add: notification Mark Complete action and app shortcut (QA-01 to QA-05)
+- Streak tracking for recurring tasks with badge display (ST-01 to ST-07)
+- Home screen widget for task list (WG-01 to WG-09)
+
+### Changed
+- Translations updated for all 8 locales (en + de/es/fr/hi/in/pt/vi)
+
+## [1.4.0] - 2025-03-30
+
+### Added
+- Recurring tasks: recurrence type, interval, days of week, end date
+- RecurrenceCalculator with completion, skip, and un-complete flows
+- Recurrence editor UI in task create/update
+- Repeat icon and skip action in task list
+- Recurrence fields in backup serializers (JSON + CSV)
+- Recurrence strings translated to 7 locales
+
+## [1.3.1] - 2025-03-25
+
+### Fixed
+- Bumped appcompat 1.7.0 → 1.7.1 to remove deprecated edge-to-edge API
+- Removed portrait lock and configChanges for large screen support
+
+## [1.3.0] - 2025-03-23
+
+### Added
+- Due date time support with optional time picker
+- Due date quick-select chips (Today / Tomorrow / Next Week)
+- Task duplication from overflow menu
+- Stats screen refresh (SPEC-S01–S08)
+- Tag chips always-visible row above task list
+- Tag filter chip row on archive screen
+- Onboarding flow, feature tips, and help screen
+- In-app rating prompt and send feedback option
+- Comprehensive accessibility audit and TalkBack improvements
+- Stats, feedback, accessibility, onboarding, feature tips, and help/FAQ translations
+
+### Changed
+- Tasks always ordered by due date (removed manual sort)
+- ViewModel unit tests added for TaskViewModel, TaskEditorViewModel, StatsViewModel
+
+## [1.2.0] - 2025-03-15
+
+### Added
+- CLAUDE.md with merged workflow and project context
+
+## [1.1.0] - 2025-03-01
+
+### Added
+- Import/export tasks (JSON + CSV) via Storage Access Framework
+- Backup validation and sanitization
+- Comprehensive unit test suite (263 tests)
+- Global language support (English + Vietnamese) and theme system
+- Settings screen with appearance, language, and backup sections
+- Dynamic Color (Material You) support on Android 12+
+
+## [1.0.0] - 2025-02-15
+
+### Added
+- Core task management: create, edit, delete tasks
+- Search and filter (all / active / completed)
+- Sort by created date, title, priority
+- Undo delete and confirm delete dialog
+- Bulk actions (mark completed, mark active, delete)
+- Form validation for task title
+- Due dates with push notification reminders
+- Notification permission request flow
+- Day-based task grouping
+- Tags and tag filtering
+- Priority levels (low, medium, high)
+- Archive and restore tasks
+- Stats chart (completion rate, counts)
+- Material 3 UI with enhanced styling
+- App icon and privacy policy

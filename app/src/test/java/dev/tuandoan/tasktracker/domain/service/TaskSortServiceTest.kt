@@ -23,7 +23,7 @@ class TaskSortServiceTest {
 
     @Test
     fun `sortTasks with empty list returns empty list`() {
-        val result = service.sortTasks(emptyList(), service.getDefaultSort())
+        val result = service.sortTasks(emptyList(), TaskSort())
         assertTrue(result.isEmpty())
     }
 
@@ -199,27 +199,10 @@ class TaskSortServiceTest {
         assertEquals(listOf(2L, 3L, 1L), result.map { it.id })
     }
 
-    // === Default and utility ===
-
     @Test
-    fun `getDefaultSort returns createdAt DESC with no grouping`() {
-        val defaultSort = service.getDefaultSort()
-
-        assertEquals(SortKey.CREATED_AT, defaultSort.key)
-        assertEquals(SortDirection.DESC, defaultSort.direction)
-        assertEquals(CompletedGrouping.NONE, defaultSort.completedGrouping)
-    }
-
-    @Test
-    fun `isValidSort returns true for any sort`() {
-        val sort = TaskSort(SortKey.TITLE, SortDirection.ASC, CompletedGrouping.COMPLETED_LAST)
-        assertTrue(service.isValidSort(sort))
-    }
-
-    @Test
-    fun `getAvailableSortOptions returns four options`() {
+    fun `getAvailableSortOptions returns five options`() {
         val options = service.getAvailableSortOptions()
-        assertEquals(4, options.size)
+        assertEquals(5, options.size)
     }
 
     // === Sort by DUE_DATE ===
@@ -287,7 +270,7 @@ class TaskSortServiceTest {
     @Test
     fun `sortTasks with single element returns same element`() {
         val tasks = listOf(TestTaskFactory.createTask(id = 1))
-        val result = service.sortTasks(tasks, service.getDefaultSort())
+        val result = service.sortTasks(tasks, TaskSort())
 
         assertEquals(1, result.size)
         assertEquals(1L, result[0].id)

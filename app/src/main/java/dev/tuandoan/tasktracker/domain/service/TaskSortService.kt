@@ -92,28 +92,13 @@ class TaskSortService @Inject constructor() {
     }
 
     /**
-     * Creates a default TaskSort configuration.
-     * Default: Created newest first, no grouping.
-     */
-    fun getDefaultSort(): TaskSort = TaskSort(
-        key = SortKey.CREATED_AT,
-        direction = SortDirection.DESC,
-        completedGrouping = CompletedGrouping.NONE,
-    )
-
-    /**
-     * Validates if a TaskSort configuration is valid.
-     * Currently all combinations are valid, but this allows for future constraints.
-     */
-    fun isValidSort(sort: TaskSort): Boolean = true
-
-    /**
      * Gets all available sort options for UI display.
      */
     fun getAvailableSortOptions(): List<TaskSort> = listOf(
+        TaskSort(SortKey.DUE_DATE, SortDirection.ASC, CompletedGrouping.NONE),
         TaskSort(SortKey.CREATED_AT, SortDirection.DESC, CompletedGrouping.NONE),
         TaskSort(SortKey.CREATED_AT, SortDirection.ASC, CompletedGrouping.NONE),
         TaskSort(SortKey.TITLE, SortDirection.ASC, CompletedGrouping.NONE),
-        TaskSort(SortKey.PRIORITY, SortDirection.DESC, CompletedGrouping.NONE), // Priority: High to Low
+        TaskSort(SortKey.PRIORITY, SortDirection.DESC, CompletedGrouping.NONE),
     )
 }

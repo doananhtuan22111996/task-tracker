@@ -1,6 +1,7 @@
 package dev.tuandoan.tasktracker.ui.state
 
 import dev.tuandoan.tasktracker.data.database.Task
+import dev.tuandoan.tasktracker.domain.model.CompletedGrouping
 import dev.tuandoan.tasktracker.domain.model.SortDirection
 import dev.tuandoan.tasktracker.domain.model.SortKey
 import dev.tuandoan.tasktracker.domain.model.TaskSort
@@ -35,6 +36,10 @@ class TaskListStateManager @Inject constructor(
     private val _tagFilter = MutableStateFlow<String?>(null)
     val tagFilter: StateFlow<String?> = _tagFilter.asStateFlow()
 
+    // Sort state
+    private val _currentSort = MutableStateFlow(DEFAULT_SORT)
+    val currentSort: StateFlow<TaskSort> = _currentSort.asStateFlow()
+
     /**
      * Initialize state flows for a given coroutine scope (typically ViewModel scope)
      */
@@ -67,20 +72,18 @@ class TaskListStateManager @Inject constructor(
                 initialValue = false,
             )
 
-        // Fixed sort: always due date ascending (null due dates last)
-        val dueDateSort = TaskSort(key = SortKey.DUE_DATE, direction = SortDirection.ASC)
-
         // Combined filtered, searched, and sorted tasks
         val visibleTasks: StateFlow<List<Task>> = combine(
             allTasks,
             searchUseCase.debouncedSearchQuery,
             filterUseCase.filter,
             _tagFilter,
-        ) { tasks, query, currentFilter, tagFilter ->
+            _currentSort,
+        ) { tasks, query, currentFilter, tagFilter, sort ->
             val statusFiltered = filterUseCase.filterTasksByStatus(tasks, currentFilter)
             val searchFiltered = searchUseCase.filterTasksBySearch(statusFiltered, query)
             val tagFiltered = filterTasksByTag(searchFiltered, tagFilter)
-            sortService.sortTasks(tagFiltered, dueDateSort)
+            sortService.sortTasks(tagFiltered, sort)
         }.stateIn(
             scope = scope,
             started = SharingStarted.WhileSubscribed(5000),
@@ -93,11 +96,21 @@ class TaskListStateManager @Inject constructor(
             searchQuery = searchUseCase.searchQuery,
             filter = filterUseCase.filter,
             tagFilter = tagFilter,
+            currentSort = _currentSort,
             hasActiveSearch = hasActiveSearch,
             hasActiveFilter = hasActiveFilter,
             hasActiveTagFilter = hasActiveTagFilter,
             isLoading = crudUseCase.isLoading,
         )
+    }
+
+    // === Sort Operations ===
+    fun updateSort(sort: TaskSort) {
+        _currentSort.value = sort
+    }
+
+    fun initializeSort(sort: TaskSort) {
+        _currentSort.value = sort
     }
 
     // === Search Operations ===
@@ -125,6 +138,14 @@ class TaskListStateManager @Inject constructor(
     } else {
         tasks.filter { task -> task.tag == tagFilter }
     }
+
+    companion object {
+        val DEFAULT_SORT = TaskSort(
+            key = SortKey.DUE_DATE,
+            direction = SortDirection.ASC,
+            completedGrouping = CompletedGrouping.COMPLETED_LAST,
+        )
+    }
 }
 
 /**
@@ -136,6 +157,7 @@ data class TaskListState(
     val searchQuery: StateFlow<String>,
     val filter: StateFlow<TaskFilter>,
     val tagFilter: StateFlow<String?>,
+    val currentSort: StateFlow<TaskSort>,
     val hasActiveSearch: StateFlow<Boolean>,
     val hasActiveFilter: StateFlow<Boolean>,
     val hasActiveTagFilter: StateFlow<Boolean>,

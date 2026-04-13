@@ -398,6 +398,15 @@
     <string name="tip_stats_cards">Tap any stat card to jump to a filtered task list.</string>
     <string name="tip_action_got_it">Got it</string>
 
+    <!-- Accessibility: CompletionRateCard + RecurrencePicker -->
+    <string name="cd_completion_rate">Completion rate: %1$d%%</string>
+    <string name="cd_completion_rate_empty">Completion rate: no data</string>
+    <string name="cd_day_selected">selected</string>
+    <string name="cd_day_not_selected">not selected</string>
+
+    <!-- Sort -->
+    <string name="sort_due_date_earliest">Due date: Earliest first</string>
+
     <!-- Help &amp; FAQ (SPEC-O03) -->
     <string name="cd_faq_expanded">expanded</string>
     <string name="cd_faq_collapsed">collapsed</string>
