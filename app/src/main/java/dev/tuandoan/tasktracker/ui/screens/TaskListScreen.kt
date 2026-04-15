@@ -3,6 +3,7 @@ package dev.tuandoan.tasktracker.ui.screens
 import android.app.Activity
 import android.content.Context
 import android.content.ContextWrapper
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -30,6 +31,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -38,11 +40,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
@@ -50,10 +54,7 @@ import dev.tuandoan.tasktracker.BuildConfig
 import dev.tuandoan.tasktracker.R
 import dev.tuandoan.tasktracker.navigation.StatsFilter
 import dev.tuandoan.tasktracker.navigation.TaskTrackerRoutes
-import dev.tuandoan.tasktracker.ui.components.FeatureTip
 import dev.tuandoan.tasktracker.ui.components.SortBottomSheet
-import dev.tuandoan.tasktracker.ui.components.TagChipRow
-import dev.tuandoan.tasktracker.ui.components.TaskFilterChipRow
 import dev.tuandoan.tasktracker.ui.components.TaskListContent
 import dev.tuandoan.tasktracker.ui.components.TaskListTopBar
 import dev.tuandoan.tasktracker.ui.events.UiEvent
@@ -72,6 +73,7 @@ fun TaskListScreen(
     navController: NavController,
     onSettingsClick: () -> Unit = {},
     initialStatsFilter: StatsFilter? = null,
+    bottomBarPadding: Dp = 0.dp,
 ) {
     // Collect all required state
     val allTasks by viewModel.allTasks.collectAsStateWithLifecycle()
@@ -102,9 +104,15 @@ fun TaskListScreen(
     // Feature tips state
     val userPrefs by viewModel.userPreferences.collectAsStateWithLifecycle()
 
+    // Scroll behavior — shows tonal elevation on TopAppBar when content scrolls
+    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
+
     // Snackbar host state
     val snackbarHostState = remember { SnackbarHostState() }
     val context = LocalContext.current
+
+    // Search state
+    var isSearchActive by remember { mutableStateOf(false) }
 
     // Debug-only mock rating dialog state
     var showDebugRatingDialog by remember { mutableStateOf(false) }
@@ -171,13 +179,21 @@ fun TaskListScreen(
         }
     }
 
+    // Close search on back press
+    BackHandler(enabled = isSearchActive) {
+        viewModel.clearSearch()
+        isSearchActive = false
+    }
+
     // Debug-only mock rating dialog that simulates Google Play In-App Review
     if (showDebugRatingDialog) {
         DebugRatingDialog(onDismiss = { showDebugRatingDialog = false })
     }
 
     Scaffold(
-        modifier = modifier.fillMaxSize(),
+        modifier = modifier
+            .fillMaxSize()
+            .nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             TaskListTopBar(
                 isSelectionMode = isSelectionMode,
@@ -190,11 +206,21 @@ fun TaskListScreen(
                 hasNonDefaultSort = isNonDefaultSort,
                 onSortClick = { showSortSheet = true },
                 onSettingsClick = onSettingsClick,
+                isSearchActive = isSearchActive,
+                searchQuery = searchQuery,
+                onSearchQueryChange = viewModel::updateSearchQuery,
+                onSearchOpen = { isSearchActive = true },
+                onSearchClose = {
+                    viewModel.clearSearch()
+                    isSearchActive = false
+                },
+                scrollBehavior = scrollBehavior,
             )
         },
         floatingActionButton = {
             FloatingActionButton(
                 onClick = { navController.navigate(TaskTrackerRoutes.TASK_EDITOR_CREATE) },
+                modifier = Modifier.padding(bottom = bottomBarPadding),
                 containerColor = MaterialTheme.colorScheme.primary,
                 contentColor = MaterialTheme.colorScheme.onPrimary,
                 elevation = FloatingActionButtonDefaults.elevation(
@@ -216,49 +242,37 @@ fun TaskListScreen(
             )
         },
     ) { paddingValues ->
-        Column(modifier = Modifier.padding(paddingValues)) {
-            TaskFilterChipRow(
-                currentFilter = currentFilter,
-                onFilterChange = viewModel::setFilter,
-            )
-            TagChipRow(
-                currentTagFilter = currentTagFilter,
-                availableTags = availableTags,
-                onTagFilterChange = viewModel::setTagFilter,
-            )
-            FeatureTip(
-                text = stringResource(R.string.tip_fab_create_task),
-                visible = !userPrefs.tipFabShown && allTasks.isEmpty(),
-                onDismiss = viewModel::setTipFabShown,
-            )
-            FeatureTip(
-                text = stringResource(R.string.tip_tag_chips_filter),
-                visible = !userPrefs.tipTagChipsShown && availableTags.isNotEmpty(),
-                onDismiss = viewModel::setTipTagChipsShown,
-            )
-            TaskListContent(
-                allTasks = allTasks,
-                visibleTasks = visibleTasks,
-                groupedVisibleTasks = groupedVisibleTasks,
-                searchQuery = searchQuery,
-                currentFilter = currentFilter,
-                currentTagFilter = currentTagFilter,
-                availableTags = availableTags,
-                selectedIds = selectedIds,
-                isSelectionMode = isSelectionMode,
-                streakMap = streakMap,
-                onSearchQueryChange = viewModel::updateSearchQuery,
-                onClearSearch = viewModel::clearSearch,
-                onToggleTaskComplete = viewModel::toggleTaskCompletion,
-                onEditTask = { task -> navController.navigate(TaskTrackerRoutes.taskEditorEdit(task.id)) },
-                onArchiveTask = viewModel::archiveTask,
-                onDuplicateTask = viewModel::duplicateTask,
-                onSkipOccurrence = viewModel::skipOccurrence,
-                onPinTask = viewModel::toggleTaskPin,
-                onLongPressTask = viewModel::enterSelection,
-                onToggleSelection = viewModel::toggleSelection,
-            )
-        }
+        TaskListContent(
+            allTasks = allTasks,
+            visibleTasks = visibleTasks,
+            groupedVisibleTasks = groupedVisibleTasks,
+            searchQuery = searchQuery,
+            currentFilter = currentFilter,
+            currentTagFilter = currentTagFilter,
+            availableTags = availableTags,
+            selectedIds = selectedIds,
+            isSelectionMode = isSelectionMode,
+            streakMap = streakMap,
+            showFabTip = !userPrefs.tipFabShown && allTasks.isEmpty(),
+            showTagTip = !userPrefs.tipTagChipsShown && availableTags.isNotEmpty(),
+            fabTipText = stringResource(R.string.tip_fab_create_task),
+            tagTipText = stringResource(R.string.tip_tag_chips_filter),
+            onFilterChange = viewModel::setFilter,
+            onTagFilterChange = viewModel::setTagFilter,
+            onDismissFabTip = viewModel::setTipFabShown,
+            onDismissTagTip = viewModel::setTipTagChipsShown,
+            onClearSearch = viewModel::clearSearch,
+            onToggleTaskComplete = viewModel::toggleTaskCompletion,
+            onEditTask = { task -> navController.navigate(TaskTrackerRoutes.taskEditorEdit(task.id)) },
+            onArchiveTask = viewModel::archiveTask,
+            onDuplicateTask = viewModel::duplicateTask,
+            onSkipOccurrence = viewModel::skipOccurrence,
+            onPinTask = viewModel::toggleTaskPin,
+            onLongPressTask = viewModel::enterSelection,
+            onToggleSelection = viewModel::toggleSelection,
+            bottomBarPadding = bottomBarPadding,
+            modifier = Modifier.padding(paddingValues),
+        )
     }
 
     // Show archive confirmation dialog
