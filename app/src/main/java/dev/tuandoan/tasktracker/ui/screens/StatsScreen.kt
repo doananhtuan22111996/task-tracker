@@ -29,7 +29,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -64,6 +63,7 @@ import dev.tuandoan.tasktracker.domain.model.StreakStats
 import dev.tuandoan.tasktracker.domain.model.TaskStreak
 import dev.tuandoan.tasktracker.navigation.StatsFilter
 import dev.tuandoan.tasktracker.ui.components.FeatureTip
+import dev.tuandoan.tasktracker.ui.theme.AppSpacing
 import dev.tuandoan.tasktracker.ui.viewmodel.StatsViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -113,10 +113,10 @@ fun StatsScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(paddingValues)
-                    .padding(horizontal = 16.dp)
-                    .padding(top = 8.dp, bottom = 8.dp + bottomBarPadding)
+                    .padding(horizontal = AppSpacing.screenPadding)
+                    .padding(top = AppSpacing.small)
                     .verticalScroll(rememberScrollState()),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
+                verticalArrangement = Arrangement.spacedBy(AppSpacing.small),
             ) {
                 // Feature tip (SPEC-O02)
                 FeatureTip(
@@ -129,9 +129,9 @@ fun StatsScreen(
                 Text(
                     text = stringResource(R.string.stat_section_today),
                     style = MaterialTheme.typography.labelLarge,
-                    modifier = Modifier.padding(top = 4.dp),
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.padding(top = AppSpacing.extraSmall),
                 )
-                HorizontalDivider()
 
                 // Completed today
                 StatCard(
@@ -181,15 +181,14 @@ fun StatsScreen(
                     onClick = { onNavigateToFilteredList(StatsFilter.OVERDUE) },
                 )
 
-                Spacer(Modifier.height(8.dp))
+                Spacer(Modifier.height(AppSpacing.sectionSpacing - AppSpacing.small))
 
                 // ALL TIME section (SPEC-S06)
                 Text(
                     text = stringResource(R.string.stat_section_all_time),
                     style = MaterialTheme.typography.labelLarge,
-                    modifier = Modifier.padding(top = 4.dp),
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
-                HorizontalDivider()
 
                 // Active tasks
                 StatCard(
@@ -220,7 +219,7 @@ fun StatsScreen(
                 // Completion rate card (SPEC-S05)
                 CompletionRateCard(completionRate = completionRate)
 
-                Spacer(Modifier.height(8.dp))
+                Spacer(Modifier.height(AppSpacing.sectionSpacing - AppSpacing.small))
 
                 // Weekly breakdown (SPEC-S04)
                 if (weeklyBreakdown.isNotEmpty()) {
@@ -228,10 +227,10 @@ fun StatsScreen(
                 }
 
                 // Streaks section
-                Spacer(Modifier.height(8.dp))
+                Spacer(Modifier.height(AppSpacing.sectionSpacing - AppSpacing.small))
                 StreaksSection(streakStats = streakStats)
 
-                Spacer(Modifier.height(4.dp))
+                Spacer(Modifier.height(AppSpacing.extraSmall))
 
                 // Note about archived tasks
                 Surface(
@@ -241,7 +240,7 @@ fun StatsScreen(
                     tonalElevation = 1.dp,
                 ) {
                     Row(
-                        modifier = Modifier.padding(12.dp),
+                        modifier = Modifier.padding(AppSpacing.medium),
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Icon(
@@ -250,7 +249,7 @@ fun StatsScreen(
                             modifier = Modifier.size(16.dp),
                             tint = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
-                        Spacer(modifier = Modifier.width(8.dp))
+                        Spacer(modifier = Modifier.width(AppSpacing.small))
                         Text(
                             text = stringResource(R.string.stat_archived_note),
                             style = MaterialTheme.typography.bodySmall,
@@ -258,6 +257,9 @@ fun StatsScreen(
                         )
                     }
                 }
+
+                // Bottom spacer so content scrolls behind the NavigationBar
+                Spacer(Modifier.height(bottomBarPadding + AppSpacing.small))
             }
         }
     }
@@ -269,7 +271,7 @@ private fun StatsEmptyState(onCreateTask: () -> Unit, modifier: Modifier = Modif
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
-        modifier = modifier.fillMaxSize().padding(32.dp),
+        modifier = modifier.fillMaxSize().padding(AppSpacing.huge),
     ) {
         Icon(
             Icons.Outlined.CheckCircle,
@@ -277,12 +279,12 @@ private fun StatsEmptyState(onCreateTask: () -> Unit, modifier: Modifier = Modif
             modifier = Modifier.size(64.dp),
             tint = MaterialTheme.colorScheme.outline,
         )
-        Spacer(Modifier.height(16.dp))
+        Spacer(Modifier.height(AppSpacing.large))
         Text(
             stringResource(R.string.stat_empty_headline),
             style = MaterialTheme.typography.titleMedium,
         )
-        Spacer(Modifier.height(8.dp))
+        Spacer(Modifier.height(AppSpacing.small))
         Button(onClick = onCreateTask) {
             Text(stringResource(R.string.stat_empty_cta))
         }
@@ -305,14 +307,14 @@ private fun DailyProgressSection(completedToday: Int, dueToday: Int, progress: F
                 stringResource(R.string.stat_daily_progress, completedToday, dueToday)
             },
             style = MaterialTheme.typography.labelMedium,
-            modifier = Modifier.padding(bottom = 4.dp),
+            modifier = Modifier.padding(bottom = AppSpacing.extraSmall),
         )
         LinearProgressIndicator(
             progress = { progress.coerceIn(0f, 1f) },
             modifier = Modifier
                 .fillMaxWidth()
-                .height(8.dp)
-                .clip(RoundedCornerShape(4.dp)),
+                .height(AppSpacing.small)
+                .clip(RoundedCornerShape(AppSpacing.extraSmall)),
         )
     }
 }
@@ -333,7 +335,7 @@ private fun CompletionRateCard(completionRate: Int?, modifier: Modifier = Modifi
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(12.dp),
+                .padding(AppSpacing.medium),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
         ) {
@@ -363,10 +365,9 @@ private fun WeeklyBreakdownSection(weeklyBreakdown: List<DailyCount>, modifier: 
         Text(
             text = stringResource(R.string.stat_this_week),
             style = MaterialTheme.typography.labelLarge,
-            modifier = Modifier.padding(bottom = 4.dp),
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(bottom = AppSpacing.small),
         )
-        HorizontalDivider()
-        Spacer(Modifier.height(8.dp))
 
         val maxCount = weeklyBreakdown.maxOfOrNull { it.count } ?: 1
         val barColor = MaterialTheme.colorScheme.primary
@@ -464,7 +465,7 @@ private fun StatCard(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(12.dp),
+                .padding(AppSpacing.medium),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
         ) {
@@ -482,7 +483,7 @@ private fun StatCard(
                         MaterialTheme.colorScheme.onSurfaceVariant
                     },
                 )
-                Spacer(modifier = Modifier.width(12.dp))
+                Spacer(modifier = Modifier.width(AppSpacing.medium))
                 Column {
                     Text(
                         text = title,
@@ -515,7 +516,7 @@ private fun StatCard(
 
             // SPEC-S01: trailing arrow for tappable cards
             if (onClick != null) {
-                Spacer(modifier = Modifier.width(8.dp))
+                Spacer(modifier = Modifier.width(AppSpacing.small))
                 Icon(
                     Icons.AutoMirrored.Default.ArrowForwardIos,
                     contentDescription = null,
@@ -538,10 +539,9 @@ private fun StreaksSection(streakStats: StreakStats, modifier: Modifier = Modifi
         Text(
             text = stringResource(R.string.stat_section_streaks),
             style = MaterialTheme.typography.labelLarge,
-            modifier = Modifier.padding(top = 4.dp),
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(bottom = AppSpacing.small),
         )
-        HorizontalDivider()
-        Spacer(Modifier.height(8.dp))
 
         if (streakStats.activeRecurringCount == 0) {
             // Empty state
@@ -552,14 +552,14 @@ private fun StreaksSection(streakStats: StreakStats, modifier: Modifier = Modifi
                 tonalElevation = 1.dp,
             ) {
                 Column(
-                    modifier = Modifier.padding(16.dp),
+                    modifier = Modifier.padding(AppSpacing.screenPadding),
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                     Text(
                         text = stringResource(R.string.stat_streak_empty),
                         style = MaterialTheme.typography.bodyMedium,
                     )
-                    Spacer(Modifier.height(4.dp))
+                    Spacer(Modifier.height(AppSpacing.extraSmall))
                     Text(
                         text = stringResource(R.string.stat_streak_empty_hint),
                         style = MaterialTheme.typography.bodySmall,
@@ -583,7 +583,7 @@ private fun StreaksSection(streakStats: StreakStats, modifier: Modifier = Modifi
             // Best current streak
             streakStats.bestCurrentStreak?.let { streak ->
                 if (streak.currentStreak > 0) {
-                    Spacer(Modifier.height(8.dp))
+                    Spacer(Modifier.height(AppSpacing.small))
                     StreakCard(
                         title = stringResource(R.string.stat_best_current_streak),
                         streak = streak,
@@ -595,7 +595,7 @@ private fun StreaksSection(streakStats: StreakStats, modifier: Modifier = Modifi
             // All-time best streak
             streakStats.allTimeBestStreak?.let { streak ->
                 if (streak.longestStreak > 0) {
-                    Spacer(Modifier.height(8.dp))
+                    Spacer(Modifier.height(AppSpacing.small))
                     StreakCard(
                         title = stringResource(R.string.stat_all_time_best_streak),
                         streak = streak,
@@ -618,7 +618,7 @@ private fun StreakCard(title: String, streak: TaskStreak, streakValue: Int, modi
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(12.dp),
+                .padding(AppSpacing.medium),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
         ) {
@@ -638,7 +638,7 @@ private fun StreakCard(title: String, streak: TaskStreak, streakValue: Int, modi
             }
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(4.dp),
+                horizontalArrangement = Arrangement.spacedBy(AppSpacing.extraSmall),
             ) {
                 Text(
                     text = "\uD83D\uDD25", // fire emoji
