@@ -1,6 +1,6 @@
 package dev.tuandoan.tasktracker.ui.screens
 
-import androidx.compose.foundation.layout.Column
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.AlertDialog
@@ -16,7 +16,9 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
@@ -30,7 +32,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dev.tuandoan.tasktracker.R
 import dev.tuandoan.tasktracker.ui.components.ArchivedTaskListContent
 import dev.tuandoan.tasktracker.ui.components.ArchivedTaskListTopBar
-import dev.tuandoan.tasktracker.ui.components.TagChipRow
 import dev.tuandoan.tasktracker.ui.events.UiEvent
 import dev.tuandoan.tasktracker.ui.viewmodel.TaskViewModel
 
@@ -52,6 +53,9 @@ fun ArchivedScreen(viewModel: TaskViewModel, modifier: Modifier = Modifier, bott
     val selectedCount by viewModel.selectedCount.collectAsStateWithLifecycle()
     val pendingBulkDeleteTasks by viewModel.pendingBulkDeleteTasks.collectAsStateWithLifecycle()
     val pendingDeleteTask by viewModel.pendingDeleteTask.collectAsStateWithLifecycle()
+
+    // Search state — managed locally like TaskListScreen
+    var isSearchActive by remember { mutableStateOf(false) }
 
     // Snackbar host state
     val snackbarHostState = remember { SnackbarHostState() }
@@ -100,6 +104,12 @@ fun ArchivedScreen(viewModel: TaskViewModel, modifier: Modifier = Modifier, bott
         }
     }
 
+    // Close search on back press
+    BackHandler(enabled = isSearchActive) {
+        viewModel.clearSearch()
+        isSearchActive = false
+    }
+
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
     Scaffold(
@@ -114,6 +124,14 @@ fun ArchivedScreen(viewModel: TaskViewModel, modifier: Modifier = Modifier, bott
                 onBulkPermanentDelete = viewModel::requestBulkPermanentDelete,
                 onClearSelection = viewModel::clearSelection,
                 onSelectAll = { viewModel.selectAll(archivedTasks.map { it.id }) },
+                isSearchActive = isSearchActive,
+                searchQuery = searchQuery,
+                onSearchQueryChange = viewModel::updateSearchQuery,
+                onSearchOpen = { isSearchActive = true },
+                onSearchClose = {
+                    viewModel.clearSearch()
+                    isSearchActive = false
+                },
                 scrollBehavior = scrollBehavior,
             )
         },
@@ -126,26 +144,21 @@ fun ArchivedScreen(viewModel: TaskViewModel, modifier: Modifier = Modifier, bott
             )
         },
     ) { paddingValues ->
-        Column(modifier = Modifier.padding(paddingValues)) {
-            TagChipRow(
-                currentTagFilter = archivedTagFilter,
-                availableTags = archivedAvailableTags,
-                onTagFilterChange = viewModel::setArchivedTagFilter,
-            )
-            ArchivedTaskListContent(
-                archivedTasks = archivedTasks,
-                searchQuery = searchQuery,
-                selectedIds = selectedIds,
-                isSelectionMode = isSelectionMode,
-                onSearchQueryChange = viewModel::updateSearchQuery,
-                onClearSearch = viewModel::clearSearch,
-                onRestoreTask = viewModel::restoreArchivedTask,
-                onPermanentDeleteTask = viewModel::requestPermanentDeleteTask,
-                onLongPressTask = viewModel::enterSelection,
-                onToggleSelection = viewModel::toggleSelection,
-                bottomBarPadding = bottomBarPadding,
-            )
-        }
+        ArchivedTaskListContent(
+            archivedTasks = archivedTasks,
+            searchQuery = searchQuery,
+            currentTagFilter = archivedTagFilter,
+            availableTags = archivedAvailableTags,
+            selectedIds = selectedIds,
+            isSelectionMode = isSelectionMode,
+            onTagFilterChange = viewModel::setArchivedTagFilter,
+            onRestoreTask = viewModel::restoreArchivedTask,
+            onPermanentDeleteTask = viewModel::requestPermanentDeleteTask,
+            onLongPressTask = viewModel::enterSelection,
+            onToggleSelection = viewModel::toggleSelection,
+            bottomBarPadding = bottomBarPadding,
+            modifier = Modifier.padding(paddingValues),
+        )
     }
 
     // Show permanent delete confirmation dialog
