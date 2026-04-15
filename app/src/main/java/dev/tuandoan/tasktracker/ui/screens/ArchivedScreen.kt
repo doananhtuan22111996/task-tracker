@@ -12,16 +12,20 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dev.tuandoan.tasktracker.R
 import dev.tuandoan.tasktracker.ui.components.ArchivedTaskListContent
@@ -35,7 +39,7 @@ import dev.tuandoan.tasktracker.ui.viewmodel.TaskViewModel
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ArchivedScreen(viewModel: TaskViewModel, modifier: Modifier = Modifier) {
+fun ArchivedScreen(viewModel: TaskViewModel, modifier: Modifier = Modifier, bottomBarPadding: Dp = 0.dp) {
     // Collect archived tasks state
     val archivedTasks by viewModel.archivedTasks.collectAsStateWithLifecycle()
     val searchQuery by viewModel.searchQuery.collectAsStateWithLifecycle()
@@ -96,8 +100,12 @@ fun ArchivedScreen(viewModel: TaskViewModel, modifier: Modifier = Modifier) {
         }
     }
 
+    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
+
     Scaffold(
-        modifier = modifier.fillMaxSize(),
+        modifier = modifier
+            .fillMaxSize()
+            .nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             ArchivedTaskListTopBar(
                 isSelectionMode = isSelectionMode,
@@ -106,12 +114,15 @@ fun ArchivedScreen(viewModel: TaskViewModel, modifier: Modifier = Modifier) {
                 onBulkPermanentDelete = viewModel::requestBulkPermanentDelete,
                 onClearSelection = viewModel::clearSelection,
                 onSelectAll = { viewModel.selectAll(archivedTasks.map { it.id }) },
+                scrollBehavior = scrollBehavior,
             )
         },
         snackbarHost = {
             SnackbarHost(
                 hostState = snackbarHostState,
-                modifier = Modifier.semantics { liveRegion = LiveRegionMode.Polite },
+                modifier = Modifier
+                    .padding(bottom = bottomBarPadding)
+                    .semantics { liveRegion = LiveRegionMode.Polite },
             )
         },
     ) { paddingValues ->
@@ -132,6 +143,7 @@ fun ArchivedScreen(viewModel: TaskViewModel, modifier: Modifier = Modifier) {
                 onPermanentDeleteTask = viewModel::requestPermanentDeleteTask,
                 onLongPressTask = viewModel::enterSelection,
                 onToggleSelection = viewModel::toggleSelection,
+                bottomBarPadding = bottomBarPadding,
             )
         }
     }

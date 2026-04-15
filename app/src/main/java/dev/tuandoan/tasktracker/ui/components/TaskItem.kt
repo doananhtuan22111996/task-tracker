@@ -5,7 +5,6 @@ import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -29,8 +28,6 @@ import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material.icons.filled.SkipNext
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.StarBorder
-import androidx.compose.material3.AssistChip
-import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
@@ -40,6 +37,7 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -83,9 +81,6 @@ fun TaskItem(
     onLongPress: () -> Unit = {},
     onToggleSelection: () -> Unit = {},
 ) {
-    // Unified interaction source for consistent ripple
-    val interactionSource = remember { MutableInteractionSource() }
-
     val completedAlpha = if (task.isCompleted) 0.65f else 1f
     val overdue = task.dueAt?.let { !task.isCompleted && isOverdue(it) } ?: false
 
@@ -153,8 +148,6 @@ fun TaskItem(
         modifier = modifier
             .fillMaxWidth()
             .combinedClickable(
-                interactionSource = interactionSource,
-                indication = null, // Use Material3 default ripple
                 onClick = {
                     if (isSelectionMode) onToggleSelection() else onEditClick()
                 },
@@ -176,7 +169,7 @@ fun TaskItem(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 14.dp),
+                .padding(horizontal = 16.dp, vertical = 12.dp),
             verticalAlignment = Alignment.Top,
         ) {
             // LEFT: Checkbox (selection mode uses selection state; normal uses completed state)
@@ -186,8 +179,6 @@ fun TaskItem(
             Box(
                 modifier = Modifier
                     .combinedClickable(
-                        interactionSource = remember { MutableInteractionSource() },
-                        indication = null, // No ripple for checkbox area
                         onClick = {
                             if (!isSelectionMode) onToggleComplete()
                         },
@@ -207,7 +198,6 @@ fun TaskItem(
                         uncheckedColor = MaterialTheme.colorScheme.outline,
                         checkmarkColor = MaterialTheme.colorScheme.onPrimary,
                     ),
-                    interactionSource = remember { MutableInteractionSource() }, // Non-rippling
                 )
             }
 
@@ -302,67 +292,10 @@ fun TaskItem(
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         chips.forEach { (label, type) ->
-                            AssistChip(
-                                onClick = { },
-                                label = {
-                                    Text(
-                                        text = label,
-                                        style = MaterialTheme.typography.labelSmall,
-                                        maxLines = 1,
-                                        overflow = TextOverflow.Ellipsis,
-                                    )
-                                },
-                                leadingIcon = {
-                                    if (type == ChipType.Priority) {
-                                        val priority = Priority.fromValue(task.priority)
-                                        Icon(
-                                            imageVector = when (priority) {
-                                                Priority.HIGH -> Icons.Default.KeyboardArrowUp
-                                                Priority.LOW -> Icons.Default.KeyboardArrowDown
-                                                else -> Icons.Default.Remove
-                                            },
-                                            contentDescription = null,
-                                            modifier = Modifier.size(16.dp),
-                                        )
-                                    }
-                                },
-                                colors = AssistChipDefaults.assistChipColors(
-                                    containerColor = when (type) {
-                                        ChipType.Overdue -> MaterialTheme.colorScheme.errorContainer.copy(
-                                            alpha = 0.75f,
-                                        )
-
-                                        ChipType.Tag -> MaterialTheme.colorScheme.secondaryContainer
-                                        ChipType.Priority -> {
-                                            val p = Priority.fromValue(task.priority)
-                                            when (p) {
-                                                Priority.HIGH -> MaterialTheme.colorScheme.errorContainer.copy(
-                                                    alpha = 0.65f,
-                                                )
-
-                                                Priority.LOW -> MaterialTheme.colorScheme.tertiaryContainer.copy(
-                                                    alpha = 0.8f,
-                                                )
-
-                                                else -> MaterialTheme.colorScheme.surfaceVariant
-                                            }
-                                        }
-                                    },
-                                    labelColor = when (type) {
-                                        ChipType.Overdue -> MaterialTheme.colorScheme.onErrorContainer
-                                        ChipType.Tag -> MaterialTheme.colorScheme.onSecondaryContainer
-                                        ChipType.Priority -> {
-                                            val p = Priority.fromValue(task.priority)
-                                            when (p) {
-                                                Priority.HIGH -> MaterialTheme.colorScheme.onErrorContainer
-                                                Priority.LOW -> MaterialTheme.colorScheme.onTertiaryContainer
-                                                else -> MaterialTheme.colorScheme.onSurfaceVariant
-                                            }
-                                        }
-                                    },
-                                ),
-                                border = null,
-                                modifier = Modifier.height(32.dp),
+                            TaskLabelChip(
+                                label = label,
+                                type = type,
+                                priority = Priority.fromValue(task.priority),
                             )
                         }
                     }
@@ -379,7 +312,6 @@ fun TaskItem(
                     IconButton(
                         onClick = onPinClick,
                         modifier = Modifier.size(40.dp),
-                        interactionSource = remember { MutableInteractionSource() },
                     ) {
                         Icon(
                             imageVector = if (task.isPinned) Icons.Default.Star else Icons.Default.StarBorder,
@@ -399,7 +331,6 @@ fun TaskItem(
                         IconButton(
                             onClick = { showMenu = true },
                             modifier = Modifier.size(40.dp),
-                            interactionSource = remember { MutableInteractionSource() },
                         ) {
                             Icon(
                                 imageVector = Icons.Default.MoreVert,
@@ -457,6 +388,65 @@ fun TaskItem(
                     }
                 }
             }
+        }
+    }
+}
+
+/**
+ * Non-interactive label chip for tag/priority display.
+ * Uses Surface instead of AssistChip to avoid announcing as a button to TalkBack.
+ */
+@Composable
+private fun TaskLabelChip(label: String, type: ChipType, priority: Priority, modifier: Modifier = Modifier) {
+    val containerColor = when (type) {
+        ChipType.Overdue -> MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.75f)
+        ChipType.Tag -> MaterialTheme.colorScheme.secondaryContainer
+        ChipType.Priority -> when (priority) {
+            Priority.HIGH -> MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.65f)
+            Priority.LOW -> MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.8f)
+            else -> MaterialTheme.colorScheme.surfaceVariant
+        }
+    }
+
+    val labelColor = when (type) {
+        ChipType.Overdue -> MaterialTheme.colorScheme.onErrorContainer
+        ChipType.Tag -> MaterialTheme.colorScheme.onSecondaryContainer
+        ChipType.Priority -> when (priority) {
+            Priority.HIGH -> MaterialTheme.colorScheme.onErrorContainer
+            Priority.LOW -> MaterialTheme.colorScheme.onTertiaryContainer
+            else -> MaterialTheme.colorScheme.onSurfaceVariant
+        }
+    }
+
+    Surface(
+        modifier = modifier.height(24.dp),
+        shape = MaterialTheme.shapes.small,
+        color = containerColor,
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = 8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(4.dp),
+        ) {
+            if (type == ChipType.Priority) {
+                Icon(
+                    imageVector = when (priority) {
+                        Priority.HIGH -> Icons.Default.KeyboardArrowUp
+                        Priority.LOW -> Icons.Default.KeyboardArrowDown
+                        else -> Icons.Default.Remove
+                    },
+                    contentDescription = null,
+                    modifier = Modifier.size(14.dp),
+                    tint = labelColor,
+                )
+            }
+            Text(
+                text = label,
+                style = MaterialTheme.typography.labelSmall,
+                color = labelColor,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
         }
     }
 }

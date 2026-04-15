@@ -59,10 +59,7 @@ fun BottomNavBar(currentRoute: String?, onTabSelected: (BottomNavTab) -> Unit) {
                     )
                 },
                 label = {
-                    Text(
-                        text = stringResource(tab.labelResId),
-                        style = MaterialTheme.typography.labelSmall,
-                    )
+                    Text(text = stringResource(tab.labelResId))
                 },
                 selected = selected,
                 onClick = { onTabSelected(tab) },

@@ -40,6 +40,7 @@
     <string name="cd_settings">सेटिंग्स</string>
     <string name="cd_search">खोजें</string>
     <string name="cd_clear_search">खोज हटाएँ</string>
+    <string name="cd_close_search">खोज बंद करें</string>
     <string name="cd_clear_filter">फ़िल्टर हटाएँ</string>
     <string name="cd_restore_selected">चयनित पुनर्स्थापित करें</string>
     <string name="cd_permanently_delete_selected">चयनित स्थायी रूप से हटाएँ</string>

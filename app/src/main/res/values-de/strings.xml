@@ -40,6 +40,7 @@
     <string name="cd_settings">Einstellungen</string>
     <string name="cd_search">Suchen</string>
     <string name="cd_clear_search">Suche löschen</string>
+    <string name="cd_close_search">Suche schließen</string>
     <string name="cd_clear_filter">Filter löschen</string>
     <string name="cd_restore_selected">Ausgewählte wiederherstellen</string>
     <string name="cd_permanently_delete_selected">Ausgewählte dauerhaft löschen</string>

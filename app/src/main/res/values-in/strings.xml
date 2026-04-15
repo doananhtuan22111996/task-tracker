@@ -40,6 +40,7 @@
     <string name="cd_settings">Pengaturan</string>
     <string name="cd_search">Cari</string>
     <string name="cd_clear_search">Hapus pencarian</string>
+    <string name="cd_close_search">Tutup pencarian</string>
     <string name="cd_clear_filter">Hapus filter</string>
     <string name="cd_restore_selected">Pulihkan yang dipilih</string>
     <string name="cd_permanently_delete_selected">Hapus permanen yang dipilih</string>

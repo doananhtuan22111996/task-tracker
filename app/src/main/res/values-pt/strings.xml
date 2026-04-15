@@ -40,6 +40,7 @@
     <string name="cd_settings">Definições</string>
     <string name="cd_search">Pesquisar</string>
     <string name="cd_clear_search">Limpar pesquisa</string>
+    <string name="cd_close_search">Fechar pesquisa</string>
     <string name="cd_clear_filter">Limpar filtro</string>
     <string name="cd_restore_selected">Restaurar selecionadas</string>
     <string name="cd_permanently_delete_selected">Eliminar permanentemente selecionadas</string>

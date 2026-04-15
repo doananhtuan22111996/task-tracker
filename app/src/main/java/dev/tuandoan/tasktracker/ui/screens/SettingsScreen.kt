@@ -56,6 +56,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.LiveRegionMode
@@ -138,7 +139,10 @@ fun SettingsScreen(viewModel: SettingsViewModel, onNavigateBack: () -> Unit, onN
     // Visual dimming when loading to indicate disabled state
     val contentAlpha = if (isLoading) 0.5f else 1f
 
+    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
+
     Scaffold(
+        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             TopAppBar(
                 title = {
@@ -157,8 +161,10 @@ fun SettingsScreen(viewModel: SettingsViewModel, onNavigateBack: () -> Unit, onN
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.surface,
+                    scrolledContainerColor = MaterialTheme.colorScheme.surfaceContainer,
                     titleContentColor = MaterialTheme.colorScheme.onSurface,
                 ),
+                scrollBehavior = scrollBehavior,
             )
         },
         snackbarHost = {

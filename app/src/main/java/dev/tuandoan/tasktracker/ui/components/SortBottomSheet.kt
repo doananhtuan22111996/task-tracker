@@ -23,12 +23,12 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
-import androidx.compose.ui.unit.dp
 import dev.tuandoan.tasktracker.R
 import dev.tuandoan.tasktracker.domain.model.CompletedGrouping
 import dev.tuandoan.tasktracker.domain.model.SortDirection
 import dev.tuandoan.tasktracker.domain.model.SortKey
 import dev.tuandoan.tasktracker.domain.model.TaskSort
+import dev.tuandoan.tasktracker.ui.theme.AppSpacing
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -48,12 +48,12 @@ fun SortBottomSheet(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp),
+                .padding(horizontal = AppSpacing.screenPadding),
         ) {
             Text(
                 text = stringResource(R.string.sort_header),
                 style = MaterialTheme.typography.titleMedium,
-                modifier = Modifier.padding(bottom = 12.dp),
+                modifier = Modifier.padding(bottom = AppSpacing.medium),
             )
 
             sortOptions.forEach { option ->
@@ -72,7 +72,7 @@ fun SortBottomSheet(
                                 currentSort.copy(key = option.key, direction = option.direction),
                             )
                         }
-                        .padding(vertical = 8.dp)
+                        .padding(vertical = AppSpacing.small)
                         .semantics {
                             contentDescription = label
                             stateDescription = selectedLabel
@@ -86,12 +86,12 @@ fun SortBottomSheet(
                     Text(
                         text = label,
                         style = MaterialTheme.typography.bodyLarge,
-                        modifier = Modifier.padding(start = 12.dp),
+                        modifier = Modifier.padding(start = AppSpacing.medium),
                     )
                 }
             }
 
-            HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+            HorizontalDivider(modifier = Modifier.padding(vertical = AppSpacing.small))
 
             Row(
                 modifier = Modifier
@@ -104,7 +104,7 @@ fun SortBottomSheet(
                         }
                         onSortSelected(currentSort.copy(completedGrouping = newGrouping))
                     }
-                    .padding(vertical = 8.dp),
+                    .padding(vertical = AppSpacing.small),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(
@@ -118,7 +118,7 @@ fun SortBottomSheet(
                 )
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(AppSpacing.large))
         }
     }
 }
