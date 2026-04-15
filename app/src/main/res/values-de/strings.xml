@@ -2,6 +2,11 @@
 <resources>
     <string name="app_name">Task Tracker</string>
 
+    <!-- Bottom Navigation Tabs -->
+    <string name="nav_tab_tasks">Aufgaben</string>
+    <string name="nav_tab_stats">Statistiken</string>
+    <string name="nav_tab_archived">Archiviert</string>
+
     <!-- Navigation -->
     <string name="nav_all">Alle</string>
     <string name="nav_active">Aktiv</string>
@@ -35,6 +40,7 @@
     <string name="cd_settings">Einstellungen</string>
     <string name="cd_search">Suchen</string>
     <string name="cd_clear_search">Suche löschen</string>
+    <string name="cd_close_search">Suche schließen</string>
     <string name="cd_clear_filter">Filter löschen</string>
     <string name="cd_restore_selected">Ausgewählte wiederherstellen</string>
     <string name="cd_permanently_delete_selected">Ausgewählte dauerhaft löschen</string>

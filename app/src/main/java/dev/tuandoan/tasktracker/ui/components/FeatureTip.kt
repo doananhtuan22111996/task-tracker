@@ -17,8 +17,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import dev.tuandoan.tasktracker.R
+import dev.tuandoan.tasktracker.ui.theme.AppSpacing
 
 @Composable
 fun FeatureTip(text: String, visible: Boolean, onDismiss: () -> Unit, modifier: Modifier = Modifier) {
@@ -30,13 +30,13 @@ fun FeatureTip(text: String, visible: Boolean, onDismiss: () -> Unit, modifier: 
         Card(
             modifier = modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 4.dp),
+                .padding(horizontal = AppSpacing.screenPadding, vertical = AppSpacing.extraSmall),
             colors = CardDefaults.cardColors(
                 containerColor = MaterialTheme.colorScheme.secondaryContainer,
             ),
         ) {
             Row(
-                modifier = Modifier.padding(12.dp),
+                modifier = Modifier.padding(AppSpacing.medium),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(

@@ -33,7 +33,7 @@ fun TagChipRow(
 
     LazyRow(
         horizontalArrangement = Arrangement.spacedBy(8.dp),
-        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 4.dp),
         modifier = modifier.fillMaxWidth(),
     ) {
         items(availableTags) { tag ->
