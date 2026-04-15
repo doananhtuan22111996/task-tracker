@@ -179,10 +179,11 @@ fun TaskTrackerApp(
             },
             contentWindowInsets = WindowInsets(0, 0, 0, 0),
         ) { rootPadding ->
+            val bottomBarPadding = rootPadding.calculateBottomPadding()
             NavHost(
                 navController = navController,
                 startDestination = startDestination,
-                modifier = Modifier.padding(rootPadding),
+                modifier = Modifier.padding(top = rootPadding.calculateTopPadding()),
                 enterTransition = { fadeIn() },
                 exitTransition = { fadeOut() },
                 popEnterTransition = { fadeIn() },
@@ -226,6 +227,7 @@ fun TaskTrackerApp(
                             navController.navigate(TaskTrackerRoutes.SETTINGS)
                         },
                         initialStatsFilter = statsFilter,
+                        bottomBarPadding = bottomBarPadding,
                     )
                 }
 
@@ -239,6 +241,7 @@ fun TaskTrackerApp(
                     val viewModel: TaskViewModel = hiltViewModel()
                     ArchivedScreen(
                         viewModel = viewModel,
+                        bottomBarPadding = bottomBarPadding,
                     )
                 }
 
@@ -252,6 +255,7 @@ fun TaskTrackerApp(
                     val statsViewModel: StatsViewModel = hiltViewModel()
                     StatsScreen(
                         viewModel = statsViewModel,
+                        bottomBarPadding = bottomBarPadding,
                         onNavigateToFilteredList = { statsFilter ->
                             navController.navigate(
                                 TaskTrackerRoutes.taskListWithFilter(statsFilter.name),

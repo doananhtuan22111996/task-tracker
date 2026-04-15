@@ -20,9 +20,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import dev.tuandoan.tasktracker.R
 import dev.tuandoan.tasktracker.data.database.Task
+import dev.tuandoan.tasktracker.ui.theme.AppSpacing
 import dev.tuandoan.tasktracker.utils.TaskDateGrouper
 import dev.tuandoan.tasktracker.utils.TaskSection
 
@@ -41,6 +43,7 @@ fun ArchivedTaskListContent(
     onPermanentDeleteTask: (Task) -> Unit,
     onLongPressTask: (Long) -> Unit,
     onToggleSelection: (Long) -> Unit,
+    bottomBarPadding: Dp = 0.dp,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -87,6 +90,7 @@ fun ArchivedTaskListContent(
                 onPermanentDeleteTask = onPermanentDeleteTask,
                 onLongPressTask = onLongPressTask,
                 onToggleSelection = onToggleSelection,
+                bottomBarPadding = bottomBarPadding,
             )
         }
     }
@@ -105,13 +109,12 @@ private fun ArchivedTaskList(
     onPermanentDeleteTask: (Task) -> Unit,
     onLongPressTask: (Long) -> Unit,
     onToggleSelection: (Long) -> Unit,
+    bottomBarPadding: Dp = 0.dp,
 ) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.spacedBy(4.dp),
-        contentPadding = PaddingValues(
-            bottom = 16.dp, // Proper clearance for navigation bars
-        ),
+        verticalArrangement = Arrangement.spacedBy(AppSpacing.itemSpacing),
+        contentPadding = PaddingValues(bottom = AppSpacing.large + bottomBarPadding),
     ) {
         taskSections.forEach { section ->
             // Sticky header for each archive date section
