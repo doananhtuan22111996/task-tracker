@@ -3,12 +3,15 @@
 All notable changes to the Task Tracker app will be documented in this file.
 Format follows [Keep a Changelog](https://keepachangelog.com).
 
-## [Unreleased]
+## [1.8.0] - 2026-04-16
 
 ### Added
 - Bottom navigation bar with 3 tabs: Tasks, Stats, Archived
 - Task filter chip row (All/Active/Completed) replacing old filter bottom bar
 - Bottom nav tab labels translated to all 8 locales
+- Edge-to-edge list content scrolling behind NavigationBar
+- ArchivedScreen TopBar search with 3-mode pattern (normal/search/selection)
+- BottomNavBar unit tests for tab config and route matching
 
 ### Changed
 - Stats and Archived promoted from top bar icons to bottom navigation tabs
@@ -16,11 +19,18 @@ Format follows [Keep a Changelog](https://keepachangelog.com).
 - Stats and Archived screens no longer show back arrow (top-level destinations)
 - Tab transitions use crossfade animation
 - Tab state preserved via saveState/restoreState when switching
+- StatsScreen polished with AppSpacing tokens, semantic colors, section headers
+- ArchivedScreen aligned with TaskListScreen M3 patterns (inline tag chips, sticky headers)
+- M3 compliance fixes across all screens (tonal elevation, scroll behavior, color tokens)
+
+### Fixed
+- Archived empty state now correctly distinguishes "no archived tasks" from "filters hide all results"
 
 ### Removed
 - Filter-only NavigationBar from TaskListScreen bottom bar
 - Stats and Archive icon buttons from TaskListTopBar
 - Back arrow from StatsScreen and ArchivedScreen top bars
+- Unused SearchField.kt component
 
 ## [1.7.0] - 2026-04-13
 
