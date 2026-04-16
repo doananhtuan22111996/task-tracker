@@ -348,6 +348,13 @@
     <string name="feedback_email_subject">Task Tracker प्रतिक्रिया</string>
     <string name="cd_send_feedback">ई-मेल द्वारा प्रतिक्रिया भेजें</string>
 
+    <!-- More Apps -->
+    <string name="settings_section_more_apps">और ऐप्स</string>
+    <string name="settings_expense_tracker">Expense Tracker</string>
+    <string name="settings_expense_tracker_desc">सरल, ऑफ़लाइन खर्च प्रबंधक। अपने खर्चों को ट्रैक करें और बजट में रहें।</string>
+    <string name="settings_view_on_play_store">Play Store पर देखें</string>
+    <string name="cd_open_expense_tracker">Play Store पर Expense Tracker खोलें</string>
+
     <!-- Accessibility -->
     <string name="a11y_chip_selected">चयनित</string>
     <string name="a11y_chip_not_selected">अचयनित</string>

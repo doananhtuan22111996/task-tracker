@@ -348,6 +348,13 @@
     <string name="feedback_email_subject">Task Tracker Phản hồi</string>
     <string name="cd_send_feedback">Gửi phản hồi qua email</string>
 
+    <!-- More Apps -->
+    <string name="settings_section_more_apps">Ứng dụng khác</string>
+    <string name="settings_expense_tracker">Expense Tracker</string>
+    <string name="settings_expense_tracker_desc">Quản lý chi tiêu đơn giản, hoạt động offline. Theo dõi chi tiêu và giữ ngân sách.</string>
+    <string name="settings_view_on_play_store">Xem trên Play Store</string>
+    <string name="cd_open_expense_tracker">Mở Expense Tracker trên Play Store</string>
+
     <!-- Accessibility -->
     <string name="a11y_chip_selected">Đã chọn</string>
     <string name="a11y_chip_not_selected">Chưa chọn</string>

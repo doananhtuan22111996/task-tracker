@@ -348,6 +348,13 @@
     <string name="feedback_email_subject">Task Tracker Comentarios</string>
     <string name="cd_send_feedback">Enviar comentarios por correo electrónico</string>
 
+    <!-- More Apps -->
+    <string name="settings_section_more_apps">Más aplicaciones</string>
+    <string name="settings_expense_tracker">Expense Tracker</string>
+    <string name="settings_expense_tracker_desc">Gestor de gastos simple y sin conexión. Controla tus gastos y mantente dentro del presupuesto.</string>
+    <string name="settings_view_on_play_store">Ver en Play Store</string>
+    <string name="cd_open_expense_tracker">Abrir Expense Tracker en Play Store</string>
+
     <!-- Accessibility -->
     <string name="a11y_chip_selected">Seleccionado</string>
     <string name="a11y_chip_not_selected">No seleccionado</string>

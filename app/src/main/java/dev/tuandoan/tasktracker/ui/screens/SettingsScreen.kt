@@ -27,6 +27,7 @@ import androidx.compose.material.icons.outlined.CloudDownload
 import androidx.compose.material.icons.outlined.CloudUpload
 import androidx.compose.material.icons.outlined.Feedback
 import androidx.compose.material.icons.outlined.HelpOutline
+import androidx.compose.material.icons.outlined.OpenInNew
 import androidx.compose.material.icons.outlined.TableChart
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
@@ -427,6 +428,58 @@ fun SettingsScreen(viewModel: SettingsViewModel, onNavigateBack: () -> Unit, onN
                         .semantics {
                             contentDescription =
                                 context.getString(R.string.cd_send_feedback)
+                        },
+                )
+
+                // =============================================
+                // More Apps Section
+                // =============================================
+                SectionHeader(text = stringResource(R.string.settings_section_more_apps))
+
+                ListItem(
+                    headlineContent = {
+                        Text(
+                            text = stringResource(R.string.settings_expense_tracker),
+                            style = MaterialTheme.typography.bodyLarge,
+                        )
+                    },
+                    supportingContent = {
+                        Column {
+                            Text(
+                                text = stringResource(R.string.settings_expense_tracker_desc),
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Text(
+                                text = stringResource(R.string.settings_view_on_play_store),
+                                style = MaterialTheme.typography.labelMedium,
+                                color = MaterialTheme.colorScheme.primary,
+                            )
+                        }
+                    },
+                    trailingContent = {
+                        Icon(
+                            imageVector = Icons.Outlined.OpenInNew,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary,
+                        )
+                    },
+                    colors = ListItemDefaults.colors(
+                        containerColor = MaterialTheme.colorScheme.surface,
+                    ),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable(role = Role.Button) {
+                            val intent = Intent(
+                                Intent.ACTION_VIEW,
+                                Uri.parse("https://play.google.com/store/apps/details?id=dev.tuandoan.expensetracker"),
+                            )
+                            runCatching { context.startActivity(intent) }
+                        }
+                        .semantics {
+                            contentDescription =
+                                context.getString(R.string.cd_open_expense_tracker)
                         },
                 )
             }
