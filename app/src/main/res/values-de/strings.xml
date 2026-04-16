@@ -253,6 +253,9 @@
     <string name="notification_default_task">Aufgabe</string>
     <string name="notification_action_complete">Als erledigt markieren</string>
     <string name="notification_task_completed">Aufgabe erledigt</string>
+    <string name="notification_snooze_15min">15 Min</string>
+    <string name="notification_snooze_1hour">1 Std.</string>
+    <string name="notification_snoozed">Erinnerung verschoben</string>
 
     <!-- App Shortcut -->
     <string name="shortcut_new_task_short">Neue Aufgabe</string>

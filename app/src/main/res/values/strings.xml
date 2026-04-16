@@ -294,6 +294,9 @@
     <string name="notification_default_task">Task</string>
     <string name="notification_action_complete">Mark Complete</string>
     <string name="notification_task_completed">Task completed</string>
+    <string name="notification_snooze_15min">15 min</string>
+    <string name="notification_snooze_1hour">1 hour</string>
+    <string name="notification_snoozed">Reminder snoozed</string>
 
     <!-- App Shortcut -->
     <string name="shortcut_new_task_short">New Task</string>

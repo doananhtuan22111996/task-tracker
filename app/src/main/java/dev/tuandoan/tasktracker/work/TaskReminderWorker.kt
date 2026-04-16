@@ -27,6 +27,8 @@ class TaskReminderWorker @AssistedInject constructor(
         const val KEY_TASK_ID = "task_id"
         const val KEY_TASK_TITLE = "task_title"
         private const val TAG = "TaskReminder"
+        private const val SNOOZE_15_REQUEST_CODE_OFFSET = 100_000
+        private const val SNOOZE_1H_REQUEST_CODE_OFFSET = 200_000
     }
 
     override suspend fun doWork(): Result {
@@ -85,12 +87,41 @@ class TaskReminderWorker @AssistedInject constructor(
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
         )
 
-        // Use app icon instead of system icon for better reliability
+        // "Snooze 15 min" action
+        val snooze15Intent = Intent(applicationContext, TaskSnoozeReceiver::class.java).apply {
+            action = TaskSnoozeReceiver.ACTION_SNOOZE_TASK
+            putExtra(TaskSnoozeReceiver.EXTRA_TASK_ID, taskId)
+            putExtra(TaskSnoozeReceiver.EXTRA_TASK_TITLE, taskTitle)
+            putExtra(TaskSnoozeReceiver.EXTRA_NOTIFICATION_ID, taskId.toInt())
+            putExtra(TaskSnoozeReceiver.EXTRA_SNOOZE_DELAY_MS, SnoozeDelayCalculator.SNOOZE_15_MIN_MS)
+        }
+        val snooze15PendingIntent = PendingIntent.getBroadcast(
+            applicationContext,
+            taskId.toInt() + SNOOZE_15_REQUEST_CODE_OFFSET,
+            snooze15Intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+        )
+
+        // "Snooze 1 hour" action
+        val snooze1hIntent = Intent(applicationContext, TaskSnoozeReceiver::class.java).apply {
+            action = TaskSnoozeReceiver.ACTION_SNOOZE_TASK
+            putExtra(TaskSnoozeReceiver.EXTRA_TASK_ID, taskId)
+            putExtra(TaskSnoozeReceiver.EXTRA_TASK_TITLE, taskTitle)
+            putExtra(TaskSnoozeReceiver.EXTRA_NOTIFICATION_ID, taskId.toInt())
+            putExtra(TaskSnoozeReceiver.EXTRA_SNOOZE_DELAY_MS, SnoozeDelayCalculator.SNOOZE_1_HOUR_MS)
+        }
+        val snooze1hPendingIntent = PendingIntent.getBroadcast(
+            applicationContext,
+            taskId.toInt() + SNOOZE_1H_REQUEST_CODE_OFFSET,
+            snooze1hIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+        )
+
         val notification = NotificationCompat.Builder(
             applicationContext,
             TaskTrackerApplication.TASK_REMINDER_CHANNEL_ID,
         )
-            .setSmallIcon(android.R.drawable.ic_dialog_alert) // Better system icon
+            .setSmallIcon(android.R.drawable.ic_dialog_alert)
             .setContentTitle(applicationContext.getString(R.string.notification_title))
             .setContentText(applicationContext.getString(R.string.notification_due_soon, taskTitle))
             .setStyle(
@@ -104,6 +135,16 @@ class TaskReminderWorker @AssistedInject constructor(
                 android.R.drawable.ic_menu_send,
                 applicationContext.getString(R.string.notification_action_complete),
                 completePendingIntent,
+            )
+            .addAction(
+                android.R.drawable.ic_popup_reminder,
+                applicationContext.getString(R.string.notification_snooze_15min),
+                snooze15PendingIntent,
+            )
+            .addAction(
+                android.R.drawable.ic_popup_reminder,
+                applicationContext.getString(R.string.notification_snooze_1hour),
+                snooze1hPendingIntent,
             )
             .setAutoCancel(true)
             .setDefaults(NotificationCompat.DEFAULT_ALL)

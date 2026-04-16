@@ -253,6 +253,9 @@
     <string name="notification_default_task">Công việc</string>
     <string name="notification_action_complete">Đánh dấu hoàn thành</string>
     <string name="notification_task_completed">Công việc đã hoàn thành</string>
+    <string name="notification_snooze_15min">15 phút</string>
+    <string name="notification_snooze_1hour">1 giờ</string>
+    <string name="notification_snoozed">Đã hoãn nhắc nhở</string>
 
     <!-- App Shortcut -->
     <string name="shortcut_new_task_short">Công việc mới</string>

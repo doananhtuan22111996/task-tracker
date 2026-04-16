@@ -253,6 +253,9 @@
     <string name="notification_default_task">Tarea</string>
     <string name="notification_action_complete">Marcar completa</string>
     <string name="notification_task_completed">Tarea completada</string>
+    <string name="notification_snooze_15min">15 min</string>
+    <string name="notification_snooze_1hour">1 hora</string>
+    <string name="notification_snoozed">Recordatorio pospuesto</string>
 
     <!-- App Shortcut -->
     <string name="shortcut_new_task_short">Nueva tarea</string>

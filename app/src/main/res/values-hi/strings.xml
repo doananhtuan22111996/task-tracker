@@ -253,6 +253,9 @@
     <string name="notification_default_task">कार्य</string>
     <string name="notification_action_complete">पूर्ण करें</string>
     <string name="notification_task_completed">कार्य पूर्ण</string>
+    <string name="notification_snooze_15min">15 मिनट</string>
+    <string name="notification_snooze_1hour">1 घंटा</string>
+    <string name="notification_snoozed">रिमाइंडर स्नूज़ किया गया</string>
 
     <!-- App Shortcut -->
     <string name="shortcut_new_task_short">नया कार्य</string>

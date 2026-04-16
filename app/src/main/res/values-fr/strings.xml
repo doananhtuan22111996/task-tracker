@@ -253,6 +253,9 @@
     <string name="notification_default_task">Tâche</string>
     <string name="notification_action_complete">Marquer terminée</string>
     <string name="notification_task_completed">Tâche terminée</string>
+    <string name="notification_snooze_15min">15 min</string>
+    <string name="notification_snooze_1hour">1 heure</string>
+    <string name="notification_snoozed">Rappel reporté</string>
 
     <!-- App Shortcut -->
     <string name="shortcut_new_task_short">Nouvelle tâche</string>

@@ -253,6 +253,9 @@
     <string name="notification_default_task">Tugas</string>
     <string name="notification_action_complete">Tandai Selesai</string>
     <string name="notification_task_completed">Tugas selesai</string>
+    <string name="notification_snooze_15min">15 mnt</string>
+    <string name="notification_snooze_1hour">1 jam</string>
+    <string name="notification_snoozed">Pengingat ditunda</string>
 
     <!-- App Shortcut -->
     <string name="shortcut_new_task_short">Tugas Baru</string>
