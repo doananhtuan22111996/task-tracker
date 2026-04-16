@@ -6,6 +6,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -15,16 +17,13 @@ import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.unit.dp
 import dev.tuandoan.tasktracker.R
 
-/**
- * Always-visible horizontally-scrollable row of tag filter chips.
- * Hidden entirely when [availableTags] is empty.
- */
 @Composable
 fun TagChipRow(
     currentTagFilter: String?,
     availableTags: List<String>,
     onTagFilterChange: (String?) -> Unit,
     modifier: Modifier = Modifier,
+    tagColorMap: Map<String, String?> = emptyMap(),
 ) {
     if (availableTags.isEmpty()) return
 
@@ -38,12 +37,31 @@ fun TagChipRow(
     ) {
         items(availableTags) { tag ->
             val isSelected = currentTagFilter == tag
+            val tagColor = TagColors.fromKey(tagColorMap[tag])
             FilterChip(
                 selected = isSelected,
                 onClick = {
                     onTagFilterChange(if (isSelected) null else tag)
                 },
-                label = { Text(tag) },
+                label = {
+                    Text(
+                        text = tag,
+                        color = if (tagColor != null) {
+                            tagColor.onContainer
+                        } else {
+                            MaterialTheme.colorScheme.onSurfaceVariant
+                        },
+                    )
+                },
+                colors = if (tagColor != null) {
+                    FilterChipDefaults.filterChipColors(
+                        containerColor = tagColor.container.copy(alpha = 0.6f),
+                        selectedContainerColor = tagColor.container,
+                        selectedLabelColor = tagColor.onContainer,
+                    )
+                } else {
+                    FilterChipDefaults.filterChipColors()
+                },
                 modifier = Modifier.semantics {
                     stateDescription = if (isSelected) selectedStateDesc else unselectedStateDesc
                 },

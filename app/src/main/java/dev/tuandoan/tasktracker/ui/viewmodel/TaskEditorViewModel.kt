@@ -13,6 +13,7 @@ import dev.tuandoan.tasktracker.domain.model.DueDatePreset
 import dev.tuandoan.tasktracker.domain.model.RecurrenceRule
 import dev.tuandoan.tasktracker.domain.model.RecurrenceType
 import dev.tuandoan.tasktracker.domain.model.ReminderOption
+import dev.tuandoan.tasktracker.domain.usecase.TagManagementUseCase
 import dev.tuandoan.tasktracker.domain.usecase.TaskFormUseCase
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -36,6 +37,7 @@ class TaskEditorViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
     private val taskManager: ITaskManager,
     private val taskFormUseCase: TaskFormUseCase,
+    private val tagManagementUseCase: TagManagementUseCase,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
@@ -401,6 +403,7 @@ class TaskEditorViewModel @Inject constructor(
                 val trimmedTitle = _taskTitle.value.trim()
                 val trimmedDescription = _taskDescription.value.trim()
                 val trimmedTag = _tag.value.trim().takeIf { it.isNotEmpty() }
+                val resolvedTagColor = trimmedTag?.let { tagManagementUseCase.getTagColor(it) }
                 val reminderOffsetMinutes = if (_reminderOption.value ==
                     ReminderOption.NONE
                 ) {
@@ -425,6 +428,7 @@ class TaskEditorViewModel @Inject constructor(
                         dueAtHasTime = _dueAtHasTime.value,
                         reminderOffsetMinutes = reminderOffsetMinutes,
                         tag = trimmedTag,
+                        tagColor = resolvedTagColor,
                         priority = _priority.value,
                         isPinned = _isPinned.value,
                         recurrenceType = recurrenceRule.type.value,
@@ -448,12 +452,17 @@ class TaskEditorViewModel @Inject constructor(
                         recurrenceEndDate = recurrenceRule.endDate,
                     )
 
-                    // Set priority and pin status if different from defaults
                     if (_priority.value != 1) {
                         taskManager.setPriority(taskId, _priority.value)
                     }
                     if (_isPinned.value) {
                         taskManager.setPinned(taskId, true)
+                    }
+                    if (resolvedTagColor != null) {
+                        val createdTask = taskManager.getTaskById(taskId)
+                        if (createdTask != null) {
+                            taskManager.updateTask(createdTask.copy(tagColor = resolvedTagColor))
+                        }
                     }
                 }
 

@@ -356,6 +356,24 @@
     <string name="cd_open_expense_tracker">Expense Tracker im Play Store öffnen</string>
 
     <!-- Accessibility -->
+    <!-- Tag Management -->
+    <string name="title_tag_management">Tags verwalten</string>
+    <string name="settings_section_tags">Tags</string>
+    <string name="settings_manage_tags">Tags verwalten</string>
+    <string name="settings_manage_tags_desc">Tags umbenennen, umfärben oder löschen</string>
+    <string name="cd_manage_tags">Tags verwalten</string>
+    <string name="cd_edit_tag">Tag bearbeiten</string>
+    <string name="cd_delete_tag">Tag löschen</string>
+    <string name="cd_tag_color">Farbe: %s</string>
+    <string name="tag_management_empty">Noch keine Tags</string>
+    <string name="tag_management_empty_hint">Tags, die Sie Aufgaben hinzufügen, erscheinen hier</string>
+    <string name="tag_task_count">%d Aufgaben</string>
+    <string name="tag_editor_title">Tag bearbeiten</string>
+    <string name="tag_editor_color">Farbe</string>
+    <string name="tag_color_none">Standard</string>
+    <string name="tag_delete_title">Tag löschen</string>
+    <string name="tag_delete_message">Tag \"%1$s\" von %2$d Aufgaben entfernen? Die Aufgaben selbst werden nicht gelöscht.</string>
+
     <string name="a11y_chip_selected">Ausgewählt</string>
     <string name="a11y_chip_not_selected">Nicht ausgewählt</string>
     <string name="a11y_checkbox_checked">Aktiviert</string>

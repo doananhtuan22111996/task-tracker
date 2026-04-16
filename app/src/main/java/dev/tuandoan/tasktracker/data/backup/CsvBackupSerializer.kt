@@ -58,6 +58,7 @@ class CsvBackupSerializer @Inject constructor() : BackupSerializer {
             task.dueAtHasTime.toString(),
             task.reminderOffsetMinutes?.toString() ?: "",
             task.tag ?: "",
+            task.tagColor ?: "",
             task.isPinned.toString(),
             task.priority.toString(),
             task.isArchived.toString(),
@@ -78,10 +79,12 @@ class CsvBackupSerializer @Inject constructor() : BackupSerializer {
             )
         }
 
-        // Support legacy 13-column, v1 14-column, and current 19-column formats
+        // Support legacy 13-column, v1 14-column, v2 19-column, and current 20-column formats
         val hasDueAtHasTime = fields.size >= V1_FIELD_COUNT
         val offset = if (hasDueAtHasTime) 1 else 0
-        val hasRecurrence = fields.size >= EXPECTED_FIELD_COUNT
+        val hasTagColor = fields.size >= EXPECTED_FIELD_COUNT
+        val colorOffset = if (hasTagColor) 1 else 0
+        val hasRecurrence = fields.size >= (V2_FIELD_COUNT + offset)
 
         return TaskBackupDto(
             id = fields[0].toLong(),
@@ -94,26 +97,28 @@ class CsvBackupSerializer @Inject constructor() : BackupSerializer {
             dueAtHasTime = if (hasDueAtHasTime) fields[7].toBooleanStrictOrNull() ?: false else false,
             reminderOffsetMinutes = fields[7 + offset].toIntOrNull(),
             tag = fields[8 + offset].ifBlank { null },
-            isPinned = fields[9 + offset].toBooleanStrict(),
-            priority = fields[10 + offset].toInt(),
-            isArchived = fields[11 + offset].toBooleanStrict(),
-            archivedAt = fields[12 + offset].toLongOrNull(),
-            recurrenceType = if (hasRecurrence) fields[13 + offset].toIntOrNull() ?: 0 else 0,
-            recurrenceInterval = if (hasRecurrence) fields[14 + offset].toIntOrNull() ?: 1 else 1,
-            recurrenceDaysOfWeek = if (hasRecurrence) fields[15 + offset].toIntOrNull() ?: 0 else 0,
-            recurrenceEndDate = if (hasRecurrence) fields[16 + offset].toLongOrNull() else null,
-            parentRecurringTaskId = if (hasRecurrence) fields[17 + offset].toLongOrNull() else null,
+            tagColor = if (hasTagColor) fields[9 + offset].ifBlank { null } else null,
+            isPinned = fields[9 + offset + colorOffset].toBooleanStrict(),
+            priority = fields[10 + offset + colorOffset].toInt(),
+            isArchived = fields[11 + offset + colorOffset].toBooleanStrict(),
+            archivedAt = fields[12 + offset + colorOffset].toLongOrNull(),
+            recurrenceType = if (hasRecurrence) fields[13 + offset + colorOffset].toIntOrNull() ?: 0 else 0,
+            recurrenceInterval = if (hasRecurrence) fields[14 + offset + colorOffset].toIntOrNull() ?: 1 else 1,
+            recurrenceDaysOfWeek = if (hasRecurrence) fields[15 + offset + colorOffset].toIntOrNull() ?: 0 else 0,
+            recurrenceEndDate = if (hasRecurrence) fields[16 + offset + colorOffset].toLongOrNull() else null,
+            parentRecurringTaskId = if (hasRecurrence) fields[17 + offset + colorOffset].toLongOrNull() else null,
         )
     }
 
     companion object {
-        private const val EXPECTED_FIELD_COUNT = 19
+        private const val EXPECTED_FIELD_COUNT = 20
+        private const val V2_FIELD_COUNT = 19
         private const val V1_FIELD_COUNT = 14
         private const val LEGACY_FIELD_COUNT = 13
 
         private const val HEADER =
             "id,title,description,isCompleted,createdAt,completedAt,dueAt,dueAtHasTime," +
-                "reminderOffsetMinutes,tag,isPinned,priority,isArchived,archivedAt," +
+                "reminderOffsetMinutes,tag,tagColor,isPinned,priority,isArchived,archivedAt," +
                 "recurrenceType,recurrenceInterval,recurrenceDaysOfWeek,recurrenceEndDate," +
                 "parentRecurringTaskId"
 

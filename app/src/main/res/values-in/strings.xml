@@ -356,6 +356,24 @@
     <string name="cd_open_expense_tracker">Buka Expense Tracker di Play Store</string>
 
     <!-- Accessibility -->
+    <!-- Tag Management -->
+    <string name="title_tag_management">Kelola Tag</string>
+    <string name="settings_section_tags">Tag</string>
+    <string name="settings_manage_tags">Kelola Tag</string>
+    <string name="settings_manage_tags_desc">Ubah nama, warnai ulang, atau hapus tag Anda</string>
+    <string name="cd_manage_tags">Kelola tag</string>
+    <string name="cd_edit_tag">Edit tag</string>
+    <string name="cd_delete_tag">Hapus tag</string>
+    <string name="cd_tag_color">Warna: %s</string>
+    <string name="tag_management_empty">Belum ada tag</string>
+    <string name="tag_management_empty_hint">Tag yang ditambahkan ke tugas akan muncul di sini</string>
+    <string name="tag_task_count">%d tugas</string>
+    <string name="tag_editor_title">Edit Tag</string>
+    <string name="tag_editor_color">Warna</string>
+    <string name="tag_color_none">Default</string>
+    <string name="tag_delete_title">Hapus Tag</string>
+    <string name="tag_delete_message">Hapus tag \"%1$s\" dari %2$d tugas? Tugas itu sendiri tidak akan dihapus.</string>
+
     <string name="a11y_chip_selected">Dipilih</string>
     <string name="a11y_chip_not_selected">Tidak dipilih</string>
     <string name="a11y_checkbox_checked">Dicentang</string>

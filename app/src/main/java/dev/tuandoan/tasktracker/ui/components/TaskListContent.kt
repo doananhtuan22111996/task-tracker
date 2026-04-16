@@ -45,6 +45,7 @@ fun TaskListContent(
     currentFilter: TaskFilter,
     currentTagFilter: String?,
     availableTags: List<String>,
+    tagColorMap: Map<String, String?> = emptyMap(),
     selectedIds: Set<Long>,
     isSelectionMode: Boolean,
     streakMap: Map<Long, Int> = emptyMap(),
@@ -77,6 +78,7 @@ fun TaskListContent(
                     currentTagFilter = currentTagFilter,
                     availableTags = availableTags,
                     onTagFilterChange = onTagFilterChange,
+                    tagColorMap = tagColorMap,
                 )
                 FeatureTip(text = fabTipText, visible = showFabTip, onDismiss = onDismissFabTip)
                 Box(modifier = Modifier.weight(1f)) {
@@ -93,6 +95,7 @@ fun TaskListContent(
                     currentTagFilter = currentTagFilter,
                     availableTags = availableTags,
                     onTagFilterChange = onTagFilterChange,
+                    tagColorMap = tagColorMap,
                 )
                 Box(modifier = Modifier.weight(1f)) {
                     EmptySearchResults(

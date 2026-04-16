@@ -1,6 +1,7 @@
 package dev.tuandoan.tasktracker.domain.repository
 
 import dev.tuandoan.tasktracker.data.database.DailyCount
+import dev.tuandoan.tasktracker.data.database.TagInfo
 import dev.tuandoan.tasktracker.data.database.Task
 import kotlinx.coroutines.flow.Flow
 
@@ -53,6 +54,13 @@ interface ITaskRepository {
     suspend fun getCompletedTasksByChain(rootId: Long): List<Task>
     suspend fun getCompletedTasksForChains(rootIds: List<Long>): List<Task>
     suspend fun getActiveRecurringRootIds(): List<Long>
+
+    // Tag management operations
+    fun getDistinctTagsWithCount(): Flow<List<TagInfo>>
+    suspend fun updateTagName(oldName: String, newName: String)
+    suspend fun clearTag(tagName: String)
+    suspend fun updateTagColor(tagName: String, color: String?)
+    suspend fun getTagColor(tagName: String): String?
 
     // Backup operations
     suspend fun getAllTasksIncludingArchived(): List<Task>

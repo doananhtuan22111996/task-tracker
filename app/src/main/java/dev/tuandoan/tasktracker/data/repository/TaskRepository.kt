@@ -2,6 +2,7 @@ package dev.tuandoan.tasktracker.data.repository
 
 import androidx.room.withTransaction
 import dev.tuandoan.tasktracker.data.database.DailyCount
+import dev.tuandoan.tasktracker.data.database.TagInfo
 import dev.tuandoan.tasktracker.data.database.Task
 import dev.tuandoan.tasktracker.data.database.TaskDao
 import dev.tuandoan.tasktracker.data.database.TaskDatabase
@@ -130,6 +131,17 @@ class TaskRepository @Inject constructor(private val taskDao: TaskDao, private v
 
     override fun observeCompletedCountPerDay(startMillis: Long, endMillis: Long): Flow<List<DailyCount>> =
         taskDao.observeCompletedCountPerDay(startMillis, endMillis)
+
+    // Tag management operations
+    override fun getDistinctTagsWithCount(): Flow<List<TagInfo>> = taskDao.getDistinctTagsWithCount()
+
+    override suspend fun updateTagName(oldName: String, newName: String) = taskDao.updateTagName(oldName, newName)
+
+    override suspend fun clearTag(tagName: String) = taskDao.clearTag(tagName)
+
+    override suspend fun updateTagColor(tagName: String, color: String?) = taskDao.updateTagColor(tagName, color)
+
+    override suspend fun getTagColor(tagName: String): String? = taskDao.getTagColor(tagName)
 
     // Backup operations
     override suspend fun getAllTasksIncludingArchived(): List<Task> = taskDao.getAllTasksIncludingArchived()

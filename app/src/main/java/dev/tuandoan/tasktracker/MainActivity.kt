@@ -42,11 +42,13 @@ import dev.tuandoan.tasktracker.ui.screens.HelpScreen
 import dev.tuandoan.tasktracker.ui.screens.OnboardingScreen
 import dev.tuandoan.tasktracker.ui.screens.SettingsScreen
 import dev.tuandoan.tasktracker.ui.screens.StatsScreen
+import dev.tuandoan.tasktracker.ui.screens.TagManagementScreen
 import dev.tuandoan.tasktracker.ui.screens.TaskEditorScreen
 import dev.tuandoan.tasktracker.ui.screens.TaskListScreen
 import dev.tuandoan.tasktracker.ui.theme.TaskTrackerTheme
 import dev.tuandoan.tasktracker.ui.viewmodel.SettingsViewModel
 import dev.tuandoan.tasktracker.ui.viewmodel.StatsViewModel
+import dev.tuandoan.tasktracker.ui.viewmodel.TagManagementViewModel
 import dev.tuandoan.tasktracker.ui.viewmodel.TaskViewModel
 import javax.inject.Inject
 
@@ -282,6 +284,19 @@ fun TaskTrackerApp(
                         },
                         onNavigateToHelp = {
                             navController.navigate(TaskTrackerRoutes.HELP)
+                        },
+                        onNavigateToTagManagement = {
+                            navController.navigate(TaskTrackerRoutes.TAG_MANAGEMENT)
+                        },
+                    )
+                }
+
+                composable(TaskTrackerRoutes.TAG_MANAGEMENT) {
+                    val tagManagementViewModel: TagManagementViewModel = hiltViewModel()
+                    TagManagementScreen(
+                        viewModel = tagManagementViewModel,
+                        onNavigateBack = {
+                            navController.popBackStack()
                         },
                     )
                 }

@@ -356,6 +356,24 @@
     <string name="cd_open_expense_tracker">Mở Expense Tracker trên Play Store</string>
 
     <!-- Accessibility -->
+    <!-- Tag Management -->
+    <string name="title_tag_management">Quản lý nhãn</string>
+    <string name="settings_section_tags">Nhãn</string>
+    <string name="settings_manage_tags">Quản lý nhãn</string>
+    <string name="settings_manage_tags_desc">Đổi tên, đổi màu hoặc xóa nhãn của bạn</string>
+    <string name="cd_manage_tags">Quản lý nhãn</string>
+    <string name="cd_edit_tag">Chỉnh sửa nhãn</string>
+    <string name="cd_delete_tag">Xóa nhãn</string>
+    <string name="cd_tag_color">Màu: %s</string>
+    <string name="tag_management_empty">Chưa có nhãn nào</string>
+    <string name="tag_management_empty_hint">Nhãn bạn thêm vào công việc sẽ hiển thị ở đây</string>
+    <string name="tag_task_count">%d công việc</string>
+    <string name="tag_editor_title">Chỉnh sửa nhãn</string>
+    <string name="tag_editor_color">Màu sắc</string>
+    <string name="tag_color_none">Mặc định</string>
+    <string name="tag_delete_title">Xóa nhãn</string>
+    <string name="tag_delete_message">Xóa nhãn \"%1$s\" khỏi %2$d công việc? Các công việc sẽ không bị xóa.</string>
+
     <string name="a11y_chip_selected">Đã chọn</string>
     <string name="a11y_chip_not_selected">Chưa chọn</string>
     <string name="a11y_checkbox_checked">Đã đánh dấu</string>

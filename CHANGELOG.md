@@ -3,6 +3,18 @@
 All notable changes to the Task Tracker app will be documented in this file.
 Format follows [Keep a Changelog](https://keepachangelog.com).
 
+## [Unreleased]
+
+### Added
+- Tag Management screen: rename, recolor, and delete tags from Settings
+- 10-color Material 3 tag palette with per-tag color assignment
+- Tag colors displayed on task item chips, filter chips, and tag management list
+- Room migration v9→v10 adding `tagColor` column to tasks table
+- Tag color auto-inherited when creating/editing tasks with existing tags
+- Backup support for tag colors in JSON and CSV formats (backward compatible)
+- Tag Management unit tests (12 test cases)
+- Full i18n for tag management strings across all 8 locales
+
 ## [1.8.0] - 2026-04-16
 
 ### Added

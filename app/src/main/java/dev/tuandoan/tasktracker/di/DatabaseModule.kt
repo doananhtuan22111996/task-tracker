@@ -160,6 +160,14 @@ object DatabaseModule {
         }
     }
 
+    private val MIGRATION_9_10 = object : Migration(9, 10) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            if (!hasColumn(database, "tasks", "tagColor")) {
+                database.execSQL("ALTER TABLE tasks ADD COLUMN tagColor TEXT")
+            }
+        }
+    }
+
     /**
      * Provides a singleton instance of TaskDatabase.
      * Uses Room.databaseBuilder for database creation with proper configuration.
@@ -180,6 +188,7 @@ object DatabaseModule {
             MIGRATION_6_7,
             MIGRATION_7_8,
             MIGRATION_8_9,
+            MIGRATION_9_10,
         )
         .build()
 

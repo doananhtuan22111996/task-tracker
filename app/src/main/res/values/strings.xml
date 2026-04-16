@@ -466,6 +466,24 @@
     <string name="settings_view_on_play_store">View on Play Store</string>
     <string name="cd_open_expense_tracker">Open Expense Tracker on Play Store</string>
 
+    <!-- Tag Management -->
+    <string name="title_tag_management">Manage Tags</string>
+    <string name="settings_section_tags">Tags</string>
+    <string name="settings_manage_tags">Manage Tags</string>
+    <string name="settings_manage_tags_desc">Rename, recolor, or delete your tags</string>
+    <string name="cd_manage_tags">Manage tags</string>
+    <string name="cd_edit_tag">Edit tag</string>
+    <string name="cd_delete_tag">Delete tag</string>
+    <string name="cd_tag_color">Color: %s</string>
+    <string name="tag_management_empty">No tags yet</string>
+    <string name="tag_management_empty_hint">Tags you add to tasks will appear here</string>
+    <string name="tag_task_count">%d tasks</string>
+    <string name="tag_editor_title">Edit Tag</string>
+    <string name="tag_editor_color">Color</string>
+    <string name="tag_color_none">Default</string>
+    <string name="tag_delete_title">Delete Tag</string>
+    <string name="tag_delete_message">Remove tag \"%1$s\" from %2$d tasks? The tasks themselves will not be deleted.</string>
+
     <!-- Accessibility -->
     <string name="a11y_chip_selected">Selected</string>
     <string name="a11y_chip_not_selected">Not selected</string>
