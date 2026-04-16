@@ -459,6 +459,13 @@
     <string name="feedback_email_subject">Task Tracker Feedback</string>
     <string name="cd_send_feedback">Send feedback via email</string>
 
+    <!-- More Apps -->
+    <string name="settings_section_more_apps">More Apps</string>
+    <string name="settings_expense_tracker">Expense Tracker</string>
+    <string name="settings_expense_tracker_desc">Simple, offline-first expense manager. Track your spending and stay on budget.</string>
+    <string name="settings_view_on_play_store">View on Play Store</string>
+    <string name="cd_open_expense_tracker">Open Expense Tracker on Play Store</string>
+
     <!-- Accessibility -->
     <string name="a11y_chip_selected">Selected</string>
     <string name="a11y_chip_not_selected">Not selected</string>

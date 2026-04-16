@@ -348,6 +348,13 @@
     <string name="feedback_email_subject">Task Tracker Umpan Balik</string>
     <string name="cd_send_feedback">Kirim umpan balik melalui email</string>
 
+    <!-- More Apps -->
+    <string name="settings_section_more_apps">Aplikasi Lainnya</string>
+    <string name="settings_expense_tracker">Expense Tracker</string>
+    <string name="settings_expense_tracker_desc">Pengelola pengeluaran sederhana dan offline. Lacak pengeluaran Anda dan tetap sesuai anggaran.</string>
+    <string name="settings_view_on_play_store">Lihat di Play Store</string>
+    <string name="cd_open_expense_tracker">Buka Expense Tracker di Play Store</string>
+
     <!-- Accessibility -->
     <string name="a11y_chip_selected">Dipilih</string>
     <string name="a11y_chip_not_selected">Tidak dipilih</string>
