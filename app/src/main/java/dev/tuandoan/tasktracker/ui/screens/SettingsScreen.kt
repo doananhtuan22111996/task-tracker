@@ -1,5 +1,6 @@
 package dev.tuandoan.tasktracker.ui.screens
 
+import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
@@ -28,6 +29,8 @@ import androidx.compose.material.icons.outlined.CloudUpload
 import androidx.compose.material.icons.outlined.Feedback
 import androidx.compose.material.icons.outlined.HelpOutline
 import androidx.compose.material.icons.outlined.OpenInNew
+import androidx.compose.material.icons.outlined.Share
+import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material.icons.outlined.TableChart
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
@@ -70,6 +73,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dev.tuandoan.tasktracker.R
 import dev.tuandoan.tasktracker.data.preferences.ThemeMode
 import dev.tuandoan.tasktracker.domain.backup.model.BackupFormat
+import dev.tuandoan.tasktracker.ui.components.RatingPromptManager
 import dev.tuandoan.tasktracker.ui.viewmodel.SettingsViewModel
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -428,6 +432,112 @@ fun SettingsScreen(viewModel: SettingsViewModel, onNavigateBack: () -> Unit, onN
                         .semantics {
                             contentDescription =
                                 context.getString(R.string.cd_send_feedback)
+                        },
+                )
+
+                HorizontalDivider(
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                )
+
+                // Share App
+                ListItem(
+                    headlineContent = {
+                        Text(
+                            text = stringResource(R.string.settings_share_app),
+                            style = MaterialTheme.typography.bodyLarge,
+                        )
+                    },
+                    supportingContent = {
+                        Text(
+                            text = stringResource(R.string.settings_share_app_desc),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    },
+                    leadingContent = {
+                        Icon(
+                            imageVector = Icons.Outlined.Share,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary,
+                        )
+                    },
+                    colors = ListItemDefaults.colors(
+                        containerColor = MaterialTheme.colorScheme.surface,
+                    ),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable(role = Role.Button) {
+                            val shareIntent = Intent(Intent.ACTION_SEND).apply {
+                                type = "text/plain"
+                                putExtra(
+                                    Intent.EXTRA_TEXT,
+                                    context.getString(
+                                        R.string.share_app_text,
+                                        "https://play.google.com/store/apps/details?id=${context.packageName}",
+                                    ),
+                                )
+                            }
+                            runCatching {
+                                context.startActivity(
+                                    Intent.createChooser(
+                                        shareIntent,
+                                        context.getString(R.string.settings_share_app),
+                                    ),
+                                )
+                            }
+                        }
+                        .semantics {
+                            contentDescription =
+                                context.getString(R.string.cd_share_app)
+                        },
+                )
+
+                HorizontalDivider(
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                )
+
+                // Rate App
+                ListItem(
+                    headlineContent = {
+                        Text(
+                            text = stringResource(R.string.settings_rate_app),
+                            style = MaterialTheme.typography.bodyLarge,
+                        )
+                    },
+                    supportingContent = {
+                        Text(
+                            text = stringResource(R.string.settings_rate_app_desc),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    },
+                    leadingContent = {
+                        Icon(
+                            imageVector = Icons.Outlined.Star,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary,
+                        )
+                    },
+                    colors = ListItemDefaults.colors(
+                        containerColor = MaterialTheme.colorScheme.surface,
+                    ),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable(role = Role.Button) {
+                            val activity = context as? Activity
+                            if (activity != null) {
+                                RatingPromptManager.maybeRequestReview(activity)
+                            } else {
+                                val intent = Intent(
+                                    Intent.ACTION_VIEW,
+                                    Uri.parse("https://play.google.com/store/apps/details?id=${context.packageName}"),
+                                )
+                                runCatching { context.startActivity(intent) }
+                            }
+                        }
+                        .semantics {
+                            contentDescription =
+                                context.getString(R.string.cd_rate_app)
                         },
                 )
 

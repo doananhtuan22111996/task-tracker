@@ -347,6 +347,13 @@
     <string name="settings_send_feedback_desc">Beri tahu kami bagaimana kami dapat meningkatkan</string>
     <string name="feedback_email_subject">Task Tracker Umpan Balik</string>
     <string name="cd_send_feedback">Kirim umpan balik melalui email</string>
+    <string name="settings_share_app">Bagikan Aplikasi</string>
+    <string name="settings_share_app_desc">Beritahu teman Anda tentang Task Tracker</string>
+    <string name="share_app_text">Coba Task Tracker — pengelola tugas sederhana dan offline!\n%1$s</string>
+    <string name="cd_share_app">Bagikan aplikasi dengan orang lain</string>
+    <string name="settings_rate_app">Beri Rating</string>
+    <string name="settings_rate_app_desc">Suka aplikasi ini? Beri rating di Google Play</string>
+    <string name="cd_rate_app">Beri rating aplikasi di Google Play</string>
 
     <!-- More Apps -->
     <string name="settings_section_more_apps">Aplikasi Lainnya</string>

@@ -347,6 +347,13 @@
     <string name="settings_send_feedback_desc">हमें बताएं कि हम कैसे सुधार कर सकते हैं</string>
     <string name="feedback_email_subject">Task Tracker प्रतिक्रिया</string>
     <string name="cd_send_feedback">ई-मेल द्वारा प्रतिक्रिया भेजें</string>
+    <string name="settings_share_app">ऐप शेयर करें</string>
+    <string name="settings_share_app_desc">अपने दोस्तों को Task Tracker के बारे में बताएं</string>
+    <string name="share_app_text">Task Tracker देखें — एक सरल, ऑफ़लाइन कार्य प्रबंधक!\n%1$s</string>
+    <string name="cd_share_app">ऐप दूसरों के साथ शेयर करें</string>
+    <string name="settings_rate_app">ऐप को रेट करें</string>
+    <string name="settings_rate_app_desc">ऐप पसंद है? Google Play पर रेटिंग दें</string>
+    <string name="cd_rate_app">Google Play पर ऐप को रेट करें</string>
 
     <!-- More Apps -->
     <string name="settings_section_more_apps">और ऐप्स</string>

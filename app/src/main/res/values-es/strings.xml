@@ -347,6 +347,13 @@
     <string name="settings_send_feedback_desc">Cuéntanos cómo podemos mejorar</string>
     <string name="feedback_email_subject">Task Tracker Comentarios</string>
     <string name="cd_send_feedback">Enviar comentarios por correo electrónico</string>
+    <string name="settings_share_app">Compartir app</string>
+    <string name="settings_share_app_desc">Cuéntale a tus amigos sobre Task Tracker</string>
+    <string name="share_app_text">Descubre Task Tracker — un gestor de tareas simple y sin conexión!\n%1$s</string>
+    <string name="cd_share_app">Compartir app con otros</string>
+    <string name="settings_rate_app">Valorar app</string>
+    <string name="settings_rate_app_desc">¿Te gusta la app? Déjanos una valoración en Google Play</string>
+    <string name="cd_rate_app">Valorar app en Google Play</string>
 
     <!-- More Apps -->
     <string name="settings_section_more_apps">Más aplicaciones</string>
