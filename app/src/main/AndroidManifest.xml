@@ -40,6 +40,10 @@
             android:exported="false" />
 
         <receiver
+            android:name=".work.TaskSnoozeReceiver"
+            android:exported="false" />
+
+        <receiver
             android:name=".widget.TaskTrackerWidgetReceiver"
             android:exported="false">
             <intent-filter>

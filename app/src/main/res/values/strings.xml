@@ -294,6 +294,9 @@
     <string name="notification_default_task">Task</string>
     <string name="notification_action_complete">Mark Complete</string>
     <string name="notification_task_completed">Task completed</string>
+    <string name="notification_snooze_15min">15 min</string>
+    <string name="notification_snooze_1hour">1 hour</string>
+    <string name="notification_snoozed">Reminder snoozed</string>
 
     <!-- App Shortcut -->
     <string name="shortcut_new_task_short">New Task</string>
@@ -458,6 +461,14 @@
     <string name="settings_send_feedback_desc">Let us know how we can improve</string>
     <string name="feedback_email_subject">Task Tracker Feedback</string>
     <string name="cd_send_feedback">Send feedback via email</string>
+    <string name="settings_share_app">Share App</string>
+    <string name="settings_share_app_desc">Tell your friends about Task Tracker</string>
+    <string name="share_app_text">Check out Task Tracker — a simple, offline-first task manager!\n%1$s</string>
+    <string name="share_app_unavailable">No app available to share with</string>
+    <string name="cd_share_app">Share app with others</string>
+    <string name="settings_rate_app">Rate App</string>
+    <string name="settings_rate_app_desc">Love the app? Leave a rating on Google Play</string>
+    <string name="cd_rate_app">Rate app on Google Play</string>
 
     <!-- More Apps -->
     <string name="settings_section_more_apps">More Apps</string>

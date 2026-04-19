@@ -18,6 +18,8 @@ class WorkManagerTaskReminderScheduler @Inject constructor(private val workManag
     companion object {
         private const val TAG = "TaskReminder"
         private const val MIN_DELAY_MS = 1000L // Minimum 1 second delay to ensure scheduling works
+
+        fun uniqueWorkName(taskId: Long): String = "task_reminder_$taskId"
     }
 
     override suspend fun schedule(taskId: Long, title: String, dueAt: Long, offsetMinutes: Int): Boolean {
@@ -50,7 +52,7 @@ class WorkManagerTaskReminderScheduler @Inject constructor(private val workManag
             .setInputData(inputData)
             .build()
 
-        val workName = getUniqueWorkName(taskId)
+        val workName = uniqueWorkName(taskId)
         Log.d(TAG, "Enqueuing work with name: $workName")
 
         workManager.enqueueUniqueWork(
@@ -64,10 +66,8 @@ class WorkManagerTaskReminderScheduler @Inject constructor(private val workManag
     }
 
     override suspend fun cancel(taskId: Long) {
-        val workName = getUniqueWorkName(taskId)
+        val workName = uniqueWorkName(taskId)
         Log.d(TAG, "Cancelling reminder for task $taskId (work name: $workName)")
         workManager.cancelUniqueWork(workName)
     }
-
-    private fun getUniqueWorkName(taskId: Long): String = "task_reminder_$taskId"
 }
