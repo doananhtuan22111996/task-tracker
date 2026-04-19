@@ -253,6 +253,9 @@
     <string name="notification_default_task">Tâche</string>
     <string name="notification_action_complete">Marquer terminée</string>
     <string name="notification_task_completed">Tâche terminée</string>
+    <string name="notification_snooze_15min">15 min</string>
+    <string name="notification_snooze_1hour">1 heure</string>
+    <string name="notification_snoozed">Rappel reporté</string>
 
     <!-- App Shortcut -->
     <string name="shortcut_new_task_short">Nouvelle tâche</string>
@@ -347,6 +350,14 @@
     <string name="settings_send_feedback_desc">Dites-nous comment nous améliorer</string>
     <string name="feedback_email_subject">Task Tracker Commentaire</string>
     <string name="cd_send_feedback">Envoyer un commentaire par e-mail</string>
+    <string name="settings_share_app">Partager l\'app</string>
+    <string name="settings_share_app_desc">Faites découvrir Task Tracker à vos amis</string>
+    <string name="share_app_text">Découvrez Task Tracker — un gestionnaire de tâches simple et hors ligne !\n%1$s</string>
+    <string name="share_app_unavailable">Aucune application disponible pour partager</string>
+    <string name="cd_share_app">Partager l\'app avec d\'autres</string>
+    <string name="settings_rate_app">Noter l\'app</string>
+    <string name="settings_rate_app_desc">Vous aimez l\'app ? Laissez un avis sur Google Play</string>
+    <string name="cd_rate_app">Noter l\'app sur Google Play</string>
 
     <!-- More Apps -->
     <string name="settings_section_more_apps">Plus d\'applications</string>
