@@ -13,6 +13,7 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import dagger.hilt.android.AndroidEntryPoint
 import dev.tuandoan.tasktracker.R
+import dev.tuandoan.tasktracker.data.scheduler.WorkManagerTaskReminderScheduler
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
@@ -57,7 +58,7 @@ class TaskSnoozeReceiver : BroadcastReceiver() {
             .build()
 
         workManager.enqueueUniqueWork(
-            "task_reminder_$taskId",
+            WorkManagerTaskReminderScheduler.uniqueWorkName(taskId),
             ExistingWorkPolicy.REPLACE,
             workRequest,
         )

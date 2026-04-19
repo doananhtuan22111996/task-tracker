@@ -464,6 +464,7 @@
     <string name="settings_share_app">Share App</string>
     <string name="settings_share_app_desc">Tell your friends about Task Tracker</string>
     <string name="share_app_text">Check out Task Tracker — a simple, offline-first task manager!\n%1$s</string>
+    <string name="share_app_unavailable">No app available to share with</string>
     <string name="cd_share_app">Share app with others</string>
     <string name="settings_rate_app">Rate App</string>
     <string name="settings_rate_app_desc">Love the app? Leave a rating on Google Play</string>

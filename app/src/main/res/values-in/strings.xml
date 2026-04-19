@@ -353,6 +353,7 @@
     <string name="settings_share_app">Bagikan Aplikasi</string>
     <string name="settings_share_app_desc">Beritahu teman Anda tentang Task Tracker</string>
     <string name="share_app_text">Coba Task Tracker — pengelola tugas sederhana dan offline!\n%1$s</string>
+    <string name="share_app_unavailable">Tidak ada aplikasi untuk berbagi</string>
     <string name="cd_share_app">Bagikan aplikasi dengan orang lain</string>
     <string name="settings_rate_app">Beri Rating</string>
     <string name="settings_rate_app_desc">Suka aplikasi ini? Beri rating di Google Play</string>

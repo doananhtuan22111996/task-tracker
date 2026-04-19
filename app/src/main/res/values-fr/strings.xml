@@ -353,6 +353,7 @@
     <string name="settings_share_app">Partager l\'app</string>
     <string name="settings_share_app_desc">Faites découvrir Task Tracker à vos amis</string>
     <string name="share_app_text">Découvrez Task Tracker — un gestionnaire de tâches simple et hors ligne !\n%1$s</string>
+    <string name="share_app_unavailable">Aucune application disponible pour partager</string>
     <string name="cd_share_app">Partager l\'app avec d\'autres</string>
     <string name="settings_rate_app">Noter l\'app</string>
     <string name="settings_rate_app_desc">Vous aimez l\'app ? Laissez un avis sur Google Play</string>

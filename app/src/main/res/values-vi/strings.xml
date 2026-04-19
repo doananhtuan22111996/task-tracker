@@ -353,6 +353,7 @@
     <string name="settings_share_app">Chia sẻ ứng dụng</string>
     <string name="settings_share_app_desc">Giới thiệu Task Tracker cho bạn bè</string>
     <string name="share_app_text">Khám phá Task Tracker — ứng dụng quản lý công việc đơn giản, hoạt động offline!\n%1$s</string>
+    <string name="share_app_unavailable">Không có ứng dụng nào để chia sẻ</string>
     <string name="cd_share_app">Chia sẻ ứng dụng với người khác</string>
     <string name="settings_rate_app">Đánh giá ứng dụng</string>
     <string name="settings_rate_app_desc">Thích ứng dụng? Để lại đánh giá trên Google Play</string>

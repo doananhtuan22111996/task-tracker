@@ -1,10 +1,10 @@
 package dev.tuandoan.tasktracker.ui.screens
 
-import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
@@ -75,6 +75,7 @@ import dev.tuandoan.tasktracker.data.preferences.ThemeMode
 import dev.tuandoan.tasktracker.domain.backup.model.BackupFormat
 import dev.tuandoan.tasktracker.ui.components.RatingPromptManager
 import dev.tuandoan.tasktracker.ui.viewmodel.SettingsViewModel
+import dev.tuandoan.tasktracker.utils.findActivity
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -477,13 +478,17 @@ fun SettingsScreen(viewModel: SettingsViewModel, onNavigateBack: () -> Unit, onN
                                     ),
                                 )
                             }
-                            runCatching {
-                                context.startActivity(
-                                    Intent.createChooser(
-                                        shareIntent,
-                                        context.getString(R.string.settings_share_app),
-                                    ),
-                                )
+                            val chooser = Intent.createChooser(
+                                shareIntent,
+                                context.getString(R.string.settings_share_app),
+                            )
+                            val launched = runCatching { context.startActivity(chooser) }.isSuccess
+                            if (!launched) {
+                                Toast.makeText(
+                                    context,
+                                    context.getString(R.string.share_app_unavailable),
+                                    Toast.LENGTH_SHORT,
+                                ).show()
                             }
                         }
                         .semantics {
@@ -524,7 +529,7 @@ fun SettingsScreen(viewModel: SettingsViewModel, onNavigateBack: () -> Unit, onN
                     modifier = Modifier
                         .fillMaxWidth()
                         .clickable(role = Role.Button) {
-                            val activity = context as? Activity
+                            val activity = context.findActivity()
                             if (activity != null) {
                                 RatingPromptManager.maybeRequestReview(activity)
                             } else {
