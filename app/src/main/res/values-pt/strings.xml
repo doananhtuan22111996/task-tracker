@@ -367,6 +367,24 @@
     <string name="cd_open_expense_tracker">Abrir Expense Tracker na Play Store</string>
 
     <!-- Accessibility -->
+    <!-- Tag Management -->
+    <string name="title_tag_management">Gerenciar Tags</string>
+    <string name="settings_section_tags">Tags</string>
+    <string name="settings_manage_tags">Gerenciar Tags</string>
+    <string name="settings_manage_tags_desc">Renomear, recolorir ou excluir suas tags</string>
+    <string name="cd_manage_tags">Gerenciar tags</string>
+    <string name="cd_edit_tag">Editar tag</string>
+    <string name="cd_delete_tag">Excluir tag</string>
+    <string name="cd_tag_color">Cor: %s</string>
+    <string name="tag_management_empty">Nenhuma tag ainda</string>
+    <string name="tag_management_empty_hint">Tags adicionadas às tarefas aparecerão aqui</string>
+    <string name="tag_task_count">%d tarefas</string>
+    <string name="tag_editor_title">Editar Tag</string>
+    <string name="tag_editor_color">Cor</string>
+    <string name="tag_color_none">Padrão</string>
+    <string name="tag_delete_title">Excluir Tag</string>
+    <string name="tag_delete_message">Remover a tag \"%1$s\" de %2$d tarefas? As tarefas não serão excluídas.</string>
+
     <string name="a11y_chip_selected">Selecionado</string>
     <string name="a11y_chip_not_selected">Não selecionado</string>
     <string name="a11y_checkbox_checked">Marcado</string>

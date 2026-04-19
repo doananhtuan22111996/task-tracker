@@ -37,6 +37,7 @@ fun ArchivedTaskListContent(
     searchQuery: String,
     currentTagFilter: String?,
     availableTags: List<String>,
+    tagColorMap: Map<String, String?> = emptyMap(),
     selectedIds: Set<Long>,
     isSelectionMode: Boolean,
     onTagFilterChange: (String?) -> Unit,
@@ -78,6 +79,7 @@ fun ArchivedTaskListContent(
                     currentTagFilter = currentTagFilter,
                     availableTags = availableTags,
                     onTagFilterChange = onTagFilterChange,
+                    tagColorMap = tagColorMap,
                 )
                 Box(modifier = Modifier.weight(1f)) {
                     EmptyArchivedSearchResults()

@@ -142,6 +142,26 @@ interface TaskDao {
     )
     suspend fun getWidgetTasks(limit: Int): List<Task>
 
+    // Tag management operations
+    @Query(
+        "SELECT tag, tagColor, COUNT(*) AS taskCount FROM tasks " +
+            "WHERE tag IS NOT NULL AND tag != '' AND isArchived = 0 " +
+            "GROUP BY tag ORDER BY tag ASC",
+    )
+    fun getDistinctTagsWithCount(): Flow<List<TagInfo>>
+
+    @Query("UPDATE tasks SET tag = :newName WHERE tag = :oldName")
+    suspend fun updateTagName(oldName: String, newName: String)
+
+    @Query("UPDATE tasks SET tag = NULL, tagColor = NULL WHERE tag = :tagName")
+    suspend fun clearTag(tagName: String)
+
+    @Query("UPDATE tasks SET tagColor = :color WHERE tag = :tagName")
+    suspend fun updateTagColor(tagName: String, color: String?)
+
+    @Query("SELECT tagColor FROM tasks WHERE tag = :tagName AND tagColor IS NOT NULL LIMIT 1")
+    suspend fun getTagColor(tagName: String): String?
+
     // Backup operations
     @Query("SELECT * FROM tasks ORDER BY createdAt DESC")
     suspend fun getAllTasksIncludingArchived(): List<Task>

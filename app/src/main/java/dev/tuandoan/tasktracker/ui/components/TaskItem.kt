@@ -98,7 +98,8 @@ fun TaskItem(
         Priority.HIGH -> stringResource(R.string.priority_high)
     }
 
-    // Chips: Tag (if any), Priority (if non-medium)
+    val tagColor = TagColors.fromKey(task.tagColor)
+
     val chips = buildList {
         if (!task.tag.isNullOrBlank()) add(task.tag.uppercase() to ChipType.Tag)
         if (task.priority != Priority.MEDIUM.value) {
@@ -296,6 +297,7 @@ fun TaskItem(
                                 label = label,
                                 type = type,
                                 priority = Priority.fromValue(task.priority),
+                                tagColor = if (type == ChipType.Tag) tagColor else null,
                             )
                         }
                     }
@@ -397,10 +399,16 @@ fun TaskItem(
  * Uses Surface instead of AssistChip to avoid announcing as a button to TalkBack.
  */
 @Composable
-private fun TaskLabelChip(label: String, type: ChipType, priority: Priority, modifier: Modifier = Modifier) {
+private fun TaskLabelChip(
+    label: String,
+    type: ChipType,
+    priority: Priority,
+    modifier: Modifier = Modifier,
+    tagColor: TagColor? = null,
+) {
     val containerColor = when (type) {
         ChipType.Overdue -> MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.75f)
-        ChipType.Tag -> MaterialTheme.colorScheme.secondaryContainer
+        ChipType.Tag -> tagColor?.container ?: MaterialTheme.colorScheme.secondaryContainer
         ChipType.Priority -> when (priority) {
             Priority.HIGH -> MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.65f)
             Priority.LOW -> MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.8f)
@@ -410,7 +418,7 @@ private fun TaskLabelChip(label: String, type: ChipType, priority: Priority, mod
 
     val labelColor = when (type) {
         ChipType.Overdue -> MaterialTheme.colorScheme.onErrorContainer
-        ChipType.Tag -> MaterialTheme.colorScheme.onSecondaryContainer
+        ChipType.Tag -> tagColor?.onContainer ?: MaterialTheme.colorScheme.onSecondaryContainer
         ChipType.Priority -> when (priority) {
             Priority.HIGH -> MaterialTheme.colorScheme.onErrorContainer
             Priority.LOW -> MaterialTheme.colorScheme.onTertiaryContainer

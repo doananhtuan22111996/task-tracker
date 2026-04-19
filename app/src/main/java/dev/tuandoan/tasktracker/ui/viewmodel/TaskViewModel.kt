@@ -119,7 +119,6 @@ class TaskViewModel @Inject constructor(
         initialValue = emptyList(),
     )
 
-    // Available tags from archived tasks
     val archivedAvailableTags: StateFlow<List<String>> = _allArchivedTasks
         .map { tasks ->
             tasks.mapNotNull { it.tag }
@@ -131,6 +130,17 @@ class TaskViewModel @Inject constructor(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),
             initialValue = emptyList(),
+        )
+
+    val archivedTagColorMap: StateFlow<Map<String, String?>> = _allArchivedTasks
+        .map { tasks ->
+            tasks.filter { !it.tag.isNullOrBlank() }
+                .associate { it.tag!! to it.tagColor }
+        }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = emptyMap(),
         )
 
     // Grouped tasks for day-based sections
@@ -152,7 +162,6 @@ class TaskViewModel @Inject constructor(
     val hasActiveTagFilter = listState.hasActiveTagFilter
     val isLoading = listState.isLoading
 
-    // Available tags computed from all tasks
     val availableTags: StateFlow<List<String>> = allTasks
         .map { tasks ->
             tasks.mapNotNull { it.tag }
@@ -164,6 +173,17 @@ class TaskViewModel @Inject constructor(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),
             initialValue = emptyList(),
+        )
+
+    val tagColorMap: StateFlow<Map<String, String?>> = allTasks
+        .map { tasks ->
+            tasks.filter { !it.tag.isNullOrBlank() }
+                .associate { it.tag!! to it.tagColor }
+        }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = emptyMap(),
         )
 
     // Form state - moved to dedicated TaskEditorViewModel for screen-based editor

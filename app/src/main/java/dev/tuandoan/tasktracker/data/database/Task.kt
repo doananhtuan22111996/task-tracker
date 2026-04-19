@@ -22,7 +22,8 @@ data class Task(
     val dueAt: Long? = null, // Nullable epoch millis
     val dueAtHasTime: Boolean = false, // Whether user explicitly set a time (vs default end-of-day)
     val reminderOffsetMinutes: Int? = null, // Nullable reminder offset in minutes (0 = none)
-    val tag: String? = null, // Single optional tag for organizing tasks
+    val tag: String? = null,
+    val tagColor: String? = null,
     val isPinned: Boolean = false, // Pin/unpin tasks to keep important items on top
     val priority: Int = 1, // Priority level: 0=LOW, 1=MEDIUM, 2=HIGH (default MEDIUM)
     val isArchived: Boolean = false, // Archive tasks instead of deleting (soft delete)

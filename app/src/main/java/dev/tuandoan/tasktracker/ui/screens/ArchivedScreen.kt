@@ -46,6 +46,7 @@ fun ArchivedScreen(viewModel: TaskViewModel, modifier: Modifier = Modifier, bott
     val searchQuery by viewModel.searchQuery.collectAsStateWithLifecycle()
     val archivedTagFilter by viewModel.archivedTagFilter.collectAsStateWithLifecycle()
     val archivedAvailableTags by viewModel.archivedAvailableTags.collectAsStateWithLifecycle()
+    val archivedTagColorMap by viewModel.archivedTagColorMap.collectAsStateWithLifecycle()
 
     // Selection state
     val selectedIds by viewModel.selectedIds.collectAsStateWithLifecycle()
@@ -149,6 +150,7 @@ fun ArchivedScreen(viewModel: TaskViewModel, modifier: Modifier = Modifier, bott
             searchQuery = searchQuery,
             currentTagFilter = archivedTagFilter,
             availableTags = archivedAvailableTags,
+            tagColorMap = archivedTagColorMap,
             selectedIds = selectedIds,
             isSelectionMode = isSelectionMode,
             onTagFilterChange = viewModel::setArchivedTagFilter,

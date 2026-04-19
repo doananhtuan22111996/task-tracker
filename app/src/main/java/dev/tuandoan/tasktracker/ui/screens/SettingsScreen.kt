@@ -28,6 +28,7 @@ import androidx.compose.material.icons.outlined.CloudDownload
 import androidx.compose.material.icons.outlined.CloudUpload
 import androidx.compose.material.icons.outlined.Feedback
 import androidx.compose.material.icons.outlined.HelpOutline
+import androidx.compose.material.icons.outlined.Label
 import androidx.compose.material.icons.outlined.OpenInNew
 import androidx.compose.material.icons.outlined.Share
 import androidx.compose.material.icons.outlined.Star
@@ -93,7 +94,12 @@ private fun generateBackupFileName(): String {
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SettingsScreen(viewModel: SettingsViewModel, onNavigateBack: () -> Unit, onNavigateToHelp: () -> Unit = {}) {
+fun SettingsScreen(
+    viewModel: SettingsViewModel,
+    onNavigateBack: () -> Unit,
+    onNavigateToHelp: () -> Unit = {},
+    onNavigateToTagManagement: () -> Unit = {},
+) {
     val context = LocalContext.current
     val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
     val showImportConfirmation by viewModel.showImportConfirmation.collectAsStateWithLifecycle()
@@ -221,6 +227,54 @@ fun SettingsScreen(viewModel: SettingsViewModel, onNavigateBack: () -> Unit, onN
                     currentTag = userPreferences.languageTag,
                     onClick = { showLanguageDialog = true },
                     supportedLocales = viewModel.getSupportedLocales(),
+                )
+
+                // =============================================
+                // Tag Management Section
+                // =============================================
+                SectionHeader(text = stringResource(R.string.settings_section_tags))
+
+                ListItem(
+                    headlineContent = {
+                        Text(
+                            text = stringResource(R.string.settings_manage_tags),
+                            style = MaterialTheme.typography.bodyLarge,
+                        )
+                    },
+                    supportingContent = {
+                        Text(
+                            text = stringResource(R.string.settings_manage_tags_desc),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    },
+                    leadingContent = {
+                        Icon(
+                            imageVector = Icons.Outlined.Label,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary,
+                        )
+                    },
+                    trailingContent = {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    },
+                    colors = ListItemDefaults.colors(
+                        containerColor = MaterialTheme.colorScheme.surface,
+                    ),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable(
+                            role = Role.Button,
+                            onClick = onNavigateToTagManagement,
+                        )
+                        .semantics {
+                            contentDescription =
+                                context.getString(R.string.cd_manage_tags)
+                        },
                 )
 
                 // =============================================

@@ -8,6 +8,7 @@ import dev.tuandoan.tasktracker.data.database.Task
 import dev.tuandoan.tasktracker.domain.ITaskManager
 import dev.tuandoan.tasktracker.domain.model.DueDatePreset
 import dev.tuandoan.tasktracker.domain.model.ReminderOption
+import dev.tuandoan.tasktracker.domain.usecase.TagManagementUseCase
 import dev.tuandoan.tasktracker.domain.usecase.TaskFormUseCase
 import dev.tuandoan.tasktracker.testutil.TestTaskFactory
 import io.mockk.every
@@ -37,6 +38,7 @@ class TaskEditorViewModelTest {
     private lateinit var context: Context
     private lateinit var fakeTaskManager: FakeEditorTaskManager
     private lateinit var formUseCase: TaskFormUseCase
+    private lateinit var tagManagementUseCase: TagManagementUseCase
 
     @Before
     fun setup() {
@@ -47,6 +49,7 @@ class TaskEditorViewModelTest {
         }
         fakeTaskManager = FakeEditorTaskManager()
         formUseCase = TaskFormUseCase(context)
+        tagManagementUseCase = mockk(relaxed = true)
     }
 
     @After
@@ -60,7 +63,7 @@ class TaskEditorViewModelTest {
                 set("taskId", taskId)
             }
         }
-        return TaskEditorViewModel(context, fakeTaskManager, formUseCase, savedStateHandle)
+        return TaskEditorViewModel(context, fakeTaskManager, formUseCase, tagManagementUseCase, savedStateHandle)
     }
 
     // === Create Mode Tests ===

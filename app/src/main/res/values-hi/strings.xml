@@ -367,6 +367,24 @@
     <string name="cd_open_expense_tracker">Play Store पर Expense Tracker खोलें</string>
 
     <!-- Accessibility -->
+    <!-- Tag Management -->
+    <string name="title_tag_management">टैग प्रबंधित करें</string>
+    <string name="settings_section_tags">टैग</string>
+    <string name="settings_manage_tags">टैग प्रबंधित करें</string>
+    <string name="settings_manage_tags_desc">अपने टैग का नाम बदलें, रंग बदलें या हटाएं</string>
+    <string name="cd_manage_tags">टैग प्रबंधित करें</string>
+    <string name="cd_edit_tag">टैग संपादित करें</string>
+    <string name="cd_delete_tag">टैग हटाएं</string>
+    <string name="cd_tag_color">रंग: %s</string>
+    <string name="tag_management_empty">अभी कोई टैग नहीं</string>
+    <string name="tag_management_empty_hint">कार्यों में जोड़े गए टैग यहां दिखाई देंगे</string>
+    <string name="tag_task_count">%d कार्य</string>
+    <string name="tag_editor_title">टैग संपादित करें</string>
+    <string name="tag_editor_color">रंग</string>
+    <string name="tag_color_none">डिफ़ॉल्ट</string>
+    <string name="tag_delete_title">टैग हटाएं</string>
+    <string name="tag_delete_message">\"%1$s\" टैग को %2$d कार्यों से हटाएं? कार्य स्वयं नहीं हटाए जाएंगे।</string>
+
     <string name="a11y_chip_selected">चयनित</string>
     <string name="a11y_chip_not_selected">अचयनित</string>
     <string name="a11y_checkbox_checked">चेक किया गया</string>

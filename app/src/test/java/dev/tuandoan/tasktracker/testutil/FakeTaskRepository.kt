@@ -1,6 +1,7 @@
 package dev.tuandoan.tasktracker.testutil
 
 import dev.tuandoan.tasktracker.data.database.DailyCount
+import dev.tuandoan.tasktracker.data.database.TagInfo
 import dev.tuandoan.tasktracker.data.database.Task
 import dev.tuandoan.tasktracker.domain.repository.ITaskRepository
 import kotlinx.coroutines.flow.Flow
@@ -234,6 +235,35 @@ class FakeTaskRepository : ITaskRepository {
         .filter { it.recurrenceType != 0 && !it.isArchived && !it.isCompleted }
         .map { it.parentRecurringTaskId ?: it.id }
         .distinct()
+
+    // Tag management operations
+    override fun getDistinctTagsWithCount(): Flow<List<TagInfo>> = tasks.map { list ->
+        list.filter { !it.tag.isNullOrBlank() && !it.isArchived }
+            .groupBy { it.tag!! }
+            .map { (tag, tasks) -> TagInfo(tag = tag, tagColor = tasks.first().tagColor, taskCount = tasks.size) }
+            .sortedBy { it.tag }
+    }
+
+    override suspend fun updateTagName(oldName: String, newName: String) {
+        tasks.value = tasks.value.map {
+            if (it.tag == oldName) it.copy(tag = newName) else it
+        }
+    }
+
+    override suspend fun clearTag(tagName: String) {
+        tasks.value = tasks.value.map {
+            if (it.tag == tagName) it.copy(tag = null, tagColor = null) else it
+        }
+    }
+
+    override suspend fun updateTagColor(tagName: String, color: String?) {
+        tasks.value = tasks.value.map {
+            if (it.tag == tagName) it.copy(tagColor = color) else it
+        }
+    }
+
+    override suspend fun getTagColor(tagName: String): String? =
+        tasks.value.firstOrNull { it.tag == tagName && it.tagColor != null }?.tagColor
 
     override suspend fun getAllTasksIncludingArchived(): List<Task> = tasks.value
 
