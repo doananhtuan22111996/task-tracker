@@ -60,10 +60,10 @@ class TaskCrudUseCaseTest {
         val result = useCase.createTask("Task", "", null, false, null, "work")
 
         assertTrue(result.isSuccess)
-        // Verify the task was created with the tag
+        // Tag is canonicalized to uppercase at TaskManager boundary
         val tasks = repository.getAllTasksSnapshot()
         assertEquals(1, tasks.size)
-        assertEquals("work", tasks[0].tag)
+        assertEquals("WORK", tasks[0].tag)
     }
 
     // === updateTask ===

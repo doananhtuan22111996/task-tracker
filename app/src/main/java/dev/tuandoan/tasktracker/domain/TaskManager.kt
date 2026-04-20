@@ -7,6 +7,7 @@ import dev.tuandoan.tasktracker.domain.repository.ITaskRepository
 import dev.tuandoan.tasktracker.domain.scheduler.TaskReminderScheduler
 import dev.tuandoan.tasktracker.domain.scheduler.WidgetUpdater
 import dev.tuandoan.tasktracker.domain.service.RecurrenceCalculator
+import dev.tuandoan.tasktracker.domain.service.TagNormalizer
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
@@ -66,7 +67,7 @@ class TaskManager @Inject constructor(
             dueAt = dueAt,
             dueAtHasTime = dueAtHasTime,
             reminderOffsetMinutes = reminderOffsetMinutes,
-            tag = tag?.trim()?.takeIf { it.isNotEmpty() },
+            tag = TagNormalizer.normalize(tag),
             recurrenceType = recurrenceType,
             recurrenceInterval = recurrenceInterval,
             recurrenceDaysOfWeek = recurrenceDaysOfWeek,
@@ -82,21 +83,32 @@ class TaskManager @Inject constructor(
     }
 
     override suspend fun updateTask(task: Task) {
-        val existingTask = repository.getTaskById(task.id)
-        repository.updateTask(task)
+        val normalizedTag = TagNormalizer.normalize(task.tag)
+        // Invariant: no orphan tagColor. Same rule as v10→v11 migration and backup import.
+        val normalizedTask = task.copy(
+            tag = normalizedTag,
+            tagColor = if (normalizedTag == null) null else task.tagColor,
+        )
+        val existingTask = repository.getTaskById(normalizedTask.id)
+        repository.updateTask(normalizedTask)
 
         // Handle reminder rescheduling if due date or reminder changed
         if (existingTask != null) {
-            val dueDateChanged = existingTask.dueAt != task.dueAt
-            val reminderChanged = existingTask.reminderOffsetMinutes != task.reminderOffsetMinutes
+            val dueDateChanged = existingTask.dueAt != normalizedTask.dueAt
+            val reminderChanged = existingTask.reminderOffsetMinutes != normalizedTask.reminderOffsetMinutes
 
             if (dueDateChanged || reminderChanged) {
                 // Cancel existing reminder
-                reminderScheduler.cancel(task.id)
+                reminderScheduler.cancel(normalizedTask.id)
 
                 // Schedule new reminder if task is not completed
-                if (!task.isCompleted) {
-                    scheduleReminderIfNeeded(task.id, task.title, task.dueAt, task.reminderOffsetMinutes)
+                if (!normalizedTask.isCompleted) {
+                    scheduleReminderIfNeeded(
+                        normalizedTask.id,
+                        normalizedTask.title,
+                        normalizedTask.dueAt,
+                        normalizedTask.reminderOffsetMinutes,
+                    )
                 }
             }
         }
@@ -129,13 +141,15 @@ class TaskManager @Inject constructor(
         val existingTask = repository.getTaskById(taskId)
         requireNotNull(existingTask) { "Task with id $taskId not found" }
 
+        val normalizedTag = TagNormalizer.normalize(tag)
         val updatedTask = existingTask.copy(
             title = title.trim(),
             description = description.trim(),
             dueAt = dueAt,
             dueAtHasTime = dueAtHasTime,
             reminderOffsetMinutes = reminderOffsetMinutes,
-            tag = tag?.trim()?.takeIf { it.isNotEmpty() },
+            tag = normalizedTag,
+            tagColor = if (normalizedTag == null) null else existingTask.tagColor,
         )
 
         repository.updateTask(updatedTask)

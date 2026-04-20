@@ -24,6 +24,9 @@ Format follows [Keep a Changelog](https://keepachangelog.com).
 
 ### Fixed
 - v10→v11 migration uses JVM `Locale.ROOT` uppercasing instead of SQLite `UPPER()` — Android SQLite is ASCII-only, so the previous SQL-based path would have split case variants for non-ASCII tags (`việc`/`Việc`/`VIỆC`)
+- `TaskManager.createTask/updateTask/updateTaskContent` now normalize tags via `TagNormalizer` — closes editor bypass where `TaskEditorViewModel` wrote raw lowercase tags straight to the repository
+- `TaskEditorViewModel.saveTask` canonicalizes the tag before the `getTagColor` lookup — a lowercase typed variant (`work`) now correctly inherits the color of the existing canonical tag (`WORK`) instead of saving with `tagColor = null`
+- `TaskManager.updateTask` / `updateTaskContent` clear `tagColor` whenever the normalized tag is null — prevents orphan tag colors, matching the invariant enforced by the v10→v11 migration and backup import
 
 ## [1.8.0] - 2026-04-16
 

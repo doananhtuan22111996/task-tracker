@@ -277,6 +277,37 @@ class TaskEditorViewModelTest {
     }
 
     @Test
+    fun `saveTask normalizes tag and resolves color for lowercase user input`() = runTest {
+        // User types "work" but canonical storage is "WORK". The color lookup must happen
+        // against the canonical form, otherwise existing color inheritance breaks.
+        io.mockk.coEvery { tagManagementUseCase.getTagColor("WORK") } returns "#FF0000"
+        val task = TestTaskFactory.createTask(id = 1, title = "T")
+        fakeTaskManager.taskToReturn = task
+
+        val viewModel = createViewModel(taskId = 1L)
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        viewModel.updateTag("work")
+        viewModel.saveTask()
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        assertEquals("WORK", fakeTaskManager.lastUpdatedTask?.tag)
+        assertEquals("#FF0000", fakeTaskManager.lastUpdatedTask?.tagColor)
+    }
+
+    @Test
+    fun `saveTask creates task with canonicalized tag`() = runTest {
+        val viewModel = createViewModel()
+        viewModel.updateTitle("New Task")
+        viewModel.updateTag("  work  ")
+
+        viewModel.saveTask()
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        assertEquals("WORK", fakeTaskManager.lastCreatedTag)
+    }
+
+    @Test
     fun `saveTask emits TaskSaved event on success`() = runTest {
         val viewModel = createViewModel()
         viewModel.updateTitle("New Task")
@@ -522,6 +553,7 @@ private class FakeEditorTaskManager : ITaskManager {
     var updateCalled = false
     var lastCreatedTitle: String? = null
     var lastCreatedDueAtHasTime: Boolean = false
+    var lastCreatedTag: String? = null
     var lastUpdatedTask: Task? = null
 
     override suspend fun getTaskById(id: Long): Task? = taskToReturn
@@ -573,6 +605,7 @@ private class FakeEditorTaskManager : ITaskManager {
         createCalled = true
         lastCreatedTitle = title
         lastCreatedDueAtHasTime = dueAtHasTime
+        lastCreatedTag = tag
         return 1L
     }
 

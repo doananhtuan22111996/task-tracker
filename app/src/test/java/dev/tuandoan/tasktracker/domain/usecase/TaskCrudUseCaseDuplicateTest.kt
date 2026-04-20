@@ -65,13 +65,15 @@ class TaskCrudUseCaseDuplicateTest {
 
     @Test
     fun `duplicateTask copies tag from source`() = runTest {
-        val source = TestTaskFactory.createTask(id = 1, tag = "work")
+        // Canonical form is uppercase; duplicateTask routes through TaskManager.createTask
+        // which normalizes on the way in.
+        val source = TestTaskFactory.createTask(id = 1, tag = "WORK")
         repository.seed(source)
 
         val result = useCase.duplicateTask(source)
 
         val duplicate = repository.getTaskById(result.getOrThrow())
-        assertEquals("work", duplicate!!.tag)
+        assertEquals("WORK", duplicate!!.tag)
     }
 
     @Test
