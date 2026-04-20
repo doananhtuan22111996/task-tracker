@@ -1,6 +1,7 @@
 package dev.tuandoan.tasktracker.data.backup.dto
 
 import dev.tuandoan.tasktracker.data.database.Task
+import dev.tuandoan.tasktracker.domain.service.TagNormalizer
 import kotlinx.serialization.Serializable
 
 /**
@@ -31,28 +32,34 @@ data class TaskBackupDto(
     val parentRecurringTaskId: Long? = null,
 ) {
 
-    fun toTask(): Task = Task(
-        id = id,
-        title = title,
-        description = description,
-        isCompleted = isCompleted,
-        createdAt = createdAt,
-        completedAt = completedAt,
-        dueAt = dueAt,
-        dueAtHasTime = dueAtHasTime,
-        reminderOffsetMinutes = reminderOffsetMinutes,
-        tag = tag,
-        tagColor = tagColor,
-        isPinned = isPinned,
-        priority = priority,
-        isArchived = isArchived,
-        archivedAt = archivedAt,
-        recurrenceType = recurrenceType,
-        recurrenceInterval = recurrenceInterval,
-        recurrenceDaysOfWeek = recurrenceDaysOfWeek,
-        recurrenceEndDate = recurrenceEndDate,
-        parentRecurringTaskId = parentRecurringTaskId,
-    )
+    fun toTask(): Task {
+        val normalizedTag = TagNormalizer.normalize(tag)
+        // Orphan tagColor without a tag is meaningless — drop it on import to match the
+        // invariant enforced by the v10→v11 migration.
+        val resolvedColor = if (normalizedTag == null) null else tagColor
+        return Task(
+            id = id,
+            title = title,
+            description = description,
+            isCompleted = isCompleted,
+            createdAt = createdAt,
+            completedAt = completedAt,
+            dueAt = dueAt,
+            dueAtHasTime = dueAtHasTime,
+            reminderOffsetMinutes = reminderOffsetMinutes,
+            tag = normalizedTag,
+            tagColor = resolvedColor,
+            isPinned = isPinned,
+            priority = priority,
+            isArchived = isArchived,
+            archivedAt = archivedAt,
+            recurrenceType = recurrenceType,
+            recurrenceInterval = recurrenceInterval,
+            recurrenceDaysOfWeek = recurrenceDaysOfWeek,
+            recurrenceEndDate = recurrenceEndDate,
+            parentRecurringTaskId = parentRecurringTaskId,
+        )
+    }
 
     companion object {
         fun fromTask(task: Task): TaskBackupDto = TaskBackupDto(

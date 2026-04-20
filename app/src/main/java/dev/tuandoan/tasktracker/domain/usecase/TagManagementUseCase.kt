@@ -2,6 +2,7 @@ package dev.tuandoan.tasktracker.domain.usecase
 
 import dev.tuandoan.tasktracker.domain.model.TagItem
 import dev.tuandoan.tasktracker.domain.repository.ITaskRepository
+import dev.tuandoan.tasktracker.domain.service.TagNormalizer
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
@@ -15,12 +16,12 @@ class TagManagementUseCase @Inject constructor(private val repository: ITaskRepo
     }
 
     suspend fun renameTag(oldName: String, newName: String): Result<Unit> {
-        val trimmed = newName.trim()
-        if (trimmed.isBlank()) return Result.failure(IllegalArgumentException("Tag name cannot be blank"))
-        if (trimmed.length > MAX_TAG_LENGTH) {
+        val normalized = TagNormalizer.normalize(newName)
+            ?: return Result.failure(IllegalArgumentException("Tag name cannot be blank"))
+        if (normalized.length > MAX_TAG_LENGTH) {
             return Result.failure(IllegalArgumentException("Tag must be ≤ $MAX_TAG_LENGTH characters"))
         }
-        return runCatching { repository.updateTagName(oldName, trimmed) }
+        return runCatching { repository.updateTagName(oldName, normalized) }
     }
 
     suspend fun deleteTag(tagName: String): Result<Unit> = runCatching {

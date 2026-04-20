@@ -235,7 +235,7 @@ class TaskFormUseCaseTest {
     // === getTrimmedFormData ===
 
     @Test
-    fun `getTrimmedFormData trims whitespace`() {
+    fun `getTrimmedFormData trims whitespace and uppercases tag`() {
         useCase.updateTaskTitle("  Hello  ")
         useCase.updateTaskDescription("  World  ")
         useCase.updateTag("  work  ")
@@ -244,7 +244,7 @@ class TaskFormUseCaseTest {
 
         assertEquals("Hello", data.title)
         assertEquals("World", data.description)
-        assertEquals("work", data.tag)
+        assertEquals("WORK", data.tag)
     }
 
     @Test

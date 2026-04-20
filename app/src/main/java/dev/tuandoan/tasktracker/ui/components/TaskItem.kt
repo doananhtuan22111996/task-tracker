@@ -101,7 +101,7 @@ fun TaskItem(
     val tagColor = TagColors.fromKey(task.tagColor)
 
     val chips = buildList {
-        if (!task.tag.isNullOrBlank()) add(task.tag.uppercase() to ChipType.Tag)
+        if (!task.tag.isNullOrBlank()) add(task.tag to ChipType.Tag)
         if (task.priority != Priority.MEDIUM.value) {
             add(priorityLabel.uppercase() to ChipType.Priority)
         }

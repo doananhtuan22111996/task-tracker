@@ -11,6 +11,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import dev.tuandoan.tasktracker.data.database.TaskDao
 import dev.tuandoan.tasktracker.data.database.TaskDatabase
+import dev.tuandoan.tasktracker.data.database.migration.TagCaseMigrationPlanner
 import javax.inject.Singleton
 
 /**
@@ -169,6 +170,43 @@ object DatabaseModule {
     }
 
     /**
+     * Migration from version 10 to 11: Canonicalize tag values to trimmed + Locale.ROOT UPPERCASE.
+     *
+     * Rules (see [TagCaseMigrationPlanner]):
+     * - Blank tags (trim → empty) become NULL, their tagColor is cleared.
+     * - Tag case folding uses JVM `Locale.ROOT` (NOT SQLite `UPPER()`), so non-ASCII scripts
+     *   like Vietnamese (`việc` → `VIỆC`) round-trip correctly. Android SQLite lacks ICU.
+     * - For each canonical tag, the winning color is the most-frequent non-null color;
+     *   ties broken by MAX(createdAt).
+     */
+    private val MIGRATION_10_11 = object : Migration(10, 11) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            val rows = mutableListOf<TagCaseMigrationPlanner.Row>()
+            database.query("SELECT id, tag, tagColor, createdAt FROM tasks WHERE tag IS NOT NULL").use { cursor ->
+                val idIdx = cursor.getColumnIndexOrThrow("id")
+                val tagIdx = cursor.getColumnIndexOrThrow("tag")
+                val colorIdx = cursor.getColumnIndexOrThrow("tagColor")
+                val createdAtIdx = cursor.getColumnIndexOrThrow("createdAt")
+                while (cursor.moveToNext()) {
+                    rows += TagCaseMigrationPlanner.Row(
+                        id = cursor.getLong(idIdx),
+                        tag = if (cursor.isNull(tagIdx)) null else cursor.getString(tagIdx),
+                        tagColor = if (cursor.isNull(colorIdx)) null else cursor.getString(colorIdx),
+                        createdAt = cursor.getLong(createdAtIdx),
+                    )
+                }
+            }
+
+            for (update in TagCaseMigrationPlanner.plan(rows)) {
+                database.execSQL(
+                    "UPDATE tasks SET tag = ?, tagColor = ? WHERE id = ?",
+                    arrayOf<Any?>(update.newTag, update.newColor, update.id),
+                )
+            }
+        }
+    }
+
+    /**
      * Provides a singleton instance of TaskDatabase.
      * Uses Room.databaseBuilder for database creation with proper configuration.
      */
@@ -189,6 +227,7 @@ object DatabaseModule {
             MIGRATION_7_8,
             MIGRATION_8_9,
             MIGRATION_9_10,
+            MIGRATION_10_11,
         )
         .build()
 

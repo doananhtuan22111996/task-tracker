@@ -62,6 +62,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dev.tuandoan.tasktracker.R
 import dev.tuandoan.tasktracker.domain.model.TagItem
+import dev.tuandoan.tasktracker.domain.service.TagNormalizer
 import dev.tuandoan.tasktracker.ui.components.TagColor
 import dev.tuandoan.tasktracker.ui.components.TagColors
 import dev.tuandoan.tasktracker.ui.viewmodel.TagManagementViewModel
@@ -195,7 +196,7 @@ private fun TagListItem(
                     color = chipContainerColor,
                 ) {
                     Text(
-                        text = tag.name.uppercase(),
+                        text = tag.name,
                         style = MaterialTheme.typography.labelSmall,
                         color = chipLabelColor,
                         modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
@@ -336,12 +337,12 @@ private fun TagEditorBottomSheet(
                 Spacer(modifier = Modifier.width(8.dp))
                 TextButton(
                     onClick = {
-                        val trimmed = tagName.trim()
+                        val normalized = TagNormalizer.normalize(tagName)
                         when {
-                            trimmed.isBlank() -> tagError = "Tag name cannot be empty"
-                            trimmed != tag.name && existingTagNames.contains(trimmed) ->
-                                tagError = "Tag \"$trimmed\" already exists"
-                            else -> onSave(trimmed)
+                            normalized == null -> tagError = "Tag name cannot be empty"
+                            normalized != tag.name && existingTagNames.contains(normalized) ->
+                                tagError = "Tag \"$normalized\" already exists"
+                            else -> onSave(normalized)
                         }
                     },
                 ) {
