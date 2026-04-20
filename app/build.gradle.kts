@@ -92,6 +92,21 @@ ksp {
     arg("room.schemaLocation", "$projectDir/schemas")
 }
 
+// Guardrail: fail the build if any file outside the allowlist writes
+// `Task(... tag = ...)` or `.copy(... tag = ...)`. All tag writes must go
+// through TaskManager (the normalization chokepoint). See TCN-13 / TCN-16.
+val checkTagInvariant =
+    tasks.register<Exec>("checkTagInvariant") {
+        group = "verification"
+        description = "Enforce that Task.tag writes go through TaskManager."
+        workingDir = rootDir
+        commandLine = listOf("bash", "scripts/check-tag-invariant.sh")
+    }
+
+tasks.named("check").configure {
+    dependsOn(checkTagInvariant)
+}
+
 dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

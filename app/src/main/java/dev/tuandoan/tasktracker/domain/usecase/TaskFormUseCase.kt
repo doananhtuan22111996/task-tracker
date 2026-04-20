@@ -5,7 +5,6 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dev.tuandoan.tasktracker.R
 import dev.tuandoan.tasktracker.data.database.Task
 import dev.tuandoan.tasktracker.domain.model.ReminderOption
-import dev.tuandoan.tasktracker.domain.service.TagNormalizer
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -343,7 +342,7 @@ class TaskFormUseCase @Inject constructor(@ApplicationContext private val contex
         } else {
             _reminderOption.value.offsetMinutes
         },
-        tag = TagNormalizer.normalize(_tag.value),
+        tag = _tag.value.trim().takeIf { it.isNotEmpty() },
     )
 
     // Error Management
@@ -392,7 +391,7 @@ class TaskFormUseCase @Inject constructor(@ApplicationContext private val contex
             dueAt = dueAt,
             dueAtHasTime = dueAtHasTime,
             reminderOffsetMinutes = if (reminderOption == ReminderOption.NONE) null else reminderOption.offsetMinutes,
-            tag = TagNormalizer.normalize(tag),
+            tag = tag.trim().takeIf { it.isNotEmpty() },
         )
     }
 }

@@ -235,16 +235,17 @@ class TaskFormUseCaseTest {
     // === getTrimmedFormData ===
 
     @Test
-    fun `getTrimmedFormData trims whitespace and uppercases tag`() {
+    fun `getTrimmedFormData trims whitespace on title, description, and tag`() {
         useCase.updateTaskTitle("  Hello  ")
         useCase.updateTaskDescription("  World  ")
         useCase.updateTag("  work  ")
 
         val data = useCase.getTrimmedFormData()
 
+        // Form layer only trims — uppercase normalization happens at TaskManager.
         assertEquals("Hello", data.title)
         assertEquals("World", data.description)
-        assertEquals("WORK", data.tag)
+        assertEquals("work", data.tag)
     }
 
     @Test

@@ -21,6 +21,8 @@ Format follows [Keep a Changelog](https://keepachangelog.com).
 ### Changed
 - All tag input paths (task form, tag rename, JSON/CSV backup import) now normalize tags to uppercase before persisting
 - Display-time `.uppercase()` calls removed on task and tag chips — storage is now canonical
+- `TaskFormUseCase` no longer normalizes tags — centralizes the invariant at `TaskManager` so the form layer only trims
+- New `:app:checkTagInvariant` Gradle task (wired into `:app:check`) fails the build when a file outside the allowlist writes `Task(... tag = ...)` or `.copy(... tag = ...)` directly
 
 ### Fixed
 - v10→v11 migration uses JVM `Locale.ROOT` uppercasing instead of SQLite `UPPER()` — Android SQLite is ASCII-only, so the previous SQL-based path would have split case variants for non-ASCII tags (`việc`/`Việc`/`VIỆC`)
