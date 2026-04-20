@@ -14,6 +14,13 @@ Format follows [Keep a Changelog](https://keepachangelog.com).
 - Backup support for tag colors in JSON and CSV formats (backward compatible)
 - Tag Management unit tests (12 test cases)
 - Full i18n for tag management strings across all 8 locales
+- `TagNormalizer` domain helper — canonicalizes tags to trimmed + `Locale.ROOT` uppercase
+- Room migration v10→v11 canonicalizing existing tags, merging colors by most-frequent-wins with `MAX(createdAt)` tiebreaker
+- Migration SQL validated with a JVM-level SQLite JDBC test suite
+
+### Changed
+- All tag input paths (task form, tag rename, JSON/CSV backup import) now normalize tags to uppercase before persisting
+- Display-time `.uppercase()` calls removed on task and tag chips — storage is now canonical
 
 ## [1.8.0] - 2026-04-16
 

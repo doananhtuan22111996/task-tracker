@@ -67,18 +67,18 @@ class TagManagementUseCaseTest {
         assertTrue(result.isSuccess)
 
         val tasks = repository.getAllTasksSnapshot()
-        assertEquals("new", tasks.find { it.id == 1L }!!.tag)
-        assertEquals("new", tasks.find { it.id == 2L }!!.tag)
+        assertEquals("NEW", tasks.find { it.id == 1L }!!.tag)
+        assertEquals("NEW", tasks.find { it.id == 2L }!!.tag)
         assertEquals("other", tasks.find { it.id == 3L }!!.tag)
     }
 
     @Test
-    fun `renameTag trims whitespace`() = runTest {
+    fun `renameTag trims whitespace and uppercases`() = runTest {
         repository.seed(Task(id = 1, title = "A", tag = "old"))
 
         val result = useCase.renameTag("old", "  new  ")
         assertTrue(result.isSuccess)
-        assertEquals("new", repository.getAllTasksSnapshot()[0].tag)
+        assertEquals("NEW", repository.getAllTasksSnapshot()[0].tag)
     }
 
     @Test

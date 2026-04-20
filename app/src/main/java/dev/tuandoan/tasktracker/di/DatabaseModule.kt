@@ -11,6 +11,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import dev.tuandoan.tasktracker.data.database.TaskDao
 import dev.tuandoan.tasktracker.data.database.TaskDatabase
+import dev.tuandoan.tasktracker.data.database.migration.TagCaseMigrationSql
 import javax.inject.Singleton
 
 /**
@@ -169,6 +170,21 @@ object DatabaseModule {
     }
 
     /**
+     * Migration from version 10 to 11: Canonicalize tag values to UPPERCASE + trimmed.
+     *
+     * - Empty/whitespace-only tags become NULL (and their tagColor is cleared).
+     * - For each canonical tag (UPPER(TRIM(tag))), merge color variants by choosing the
+     *   most-frequent non-null color; ties are broken by the latest createdAt among the
+     *   winning color's tasks.
+     * - All tasks sharing a canonical tag end up with the same tag spelling and winning color.
+     */
+    private val MIGRATION_10_11 = object : Migration(10, 11) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            TagCaseMigrationSql.statements().forEach(database::execSQL)
+        }
+    }
+
+    /**
      * Provides a singleton instance of TaskDatabase.
      * Uses Room.databaseBuilder for database creation with proper configuration.
      */
@@ -189,6 +205,7 @@ object DatabaseModule {
             MIGRATION_7_8,
             MIGRATION_8_9,
             MIGRATION_9_10,
+            MIGRATION_10_11,
         )
         .build()
 

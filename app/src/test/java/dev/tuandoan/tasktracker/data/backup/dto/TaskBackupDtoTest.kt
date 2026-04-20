@@ -97,7 +97,7 @@ class TaskBackupDtoTest {
         assertEquals(1700050000000L, task.completedAt)
         assertEquals(1700100000000L, task.dueAt)
         assertEquals(5, task.reminderOffsetMinutes)
-        assertEquals("home", task.tag)
+        assertEquals("HOME", task.tag)
         assertFalse(task.isPinned)
         assertEquals(0, task.priority)
         assertTrue(task.isArchived)
@@ -139,7 +139,7 @@ class TaskBackupDtoTest {
             completedAt = 1700050000000L,
             dueAt = 1700100000000L,
             reminderOffsetMinutes = 1440,
-            tag = "important",
+            tag = "IMPORTANT",
             isPinned = true,
             priority = 2,
             isArchived = true,
