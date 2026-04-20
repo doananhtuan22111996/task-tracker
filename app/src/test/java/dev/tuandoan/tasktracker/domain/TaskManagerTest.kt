@@ -79,10 +79,10 @@ class TaskManagerTest {
     }
 
     @Test
-    fun `createTask with tag trims and stores tag`() = runTest {
+    fun `createTask normalizes tag to uppercase and trims whitespace`() = runTest {
         val id = manager.createTask("Task", "", null, false, null, "  work  ")
         val task = repository.getTaskById(id)
-        assertEquals("work", task!!.tag)
+        assertEquals("WORK", task!!.tag)
     }
 
     @Test
@@ -90,6 +90,46 @@ class TaskManagerTest {
         val id = manager.createTask("Task", "", null, false, null, "   ")
         val task = repository.getTaskById(id)
         assertNull(task!!.tag)
+    }
+
+    @Test
+    fun `createTask uppercases Vietnamese tag via Locale ROOT`() = runTest {
+        val id = manager.createTask("Task", "", null, false, null, "việc")
+        val task = repository.getTaskById(id)
+        assertEquals("VIỆC", task!!.tag)
+    }
+
+    @Test
+    fun `updateTask normalizes tag on whole-task write`() = runTest {
+        val original = TestTaskFactory.createTask(id = 1, title = "T").copy(tag = "WORK")
+        repository.seed(original)
+
+        manager.updateTask(original.copy(tag = "  home  "))
+
+        val updated = repository.getTaskById(1)!!
+        assertEquals("HOME", updated.tag)
+    }
+
+    @Test
+    fun `updateTask collapses blank tag to null`() = runTest {
+        val original = TestTaskFactory.createTask(id = 1).copy(tag = "WORK")
+        repository.seed(original)
+
+        manager.updateTask(original.copy(tag = "   "))
+
+        val updated = repository.getTaskById(1)!!
+        assertNull(updated.tag)
+    }
+
+    @Test
+    fun `updateTaskContent normalizes tag to uppercase`() = runTest {
+        val original = TestTaskFactory.createTask(id = 1, title = "Old")
+        repository.seed(original)
+
+        manager.updateTaskContent(1, "New", "desc", null, false, null, "  personal  ")
+
+        val updated = repository.getTaskById(1)!!
+        assertEquals("PERSONAL", updated.tag)
     }
 
     // === toggleTaskCompletion ===
