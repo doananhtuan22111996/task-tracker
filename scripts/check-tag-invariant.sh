@@ -45,9 +45,9 @@ while IFS= read -r file; do
 
   # awk walks the file once, tracks when we're inside a `Task(` or `.copy(`
   # block (by counting parens), and reports any `tag =` line encountered
-  # inside such a block along with the block opener's line number.
+  # inside such a block.
   hit=$(awk '
-    BEGIN { depth = 0; opener_line = 0 }
+    BEGIN { depth = 0 }
     {
       line = $0
       # Detect start of a Task( or .copy( block on this line.
@@ -55,7 +55,6 @@ while IFS= read -r file; do
       if (depth == 0) {
         if (match(line, /(^|[^A-Za-z0-9_])Task[[:space:]]*\(|\.copy[[:space:]]*\(/)) {
           depth = 1
-          opener_line = NR
           # Strip everything up to the opening paren on this line so the
           # paren counter below starts from the block body.
           line = substr(line, RSTART + RLENGTH)
@@ -76,7 +75,6 @@ while IFS= read -r file; do
         if ($0 ~ /[[:space:],(]tag[[:space:]]*=/) {
           printf("%d: %s\n", NR, $0)
         }
-        if (depth == 0) opener_line = 0
       }
     }
   ' "$file")

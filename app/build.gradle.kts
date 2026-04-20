@@ -101,6 +101,10 @@ val checkTagInvariant =
         description = "Enforce that Task.tag writes go through TaskManager."
         workingDir = rootDir
         commandLine = listOf("bash", "scripts/check-tag-invariant.sh")
+        // Incremental: re-run only when a scanned file or the script itself changed.
+        inputs.files(fileTree("src/main") { include("**/*.kt") })
+        inputs.file(rootProject.file("scripts/check-tag-invariant.sh"))
+        outputs.upToDateWhen { true }
     }
 
 tasks.named("check").configure {
