@@ -83,7 +83,12 @@ class TaskManager @Inject constructor(
     }
 
     override suspend fun updateTask(task: Task) {
-        val normalizedTask = task.copy(tag = TagNormalizer.normalize(task.tag))
+        val normalizedTag = TagNormalizer.normalize(task.tag)
+        // Invariant: no orphan tagColor. Same rule as v10→v11 migration and backup import.
+        val normalizedTask = task.copy(
+            tag = normalizedTag,
+            tagColor = if (normalizedTag == null) null else task.tagColor,
+        )
         val existingTask = repository.getTaskById(normalizedTask.id)
         repository.updateTask(normalizedTask)
 
@@ -136,13 +141,15 @@ class TaskManager @Inject constructor(
         val existingTask = repository.getTaskById(taskId)
         requireNotNull(existingTask) { "Task with id $taskId not found" }
 
+        val normalizedTag = TagNormalizer.normalize(tag)
         val updatedTask = existingTask.copy(
             title = title.trim(),
             description = description.trim(),
             dueAt = dueAt,
             dueAtHasTime = dueAtHasTime,
             reminderOffsetMinutes = reminderOffsetMinutes,
-            tag = TagNormalizer.normalize(tag),
+            tag = normalizedTag,
+            tagColor = if (normalizedTag == null) null else existingTask.tagColor,
         )
 
         repository.updateTask(updatedTask)

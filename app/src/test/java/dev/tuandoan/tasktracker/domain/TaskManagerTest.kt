@@ -132,6 +132,31 @@ class TaskManagerTest {
         assertEquals("PERSONAL", updated.tag)
     }
 
+    @Test
+    fun `updateTask clears tagColor when tag becomes null`() = runTest {
+        val original = TestTaskFactory.createTask(id = 1).copy(tag = "WORK", tagColor = "#FF0000")
+        repository.seed(original)
+
+        // Caller-supplied tagColor is dropped because the normalized tag is null.
+        manager.updateTask(original.copy(tag = "  "))
+
+        val updated = repository.getTaskById(1)!!
+        assertNull(updated.tag)
+        assertNull(updated.tagColor)
+    }
+
+    @Test
+    fun `updateTaskContent clears tagColor when tag becomes null`() = runTest {
+        val original = TestTaskFactory.createTask(id = 1, title = "Old").copy(tag = "WORK", tagColor = "#FF0000")
+        repository.seed(original)
+
+        manager.updateTaskContent(1, "Old", "", null, false, null, null)
+
+        val updated = repository.getTaskById(1)!!
+        assertNull(updated.tag)
+        assertNull(updated.tagColor)
+    }
+
     // === toggleTaskCompletion ===
 
     @Test

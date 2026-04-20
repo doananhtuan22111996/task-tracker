@@ -13,6 +13,7 @@ import dev.tuandoan.tasktracker.domain.model.DueDatePreset
 import dev.tuandoan.tasktracker.domain.model.RecurrenceRule
 import dev.tuandoan.tasktracker.domain.model.RecurrenceType
 import dev.tuandoan.tasktracker.domain.model.ReminderOption
+import dev.tuandoan.tasktracker.domain.service.TagNormalizer
 import dev.tuandoan.tasktracker.domain.usecase.TagManagementUseCase
 import dev.tuandoan.tasktracker.domain.usecase.TaskFormUseCase
 import kotlinx.coroutines.flow.Flow
@@ -402,8 +403,10 @@ class TaskEditorViewModel @Inject constructor(
             try {
                 val trimmedTitle = _taskTitle.value.trim()
                 val trimmedDescription = _taskDescription.value.trim()
-                val trimmedTag = _tag.value.trim().takeIf { it.isNotEmpty() }
-                val resolvedTagColor = trimmedTag?.let { tagManagementUseCase.getTagColor(it) }
+                // Normalize before the color lookup: storage is canonical UPPERCASE since PR #72,
+                // so a raw lowercase typed tag would miss the existing color row and drop inheritance.
+                val normalizedTag = TagNormalizer.normalize(_tag.value)
+                val resolvedTagColor = normalizedTag?.let { tagManagementUseCase.getTagColor(it) }
                 val reminderOffsetMinutes = if (_reminderOption.value ==
                     ReminderOption.NONE
                 ) {
@@ -427,7 +430,7 @@ class TaskEditorViewModel @Inject constructor(
                         dueAt = _dueAt.value,
                         dueAtHasTime = _dueAtHasTime.value,
                         reminderOffsetMinutes = reminderOffsetMinutes,
-                        tag = trimmedTag,
+                        tag = normalizedTag,
                         tagColor = resolvedTagColor,
                         priority = _priority.value,
                         isPinned = _isPinned.value,
@@ -445,7 +448,7 @@ class TaskEditorViewModel @Inject constructor(
                         dueAt = _dueAt.value,
                         dueAtHasTime = _dueAtHasTime.value,
                         reminderOffsetMinutes = reminderOffsetMinutes,
-                        tag = trimmedTag,
+                        tag = normalizedTag,
                         recurrenceType = recurrenceRule.type.value,
                         recurrenceInterval = recurrenceRule.interval,
                         recurrenceDaysOfWeek = recurrenceRule.daysOfWeekBitmask(),
