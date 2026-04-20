@@ -34,6 +34,9 @@ data class TaskBackupDto(
 
     fun toTask(): Task {
         val normalizedTag = TagNormalizer.normalize(tag)
+        // Orphan tagColor without a tag is meaningless — drop it on import to match the
+        // invariant enforced by the v10→v11 migration.
+        val resolvedColor = if (normalizedTag == null) null else tagColor
         return Task(
             id = id,
             title = title,
@@ -45,7 +48,7 @@ data class TaskBackupDto(
             dueAtHasTime = dueAtHasTime,
             reminderOffsetMinutes = reminderOffsetMinutes,
             tag = normalizedTag,
-            tagColor = if (normalizedTag == null) null else tagColor,
+            tagColor = resolvedColor,
             isPinned = isPinned,
             priority = priority,
             isArchived = isArchived,

@@ -16,11 +16,14 @@ Format follows [Keep a Changelog](https://keepachangelog.com).
 - Full i18n for tag management strings across all 8 locales
 - `TagNormalizer` domain helper — canonicalizes tags to trimmed + `Locale.ROOT` uppercase
 - Room migration v10→v11 canonicalizing existing tags, merging colors by most-frequent-wins with `MAX(createdAt)` tiebreaker
-- Migration SQL validated with a JVM-level SQLite JDBC test suite
+- `TagCaseMigrationPlanner` pure-Kotlin planner drives the migration so non-ASCII scripts (Vietnamese, Turkish, etc.) canonicalize correctly
 
 ### Changed
 - All tag input paths (task form, tag rename, JSON/CSV backup import) now normalize tags to uppercase before persisting
 - Display-time `.uppercase()` calls removed on task and tag chips — storage is now canonical
+
+### Fixed
+- v10→v11 migration uses JVM `Locale.ROOT` uppercasing instead of SQLite `UPPER()` — Android SQLite is ASCII-only, so the previous SQL-based path would have split case variants for non-ASCII tags (`việc`/`Việc`/`VIỆC`)
 
 ## [1.8.0] - 2026-04-16
 
