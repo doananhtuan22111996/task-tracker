@@ -65,4 +65,14 @@ interface ITaskRepository {
     // Backup operations
     suspend fun getAllTasksIncludingArchived(): List<Task>
     suspend fun replaceAllTasks(tasks: List<Task>)
+
+    /**
+     * Atomically replaces all tasks AND all subtasks. Used by import to avoid a partial state
+     * where tasks exist without their subtasks. The caller is responsible for supplying subtasks
+     * whose `taskId` references a task id also present in [tasks].
+     */
+    suspend fun replaceAllTasksAndSubtasks(
+        tasks: List<Task>,
+        subtasks: List<dev.tuandoan.tasktracker.data.database.Subtask>,
+    )
 }

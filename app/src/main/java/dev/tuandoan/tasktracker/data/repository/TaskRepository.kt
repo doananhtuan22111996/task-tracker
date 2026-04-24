@@ -152,4 +152,19 @@ class TaskRepository @Inject constructor(private val taskDao: TaskDao, private v
             taskDao.upsertAll(tasks)
         }
     }
+
+    override suspend fun replaceAllTasksAndSubtasks(
+        tasks: List<Task>,
+        subtasks: List<dev.tuandoan.tasktracker.data.database.Subtask>,
+    ) {
+        taskDatabase.withTransaction {
+            // Deleting all tasks cascades to all subtasks via FK ON DELETE CASCADE; explicit
+            // subtask wipe is unnecessary but harmless.
+            taskDao.deleteAllTasks()
+            taskDao.upsertAll(tasks)
+            if (subtasks.isNotEmpty()) {
+                taskDatabase.subtaskDao().upsertAll(subtasks)
+            }
+        }
+    }
 }

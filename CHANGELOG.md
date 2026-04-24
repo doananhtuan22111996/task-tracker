@@ -19,8 +19,20 @@ Format follows [Keep a Changelog](https://keepachangelog.com).
 - Recurrence regeneration (`completeAndGenerateNext` / `archiveAndGenerateNext`) now copies subtasks from the completed/skipped instance to the new instance with checked state reset
 - `TaskManagerRecurrenceTest` cases covering subtask copy on complete, skip, no-subtasks no-op, and non-recurring no-op
 
+### Added
+- Backup schema v3: JSON and CSV backups now include subtasks nested inside each task
+- `SubtaskBackupDto` and subtasks field on `TaskBackupDto` (defaulted, backward compatible with v1/v2)
+- `ITaskRepository.replaceAllTasksAndSubtasks` — atomic import of tasks + subtasks
+- `ISubtaskRepository.getAllSubtasks` — bulk fetch for export
+- `ImportBackupUseCase` now restores subtasks, trims oversized titles, and drops blank-title subtasks
+- `SubtaskBackupTest` — 7 round-trip tests (JSON + CSV, special characters, v2 backward compat, empty cell)
+- `ImportBackupSubtaskTest` — 3 end-to-end tests covering subtask persistence, blank-parent filtering, and oversize-title truncation
+
 ### Changed
 - `TaskManager` constructor now takes `ISubtaskRepository` alongside `ITaskRepository`
+- `BackupMetadata.CURRENT_SCHEMA_VERSION` bumped from 2 to 3
+- `ExportBackupUseCase` now injects `ISubtaskRepository` to hydrate subtasks during export
+- CSV backup header gains a trailing `subtasks` column (JSON-in-cell encoding); import tolerates 13/14/19/20/21 column counts
 
 ### Fixed
 - `SubtaskUseCase` mutations now re-throw `CancellationException` instead of wrapping it in `Result.failure`, preserving structured-concurrency cancellation semantics

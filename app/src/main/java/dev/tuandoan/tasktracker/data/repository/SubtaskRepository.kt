@@ -53,6 +53,8 @@ class SubtaskRepository @Inject constructor(
         }
     }
 
+    override suspend fun getAllSubtasks(): List<Subtask> = subtaskDao.getAllSubtasks()
+
     override suspend fun copySubtasksResetCompletion(fromTaskId: Long, toTaskId: Long) {
         taskDatabase.withTransaction {
             val source = subtaskDao.getSubtasks(fromTaskId)

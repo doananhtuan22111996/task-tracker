@@ -12,6 +12,7 @@ import dev.tuandoan.tasktracker.di.JsonSerializer
 import dev.tuandoan.tasktracker.domain.backup.model.BackupFormat
 import dev.tuandoan.tasktracker.domain.backup.model.BackupMetadata
 import dev.tuandoan.tasktracker.domain.backup.model.ExportResult
+import dev.tuandoan.tasktracker.domain.repository.ISubtaskRepository
 import dev.tuandoan.tasktracker.domain.repository.ITaskRepository
 import javax.inject.Inject
 
@@ -20,6 +21,7 @@ import javax.inject.Inject
  */
 class ExportBackupUseCase @Inject constructor(
     private val repository: ITaskRepository,
+    private val subtaskRepository: ISubtaskRepository,
     @JsonSerializer private val jsonSerializer: BackupSerializer,
     @CsvSerializer private val csvSerializer: BackupSerializer,
     private val fileProvider: BackupFileProvider,
@@ -36,7 +38,11 @@ class ExportBackupUseCase @Inject constructor(
      */
     suspend fun execute(uri: Uri, format: BackupFormat, appVersion: String): ExportResult = try {
         val tasks = repository.getAllTasksIncludingArchived()
-        val dtos = tasks.map { TaskBackupDto.fromTask(it) }
+        val allSubtasks = subtaskRepository.getAllSubtasks()
+        val subtasksByTask = allSubtasks.groupBy { it.taskId }
+        val dtos = tasks.map { task ->
+            TaskBackupDto.fromTask(task, subtasksByTask[task.id].orEmpty())
+        }
         val metadata = BackupMetadata(appVersion = appVersion)
 
         val serializer = when (format) {

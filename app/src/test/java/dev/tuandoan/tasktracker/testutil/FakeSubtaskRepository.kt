@@ -97,4 +97,7 @@ class FakeSubtaskRepository : ISubtaskRepository {
         }
         subtasks.value = subtasks.value + copies
     }
+
+    override suspend fun getAllSubtasks(): List<Subtask> =
+        subtasks.value.sortedWith(compareBy({ it.taskId }, { it.sortOrder }, { it.id }))
 }

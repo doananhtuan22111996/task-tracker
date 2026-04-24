@@ -1,6 +1,9 @@
 package dev.tuandoan.tasktracker.data.backup
 
+import dev.tuandoan.tasktracker.data.backup.dto.SubtaskBackupDto
 import dev.tuandoan.tasktracker.data.backup.dto.TaskBackupDto
+import kotlinx.serialization.builtins.ListSerializer
+import kotlinx.serialization.json.Json
 import javax.inject.Inject
 
 /**
@@ -9,6 +12,8 @@ import javax.inject.Inject
  * Metadata parameters (schemaVersion, exportedAt, appVersion) are ignored for CSV format.
  */
 class CsvBackupSerializer @Inject constructor() : BackupSerializer {
+
+    private val subtaskListJson = Json { ignoreUnknownKeys = true }
 
     override fun serialize(
         tasks: List<TaskBackupDto>,
@@ -47,6 +52,11 @@ class CsvBackupSerializer @Inject constructor() : BackupSerializer {
     }
 
     private fun taskToCsvRow(task: TaskBackupDto): String {
+        val subtasksJson = if (task.subtasks.isEmpty()) {
+            ""
+        } else {
+            subtaskListJson.encodeToString(ListSerializer(SubtaskBackupDto.serializer()), task.subtasks)
+        }
         val fields = listOf(
             task.id.toString(),
             task.title,
@@ -68,6 +78,7 @@ class CsvBackupSerializer @Inject constructor() : BackupSerializer {
             task.recurrenceDaysOfWeek.toString(),
             task.recurrenceEndDate?.toString() ?: "",
             task.parentRecurringTaskId?.toString() ?: "",
+            subtasksJson,
         )
         return fields.joinToString(",") { escapeCsvField(it) }
     }
@@ -79,12 +90,24 @@ class CsvBackupSerializer @Inject constructor() : BackupSerializer {
             )
         }
 
-        // Support legacy 13-column, v1 14-column, v2 19-column, and current 20-column formats
+        // Support legacy 13-column, v1 14-column, v2 19-column, v2-color 20-column, and v3 21-column formats
         val hasDueAtHasTime = fields.size >= V1_FIELD_COUNT
         val offset = if (hasDueAtHasTime) 1 else 0
-        val hasTagColor = fields.size >= EXPECTED_FIELD_COUNT
+        val hasTagColor = fields.size >= V2_COLOR_FIELD_COUNT
         val colorOffset = if (hasTagColor) 1 else 0
         val hasRecurrence = fields.size >= (V2_FIELD_COUNT + offset)
+        val hasSubtasks = fields.size >= EXPECTED_FIELD_COUNT
+
+        val subtasksJson = if (hasSubtasks) fields[18 + offset + colorOffset] else ""
+        val subtasks = if (subtasksJson.isBlank()) {
+            emptyList()
+        } else {
+            try {
+                subtaskListJson.decodeFromString(ListSerializer(SubtaskBackupDto.serializer()), subtasksJson)
+            } catch (e: Exception) {
+                throw BackupParseException("Failed to parse subtasks cell: ${e.message}", e)
+            }
+        }
 
         return TaskBackupDto(
             id = fields[0].toLong(),
@@ -107,11 +130,13 @@ class CsvBackupSerializer @Inject constructor() : BackupSerializer {
             recurrenceDaysOfWeek = if (hasRecurrence) fields[15 + offset + colorOffset].toIntOrNull() ?: 0 else 0,
             recurrenceEndDate = if (hasRecurrence) fields[16 + offset + colorOffset].toLongOrNull() else null,
             parentRecurringTaskId = if (hasRecurrence) fields[17 + offset + colorOffset].toLongOrNull() else null,
+            subtasks = subtasks,
         )
     }
 
     companion object {
-        private const val EXPECTED_FIELD_COUNT = 20
+        private const val EXPECTED_FIELD_COUNT = 21
+        private const val V2_COLOR_FIELD_COUNT = 20
         private const val V2_FIELD_COUNT = 19
         private const val V1_FIELD_COUNT = 14
         private const val LEGACY_FIELD_COUNT = 13
@@ -120,7 +145,7 @@ class CsvBackupSerializer @Inject constructor() : BackupSerializer {
             "id,title,description,isCompleted,createdAt,completedAt,dueAt,dueAtHasTime," +
                 "reminderOffsetMinutes,tag,tagColor,isPinned,priority,isArchived,archivedAt," +
                 "recurrenceType,recurrenceInterval,recurrenceDaysOfWeek,recurrenceEndDate," +
-                "parentRecurringTaskId"
+                "parentRecurringTaskId,subtasks"
 
         /**
          * Escapes a CSV field per RFC 4180: wrap in quotes if the field contains
