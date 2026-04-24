@@ -4,9 +4,11 @@ import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import dev.tuandoan.tasktracker.data.repository.SubtaskRepository
 import dev.tuandoan.tasktracker.data.repository.TaskRepository
 import dev.tuandoan.tasktracker.domain.ITaskManager
 import dev.tuandoan.tasktracker.domain.TaskManager
+import dev.tuandoan.tasktracker.domain.repository.ISubtaskRepository
 import dev.tuandoan.tasktracker.domain.repository.ITaskRepository
 import javax.inject.Singleton
 
@@ -33,4 +35,11 @@ abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun bindTaskManager(taskManager: TaskManager): ITaskManager
+
+    /**
+     * Binds SubtaskRepository implementation to ISubtaskRepository interface.
+     */
+    @Binds
+    @Singleton
+    abstract fun bindSubtaskRepository(subtaskRepository: SubtaskRepository): ISubtaskRepository
 }
