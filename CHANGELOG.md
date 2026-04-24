@@ -5,6 +5,8 @@ Format follows [Keep a Changelog](https://keepachangelog.com).
 
 ## [Unreleased]
 
+## [1.9.0] - 2026-04-24
+
 ### Added
 - Tag Management screen: rename, recolor, and delete tags from Settings
 - 10-color Material 3 tag palette with per-tag color assignment
