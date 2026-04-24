@@ -3,6 +3,7 @@ package dev.tuandoan.tasktracker.domain
 import dev.tuandoan.tasktracker.data.database.DailyCount
 import dev.tuandoan.tasktracker.data.database.Task
 import dev.tuandoan.tasktracker.domain.model.RecurrenceType
+import dev.tuandoan.tasktracker.domain.repository.ISubtaskRepository
 import dev.tuandoan.tasktracker.domain.repository.ITaskRepository
 import dev.tuandoan.tasktracker.domain.scheduler.TaskReminderScheduler
 import dev.tuandoan.tasktracker.domain.scheduler.WidgetUpdater
@@ -18,6 +19,7 @@ import javax.inject.Inject
  */
 class TaskManager @Inject constructor(
     private val repository: ITaskRepository,
+    private val subtaskRepository: ISubtaskRepository,
     private val reminderScheduler: TaskReminderScheduler,
     private val widgetUpdater: WidgetUpdater,
 ) : ITaskManager {
@@ -414,6 +416,7 @@ class TaskManager @Inject constructor(
         val nextTask = buildNextTask(task, currentTime)
         if (nextTask != null) {
             val newTaskId = repository.completeAndGenerateNext(completedTask, nextTask)
+            subtaskRepository.copySubtasksResetCompletion(fromTaskId = task.id, toTaskId = newTaskId)
             scheduleReminderIfNeeded(newTaskId, nextTask.title, nextTask.dueAt, nextTask.reminderOffsetMinutes)
         } else {
             repository.updateTask(completedTask)
@@ -440,6 +443,7 @@ class TaskManager @Inject constructor(
         val nextTask = buildNextTask(task, currentTime)
         if (nextTask != null) {
             val newTaskId = repository.archiveAndGenerateNext(task.id, nextTask)
+            subtaskRepository.copySubtasksResetCompletion(fromTaskId = task.id, toTaskId = newTaskId)
             scheduleReminderIfNeeded(newTaskId, nextTask.title, nextTask.dueAt, nextTask.reminderOffsetMinutes)
         } else {
             repository.archiveTask(task.id)

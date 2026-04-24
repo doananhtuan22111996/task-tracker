@@ -32,4 +32,11 @@ interface ISubtaskRepository {
      * for the task — partial writes are avoided by wrapping the update in a DB transaction.
      */
     suspend fun reorderSubtasks(taskId: Long, orderedIds: List<Long>)
+
+    /**
+     * Atomically copies every subtask under [fromTaskId] to [toTaskId] with `isCompleted = false`,
+     * preserving titles and `sortOrder`. No-op when the source has no subtasks. Used by recurrence
+     * regeneration so a new task instance inherits a fresh checklist.
+     */
+    suspend fun copySubtasksResetCompletion(fromTaskId: Long, toTaskId: Long)
 }

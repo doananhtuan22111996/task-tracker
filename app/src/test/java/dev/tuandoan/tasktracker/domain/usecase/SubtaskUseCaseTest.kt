@@ -283,6 +283,38 @@ class SubtaskUseCaseTest {
         }
     }
 
+    // === copySubtasksResetCompletion (repository contract) ===
+
+    @Test
+    fun `copySubtasksResetCompletion copies from source to target with isCompleted reset`() = runTest {
+        repository.seed(
+            TestSubtaskFactory.createSubtask(id = 1L, taskId = 10L, title = "A", sortOrder = 0, isCompleted = true),
+            TestSubtaskFactory.createSubtask(id = 2L, taskId = 10L, title = "B", sortOrder = 1, isCompleted = true),
+            TestSubtaskFactory.createSubtask(id = 3L, taskId = 99L, title = "Other", sortOrder = 0),
+        )
+
+        repository.copySubtasksResetCompletion(fromTaskId = 10L, toTaskId = 20L)
+
+        val targetSubtasks = repository.getSubtasks(20L)
+        assertEquals(listOf("A", "B"), targetSubtasks.map { it.title })
+        assertEquals(listOf(0, 1), targetSubtasks.map { it.sortOrder })
+        assertTrue(targetSubtasks.all { !it.isCompleted })
+
+        // Source untouched.
+        assertEquals(2, repository.getSubtasks(10L).size)
+        assertTrue(repository.getSubtasks(10L).all { it.isCompleted })
+
+        // Unrelated task untouched.
+        assertEquals(1, repository.getSubtasks(99L).size)
+    }
+
+    @Test
+    fun `copySubtasksResetCompletion is a no-op when source has no subtasks`() = runTest {
+        repository.copySubtasksResetCompletion(fromTaskId = 10L, toTaskId = 20L)
+
+        assertEquals(0, repository.getAllSubtasksSnapshot().size)
+    }
+
     // === CancellationException propagation ===
 
     @Test

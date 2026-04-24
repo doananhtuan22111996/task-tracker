@@ -13,6 +13,7 @@ import dev.tuandoan.tasktracker.domain.usecase.TaskFilterUseCase
 import dev.tuandoan.tasktracker.domain.usecase.TaskFormUseCase
 import dev.tuandoan.tasktracker.domain.usecase.TaskSearchUseCase
 import dev.tuandoan.tasktracker.testutil.FakeReminderScheduler
+import dev.tuandoan.tasktracker.testutil.FakeSubtaskRepository
 import dev.tuandoan.tasktracker.testutil.FakeTaskRepository
 import dev.tuandoan.tasktracker.testutil.FakeWidgetUpdater
 import dev.tuandoan.tasktracker.testutil.TestTaskFactory
@@ -69,7 +70,7 @@ class TaskViewModelTest {
     }
 
     private fun createViewModel(): TaskViewModel {
-        val taskManager = TaskManager(repository, scheduler, FakeWidgetUpdater())
+        val taskManager = TaskManager(repository, FakeSubtaskRepository(), scheduler, FakeWidgetUpdater())
         val crudUseCase = TaskCrudUseCase(taskManager, context)
         val searchUseCase = TaskSearchUseCase()
         val filterUseCase = TaskFilterUseCase()

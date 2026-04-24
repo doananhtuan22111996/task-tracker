@@ -86,4 +86,15 @@ class FakeSubtaskRepository : ISubtaskRepository {
         val untouched = subtasks.value.filter { it.taskId != taskId }
         subtasks.value = untouched + reordered
     }
+
+    override suspend fun copySubtasksResetCompletion(fromTaskId: Long, toTaskId: Long) {
+        val source = subtasks.value.filter { it.taskId == fromTaskId }
+            .sortedWith(compareBy({ it.sortOrder }, { it.id }))
+        if (source.isEmpty()) return
+        val copies = source.map { original ->
+            val newId = nextId++
+            original.copy(id = newId, taskId = toTaskId, isCompleted = false)
+        }
+        subtasks.value = subtasks.value + copies
+    }
 }

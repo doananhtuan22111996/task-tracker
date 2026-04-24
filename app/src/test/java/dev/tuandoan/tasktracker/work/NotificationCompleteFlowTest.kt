@@ -3,6 +3,7 @@ package dev.tuandoan.tasktracker.work
 import dev.tuandoan.tasktracker.domain.TaskManager
 import dev.tuandoan.tasktracker.domain.model.RecurrenceType
 import dev.tuandoan.tasktracker.testutil.FakeReminderScheduler
+import dev.tuandoan.tasktracker.testutil.FakeSubtaskRepository
 import dev.tuandoan.tasktracker.testutil.FakeTaskRepository
 import dev.tuandoan.tasktracker.testutil.FakeWidgetUpdater
 import dev.tuandoan.tasktracker.testutil.TestTaskFactory
@@ -28,7 +29,7 @@ class NotificationCompleteFlowTest {
     fun setup() {
         repository = FakeTaskRepository()
         scheduler = FakeReminderScheduler()
-        taskManager = TaskManager(repository, scheduler, FakeWidgetUpdater())
+        taskManager = TaskManager(repository, FakeSubtaskRepository(), scheduler, FakeWidgetUpdater())
     }
 
     @Test
