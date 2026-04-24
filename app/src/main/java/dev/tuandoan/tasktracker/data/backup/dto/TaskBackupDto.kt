@@ -30,6 +30,8 @@ data class TaskBackupDto(
     val recurrenceDaysOfWeek: Int = 0,
     val recurrenceEndDate: Long? = null,
     val parentRecurringTaskId: Long? = null,
+    // v3 schema: subtasks per task. Defaults to empty for backward compatibility with v1/v2.
+    val subtasks: List<SubtaskBackupDto> = emptyList(),
 ) {
 
     fun toTask(): Task {
@@ -62,7 +64,10 @@ data class TaskBackupDto(
     }
 
     companion object {
-        fun fromTask(task: Task): TaskBackupDto = TaskBackupDto(
+        fun fromTask(
+            task: Task,
+            subtasks: List<dev.tuandoan.tasktracker.data.database.Subtask> = emptyList(),
+        ): TaskBackupDto = TaskBackupDto(
             id = task.id,
             title = task.title,
             description = task.description,
@@ -83,6 +88,9 @@ data class TaskBackupDto(
             recurrenceDaysOfWeek = task.recurrenceDaysOfWeek,
             recurrenceEndDate = task.recurrenceEndDate,
             parentRecurringTaskId = task.parentRecurringTaskId,
+            subtasks = subtasks
+                .sortedWith(compareBy({ it.sortOrder }, { it.id }))
+                .map { SubtaskBackupDto.fromSubtask(it) },
         )
     }
 }

@@ -39,4 +39,10 @@ interface ISubtaskRepository {
      * regeneration so a new task instance inherits a fresh checklist.
      */
     suspend fun copySubtasksResetCompletion(fromTaskId: Long, toTaskId: Long)
+
+    /**
+     * Returns every subtask across all tasks, ordered by `taskId`, `sortOrder`, `id`. Used by
+     * backup export to serialize the full subtask corpus in one query.
+     */
+    suspend fun getAllSubtasks(): List<dev.tuandoan.tasktracker.data.database.Subtask>
 }

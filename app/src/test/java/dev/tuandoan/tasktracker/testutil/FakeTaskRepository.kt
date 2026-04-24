@@ -1,6 +1,7 @@
 package dev.tuandoan.tasktracker.testutil
 
 import dev.tuandoan.tasktracker.data.database.DailyCount
+import dev.tuandoan.tasktracker.data.database.Subtask
 import dev.tuandoan.tasktracker.data.database.TagInfo
 import dev.tuandoan.tasktracker.data.database.Task
 import dev.tuandoan.tasktracker.domain.repository.ITaskRepository
@@ -19,6 +20,12 @@ class FakeTaskRepository : ITaskRepository {
 
     private val tasks = MutableStateFlow<List<Task>>(emptyList())
     private var nextId = 1L
+
+    /**
+     * Optional sink that [replaceAllTasksAndSubtasks] forwards the subtask list to, so backup
+     * import tests can assert subtask persistence without standing up a real Room DB.
+     */
+    var subtaskSink: ((List<Subtask>) -> Unit)? = null
 
     /** Expose internal state for test assertions */
     fun getAllTasksSnapshot(): List<Task> = tasks.value
@@ -269,5 +276,10 @@ class FakeTaskRepository : ITaskRepository {
 
     override suspend fun replaceAllTasks(tasks: List<Task>) {
         this.tasks.value = tasks
+    }
+
+    override suspend fun replaceAllTasksAndSubtasks(tasks: List<Task>, subtasks: List<Subtask>) {
+        this.tasks.value = tasks
+        subtaskSink?.invoke(subtasks)
     }
 }

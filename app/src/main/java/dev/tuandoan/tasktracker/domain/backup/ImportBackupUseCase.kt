@@ -9,6 +9,7 @@ import dev.tuandoan.tasktracker.data.backup.BackupSerializer
 import dev.tuandoan.tasktracker.di.JsonSerializer
 import dev.tuandoan.tasktracker.domain.backup.model.ImportResult
 import dev.tuandoan.tasktracker.domain.repository.ITaskRepository
+import dev.tuandoan.tasktracker.domain.usecase.SubtaskUseCase
 import javax.inject.Inject
 
 /**
@@ -35,8 +36,24 @@ class ImportBackupUseCase @Inject constructor(
         val tasks = dtos.map { it.toTask() }
 
         val validationResult = validator.validate(tasks)
+        val validTaskIds = validationResult.validTasks.map { it.id }.toSet()
 
-        repository.replaceAllTasks(validationResult.validTasks)
+        // Only keep subtasks whose parent task id survived validation; skip blank titles and
+        // truncate to SubtaskUseCase.MAX_TITLE_LENGTH for consistency with the use case surface.
+        val subtasks = dtos.flatMap { dto ->
+            if (dto.id !in validTaskIds) return@flatMap emptyList()
+            dto.subtasks.mapNotNull { sub ->
+                val trimmed = sub.title.trim()
+                if (trimmed.isEmpty()) return@mapNotNull null
+                sub.toSubtask(taskId = dto.id)
+                    .copy(title = trimmed.take(SubtaskUseCase.MAX_TITLE_LENGTH))
+            }
+        }
+
+        repository.replaceAllTasksAndSubtasks(
+            tasks = validationResult.validTasks,
+            subtasks = subtasks,
+        )
 
         ImportResult.Success(
             importedCount = validationResult.validTasks.size,
