@@ -26,6 +26,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com).
 - `ISubtaskRepository.getAllSubtasks` — bulk fetch for export
 - `ImportBackupUseCase` now restores subtasks, trims oversized titles, and drops blank-title subtasks
 - `SubtaskBackupTest` — 7 round-trip tests (JSON + CSV, special characters, v2 backward compat, empty cell)
+- `ImportBackupSubtaskTest` — 3 end-to-end tests covering subtask persistence, blank-parent filtering, and oversize-title truncation
 
 ### Changed
 - `TaskManager` constructor now takes `ISubtaskRepository` alongside `ITaskRepository`
