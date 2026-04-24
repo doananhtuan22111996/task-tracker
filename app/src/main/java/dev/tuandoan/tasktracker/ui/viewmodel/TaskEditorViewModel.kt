@@ -14,8 +14,10 @@ import dev.tuandoan.tasktracker.domain.model.RecurrenceRule
 import dev.tuandoan.tasktracker.domain.model.RecurrenceType
 import dev.tuandoan.tasktracker.domain.model.ReminderOption
 import dev.tuandoan.tasktracker.domain.service.TagNormalizer
+import dev.tuandoan.tasktracker.domain.usecase.SubtaskUseCase
 import dev.tuandoan.tasktracker.domain.usecase.TagManagementUseCase
 import dev.tuandoan.tasktracker.domain.usecase.TaskFormUseCase
+import dev.tuandoan.tasktracker.ui.model.SubtaskDraft
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -24,6 +26,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import java.time.DayOfWeek
@@ -39,6 +42,7 @@ class TaskEditorViewModel @Inject constructor(
     private val taskManager: ITaskManager,
     private val taskFormUseCase: TaskFormUseCase,
     private val tagManagementUseCase: TagManagementUseCase,
+    private val subtaskUseCase: SubtaskUseCase,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
@@ -85,6 +89,16 @@ class TaskEditorViewModel @Inject constructor(
 
     private val _recurrenceEndDate = MutableStateFlow<Long?>(null)
     val recurrenceEndDate: StateFlow<Long?> = _recurrenceEndDate.asStateFlow()
+
+    // Subtasks (draft list; persisted on save)
+    private val _subtasks = MutableStateFlow<List<SubtaskDraft>>(emptyList())
+    val subtasks: StateFlow<List<SubtaskDraft>> = _subtasks.asStateFlow()
+
+    // Monotonically decreasing placeholder id for newly-added drafts so LazyColumn keys stay unique.
+    private var nextDraftId: Long = -1L
+
+    // Snapshot of subtasks as loaded from storage in edit mode; used for diffing on save.
+    private var originalSubtasks: List<SubtaskDraft> = emptyList()
 
     // UI state
     private val _isLoading = MutableStateFlow(false)
@@ -136,7 +150,8 @@ class TaskEditorViewModel @Inject constructor(
                 _tag.value.trim().isNotBlank() ||
                 _priority.value != 1 ||
                 _isPinned.value ||
-                _recurrenceType.value != RecurrenceType.NONE
+                _recurrenceType.value != RecurrenceType.NONE ||
+                _subtasks.value.isNotEmpty()
         } else {
             // Edit mode - compare with original values
             _hasChanges.value = originalTask?.let { original ->
@@ -157,7 +172,8 @@ class TaskEditorViewModel @Inject constructor(
                     _recurrenceType.value != originalRule.type ||
                     _recurrenceInterval.value != originalRule.interval ||
                     _recurrenceDaysOfWeek.value != originalRule.daysOfWeek ||
-                    _recurrenceEndDate.value != originalRule.endDate
+                    _recurrenceEndDate.value != originalRule.endDate ||
+                    _subtasks.value != originalSubtasks
             } ?: false
         }
     }
@@ -246,6 +262,11 @@ class TaskEditorViewModel @Inject constructor(
                     _recurrenceInterval.value = rule.interval
                     _recurrenceDaysOfWeek.value = rule.daysOfWeek
                     _recurrenceEndDate.value = rule.endDate
+                    val loadedSubtasks = subtaskUseCase.observeSubtasks(taskId)
+                        .first()
+                        .map(SubtaskDraft::fromSubtask)
+                    _subtasks.value = loadedSubtasks
+                    originalSubtasks = loadedSubtasks
                     updateHasChanges()
                 } else {
                     _events.emit(TaskEditorEvent.TaskNotFound)
@@ -397,6 +418,46 @@ class TaskEditorViewModel @Inject constructor(
         updateRecurrenceType(RecurrenceType.NONE)
     }
 
+    // Subtask events
+
+    /**
+     * Adds a draft subtask at the end of the list. Blank titles are ignored so the inline "Add
+     * subtask" row can freely commit on IME Done without producing empty rows.
+     */
+    fun addSubtaskDraft(title: String) {
+        val trimmed = title.trim()
+        if (trimmed.isEmpty()) return
+        if (trimmed.length > SubtaskUseCase.MAX_TITLE_LENGTH) return
+        val next = _subtasks.value + SubtaskDraft(
+            id = nextDraftId--,
+            title = trimmed,
+            isCompleted = false,
+            sortOrder = _subtasks.value.size,
+        )
+        _subtasks.value = next
+        updateHasChanges()
+    }
+
+    fun updateSubtaskDraftTitle(id: Long, title: String) {
+        if (title.length > SubtaskUseCase.MAX_TITLE_LENGTH) return
+        _subtasks.value = _subtasks.value.map { if (it.id == id) it.copy(title = title) else it }
+        updateHasChanges()
+    }
+
+    fun toggleSubtaskDraft(id: Long) {
+        _subtasks.value = _subtasks.value.map {
+            if (it.id == id) it.copy(isCompleted = !it.isCompleted) else it
+        }
+        updateHasChanges()
+    }
+
+    fun removeSubtaskDraft(id: Long) {
+        _subtasks.value = _subtasks.value
+            .filter { it.id != id }
+            .mapIndexed { index, draft -> draft.copy(sortOrder = index) }
+        updateHasChanges()
+    }
+
     fun saveTask() {
         viewModelScope.launch {
             _isLoading.value = true
@@ -422,7 +483,7 @@ class TaskEditorViewModel @Inject constructor(
                     endDate = _recurrenceEndDate.value,
                 )
 
-                if (isEditMode && originalTask != null) {
+                val savedTaskId: Long = if (isEditMode && originalTask != null) {
                     // Update existing task
                     val updatedTask = originalTask!!.copy(
                         title = trimmedTitle,
@@ -440,9 +501,10 @@ class TaskEditorViewModel @Inject constructor(
                         recurrenceEndDate = recurrenceRule.endDate,
                     )
                     taskManager.updateTask(updatedTask)
+                    updatedTask.id
                 } else {
                     // Create new task
-                    val taskId = taskManager.createTask(
+                    val newId = taskManager.createTask(
                         title = trimmedTitle,
                         description = trimmedDescription,
                         dueAt = _dueAt.value,
@@ -456,24 +518,60 @@ class TaskEditorViewModel @Inject constructor(
                     )
 
                     if (_priority.value != 1) {
-                        taskManager.setPriority(taskId, _priority.value)
+                        taskManager.setPriority(newId, _priority.value)
                     }
                     if (_isPinned.value) {
-                        taskManager.setPinned(taskId, true)
+                        taskManager.setPinned(newId, true)
                     }
                     if (resolvedTagColor != null) {
-                        val createdTask = taskManager.getTaskById(taskId)
+                        val createdTask = taskManager.getTaskById(newId)
                         if (createdTask != null) {
                             taskManager.updateTask(createdTask.copy(tagColor = resolvedTagColor))
                         }
                     }
+                    newId
                 }
+
+                persistSubtaskDiff(savedTaskId)
 
                 _events.emit(TaskEditorEvent.TaskSaved)
             } catch (e: Exception) {
                 _errorMessage.value = context.getString(R.string.error_failed_save_task, e.message ?: "")
             } finally {
                 _isLoading.value = false
+            }
+        }
+    }
+
+    /**
+     * Persists subtask drafts against [taskId]. In create mode (`originalSubtasks` empty) every
+     * draft is new. In edit mode: drafts present in the original but missing from the new list
+     * are deleted; drafts with mutated fields are updated in place; drafts with negative ids are
+     * added. Sort order follows the list's current index.
+     */
+    private suspend fun persistSubtaskDiff(taskId: Long) {
+        val drafts = _subtasks.value
+        val originalById = originalSubtasks.associateBy { it.id }
+        val currentIds = drafts.filter { it.isPersisted }.map { it.id }.toSet()
+
+        // Delete subtasks removed from the list.
+        originalSubtasks
+            .filter { it.id !in currentIds }
+            .forEach { subtaskUseCase.delete(it.id) }
+
+        // Apply adds and updates in current draft order so sortOrder stays coherent.
+        drafts.forEach { draft ->
+            if (!draft.isPersisted) {
+                subtaskUseCase.addSubtask(taskId, draft.title)
+            } else {
+                val original = originalById[draft.id] ?: return@forEach
+                if (draft.title != original.title) {
+                    subtaskUseCase.updateTitle(draft.id, draft.title)
+                }
+                if (draft.isCompleted != original.isCompleted) {
+                    subtaskUseCase.setCompleted(draft.id, completed = draft.isCompleted)
+                }
+                // sortOrder changes belong to reorder (ST-07) — not persisted here.
             }
         }
     }

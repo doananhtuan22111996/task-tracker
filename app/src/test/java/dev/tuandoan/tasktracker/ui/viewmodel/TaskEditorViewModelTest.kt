@@ -8,8 +8,10 @@ import dev.tuandoan.tasktracker.data.database.Task
 import dev.tuandoan.tasktracker.domain.ITaskManager
 import dev.tuandoan.tasktracker.domain.model.DueDatePreset
 import dev.tuandoan.tasktracker.domain.model.ReminderOption
+import dev.tuandoan.tasktracker.domain.usecase.SubtaskUseCase
 import dev.tuandoan.tasktracker.domain.usecase.TagManagementUseCase
 import dev.tuandoan.tasktracker.domain.usecase.TaskFormUseCase
+import dev.tuandoan.tasktracker.testutil.FakeSubtaskRepository
 import dev.tuandoan.tasktracker.testutil.TestTaskFactory
 import io.mockk.every
 import io.mockk.mockk
@@ -39,6 +41,8 @@ class TaskEditorViewModelTest {
     private lateinit var fakeTaskManager: FakeEditorTaskManager
     private lateinit var formUseCase: TaskFormUseCase
     private lateinit var tagManagementUseCase: TagManagementUseCase
+    private lateinit var subtaskRepository: FakeSubtaskRepository
+    private lateinit var subtaskUseCase: SubtaskUseCase
 
     @Before
     fun setup() {
@@ -50,6 +54,8 @@ class TaskEditorViewModelTest {
         fakeTaskManager = FakeEditorTaskManager()
         formUseCase = TaskFormUseCase(context)
         tagManagementUseCase = mockk(relaxed = true)
+        subtaskRepository = FakeSubtaskRepository()
+        subtaskUseCase = SubtaskUseCase(subtaskRepository)
     }
 
     @After
@@ -63,7 +69,14 @@ class TaskEditorViewModelTest {
                 set("taskId", taskId)
             }
         }
-        return TaskEditorViewModel(context, fakeTaskManager, formUseCase, tagManagementUseCase, savedStateHandle)
+        return TaskEditorViewModel(
+            context,
+            fakeTaskManager,
+            formUseCase,
+            tagManagementUseCase,
+            subtaskUseCase,
+            savedStateHandle,
+        )
     }
 
     // === Create Mode Tests ===
@@ -543,6 +556,110 @@ class TaskEditorViewModelTest {
         viewModel.updateTitle("Valid Title")
         val enabled = viewModel.isSaveEnabled.first()
         assertTrue(enabled)
+    }
+
+    // === Subtask editor tests ===
+
+    @Test
+    fun `addSubtaskDraft appends a draft with a negative id`() = runTest {
+        val viewModel = createViewModel()
+
+        viewModel.addSubtaskDraft("Buy milk")
+
+        val drafts = viewModel.subtasks.value
+        assertEquals(1, drafts.size)
+        assertEquals("Buy milk", drafts[0].title)
+        assertTrue(drafts[0].id < 0L)
+        assertFalse(drafts[0].isPersisted)
+        assertEquals(0, drafts[0].sortOrder)
+    }
+
+    @Test
+    fun `addSubtaskDraft ignores blank titles`() = runTest {
+        val viewModel = createViewModel()
+
+        viewModel.addSubtaskDraft("   ")
+
+        assertTrue(viewModel.subtasks.value.isEmpty())
+    }
+
+    @Test
+    fun `addSubtaskDraft rejects titles over MAX_TITLE_LENGTH`() = runTest {
+        val viewModel = createViewModel()
+        val longTitle = "a".repeat(501)
+
+        viewModel.addSubtaskDraft(longTitle)
+
+        assertTrue(viewModel.subtasks.value.isEmpty())
+    }
+
+    @Test
+    fun `toggleSubtaskDraft flips isCompleted`() = runTest {
+        val viewModel = createViewModel()
+        viewModel.addSubtaskDraft("A")
+        val id = viewModel.subtasks.value.first().id
+
+        viewModel.toggleSubtaskDraft(id)
+        assertTrue(viewModel.subtasks.value.first().isCompleted)
+
+        viewModel.toggleSubtaskDraft(id)
+        assertFalse(viewModel.subtasks.value.first().isCompleted)
+    }
+
+    @Test
+    fun `removeSubtaskDraft drops the row and reindexes sortOrder`() = runTest {
+        val viewModel = createViewModel()
+        viewModel.addSubtaskDraft("A")
+        viewModel.addSubtaskDraft("B")
+        viewModel.addSubtaskDraft("C")
+        val middleId = viewModel.subtasks.value[1].id
+
+        viewModel.removeSubtaskDraft(middleId)
+
+        val after = viewModel.subtasks.value
+        assertEquals(listOf("A", "C"), after.map { it.title })
+        assertEquals(listOf(0, 1), after.map { it.sortOrder })
+    }
+
+    @Test
+    fun `adding a subtask enables isSaveEnabled in create mode with title`() = runTest {
+        val viewModel = createViewModel()
+        viewModel.updateTitle("Parent")
+        val baseline = viewModel.isSaveEnabled.first()
+        assertTrue(baseline)
+
+        viewModel.addSubtaskDraft("step")
+
+        // Still enabled (title was already valid); and hasChanges stays true.
+        assertTrue(viewModel.hasChanges.value)
+        assertTrue(viewModel.isSaveEnabled.first())
+    }
+
+    @Test
+    fun `adding only a subtask with no title leaves isSaveEnabled false`() = runTest {
+        val viewModel = createViewModel()
+
+        viewModel.addSubtaskDraft("step")
+
+        assertTrue(viewModel.hasChanges.value) // hasChanges reflects subtask presence
+        // But isSaveEnabled requires a valid title too.
+        assertFalse(viewModel.isSaveEnabled.first())
+    }
+
+    @Test
+    fun `saveTask persists draft subtasks via the use case`() = runTest {
+        val viewModel = createViewModel()
+        viewModel.updateTitle("Parent")
+        viewModel.addSubtaskDraft("First")
+        viewModel.addSubtaskDraft("Second")
+
+        viewModel.saveTask()
+
+        val written = subtaskRepository.getAllSubtasksSnapshot()
+        assertEquals(2, written.size)
+        assertEquals(listOf("First", "Second"), written.map { it.title })
+        assertTrue(written.all { it.taskId == 1L }) // FakeEditorTaskManager returns 1L
+        assertTrue(written.all { !it.isCompleted })
     }
 }
 

@@ -6,6 +6,11 @@ Format follows [Keep a Changelog](https://keepachangelog.com).
 ## [Unreleased]
 
 ### Added
+- `SubtaskListSection` Composable: inline checklist inside the task editor with checkbox, inline text edit, delete, and "Add subtask" row (IME Done commits)
+- Soft-cap hint at 50 subtasks per task (non-blocking advisory text)
+- `TaskEditorViewModel` state + events for subtask drafts (add / update title / toggle / remove) with diff-on-save persistence
+- English strings for subtasks: `section_subtasks`, `label_add_subtask`, `hint_subtask_soft_cap`, content-description keys for checkbox + remove icon
+- 9 new `TaskEditorViewModelTest` cases covering subtask CRUD, validation, hasChanges, save persistence
 - `Subtask` Room entity with foreign key to `tasks` (cascade delete) and index on `taskId`
 - `SubtaskDao` with observe/CRUD/reset-completion operations
 - Room migration v11→v12 creating the `subtasks` table
@@ -18,8 +23,6 @@ Format follows [Keep a Changelog](https://keepachangelog.com).
 - `ISubtaskRepository.copySubtasksResetCompletion(fromTaskId, toTaskId)` — atomic copy of subtasks to a new task with `isCompleted = false`, preserving titles and sortOrder
 - Recurrence regeneration (`completeAndGenerateNext` / `archiveAndGenerateNext`) now copies subtasks from the completed/skipped instance to the new instance with checked state reset
 - `TaskManagerRecurrenceTest` cases covering subtask copy on complete, skip, no-subtasks no-op, and non-recurring no-op
-
-### Added
 - Backup schema v3: JSON and CSV backups now include subtasks nested inside each task
 - `SubtaskBackupDto` and subtasks field on `TaskBackupDto` (defaulted, backward compatible with v1/v2)
 - `ITaskRepository.replaceAllTasksAndSubtasks` — atomic import of tasks + subtasks
@@ -29,6 +32,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com).
 - `ImportBackupSubtaskTest` — 3 end-to-end tests covering subtask persistence, blank-parent filtering, and oversize-title truncation
 
 ### Changed
+- `TaskEditorViewModel` constructor now takes `SubtaskUseCase`
 - `TaskManager` constructor now takes `ISubtaskRepository` alongside `ITaskRepository`
 - `BackupMetadata.CURRENT_SCHEMA_VERSION` bumped from 2 to 3
 - `ExportBackupUseCase` now injects `ISubtaskRepository` to hydrate subtasks during export
