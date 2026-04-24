@@ -2,8 +2,10 @@ package dev.tuandoan.tasktracker.domain
 
 import dev.tuandoan.tasktracker.domain.model.RecurrenceType
 import dev.tuandoan.tasktracker.testutil.FakeReminderScheduler
+import dev.tuandoan.tasktracker.testutil.FakeSubtaskRepository
 import dev.tuandoan.tasktracker.testutil.FakeTaskRepository
 import dev.tuandoan.tasktracker.testutil.FakeWidgetUpdater
+import dev.tuandoan.tasktracker.testutil.TestSubtaskFactory
 import dev.tuandoan.tasktracker.testutil.TestTaskFactory
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -19,6 +21,7 @@ import java.time.ZoneId
 class TaskManagerRecurrenceTest {
 
     private lateinit var repository: FakeTaskRepository
+    private lateinit var subtaskRepository: FakeSubtaskRepository
     private lateinit var reminderScheduler: FakeReminderScheduler
     private lateinit var taskManager: TaskManager
 
@@ -30,8 +33,9 @@ class TaskManagerRecurrenceTest {
     @Before
     fun setUp() {
         repository = FakeTaskRepository()
+        subtaskRepository = FakeSubtaskRepository()
         reminderScheduler = FakeReminderScheduler()
-        taskManager = TaskManager(repository, reminderScheduler, FakeWidgetUpdater())
+        taskManager = TaskManager(repository, subtaskRepository, reminderScheduler, FakeWidgetUpdater())
     }
 
     // ── Complete generates next occurrence ──
@@ -390,5 +394,93 @@ class TaskManagerRecurrenceTest {
         val finalGen = afterComplete.find { it.id != 1L && it.id != skippedGen.id }!!
         assertEquals(dateToEpoch(2026, 3, 29), finalGen.dueAt)
         assertEquals(1L, finalGen.parentRecurringTaskId) // Still points to original
+    }
+
+    // ── Subtask copy on recurrence ──
+
+    @Test
+    fun `completing recurring task with subtasks copies them reset to unchecked on new instance`() = runTest {
+        val task = TestTaskFactory.createTask(
+            id = 1L,
+            title = "Weekly chores",
+            dueAt = dateToEpoch(2026, 3, 27),
+            recurrenceType = RecurrenceType.DAILY.value,
+        )
+        repository.seed(task)
+        subtaskRepository.seed(
+            TestSubtaskFactory.createSubtask(id = 100L, taskId = 1L, title = "Milk", sortOrder = 0, isCompleted = true),
+            TestSubtaskFactory.createSubtask(id = 101L, taskId = 1L, title = "Eggs", sortOrder = 1, isCompleted = true),
+        )
+
+        taskManager.toggleTaskCompletion(task)
+
+        val generated = repository.getAllTasksSnapshot().single { it.id != 1L }
+        val copied = subtaskRepository.getSubtasks(generated.id)
+        assertEquals(listOf("Milk", "Eggs"), copied.map { it.title })
+        assertEquals(listOf(0, 1), copied.map { it.sortOrder })
+        assertTrue(copied.all { !it.isCompleted })
+
+        // Original subtasks on the parent task are untouched.
+        val originalSubtasks = subtaskRepository.getSubtasks(1L)
+        assertEquals(2, originalSubtasks.size)
+        assertTrue(originalSubtasks.all { it.isCompleted })
+    }
+
+    @Test
+    fun `completing recurring task with no subtasks does not create any`() = runTest {
+        val task = TestTaskFactory.createTask(
+            id = 1L,
+            title = "No-checklist task",
+            dueAt = dateToEpoch(2026, 3, 27),
+            recurrenceType = RecurrenceType.DAILY.value,
+        )
+        repository.seed(task)
+
+        taskManager.toggleTaskCompletion(task)
+
+        val generated = repository.getAllTasksSnapshot().single { it.id != 1L }
+        assertEquals(0, subtaskRepository.countForTask(generated.id))
+    }
+
+    @Test
+    fun `skip on recurring task with subtasks copies them reset to unchecked`() = runTest {
+        val task = TestTaskFactory.createTask(
+            id = 1L,
+            title = "Weekly chores",
+            dueAt = dateToEpoch(2026, 3, 27),
+            recurrenceType = RecurrenceType.DAILY.value,
+        )
+        repository.seed(task)
+        subtaskRepository.seed(
+            TestSubtaskFactory.createSubtask(id = 200L, taskId = 1L, title = "Mop", sortOrder = 0, isCompleted = false),
+            TestSubtaskFactory.createSubtask(id = 201L, taskId = 1L, title = "Dust", sortOrder = 1, isCompleted = true),
+        )
+
+        taskManager.skipOccurrence(task)
+
+        val generated = repository.getAllTasksSnapshot().single { !it.isArchived }
+        val copied = subtaskRepository.getSubtasks(generated.id)
+        assertEquals(listOf("Mop", "Dust"), copied.map { it.title })
+        assertTrue(copied.all { !it.isCompleted })
+    }
+
+    @Test
+    fun `completing non-recurring task does not touch subtasks`() = runTest {
+        val task = TestTaskFactory.createTask(
+            id = 1L,
+            title = "One-off",
+            recurrenceType = RecurrenceType.NONE.value,
+        )
+        repository.seed(task)
+        subtaskRepository.seed(
+            TestSubtaskFactory.createSubtask(id = 300L, taskId = 1L, title = "Step 1", isCompleted = true),
+        )
+
+        taskManager.toggleTaskCompletion(task)
+
+        val allSubtasks = subtaskRepository.getAllSubtasksSnapshot()
+        assertEquals(1, allSubtasks.size)
+        assertEquals(1L, allSubtasks.first().taskId)
+        assertTrue(allSubtasks.first().isCompleted)
     }
 }

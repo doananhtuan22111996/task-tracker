@@ -1,6 +1,7 @@
 package dev.tuandoan.tasktracker.domain
 
 import dev.tuandoan.tasktracker.testutil.FakeReminderScheduler
+import dev.tuandoan.tasktracker.testutil.FakeSubtaskRepository
 import dev.tuandoan.tasktracker.testutil.FakeTaskRepository
 import dev.tuandoan.tasktracker.testutil.FakeWidgetUpdater
 import dev.tuandoan.tasktracker.testutil.TestTaskFactory
@@ -17,6 +18,7 @@ import org.junit.Test
 class TaskManagerTest {
 
     private lateinit var repository: FakeTaskRepository
+    private lateinit var subtaskRepository: FakeSubtaskRepository
     private lateinit var scheduler: FakeReminderScheduler
     private lateinit var widgetUpdater: FakeWidgetUpdater
     private lateinit var manager: TaskManager
@@ -24,9 +26,10 @@ class TaskManagerTest {
     @Before
     fun setup() {
         repository = FakeTaskRepository()
+        subtaskRepository = FakeSubtaskRepository()
         scheduler = FakeReminderScheduler()
         widgetUpdater = FakeWidgetUpdater()
-        manager = TaskManager(repository, scheduler, widgetUpdater)
+        manager = TaskManager(repository, subtaskRepository, scheduler, widgetUpdater)
     }
 
     // === createTask ===

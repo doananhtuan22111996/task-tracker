@@ -6,6 +6,7 @@ import dev.tuandoan.tasktracker.domain.TaskManager
 import dev.tuandoan.tasktracker.domain.usecase.TaskCrudUseCase
 import dev.tuandoan.tasktracker.domain.usecase.TaskFormUseCase
 import dev.tuandoan.tasktracker.testutil.FakeReminderScheduler
+import dev.tuandoan.tasktracker.testutil.FakeSubtaskRepository
 import dev.tuandoan.tasktracker.testutil.FakeTaskRepository
 import dev.tuandoan.tasktracker.testutil.FakeWidgetUpdater
 import dev.tuandoan.tasktracker.testutil.TestTaskFactory
@@ -70,7 +71,7 @@ class TaskBulkActionManagerTest {
 
         repository = FakeTaskRepository()
         scheduler = FakeReminderScheduler()
-        val taskManager = TaskManager(repository, scheduler, FakeWidgetUpdater())
+        val taskManager = TaskManager(repository, FakeSubtaskRepository(), scheduler, FakeWidgetUpdater())
         val crudUseCase = TaskCrudUseCase(taskManager, context)
         val formUseCase = TaskFormUseCase(context)
         val formStateManager = TaskFormStateManager(formUseCase, context)

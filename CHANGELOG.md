@@ -14,7 +14,13 @@ Format follows [Keep a Changelog](https://keepachangelog.com).
 - `ISubtaskRepository` + `SubtaskRepository` (Hilt-bound) wrapping `SubtaskDao` with transactional reorder
 - `SubtaskUseCase` (pure domain) with validation, 500-char title cap, reorder, reset-completion
 - `FakeSubtaskRepository` + `TestSubtaskFactory` for JVM unit tests
-- `SubtaskUseCaseTest` covering add/update/delete/reorder/reset/observe, Flow reactivity, and CancellationException propagation (22 tests)
+- `SubtaskUseCaseTest` covering add/update/delete/reorder/reset/observe, Flow reactivity, and CancellationException propagation (24 tests)
+- `ISubtaskRepository.copySubtasksResetCompletion(fromTaskId, toTaskId)` — atomic copy of subtasks to a new task with `isCompleted = false`, preserving titles and sortOrder
+- Recurrence regeneration (`completeAndGenerateNext` / `archiveAndGenerateNext`) now copies subtasks from the completed/skipped instance to the new instance with checked state reset
+- `TaskManagerRecurrenceTest` cases covering subtask copy on complete, skip, no-subtasks no-op, and non-recurring no-op
+
+### Changed
+- `TaskManager` constructor now takes `ISubtaskRepository` alongside `ITaskRepository`
 
 ### Fixed
 - `SubtaskUseCase` mutations now re-throw `CancellationException` instead of wrapping it in `Result.failure`, preserving structured-concurrency cancellation semantics
