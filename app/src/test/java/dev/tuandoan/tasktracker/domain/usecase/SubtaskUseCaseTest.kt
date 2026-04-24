@@ -1,7 +1,11 @@
 package dev.tuandoan.tasktracker.domain.usecase
 
+import app.cash.turbine.test
+import dev.tuandoan.tasktracker.data.database.Subtask
+import dev.tuandoan.tasktracker.domain.repository.ISubtaskRepository
 import dev.tuandoan.tasktracker.testutil.FakeSubtaskRepository
 import dev.tuandoan.tasktracker.testutil.TestSubtaskFactory
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -9,6 +13,7 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
+import org.junit.Assert.fail
 import org.junit.Before
 import org.junit.Test
 
@@ -263,5 +268,36 @@ class SubtaskUseCaseTest {
         val emitted = useCase.observeSubtasks(taskId = 1L).first()
 
         assertEquals(listOf("First", "Second"), emitted.map { it.title })
+    }
+
+    @Test
+    fun `observeSubtasks emits new item after addSubtask`() = runTest {
+        useCase.observeSubtasks(taskId = 1L).test {
+            assertEquals(emptyList<Subtask>(), awaitItem())
+
+            useCase.addSubtask(taskId = 1L, title = "Added").getOrThrow()
+
+            val next = awaitItem()
+            assertEquals(listOf("Added"), next.map { it.title })
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    // === CancellationException propagation ===
+
+    @Test
+    fun `mutations rethrow CancellationException instead of wrapping in Result`() = runTest {
+        val throwing = object : ISubtaskRepository by repository {
+            override suspend fun updateSubtask(subtask: Subtask): Unit = throw CancellationException("cancel")
+        }
+        val cancellingUseCase = SubtaskUseCase(throwing)
+        repository.seed(TestSubtaskFactory.createSubtask(id = 1L, isCompleted = false))
+
+        try {
+            cancellingUseCase.setCompleted(subtaskId = 1L, completed = true)
+            fail("CancellationException should have propagated")
+        } catch (expected: CancellationException) {
+            assertEquals("cancel", expected.message)
+        }
     }
 }

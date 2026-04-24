@@ -14,7 +14,10 @@ Format follows [Keep a Changelog](https://keepachangelog.com).
 - `ISubtaskRepository` + `SubtaskRepository` (Hilt-bound) wrapping `SubtaskDao` with transactional reorder
 - `SubtaskUseCase` (pure domain) with validation, 500-char title cap, reorder, reset-completion
 - `FakeSubtaskRepository` + `TestSubtaskFactory` for JVM unit tests
-- `SubtaskUseCaseTest` covering add/update/delete/reorder/reset/observe (20 tests)
+- `SubtaskUseCaseTest` covering add/update/delete/reorder/reset/observe, Flow reactivity, and CancellationException propagation (22 tests)
+
+### Fixed
+- `SubtaskUseCase` mutations now re-throw `CancellationException` instead of wrapping it in `Result.failure`, preserving structured-concurrency cancellation semantics
 
 ## [1.9.0] - 2026-04-24
 
