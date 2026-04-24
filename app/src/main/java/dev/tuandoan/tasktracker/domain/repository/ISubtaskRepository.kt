@@ -1,0 +1,35 @@
+package dev.tuandoan.tasktracker.domain.repository
+
+import dev.tuandoan.tasktracker.data.database.Subtask
+import kotlinx.coroutines.flow.Flow
+
+interface ISubtaskRepository {
+
+    fun observeSubtasks(taskId: Long): Flow<List<Subtask>>
+
+    suspend fun getSubtasks(taskId: Long): List<Subtask>
+
+    suspend fun getSubtaskById(id: Long): Subtask?
+
+    suspend fun insertSubtask(subtask: Subtask): Long
+
+    suspend fun updateSubtask(subtask: Subtask)
+
+    suspend fun deleteById(id: Long)
+
+    suspend fun deleteByTaskId(taskId: Long)
+
+    suspend fun resetCompletionForTask(taskId: Long)
+
+    suspend fun countForTask(taskId: Long): Int
+
+    // Bulk operations
+    suspend fun upsertAll(subtasks: List<Subtask>)
+
+    /**
+     * Atomically rewrites `sortOrder` for every subtask under [taskId] based on its position in
+     * [orderedIds]. Fails if [orderedIds] does not exactly match the current subtask id set
+     * for the task — partial writes are avoided by wrapping the update in a DB transaction.
+     */
+    suspend fun reorderSubtasks(taskId: Long, orderedIds: List<Long>)
+}

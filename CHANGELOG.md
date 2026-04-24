@@ -11,6 +11,10 @@ Format follows [Keep a Changelog](https://keepachangelog.com).
 - Room migration v11→v12 creating the `subtasks` table
 - Android instrumentation test `TaskDatabaseMigrationTest` covering v11→v12 data preservation, schema shape, idempotency, and FK cascade delete
 - `androidx.room:room-testing` dependency for migration tests
+- `ISubtaskRepository` + `SubtaskRepository` (Hilt-bound) wrapping `SubtaskDao` with transactional reorder
+- `SubtaskUseCase` (pure domain) with validation, 500-char title cap, reorder, reset-completion
+- `FakeSubtaskRepository` + `TestSubtaskFactory` for JVM unit tests
+- `SubtaskUseCaseTest` covering add/update/delete/reorder/reset/observe (20 tests)
 
 ## [1.9.0] - 2026-04-24
 
