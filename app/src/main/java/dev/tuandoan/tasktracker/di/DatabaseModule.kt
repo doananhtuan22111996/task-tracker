@@ -9,8 +9,10 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import dev.tuandoan.tasktracker.data.database.SubtaskDao
 import dev.tuandoan.tasktracker.data.database.TaskDao
 import dev.tuandoan.tasktracker.data.database.TaskDatabase
+import dev.tuandoan.tasktracker.data.database.migration.MIGRATION_11_12
 import dev.tuandoan.tasktracker.data.database.migration.TagCaseMigrationPlanner
 import javax.inject.Singleton
 
@@ -228,6 +230,7 @@ object DatabaseModule {
             MIGRATION_8_9,
             MIGRATION_9_10,
             MIGRATION_10_11,
+            MIGRATION_11_12,
         )
         .build()
 
@@ -237,4 +240,11 @@ object DatabaseModule {
      */
     @Provides
     fun provideTaskDao(database: TaskDatabase): TaskDao = database.taskDao()
+
+    /**
+     * Provides SubtaskDao from the database.
+     * No @Singleton needed here as it's tied to the singleton database instance.
+     */
+    @Provides
+    fun provideSubtaskDao(database: TaskDatabase): SubtaskDao = database.subtaskDao()
 }
