@@ -9,7 +9,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com).
 - `Subtask` Room entity with foreign key to `tasks` (cascade delete) and index on `taskId`
 - `SubtaskDao` with observe/CRUD/reset-completion operations
 - Room migration v11→v12 creating the `subtasks` table
-- Android instrumentation test `TaskDatabaseMigrationTest` covering v11→v12 data preservation, schema shape, and FK cascade delete
+- Android instrumentation test `TaskDatabaseMigrationTest` covering v11→v12 data preservation, schema shape, idempotency, and FK cascade delete
 - `androidx.room:room-testing` dependency for migration tests
 
 ## [1.9.0] - 2026-04-24

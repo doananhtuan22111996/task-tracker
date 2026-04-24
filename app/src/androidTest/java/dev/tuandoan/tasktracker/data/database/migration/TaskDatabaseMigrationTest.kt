@@ -36,22 +36,22 @@ class TaskDatabaseMigrationTest {
             )
         }
 
-        val migratedDb = helper.runMigrationsAndValidate(
+        helper.runMigrationsAndValidate(
             TEST_DB_NAME,
             12,
             /* validateDroppedTables = */
             true,
             MIGRATION_11_12,
-        )
-
-        migratedDb.query("SELECT id, title FROM tasks ORDER BY id ASC").use { cursor ->
-            assertEquals(2, cursor.count)
-            assertTrue(cursor.moveToFirst())
-            assertEquals(1L, cursor.getLong(0))
-            assertEquals("First", cursor.getString(1))
-            assertTrue(cursor.moveToNext())
-            assertEquals(2L, cursor.getLong(0))
-            assertEquals("Second", cursor.getString(1))
+        ).use { migratedDb ->
+            migratedDb.query("SELECT id, title FROM tasks ORDER BY id ASC").use { cursor ->
+                assertEquals(2, cursor.count)
+                assertTrue(cursor.moveToFirst())
+                assertEquals(1L, cursor.getLong(0))
+                assertEquals("First", cursor.getString(1))
+                assertTrue(cursor.moveToNext())
+                assertEquals(2L, cursor.getLong(0))
+                assertEquals("Second", cursor.getString(1))
+            }
         }
     }
 
@@ -59,37 +59,59 @@ class TaskDatabaseMigrationTest {
     fun migrate_11_to_12_createsSubtasksTable() {
         helper.createDatabase(TEST_DB_NAME, 11).close()
 
-        val migratedDb = helper.runMigrationsAndValidate(
+        helper.runMigrationsAndValidate(
             TEST_DB_NAME,
             12,
             true,
             MIGRATION_11_12,
-        )
+        ).use { migratedDb ->
+            // Validate the table exists by reading sqlite_master.
+            migratedDb.query(
+                "SELECT name FROM sqlite_master WHERE type = 'table' AND name = 'subtasks'",
+            ).use { cursor ->
+                assertEquals(1, cursor.count)
+            }
 
-        // Validate the table exists by reading sqlite_master.
-        migratedDb.query(
-            "SELECT name FROM sqlite_master WHERE type = 'table' AND name = 'subtasks'",
-        ).use { cursor ->
-            assertEquals(1, cursor.count)
+            // Validate the FK index exists.
+            migratedDb.query(
+                "SELECT name FROM sqlite_master WHERE type = 'index' AND name = 'index_subtasks_taskId'",
+            ).use { cursor ->
+                assertEquals(1, cursor.count)
+            }
+
+            // Validate column layout.
+            val expectedColumns = setOf("id", "taskId", "title", "isCompleted", "sortOrder", "createdAt")
+            val actualColumns = mutableSetOf<String>()
+            migratedDb.query("PRAGMA table_info(subtasks)").use { cursor ->
+                val nameIdx = cursor.getColumnIndexOrThrow("name")
+                while (cursor.moveToNext()) {
+                    actualColumns += cursor.getString(nameIdx)
+                }
+            }
+            assertEquals(expectedColumns, actualColumns)
         }
+    }
 
-        // Validate the FK index exists.
-        migratedDb.query(
-            "SELECT name FROM sqlite_master WHERE type = 'index' AND name = 'index_subtasks_taskId'",
-        ).use { cursor ->
-            assertEquals(1, cursor.count)
-        }
+    /**
+     * Running the migration a second time (e.g., on a partially-migrated DB, or after a crash)
+     * must not throw. The migration SQL uses CREATE TABLE/INDEX IF NOT EXISTS to guarantee this.
+     */
+    @Test
+    fun migrate_11_to_12_isIdempotent() {
+        helper.createDatabase(TEST_DB_NAME, 11).use { db ->
+            MIGRATION_11_12.migrate(db)
+            // Second invocation must be a no-op, not throw.
+            MIGRATION_11_12.migrate(db)
 
-        // Validate column layout.
-        val expectedColumns = setOf("id", "taskId", "title", "isCompleted", "sortOrder", "createdAt")
-        val actualColumns = mutableSetOf<String>()
-        migratedDb.query("PRAGMA table_info(subtasks)").use { cursor ->
-            val nameIdx = cursor.getColumnIndexOrThrow("name")
-            while (cursor.moveToNext()) {
-                actualColumns += cursor.getString(nameIdx)
+            db.query("SELECT name FROM sqlite_master WHERE type = 'table' AND name = 'subtasks'").use { cursor ->
+                assertEquals(1, cursor.count)
+            }
+            db.query(
+                "SELECT name FROM sqlite_master WHERE type = 'index' AND name = 'index_subtasks_taskId'",
+            ).use { cursor ->
+                assertEquals(1, cursor.count)
             }
         }
-        assertEquals(expectedColumns, actualColumns)
     }
 
     @Test
@@ -98,7 +120,10 @@ class TaskDatabaseMigrationTest {
             db.insert("tasks", android.database.sqlite.SQLiteDatabase.CONFLICT_REPLACE, v11TaskValues(id = 1))
         }
 
-        helper.runMigrationsAndValidate(TEST_DB_NAME, 12, true, MIGRATION_11_12)
+        // Close the helper-managed DB before handing off to Room. Room requires exclusive
+        // ownership of the DB file; leaving the SupportSQLiteDatabase open can cause flaky
+        // locking errors on older API levels.
+        helper.runMigrationsAndValidate(TEST_DB_NAME, 12, true, MIGRATION_11_12).close()
 
         // Open the fully-migrated DB via Room so foreign keys are enforced (Room enables FKs by default).
         val context = InstrumentationRegistry.getInstrumentation().targetContext
