@@ -458,6 +458,22 @@ class TaskEditorViewModel @Inject constructor(
         updateHasChanges()
     }
 
+    /**
+     * Moves the subtask draft at [fromIndex] to [toIndex], reindexing `sortOrder` across the
+     * whole list so persisted rows can be diffed against their original sortOrder on save.
+     * Out-of-bounds indices and no-op moves are ignored.
+     */
+    fun moveSubtaskDraft(fromIndex: Int, toIndex: Int) {
+        val current = _subtasks.value
+        if (fromIndex == toIndex) return
+        if (fromIndex !in current.indices || toIndex !in current.indices) return
+        val reordered = current.toMutableList().apply {
+            add(toIndex, removeAt(fromIndex))
+        }
+        _subtasks.value = reordered.mapIndexed { index, draft -> draft.copy(sortOrder = index) }
+        updateHasChanges()
+    }
+
     fun saveTask() {
         viewModelScope.launch {
             _isLoading.value = true
@@ -572,7 +588,9 @@ class TaskEditorViewModel @Inject constructor(
                 subtaskUseCase.delete(old.id).onFailure { skipped++ }
             }
 
-        // Apply adds and updates in current draft order so sortOrder stays coherent.
+        // Apply adds and updates in current draft order. Capture the persisted ids so the
+        // subsequent reorder pass can set sortOrder on every row (including fresh inserts).
+        val finalIds = mutableListOf<Long>()
         drafts.forEach { draft ->
             val trimmedTitle = draft.title.trim()
             if (trimmedTitle.isEmpty()) {
@@ -581,7 +599,9 @@ class TaskEditorViewModel @Inject constructor(
                 return@forEach
             }
             if (!draft.isPersisted) {
-                subtaskUseCase.addSubtask(taskId, trimmedTitle).onFailure { skipped++ }
+                val addResult = subtaskUseCase.addSubtask(taskId, trimmedTitle)
+                addResult.onSuccess { newId -> finalIds += newId }
+                    .onFailure { skipped++ }
             } else {
                 val original = originalById[draft.id] ?: return@forEach
                 if (trimmedTitle != original.title) {
@@ -591,10 +611,28 @@ class TaskEditorViewModel @Inject constructor(
                     subtaskUseCase.setCompleted(draft.id, completed = draft.isCompleted)
                         .onFailure { skipped++ }
                 }
-                // sortOrder changes belong to reorder (ST-07) — not persisted here.
+                finalIds += draft.id
             }
         }
+
+        // Reorder pass: invoke only if the final order differs from what's already persisted.
+        // The use case's reorder() validates the id set matches the live DB state, which is now
+        // true after the add/delete passes above.
+        if (finalIds.isNotEmpty() && needsReorder(finalIds)) {
+            subtaskUseCase.reorder(taskId, finalIds).onFailure { skipped++ }
+        }
         return skipped
+    }
+
+    /**
+     * True when the final ordered ids differ from the original persisted order in either
+     * position or membership. Keeps the save path from issuing a redundant reorder transaction
+     * on pure title/completion edits with no drag reorder.
+     */
+    private fun needsReorder(finalIds: List<Long>): Boolean {
+        val originalIds = originalSubtasks.map { it.id }
+        if (finalIds.size != originalIds.size) return true // added or removed rows
+        return finalIds != originalIds
     }
 
     fun clearError() {

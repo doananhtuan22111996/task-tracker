@@ -254,6 +254,7 @@ fun TaskEditorScreen(
                 onToggleSubtask = viewModel::toggleSubtaskDraft,
                 onUpdateTitle = viewModel::updateSubtaskDraftTitle,
                 onRemoveSubtask = viewModel::removeSubtaskDraft,
+                onMoveSubtask = viewModel::moveSubtaskDraft,
             )
 
             // Organization section
