@@ -53,6 +53,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com).
 - Editor no longer silently drops subtask saves — blank-title drafts are skipped on save and any skipped/failed subtask surfaces a user-facing error message
 - `AddSubtaskRow` uses `rememberSaveable` so a typed-but-uncommitted subtask draft survives configuration change (rotation)
 - Subtask drag gesture no longer uses a stale captured `index` after the first swap — ViewModel re-resolves the current draft position via its stable `id`, so sustained/fast drags reorder correctly
+- Subtask drag no longer banks overshoot at list boundaries: `moveSubtaskDraftBy` returns `Boolean`, letting the gesture clamp the accumulator when a move would be a no-op so reverse drags respond immediately
 
 ## [1.9.0] - 2026-04-24
 

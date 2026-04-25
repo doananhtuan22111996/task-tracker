@@ -787,7 +787,17 @@ class TaskEditorViewModelTest {
     }
 
     @Test
-    fun `moveSubtaskDraftBy is a no-op at list boundaries`() = runTest {
+    fun `moveSubtaskDraftBy returns true on successful move`() = runTest {
+        val viewModel = createViewModel()
+        viewModel.addSubtaskDraft("A")
+        viewModel.addSubtaskDraft("B")
+        val id = viewModel.subtasks.value[0].id
+
+        assertTrue(viewModel.moveSubtaskDraftBy(draftId = id, direction = 1))
+    }
+
+    @Test
+    fun `moveSubtaskDraftBy returns false and no-ops at list boundaries`() = runTest {
         val viewModel = createViewModel()
         viewModel.addSubtaskDraft("A")
         viewModel.addSubtaskDraft("B")
@@ -796,34 +806,34 @@ class TaskEditorViewModelTest {
         val before = viewModel.subtasks.value
 
         // Top row can't move up.
-        viewModel.moveSubtaskDraftBy(draftId = firstId, direction = -1)
+        assertFalse(viewModel.moveSubtaskDraftBy(draftId = firstId, direction = -1))
         // Bottom row can't move down.
-        viewModel.moveSubtaskDraftBy(draftId = lastId, direction = 1)
+        assertFalse(viewModel.moveSubtaskDraftBy(draftId = lastId, direction = 1))
 
         assertEquals(before, viewModel.subtasks.value)
     }
 
     @Test
-    fun `moveSubtaskDraftBy with unknown id is a no-op`() = runTest {
+    fun `moveSubtaskDraftBy returns false for unknown id`() = runTest {
         val viewModel = createViewModel()
         viewModel.addSubtaskDraft("A")
         val before = viewModel.subtasks.value
 
-        viewModel.moveSubtaskDraftBy(draftId = 9999L, direction = 1)
+        assertFalse(viewModel.moveSubtaskDraftBy(draftId = 9999L, direction = 1))
 
         assertEquals(before, viewModel.subtasks.value)
     }
 
     @Test
-    fun `moveSubtaskDraftBy rejects invalid direction values`() = runTest {
+    fun `moveSubtaskDraftBy returns false for invalid direction`() = runTest {
         val viewModel = createViewModel()
         viewModel.addSubtaskDraft("A")
         viewModel.addSubtaskDraft("B")
         val id = viewModel.subtasks.value[0].id
         val before = viewModel.subtasks.value
 
-        viewModel.moveSubtaskDraftBy(draftId = id, direction = 2)
-        viewModel.moveSubtaskDraftBy(draftId = id, direction = 0)
+        assertFalse(viewModel.moveSubtaskDraftBy(draftId = id, direction = 2))
+        assertFalse(viewModel.moveSubtaskDraftBy(draftId = id, direction = 0))
 
         assertEquals(before, viewModel.subtasks.value)
     }
@@ -862,6 +872,52 @@ class TaskEditorViewModelTest {
         // Because drafts are saved in their final list order, sortOrder matches the reordered
         // list even before the explicit reorder tail pass runs.
         val persisted = subtaskRepository.getSubtasks(1L).sortedBy { it.sortOrder }
+        assertEquals(listOf("B", "C", "A"), persisted.map { it.title })
+        assertEquals(listOf(0, 1, 2), persisted.map { it.sortOrder })
+    }
+
+    @Test
+    fun `saveTask in edit mode persists sortOrder change via reorder tail`() = runTest {
+        // Seed the fake with a persisted task and three persisted subtasks.
+        val task = TestTaskFactory.createTask(id = 42L, title = "Parent")
+        fakeTaskManager.taskToReturn = task
+        subtaskRepository.seed(
+            dev.tuandoan.tasktracker.testutil.TestSubtaskFactory.createSubtask(
+                id = 10L,
+                taskId = 42L,
+                title = "A",
+                sortOrder = 0,
+            ),
+            dev.tuandoan.tasktracker.testutil.TestSubtaskFactory.createSubtask(
+                id = 11L,
+                taskId = 42L,
+                title = "B",
+                sortOrder = 1,
+            ),
+            dev.tuandoan.tasktracker.testutil.TestSubtaskFactory.createSubtask(
+                id = 12L,
+                taskId = 42L,
+                title = "C",
+                sortOrder = 2,
+            ),
+        )
+
+        // Open in edit mode so loadTask seeds originalSubtasks from the fake.
+        val viewModel = createViewModel(taskId = 42L)
+        // The `init` path may launch asynchronously; let it settle.
+        testDispatcher.scheduler.advanceUntilIdle()
+        assertTrue(viewModel.isEditMode)
+        assertEquals(listOf("A", "B", "C"), viewModel.subtasks.value.map { it.title })
+
+        // Reorder: move the top draft to the end.
+        viewModel.moveSubtaskDraftBy(draftId = 10L, direction = 1)
+        viewModel.moveSubtaskDraftBy(draftId = 10L, direction = 1)
+
+        viewModel.saveTask()
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        // Persisted sortOrder reflects the reordered list (B, C, A).
+        val persisted = subtaskRepository.getSubtasks(42L)
         assertEquals(listOf("B", "C", "A"), persisted.map { it.title })
         assertEquals(listOf(0, 1, 2), persisted.map { it.sortOrder })
     }

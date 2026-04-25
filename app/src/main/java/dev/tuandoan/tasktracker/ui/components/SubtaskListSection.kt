@@ -60,7 +60,7 @@ fun SubtaskListSection(
     onToggleSubtask: (Long) -> Unit,
     onUpdateTitle: (Long, String) -> Unit,
     onRemoveSubtask: (Long) -> Unit,
-    onMoveSubtaskBy: (draftId: Long, direction: Int) -> Unit,
+    onMoveSubtaskBy: (draftId: Long, direction: Int) -> Boolean,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -101,7 +101,7 @@ private fun SubtaskRow(
     onToggle: () -> Unit,
     onUpdateTitle: (String) -> Unit,
     onRemove: () -> Unit,
-    onMoveBy: (direction: Int) -> Unit,
+    onMoveBy: (direction: Int) -> Boolean,
 ) {
     val checkboxDescriptionResId = if (draft.isCompleted) {
         R.string.cd_subtask_checkbox_checked
@@ -145,12 +145,23 @@ private fun SubtaskRow(
                         onDrag = { _, dragAmount ->
                             dragAccumulator += dragAmount.y
                             while (dragAccumulator > rowHeightPx) {
-                                onMoveBy(1)
-                                dragAccumulator -= rowHeightPx
+                                if (onMoveBy(1)) {
+                                    dragAccumulator -= rowHeightPx
+                                } else {
+                                    // Hit bottom of list; clamp so the next reverse drag
+                                    // responds immediately instead of having to burn off banked
+                                    // overshoot first.
+                                    dragAccumulator = rowHeightPx
+                                    break
+                                }
                             }
                             while (dragAccumulator < -rowHeightPx) {
-                                onMoveBy(-1)
-                                dragAccumulator += rowHeightPx
+                                if (onMoveBy(-1)) {
+                                    dragAccumulator += rowHeightPx
+                                } else {
+                                    dragAccumulator = -rowHeightPx
+                                    break
+                                }
                             }
                         },
                     )
