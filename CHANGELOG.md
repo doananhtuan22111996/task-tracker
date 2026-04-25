@@ -6,6 +6,9 @@ Format follows [Keep a Changelog](https://keepachangelog.com).
 ## [Unreleased]
 
 ### Added
+- Drag-to-reorder for subtasks in the task editor: long-press the drag handle and move vertically to reorder. Final order is persisted atomically on save.
+- English string `cd_drag_handle_subtask` for drag handle content description
+- 4 new `TaskEditorViewModelTest` cases covering move / no-op / out-of-bounds / hasChanges propagation (55 total editor tests)
 - Inline subtask progress indicator ("m / n" + slim bar) on each task row in `TaskListScreen` — only rendered when the task has at least one subtask; TalkBack reads "X of Y subtasks completed"
 - `SubtaskProgress` projection + `SubtaskDao.observeSubtaskProgress` aggregate query (GROUP BY taskId) for live per-task progress
 - `ISubtaskRepository.observeSubtaskProgress` + `SubtaskUseCase.observeProgressByTaskId` for O(1) UI lookup
@@ -49,6 +52,8 @@ Format follows [Keep a Changelog](https://keepachangelog.com).
 - `SubtaskUseCase` mutations now re-throw `CancellationException` instead of wrapping it in `Result.failure`, preserving structured-concurrency cancellation semantics
 - Editor no longer silently drops subtask saves — blank-title drafts are skipped on save and any skipped/failed subtask surfaces a user-facing error message
 - `AddSubtaskRow` uses `rememberSaveable` so a typed-but-uncommitted subtask draft survives configuration change (rotation)
+- Subtask drag gesture no longer uses a stale captured `index` after the first swap — ViewModel re-resolves the current draft position via its stable `id`, so sustained/fast drags reorder correctly
+- Subtask drag no longer banks overshoot at list boundaries: `moveSubtaskDraftBy` returns `Boolean`, letting the gesture clamp the accumulator when a move would be a no-op so reverse drags respond immediately
 
 ## [1.9.0] - 2026-04-24
 
