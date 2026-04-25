@@ -25,6 +25,7 @@ import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
+import org.junit.Assert.fail
 import org.junit.Before
 import org.junit.Test
 
@@ -62,12 +63,15 @@ class TaskBulkActionManagerTest {
                 R.string.snackbar_failed_restore_archive -> "Failed to restore tasks from archive: $firstFormatArg"
                 R.string.snackbar_tasks_permanently_deleted -> "$firstFormatArg tasks permanently deleted"
                 R.string.snackbar_failed_permanent_delete -> "Failed to permanently delete tasks: $firstFormatArg"
+                R.string.snackbar_tasks_priority_updated -> "Priority updated for $firstFormatArg tasks"
                 else -> "unknown string $resId"
             }
         }
         // Mock getString without varargs (single-arg overload)
         every { context.getString(R.string.snackbar_failed_mark_completed) } returns "Failed to mark tasks as completed"
         every { context.getString(R.string.snackbar_failed_mark_active) } returns "Failed to mark tasks as active"
+        every { context.getString(R.string.error_update_tasks) } returns "Failed to update tasks"
+        every { context.getString(R.string.error_validation_failed) } returns "Validation failed"
 
         repository = FakeTaskRepository()
         scheduler = FakeReminderScheduler()
@@ -263,6 +267,42 @@ class TaskBulkActionManagerTest {
         advanceUntilIdle()
 
         assertTrue(successMsg.contains("2 tasks"))
+    }
+
+    // === bulkApplyPriority ===
+
+    @Test
+    fun `bulkApplyPriority sets priority on all selected tasks and clears selection`() = runTest {
+        val tasks = listOf(
+            TestTaskFactory.createTask(id = 1, priority = 1),
+            TestTaskFactory.createTask(id = 2, priority = 1),
+            TestTaskFactory.createTask(id = 3, priority = 1),
+        )
+        repository.seed(*tasks.toTypedArray())
+        selectionManager.selectAll(listOf(1L, 2L))
+
+        var successMsg = ""
+        bulkManager.bulkApplyPriority(this, priority = 2, onSuccess = { successMsg = it })
+        advanceUntilIdle()
+
+        assertTrue(successMsg.contains("2"))
+        val snapshot = repository.getAllTasksSnapshot()
+        assertEquals(2, snapshot.first { it.id == 1L }.priority)
+        assertEquals(2, snapshot.first { it.id == 2L }.priority)
+        // Unselected task untouched.
+        assertEquals(1, snapshot.first { it.id == 3L }.priority)
+        // Selection cleared on success.
+        assertTrue(selectionManager.selectedIds.value.isEmpty())
+    }
+
+    @Test
+    fun `bulkApplyPriority rejects out-of-range priority`() = runTest {
+        try {
+            bulkManager.bulkApplyPriority(this, priority = 3)
+            fail("Expected IllegalArgumentException")
+        } catch (expected: IllegalArgumentException) {
+            // expected
+        }
     }
 
     // === requestBulkPermanentDelete ===

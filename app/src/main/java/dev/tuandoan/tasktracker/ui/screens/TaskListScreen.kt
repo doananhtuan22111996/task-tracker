@@ -54,6 +54,7 @@ import dev.tuandoan.tasktracker.BuildConfig
 import dev.tuandoan.tasktracker.R
 import dev.tuandoan.tasktracker.navigation.StatsFilter
 import dev.tuandoan.tasktracker.navigation.TaskTrackerRoutes
+import dev.tuandoan.tasktracker.ui.components.BulkPriorityBottomSheet
 import dev.tuandoan.tasktracker.ui.components.SortBottomSheet
 import dev.tuandoan.tasktracker.ui.components.TaskListContent
 import dev.tuandoan.tasktracker.ui.components.TaskListTopBar
@@ -98,6 +99,7 @@ fun TaskListScreen(
     val sortOptions = viewModel.sortOptions
     val isNonDefaultSort = currentSort != TaskListStateManager.DEFAULT_SORT
     var showSortSheet by remember { mutableStateOf(false) }
+    var showPrioritySheet by remember { mutableStateOf(false) }
 
     // Streak data
     val streakMap by viewModel.streakMap.collectAsStateWithLifecycle()
@@ -187,6 +189,11 @@ fun TaskListScreen(
         isSearchActive = false
     }
 
+    // Exit selection mode on back press (BO-09).
+    BackHandler(enabled = isSelectionMode) {
+        viewModel.clearSelection()
+    }
+
     // Debug-only mock rating dialog that simulates Google Play In-App Review
     if (showDebugRatingDialog) {
         DebugRatingDialog(onDismiss = { showDebugRatingDialog = false })
@@ -203,6 +210,7 @@ fun TaskListScreen(
                 onBulkMarkCompleted = viewModel::bulkMarkCompleted,
                 onBulkMarkActive = viewModel::bulkMarkActive,
                 onBulkArchive = viewModel::requestBulkArchive,
+                onBulkChangePriority = { showPrioritySheet = true },
                 onClearSelection = viewModel::clearSelection,
                 onSelectAll = { viewModel.selectAll(visibleTasks.map { it.id }) },
                 hasNonDefaultSort = isNonDefaultSort,
@@ -367,6 +375,18 @@ fun TaskListScreen(
                 viewModel.updateSort(sort)
             },
             onDismiss = { showSortSheet = false },
+        )
+    }
+
+    // Bulk priority picker sheet (BO-08).
+    if (showPrioritySheet) {
+        BulkPriorityBottomSheet(
+            selectedCount = selectedCount,
+            onPrioritySelected = { priority ->
+                viewModel.bulkApplyPriority(priority)
+                showPrioritySheet = false
+            },
+            onDismiss = { showPrioritySheet = false },
         )
     }
 }

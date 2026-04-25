@@ -156,6 +156,30 @@ class TaskBulkActionManager @Inject constructor(
     }
 
     /**
+     * Applies [priority] (0 = LOW, 1 = MEDIUM, 2 = HIGH) to every selected task and clears
+     * the selection on success. No undo — priority changes are trivially reversible.
+     */
+    fun bulkApplyPriority(
+        scope: CoroutineScope,
+        priority: Int,
+        onSuccess: (String) -> Unit = {},
+        onError: (String) -> Unit = {},
+    ) {
+        require(priority in 0..2) { "Priority must be LOW (0), MEDIUM (1), or HIGH (2)" }
+        executeBulkOperation(
+            scope = scope,
+            operation = { taskIds ->
+                crudManager.bulkApplyPriority(taskIds, priority)
+            },
+            successMessage = { count -> context.getString(R.string.snackbar_tasks_priority_updated, count) },
+            errorMessage = context.getString(R.string.error_update_tasks),
+            clearSelectionOnSuccess = true,
+            onSuccess = onSuccess,
+            onError = onError,
+        )
+    }
+
+    /**
      * Initiates bulk delete by showing confirmation dialog
      * @param allTasks List of all tasks to filter selected ones from
      * @throws IllegalArgumentException if input validation fails

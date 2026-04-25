@@ -450,6 +450,8 @@ class TaskViewModel @Inject constructor(
 
     fun bulkMarkActive() = bulkActionManager.bulkMarkActive(viewModelScope)
 
+    fun bulkApplyPriority(priority: Int) = bulkActionManager.bulkApplyPriority(viewModelScope, priority)
+
     fun requestBulkDelete() = bulkActionManager.requestBulkDelete(allTasks.value)
 
     fun confirmBulkDelete() = bulkActionManager.confirmBulkDelete(viewModelScope)

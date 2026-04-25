@@ -251,6 +251,27 @@ class TaskCrudUseCase @Inject constructor(
     }
 
     /**
+     * Bulk apply a priority to multiple tasks. Priority must be in [0, 2] (LOW/MEDIUM/HIGH).
+     */
+    suspend fun bulkApplyPriority(taskIds: List<Long>, priority: Int): Result<Unit> = try {
+        require(priority in 0..2) { "Priority must be in 0..2" }
+        _isLoading.value = true
+        _errorMessage.value = null
+
+        taskManager.setPriorityBulk(taskIds, priority)
+
+        _lastOperationSuccess.value =
+            context.getString(R.string.snackbar_tasks_priority_updated, taskIds.size)
+        Result.success(Unit)
+    } catch (e: Exception) {
+        val errorMsg = e.message ?: context.getString(R.string.error_update_tasks)
+        _errorMessage.value = errorMsg
+        Result.failure(e)
+    } finally {
+        _isLoading.value = false
+    }
+
+    /**
      * Bulk delete tasks by IDs
      */
     suspend fun bulkDeleteTasks(taskIds: List<Long>): Result<Unit> = try {

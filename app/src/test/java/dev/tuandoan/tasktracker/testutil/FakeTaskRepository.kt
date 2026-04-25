@@ -116,6 +116,10 @@ class FakeTaskRepository : ITaskRepository {
         tasks.value = tasks.value.map { if (it.id == taskId) it.copy(priority = priority) else it }
     }
 
+    override suspend fun setPriorityBulk(ids: List<Long>, priority: Int) {
+        tasks.value = tasks.value.map { if (it.id in ids) it.copy(priority = priority) else it }
+    }
+
     override fun getArchivedTasks(): Flow<List<Task>> = tasks.map { list -> list.filter { it.isArchived } }
 
     override suspend fun archiveTask(taskId: Long) {

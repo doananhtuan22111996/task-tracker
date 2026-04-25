@@ -200,6 +200,7 @@ private class FakeWidgetTaskDao : dev.tuandoan.tasktracker.data.database.TaskDao
     override suspend fun hardDeleteByIds(ids: List<Long>) = throw UnsupportedOperationException()
     override suspend fun setPinned(id: Long, pinned: Boolean) = throw UnsupportedOperationException()
     override suspend fun setPriority(id: Long, priority: Int) = throw UnsupportedOperationException()
+    override suspend fun setPriorityBulk(ids: List<Long>, priority: Int) = throw UnsupportedOperationException()
     override fun observeActiveCount() = throw UnsupportedOperationException()
     override fun observeCompletedCount() = throw UnsupportedOperationException()
     override fun observeCompletedTodayCount(startOfDayMillis: Long, endOfDayMillis: Long) =

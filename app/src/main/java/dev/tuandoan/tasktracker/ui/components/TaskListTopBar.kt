@@ -12,6 +12,7 @@ import androidx.compose.material.icons.filled.CheckBox
 import androidx.compose.material.icons.filled.CheckBoxOutlineBlank
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Flag
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.SelectAll
@@ -57,6 +58,7 @@ fun TaskListTopBar(
     onBulkMarkCompleted: () -> Unit = {},
     onBulkMarkActive: () -> Unit = {},
     onBulkArchive: () -> Unit = {},
+    onBulkChangePriority: () -> Unit = {},
     onClearSelection: () -> Unit = {},
     onSelectAll: () -> Unit = {},
     hasNonDefaultSort: Boolean = false,
@@ -200,6 +202,25 @@ fun TaskListTopBar(
                                 leadingIcon = {
                                     Icon(
                                         imageVector = Icons.Default.SelectAll,
+                                        contentDescription = null,
+                                        tint = MaterialTheme.colorScheme.onSurface,
+                                    )
+                                },
+                            )
+                            DropdownMenuItem(
+                                text = {
+                                    Text(
+                                        stringResource(R.string.action_change_priority),
+                                        style = MaterialTheme.typography.labelLarge,
+                                    )
+                                },
+                                onClick = {
+                                    onBulkChangePriority()
+                                    showMoreMenu = false
+                                },
+                                leadingIcon = {
+                                    Icon(
+                                        imageVector = Icons.Default.Flag,
                                         contentDescription = null,
                                         tint = MaterialTheme.colorScheme.onSurface,
                                     )

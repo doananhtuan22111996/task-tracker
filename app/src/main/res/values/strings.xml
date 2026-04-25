@@ -32,6 +32,9 @@
     <string name="cd_mark_active">Mark as active</string>
     <string name="cd_mark_completed">Mark as completed</string>
     <string name="cd_archive_selected">Archive selected</string>
+    <string name="cd_change_priority_selected">Change priority for selected</string>
+    <string name="action_change_priority">Change priority</string>
+    <string name="title_change_priority_for_count">Change priority for %d tasks</string>
     <string name="cd_more_options">More options</string>
     <string name="cd_sort_tasks">Sort tasks</string>
     <string name="cd_statistics">Statistics</string>
@@ -386,6 +389,7 @@
     <string name="error_skip_occurrence">Failed to skip occurrence</string>
     <string name="snackbar_tasks_marked_completed">%d tasks marked as completed</string>
     <string name="snackbar_tasks_marked_active">%d tasks marked as active</string>
+    <string name="snackbar_tasks_priority_updated">Priority updated for %d tasks</string>
     <string name="snackbar_tasks_archived">%d tasks archived</string>
     <string name="snackbar_tasks_restored">%d tasks restored from archive</string>
     <string name="snackbar_failed_mark_completed">Failed to mark tasks as completed</string>

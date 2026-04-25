@@ -312,6 +312,12 @@ class TaskManager @Inject constructor(
         widgetUpdater.requestUpdate()
     }
 
+    override suspend fun setPriorityBulk(ids: List<Long>, priority: Int) {
+        if (ids.isEmpty()) return
+        repository.setPriorityBulk(ids, priority)
+        widgetUpdater.requestUpdate()
+    }
+
     // Archive operations
     override fun getArchivedTasks(): Flow<List<Task>> = repository.getArchivedTasks()
 
