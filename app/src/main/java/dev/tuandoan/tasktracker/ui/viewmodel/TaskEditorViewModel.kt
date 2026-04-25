@@ -532,7 +532,13 @@ class TaskEditorViewModel @Inject constructor(
                     newId
                 }
 
-                persistSubtaskDiff(savedTaskId)
+                val skippedSubtasks = persistSubtaskDiff(savedTaskId)
+                if (skippedSubtasks > 0) {
+                    _errorMessage.value = context.getString(
+                        R.string.error_subtask_save,
+                        skippedSubtasks.toString(),
+                    )
+                }
 
                 _events.emit(TaskEditorEvent.TaskSaved)
             } catch (e: Exception) {
@@ -548,32 +554,47 @@ class TaskEditorViewModel @Inject constructor(
      * draft is new. In edit mode: drafts present in the original but missing from the new list
      * are deleted; drafts with mutated fields are updated in place; drafts with negative ids are
      * added. Sort order follows the list's current index.
+     *
+     * Drafts whose titles are blank after trimming are skipped (blank titles are invalid per
+     * the use case contract). Returns the number of such skipped drafts so the caller can
+     * surface a user-facing error.
      */
-    private suspend fun persistSubtaskDiff(taskId: Long) {
+    private suspend fun persistSubtaskDiff(taskId: Long): Int {
         val drafts = _subtasks.value
         val originalById = originalSubtasks.associateBy { it.id }
         val currentIds = drafts.filter { it.isPersisted }.map { it.id }.toSet()
+        var skipped = 0
 
         // Delete subtasks removed from the list.
         originalSubtasks
             .filter { it.id !in currentIds }
-            .forEach { subtaskUseCase.delete(it.id) }
+            .forEach { old ->
+                subtaskUseCase.delete(old.id).onFailure { skipped++ }
+            }
 
         // Apply adds and updates in current draft order so sortOrder stays coherent.
         drafts.forEach { draft ->
+            val trimmedTitle = draft.title.trim()
+            if (trimmedTitle.isEmpty()) {
+                // Blank titles are rejected by the use case; drop instead of silently failing.
+                skipped++
+                return@forEach
+            }
             if (!draft.isPersisted) {
-                subtaskUseCase.addSubtask(taskId, draft.title)
+                subtaskUseCase.addSubtask(taskId, trimmedTitle).onFailure { skipped++ }
             } else {
                 val original = originalById[draft.id] ?: return@forEach
-                if (draft.title != original.title) {
-                    subtaskUseCase.updateTitle(draft.id, draft.title)
+                if (trimmedTitle != original.title) {
+                    subtaskUseCase.updateTitle(draft.id, trimmedTitle).onFailure { skipped++ }
                 }
                 if (draft.isCompleted != original.isCompleted) {
                     subtaskUseCase.setCompleted(draft.id, completed = draft.isCompleted)
+                        .onFailure { skipped++ }
                 }
                 // sortOrder changes belong to reorder (ST-07) — not persisted here.
             }
         }
+        return skipped
     }
 
     fun clearError() {

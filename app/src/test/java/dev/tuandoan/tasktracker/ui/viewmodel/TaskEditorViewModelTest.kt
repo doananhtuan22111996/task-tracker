@@ -27,6 +27,7 @@ import kotlinx.coroutines.test.setMain
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -660,6 +661,50 @@ class TaskEditorViewModelTest {
         assertEquals(listOf("First", "Second"), written.map { it.title })
         assertTrue(written.all { it.taskId == 1L }) // FakeEditorTaskManager returns 1L
         assertTrue(written.all { !it.isCompleted })
+    }
+
+    @Test
+    fun `saveTask trims subtask titles before persisting`() = runTest {
+        val viewModel = createViewModel()
+        viewModel.updateTitle("Parent")
+        // The add path trims, but direct state mutation via updateSubtaskDraftTitle does not.
+        viewModel.addSubtaskDraft("keep")
+        val id = viewModel.subtasks.value.first().id
+        viewModel.updateSubtaskDraftTitle(id, "  padded  ")
+
+        viewModel.saveTask()
+
+        val written = subtaskRepository.getAllSubtasksSnapshot()
+        assertEquals(1, written.size)
+        assertEquals("padded", written.first().title)
+    }
+
+    @Test
+    fun `saveTask skips blank-title drafts and surfaces an error`() = runTest {
+        val viewModel = createViewModel()
+        viewModel.updateTitle("Parent")
+        viewModel.addSubtaskDraft("valid")
+        val id = viewModel.subtasks.value.first().id
+        // Simulate the user clearing the title of a draft row before saving.
+        viewModel.updateSubtaskDraftTitle(id, "")
+
+        viewModel.saveTask()
+
+        // Blank-title draft dropped from the write.
+        assertTrue(subtaskRepository.getAllSubtasksSnapshot().isEmpty())
+        // Error surfaced to the UI.
+        assertNotNull(viewModel.errorMessage.value)
+    }
+
+    @Test
+    fun `saveTask with only valid drafts does not set errorMessage`() = runTest {
+        val viewModel = createViewModel()
+        viewModel.updateTitle("Parent")
+        viewModel.addSubtaskDraft("valid")
+
+        viewModel.saveTask()
+
+        assertNull(viewModel.errorMessage.value)
     }
 }
 

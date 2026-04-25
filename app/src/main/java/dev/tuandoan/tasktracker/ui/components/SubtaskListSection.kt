@@ -19,7 +19,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -93,7 +93,11 @@ private fun SubtaskRow(
     } else {
         R.string.cd_subtask_checkbox_unchecked
     }
-    val checkboxDescription = stringResource(checkboxDescriptionResId, draft.title.ifBlank { " " })
+    val fallback = stringResource(R.string.label_add_subtask)
+    val checkboxDescription = stringResource(
+        checkboxDescriptionResId,
+        draft.title.ifBlank { fallback },
+    )
     val removeDescription = stringResource(R.string.cd_remove_subtask)
 
     Row(
@@ -129,7 +133,8 @@ private fun SubtaskRow(
 
 @Composable
 private fun AddSubtaskRow(onAdd: (String) -> Unit) {
-    var text by remember { mutableStateOf("") }
+    // rememberSaveable so an in-progress "Add subtask" draft survives rotation.
+    var text by rememberSaveable { mutableStateOf("") }
     val label = stringResource(R.string.label_add_subtask)
 
     OutlinedTextField(

@@ -187,6 +187,7 @@
     <string name="cd_subtask_checkbox_checked">Completed subtask: %1$s</string>
     <string name="cd_subtask_checkbox_unchecked">Not completed subtask: %1$s</string>
     <string name="cd_remove_subtask">Remove subtask</string>
+    <string name="error_subtask_save">Some subtasks could not be saved: %1$s</string>
 
     <!-- Priority -->
     <string name="priority_low">Low</string>

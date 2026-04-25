@@ -40,6 +40,8 @@ Format follows [Keep a Changelog](https://keepachangelog.com).
 
 ### Fixed
 - `SubtaskUseCase` mutations now re-throw `CancellationException` instead of wrapping it in `Result.failure`, preserving structured-concurrency cancellation semantics
+- Editor no longer silently drops subtask saves — blank-title drafts are skipped on save and any skipped/failed subtask surfaces a user-facing error message
+- `AddSubtaskRow` uses `rememberSaveable` so a typed-but-uncommitted subtask draft survives configuration change (rotation)
 
 ## [1.9.0] - 2026-04-24
 
