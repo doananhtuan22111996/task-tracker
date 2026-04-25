@@ -74,6 +74,7 @@ interface ITaskManager {
     // Pin/Priority operations
     suspend fun setPinned(taskId: Long, pinned: Boolean)
     suspend fun setPriority(taskId: Long, priority: Int)
+    suspend fun setPriorityBulk(ids: List<Long>, priority: Int)
 
     // Archive operations
     fun getArchivedTasks(): Flow<List<Task>>

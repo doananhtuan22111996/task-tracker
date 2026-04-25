@@ -1023,6 +1023,7 @@ private class FakeEditorTaskManager : ITaskManager {
     override fun getCompletedTasks(): Flow<List<Task>> = MutableStateFlow(emptyList())
     override suspend fun setPinned(taskId: Long, pinned: Boolean) {}
     override suspend fun setPriority(taskId: Long, priority: Int) {}
+    override suspend fun setPriorityBulk(ids: List<Long>, priority: Int) {}
     override fun getArchivedTasks(): Flow<List<Task>> = MutableStateFlow(emptyList())
     override suspend fun archiveTask(taskId: Long) {}
     override suspend fun unarchiveTask(taskId: Long) {}

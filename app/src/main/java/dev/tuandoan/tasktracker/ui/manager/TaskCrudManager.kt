@@ -247,6 +247,22 @@ class TaskCrudManager @Inject constructor(
     }
 
     /**
+     * Bulk apply a priority (0 = LOW, 1 = MEDIUM, 2 = HIGH) to multiple tasks.
+     * @throws IllegalArgumentException if input validation fails or priority is out of range
+     */
+    suspend fun bulkApplyPriority(taskIds: List<Long>, priority: Int): TaskOperationResult = try {
+        validateBulkOperationInput(taskIds, "change priority")
+        require(priority in 0..2) { "Priority must be LOW (0), MEDIUM (1), or HIGH (2)" }
+        crudUseCase.bulkApplyPriority(taskIds, priority)
+        TaskOperationResult.Success(context.getString(R.string.snackbar_tasks_priority_updated, taskIds.size))
+    } catch (e: IllegalArgumentException) {
+        TaskOperationResult.ValidationError(e.message ?: context.getString(R.string.error_validation_failed))
+    } catch (e: Exception) {
+        val errorMessage = e.message ?: context.getString(R.string.error_update_tasks)
+        TaskOperationResult.CrudError(errorMessage)
+    }
+
+    /**
      * Bulk delete tasks by IDs
      * @param taskIds List of task IDs to delete
      * @throws IllegalArgumentException if input validation fails
