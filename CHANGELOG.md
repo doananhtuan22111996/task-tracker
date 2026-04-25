@@ -6,6 +6,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com).
 ## [Unreleased]
 
 ### Added
+- Translations of all 10 subtasks/progress/drag-reorder strings for `de`, `es`, `fr`, `hi`, `in`, `pt`, `vi` (70 new entries)
 - Drag-to-reorder for subtasks in the task editor: long-press the drag handle and move vertically to reorder. Final order is persisted atomically on save.
 - English string `cd_drag_handle_subtask` for drag handle content description
 - 4 new `TaskEditorViewModelTest` cases covering move / no-op / out-of-bounds / hasChanges propagation (55 total editor tests)

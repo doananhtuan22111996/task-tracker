@@ -181,6 +181,18 @@
     <string name="label_pin_task">Fixar tarefa</string>
     <string name="label_pin_task_description">Manter esta tarefa no topo</string>
 
+    <!-- Subtasks -->
+    <string name="section_subtasks">Subtarefas</string>
+    <string name="label_add_subtask">Adicionar subtarefa</string>
+    <string name="hint_subtask_soft_cap">Listas longas podem ser difíceis de ler</string>
+    <string name="cd_subtask_checkbox_checked">Subtarefa concluída: %1$s</string>
+    <string name="cd_subtask_checkbox_unchecked">Subtarefa não concluída: %1$s</string>
+    <string name="cd_remove_subtask">Remover subtarefa</string>
+    <string name="cd_drag_handle_subtask">Alça de arrastar, mantenha pressionado para reordenar a subtarefa</string>
+    <string name="error_subtask_save">Algumas subtarefas não puderam ser salvas: %1$s</string>
+    <string name="label_subtask_progress">%1$d / %2$d</string>
+    <string name="cd_subtask_progress">%1$d de %2$d subtarefas concluídas</string>
+
     <!-- Priority -->
     <string name="priority_low">Baixa</string>
     <string name="priority_medium">Média</string>

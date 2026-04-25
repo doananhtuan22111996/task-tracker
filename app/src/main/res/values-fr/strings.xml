@@ -181,6 +181,18 @@
     <string name="label_pin_task">Épingler la tâche</string>
     <string name="label_pin_task_description">Garder cette tâche en haut</string>
 
+    <!-- Subtasks -->
+    <string name="section_subtasks">Sous-tâches</string>
+    <string name="label_add_subtask">Ajouter une sous-tâche</string>
+    <string name="hint_subtask_soft_cap">Les longues listes peuvent être difficiles à lire</string>
+    <string name="cd_subtask_checkbox_checked">Sous-tâche terminée : %1$s</string>
+    <string name="cd_subtask_checkbox_unchecked">Sous-tâche non terminée : %1$s</string>
+    <string name="cd_remove_subtask">Supprimer la sous-tâche</string>
+    <string name="cd_drag_handle_subtask">Poignée de déplacement, appui long pour réorganiser la sous-tâche</string>
+    <string name="error_subtask_save">Certaines sous-tâches n\'ont pas pu être enregistrées : %1$s</string>
+    <string name="label_subtask_progress">%1$d / %2$d</string>
+    <string name="cd_subtask_progress">%1$d sur %2$d sous-tâches terminées</string>
+
     <!-- Priority -->
     <string name="priority_low">Faible</string>
     <string name="priority_medium">Moyenne</string>
