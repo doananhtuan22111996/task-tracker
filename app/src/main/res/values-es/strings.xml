@@ -189,6 +189,8 @@
     <string name="cd_subtask_checkbox_unchecked">Subtarea no completada: %1$s</string>
     <string name="cd_remove_subtask">Eliminar subtarea</string>
     <string name="cd_drag_handle_subtask">Controlador de arrastre, mantén presionado para reordenar la subtarea</string>
+    <string name="action_move_up_subtask">Mover arriba</string>
+    <string name="action_move_down_subtask">Mover abajo</string>
     <string name="error_subtask_save">Algunas subtareas no se pudieron guardar: %1$s</string>
     <string name="label_subtask_progress">%1$d / %2$d</string>
     <string name="cd_subtask_progress">%1$d de %2$d subtareas completadas</string>
