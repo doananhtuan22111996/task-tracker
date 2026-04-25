@@ -6,6 +6,11 @@ Format follows [Keep a Changelog](https://keepachangelog.com).
 ## [Unreleased]
 
 ### Added
+- Inline subtask progress indicator ("m / n" + slim bar) on each task row in `TaskListScreen` — only rendered when the task has at least one subtask; TalkBack reads "X of Y subtasks completed"
+- `SubtaskProgress` projection + `SubtaskDao.observeSubtaskProgress` aggregate query (GROUP BY taskId) for live per-task progress
+- `ISubtaskRepository.observeSubtaskProgress` + `SubtaskUseCase.observeProgressByTaskId` for O(1) UI lookup
+- English strings `label_subtask_progress`, `cd_subtask_progress`
+- 2 new `SubtaskUseCaseTest` cases covering the progress flow (26 total)
 - `SubtaskListSection` Composable: inline checklist inside the task editor with checkbox, inline text edit, delete, and "Add subtask" row (IME Done commits)
 - Soft-cap hint at 50 subtasks per task (non-blocking advisory text)
 - `TaskEditorViewModel` state + events for subtask drafts (add / update title / toggle / remove) with diff-on-save persistence
@@ -32,6 +37,8 @@ Format follows [Keep a Changelog](https://keepachangelog.com).
 - `ImportBackupSubtaskTest` — 3 end-to-end tests covering subtask persistence, blank-parent filtering, and oversize-title truncation
 
 ### Changed
+- `TaskViewModel` constructor now takes `SubtaskUseCase`
+- `TaskListContent` + `TaskItem` gain an optional `subtaskProgressMap` / `subtaskProgress` parameter
 - `TaskEditorViewModel` constructor now takes `SubtaskUseCase`
 - `TaskManager` constructor now takes `ISubtaskRepository` alongside `ITaskRepository`
 - `BackupMetadata.CURRENT_SCHEMA_VERSION` bumped from 2 to 3

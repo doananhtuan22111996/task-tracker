@@ -8,6 +8,7 @@ import dev.tuandoan.tasktracker.domain.TaskManager
 import dev.tuandoan.tasktracker.domain.model.TaskSort
 import dev.tuandoan.tasktracker.domain.service.TaskSortService
 import dev.tuandoan.tasktracker.domain.usecase.StreakUseCase
+import dev.tuandoan.tasktracker.domain.usecase.SubtaskUseCase
 import dev.tuandoan.tasktracker.domain.usecase.TaskCrudUseCase
 import dev.tuandoan.tasktracker.domain.usecase.TaskFilterUseCase
 import dev.tuandoan.tasktracker.domain.usecase.TaskFormUseCase
@@ -95,6 +96,7 @@ class TaskViewModelTest {
             settingsRepository,
             taskManager,
             StreakUseCase(repository),
+            SubtaskUseCase(FakeSubtaskRepository()),
             TaskSortService(),
         )
     }

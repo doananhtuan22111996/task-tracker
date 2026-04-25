@@ -1,9 +1,11 @@
 package dev.tuandoan.tasktracker.domain.usecase
 
 import dev.tuandoan.tasktracker.data.database.Subtask
+import dev.tuandoan.tasktracker.data.database.SubtaskProgress
 import dev.tuandoan.tasktracker.domain.repository.ISubtaskRepository
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -18,6 +20,13 @@ import javax.inject.Singleton
 class SubtaskUseCase @Inject constructor(private val repository: ISubtaskRepository) {
 
     fun observeSubtasks(taskId: Long): Flow<List<Subtask>> = repository.observeSubtasks(taskId)
+
+    /**
+     * Live map of [SubtaskProgress] keyed by `taskId`. Tasks with no subtasks are absent — the
+     * UI treats a missing entry as "no indicator". Suitable for O(1) per-row lookup on the list.
+     */
+    fun observeProgressByTaskId(): Flow<Map<Long, SubtaskProgress>> =
+        repository.observeSubtaskProgress().map { list -> list.associateBy { it.taskId } }
 
     suspend fun addSubtask(taskId: Long, title: String): Result<Long> {
         val normalized = title.trim()
