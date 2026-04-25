@@ -189,6 +189,8 @@
     <string name="cd_subtask_checkbox_unchecked">Công việc phụ chưa hoàn thành: %1$s</string>
     <string name="cd_remove_subtask">Xóa công việc phụ</string>
     <string name="cd_drag_handle_subtask">Tay cầm kéo, nhấn giữ để sắp xếp lại công việc phụ</string>
+    <string name="action_move_up_subtask">Di chuyển lên</string>
+    <string name="action_move_down_subtask">Di chuyển xuống</string>
     <string name="error_subtask_save">Không thể lưu một số công việc phụ: %1$s</string>
     <string name="label_subtask_progress">%1$d / %2$d</string>
     <string name="cd_subtask_progress">Đã hoàn thành %1$d trên %2$d công việc phụ</string>

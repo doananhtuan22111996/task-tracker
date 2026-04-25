@@ -30,7 +30,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.CustomAccessibilityAction
 import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.customActions
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -73,9 +75,11 @@ fun SubtaskListSection(
             fontWeight = FontWeight.SemiBold,
         )
 
-        subtasks.forEach { draft ->
+        subtasks.forEachIndexed { index, draft ->
             SubtaskRow(
                 draft = draft,
+                isFirst = index == 0,
+                isLast = index == subtasks.lastIndex,
                 onToggle = { onToggleSubtask(draft.id) },
                 onUpdateTitle = { onUpdateTitle(draft.id, it) },
                 onRemove = { onRemoveSubtask(draft.id) },
@@ -98,6 +102,8 @@ fun SubtaskListSection(
 @Composable
 private fun SubtaskRow(
     draft: SubtaskDraft,
+    isFirst: Boolean,
+    isLast: Boolean,
     onToggle: () -> Unit,
     onUpdateTitle: (String) -> Unit,
     onRemove: () -> Unit,
@@ -115,6 +121,19 @@ private fun SubtaskRow(
     )
     val removeDescription = stringResource(R.string.cd_remove_subtask)
     val dragHandleDescription = stringResource(R.string.cd_drag_handle_subtask)
+    val moveUpLabel = stringResource(R.string.action_move_up_subtask)
+    val moveDownLabel = stringResource(R.string.action_move_down_subtask)
+
+    // Build CustomAccessibilityActions omitted at list boundaries so TalkBack's menu stays
+    // clean — no "Move up" on the first row, no "Move down" on the last.
+    val accessibilityActions = buildList {
+        if (!isFirst) {
+            add(CustomAccessibilityAction(label = moveUpLabel) { onMoveBy(-1) })
+        }
+        if (!isLast) {
+            add(CustomAccessibilityAction(label = moveDownLabel) { onMoveBy(1) })
+        }
+    }
 
     val density = LocalDensity.current
     val rowHeightPx = remember(density) { with(density) { ROW_HEIGHT_DP.dp.toPx() } }
@@ -126,7 +145,9 @@ private fun SubtaskRow(
     var dragAccumulator by remember(draft.id) { mutableFloatStateOf(0f) }
 
     Row(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .semantics { customActions = accessibilityActions },
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(4.dp),
     ) {

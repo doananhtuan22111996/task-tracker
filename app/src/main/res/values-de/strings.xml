@@ -189,6 +189,8 @@
     <string name="cd_subtask_checkbox_unchecked">Nicht erledigte Unteraufgabe: %1$s</string>
     <string name="cd_remove_subtask">Unteraufgabe entfernen</string>
     <string name="cd_drag_handle_subtask">Ziehpunkt, lange drücken zum Umsortieren der Unteraufgabe</string>
+    <string name="action_move_up_subtask">Nach oben verschieben</string>
+    <string name="action_move_down_subtask">Nach unten verschieben</string>
     <string name="error_subtask_save">Einige Unteraufgaben konnten nicht gespeichert werden: %1$s</string>
     <string name="label_subtask_progress">%1$d / %2$d</string>
     <string name="cd_subtask_progress">%1$d von %2$d Unteraufgaben erledigt</string>

@@ -6,6 +6,8 @@ Format follows [Keep a Changelog](https://keepachangelog.com).
 ## [Unreleased]
 
 ### Added
+- TalkBack-accessible reorder: `CustomAccessibilityAction` "Move up" / "Move down" on each subtask row (with boundary omission — first row has no "Move up", last has no "Move down"); drag remains for sighted users
+- English + 7-locale translations for `action_move_up_subtask` / `action_move_down_subtask` (16 new entries)
 - Translations of all 10 subtasks/progress/drag-reorder strings for `de`, `es`, `fr`, `hi`, `in`, `pt`, `vi` (70 new entries)
 - Drag-to-reorder for subtasks in the task editor: long-press the drag handle and move vertically to reorder. Final order is persisted atomically on save.
 - English string `cd_drag_handle_subtask` for drag handle content description

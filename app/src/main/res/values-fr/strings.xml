@@ -189,6 +189,8 @@
     <string name="cd_subtask_checkbox_unchecked">Sous-tâche non terminée : %1$s</string>
     <string name="cd_remove_subtask">Supprimer la sous-tâche</string>
     <string name="cd_drag_handle_subtask">Poignée de déplacement, appui long pour réorganiser la sous-tâche</string>
+    <string name="action_move_up_subtask">Monter</string>
+    <string name="action_move_down_subtask">Descendre</string>
     <string name="error_subtask_save">Certaines sous-tâches n\'ont pas pu être enregistrées : %1$s</string>
     <string name="label_subtask_progress">%1$d / %2$d</string>
     <string name="cd_subtask_progress">%1$d sur %2$d sous-tâches terminées</string>

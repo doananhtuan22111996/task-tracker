@@ -189,6 +189,8 @@
     <string name="cd_subtask_checkbox_unchecked">अपूर्ण उप-कार्य: %1$s</string>
     <string name="cd_remove_subtask">उप-कार्य हटाएँ</string>
     <string name="cd_drag_handle_subtask">खींचने का हैंडल, उप-कार्य को पुन: क्रमित करने के लिए दबाए रखें</string>
+    <string name="action_move_up_subtask">ऊपर ले जाएँ</string>
+    <string name="action_move_down_subtask">नीचे ले जाएँ</string>
     <string name="error_subtask_save">कुछ उप-कार्य सहेजे नहीं जा सके: %1$s</string>
     <string name="label_subtask_progress">%1$d / %2$d</string>
     <string name="cd_subtask_progress">%2$d में से %1$d उप-कार्य पूर्ण</string>

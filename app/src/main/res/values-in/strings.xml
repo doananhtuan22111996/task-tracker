@@ -189,6 +189,8 @@
     <string name="cd_subtask_checkbox_unchecked">Subtugas belum selesai: %1$s</string>
     <string name="cd_remove_subtask">Hapus subtugas</string>
     <string name="cd_drag_handle_subtask">Pegangan seret, tekan lama untuk mengurutkan ulang subtugas</string>
+    <string name="action_move_up_subtask">Pindah ke atas</string>
+    <string name="action_move_down_subtask">Pindah ke bawah</string>
     <string name="error_subtask_save">Beberapa subtugas tidak dapat disimpan: %1$s</string>
     <string name="label_subtask_progress">%1$d / %2$d</string>
     <string name="cd_subtask_progress">%1$d dari %2$d subtugas selesai</string>
