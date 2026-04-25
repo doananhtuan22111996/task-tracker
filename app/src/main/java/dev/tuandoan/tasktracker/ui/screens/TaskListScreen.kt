@@ -101,6 +101,7 @@ fun TaskListScreen(
 
     // Streak data
     val streakMap by viewModel.streakMap.collectAsStateWithLifecycle()
+    val subtaskProgressMap by viewModel.subtaskProgressMap.collectAsStateWithLifecycle()
 
     // Feature tips state
     val userPrefs by viewModel.userPreferences.collectAsStateWithLifecycle()
@@ -255,6 +256,7 @@ fun TaskListScreen(
             selectedIds = selectedIds,
             isSelectionMode = isSelectionMode,
             streakMap = streakMap,
+            subtaskProgressMap = subtaskProgressMap,
             showFabTip = !userPrefs.tipFabShown && allTasks.isEmpty(),
             showTagTip = !userPrefs.tipTagChipsShown && availableTags.isNotEmpty(),
             fabTipText = stringResource(R.string.tip_fab_create_task),

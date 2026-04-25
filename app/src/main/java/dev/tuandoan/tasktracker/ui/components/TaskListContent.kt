@@ -23,6 +23,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import dev.tuandoan.tasktracker.data.database.SubtaskProgress
 import dev.tuandoan.tasktracker.data.database.Task
 import dev.tuandoan.tasktracker.ui.theme.AppSpacing
 import dev.tuandoan.tasktracker.ui.viewmodel.TaskFilter
@@ -49,6 +50,7 @@ fun TaskListContent(
     selectedIds: Set<Long>,
     isSelectionMode: Boolean,
     streakMap: Map<Long, Int> = emptyMap(),
+    subtaskProgressMap: Map<Long, SubtaskProgress> = emptyMap(),
     showFabTip: Boolean = false,
     showTagTip: Boolean = false,
     fabTipText: String = "",
@@ -172,6 +174,7 @@ fun TaskListContent(
                         TaskItem(
                             task = task,
                             streakCount = streakMap[task.parentRecurringTaskId ?: task.id] ?: 0,
+                            subtaskProgress = subtaskProgressMap[task.id],
                             isSelected = selectedIds.contains(task.id),
                             isSelectionMode = isSelectionMode,
                             onToggleComplete = { onToggleTaskComplete(task) },

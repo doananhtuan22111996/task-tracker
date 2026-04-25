@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dev.tuandoan.tasktracker.R
+import dev.tuandoan.tasktracker.data.database.SubtaskProgress
 import dev.tuandoan.tasktracker.data.database.Task
 import dev.tuandoan.tasktracker.data.preferences.SettingsRepository
 import dev.tuandoan.tasktracker.data.preferences.UserPreferences
@@ -13,6 +14,7 @@ import dev.tuandoan.tasktracker.domain.ITaskManager
 import dev.tuandoan.tasktracker.domain.model.TaskSort
 import dev.tuandoan.tasktracker.domain.service.TaskSortService
 import dev.tuandoan.tasktracker.domain.usecase.StreakUseCase
+import dev.tuandoan.tasktracker.domain.usecase.SubtaskUseCase
 import dev.tuandoan.tasktracker.ui.events.UiEvent
 import dev.tuandoan.tasktracker.ui.manager.TaskBulkActionManager
 import dev.tuandoan.tasktracker.ui.manager.TaskCrudManager
@@ -59,6 +61,7 @@ class TaskViewModel @Inject constructor(
     private val settingsRepository: SettingsRepository,
     private val taskManager: ITaskManager,
     private val streakUseCase: StreakUseCase,
+    private val subtaskUseCase: SubtaskUseCase,
     private val sortService: TaskSortService,
 ) : ViewModel() {
 
@@ -69,6 +72,15 @@ class TaskViewModel @Inject constructor(
     // Streak map: rootChainId → currentStreak count (for badge display)
     private val _streakMap = MutableStateFlow<Map<Long, Int>>(emptyMap())
     val streakMap: StateFlow<Map<Long, Int>> = _streakMap.asStateFlow()
+
+    // Subtask progress map: taskId → SubtaskProgress (for inline "m/n" indicator on the list row).
+    // Tasks with zero subtasks are absent; the UI treats a missing entry as "no indicator".
+    val subtaskProgressMap: StateFlow<Map<Long, SubtaskProgress>> = subtaskUseCase.observeProgressByTaskId()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = emptyMap(),
+        )
 
     init {
         viewModelScope.launch { settingsRepository.ensureFirstLaunchDate() }

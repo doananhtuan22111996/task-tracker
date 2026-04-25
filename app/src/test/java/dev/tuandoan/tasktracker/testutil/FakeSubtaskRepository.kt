@@ -1,6 +1,7 @@
 package dev.tuandoan.tasktracker.testutil
 
 import dev.tuandoan.tasktracker.data.database.Subtask
+import dev.tuandoan.tasktracker.data.database.SubtaskProgress
 import dev.tuandoan.tasktracker.domain.repository.ISubtaskRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -26,6 +27,17 @@ class FakeSubtaskRepository : ISubtaskRepository {
 
     override fun observeSubtasks(taskId: Long): Flow<List<Subtask>> = subtasks.map { list ->
         list.filter { it.taskId == taskId }.sortedWith(compareBy({ it.sortOrder }, { it.id }))
+    }
+
+    override fun observeSubtaskProgress(): Flow<List<SubtaskProgress>> = subtasks.map { list ->
+        list.groupBy { it.taskId }
+            .map { (taskId, items) ->
+                SubtaskProgress(
+                    taskId = taskId,
+                    total = items.size,
+                    completed = items.count { it.isCompleted },
+                )
+            }
     }
 
     override suspend fun getSubtasks(taskId: Long): List<Subtask> =

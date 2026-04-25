@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Archive
 import androidx.compose.material.icons.filled.ContentCopy
@@ -36,6 +37,7 @@ import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -47,6 +49,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
@@ -59,6 +62,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import dev.tuandoan.tasktracker.R
+import dev.tuandoan.tasktracker.data.database.SubtaskProgress
 import dev.tuandoan.tasktracker.data.database.Task
 import dev.tuandoan.tasktracker.domain.model.Priority
 import dev.tuandoan.tasktracker.domain.model.RecurrenceType
@@ -70,6 +74,7 @@ fun TaskItem(
     modifier: Modifier = Modifier,
     task: Task,
     streakCount: Int = 0,
+    subtaskProgress: SubtaskProgress? = null,
     isSelected: Boolean = false,
     isSelectionMode: Boolean = false,
     onToggleComplete: () -> Unit,
@@ -282,6 +287,44 @@ fun TaskItem(
                         if (streakCount >= 2) {
                             StreakBadge(count = streakCount)
                         }
+                    }
+                }
+
+                // Subtask progress indicator — only rendered when the task has >=1 subtask.
+                if (subtaskProgress != null && subtaskProgress.total > 0) {
+                    val progressDescription = stringResource(
+                        R.string.cd_subtask_progress,
+                        subtaskProgress.completed,
+                        subtaskProgress.total,
+                    )
+                    Column(
+                        modifier = Modifier
+                            .padding(top = 4.dp)
+                            .semantics { contentDescription = progressDescription },
+                        verticalArrangement = Arrangement.spacedBy(2.dp),
+                    ) {
+                        Text(
+                            text = stringResource(
+                                R.string.label_subtask_progress,
+                                subtaskProgress.completed,
+                                subtaskProgress.total,
+                            ),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                        LinearProgressIndicator(
+                            progress = {
+                                if (subtaskProgress.total == 0) {
+                                    0f
+                                } else {
+                                    subtaskProgress.completed.toFloat() / subtaskProgress.total.toFloat()
+                                }
+                            },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(4.dp)
+                                .clip(RoundedCornerShape(2.dp)),
+                        )
                     }
                 }
 

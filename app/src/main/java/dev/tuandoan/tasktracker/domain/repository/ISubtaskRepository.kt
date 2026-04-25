@@ -1,11 +1,18 @@
 package dev.tuandoan.tasktracker.domain.repository
 
 import dev.tuandoan.tasktracker.data.database.Subtask
+import dev.tuandoan.tasktracker.data.database.SubtaskProgress
 import kotlinx.coroutines.flow.Flow
 
 interface ISubtaskRepository {
 
     fun observeSubtasks(taskId: Long): Flow<List<Subtask>>
+
+    /**
+     * Live aggregated progress per task. Emits one row per task that has at least one subtask;
+     * tasks with no subtasks are absent from the list.
+     */
+    fun observeSubtaskProgress(): Flow<List<SubtaskProgress>>
 
     suspend fun getSubtasks(taskId: Long): List<Subtask>
 

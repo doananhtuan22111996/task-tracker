@@ -315,6 +315,32 @@ class SubtaskUseCaseTest {
         assertEquals(0, repository.getAllSubtasksSnapshot().size)
     }
 
+    // === observeProgressByTaskId ===
+
+    @Test
+    fun `observeProgressByTaskId emits per-task progress keyed by taskId`() = runTest {
+        repository.seed(
+            TestSubtaskFactory.createSubtask(id = 1L, taskId = 10L, isCompleted = true),
+            TestSubtaskFactory.createSubtask(id = 2L, taskId = 10L, isCompleted = false),
+            TestSubtaskFactory.createSubtask(id = 3L, taskId = 10L, isCompleted = false),
+            TestSubtaskFactory.createSubtask(id = 4L, taskId = 20L, isCompleted = true),
+        )
+
+        val progress = useCase.observeProgressByTaskId().first()
+
+        assertEquals(2, progress.size)
+        assertEquals(3, progress[10L]!!.total)
+        assertEquals(1, progress[10L]!!.completed)
+        assertEquals(1, progress[20L]!!.total)
+        assertEquals(1, progress[20L]!!.completed)
+    }
+
+    @Test
+    fun `observeProgressByTaskId emits empty map when no subtasks exist`() = runTest {
+        val progress = useCase.observeProgressByTaskId().first()
+        assertTrue(progress.isEmpty())
+    }
+
     // === CancellationException propagation ===
 
     @Test

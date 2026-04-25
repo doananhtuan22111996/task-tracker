@@ -61,6 +61,9 @@ class RatingEligibilityTest {
         settingsRepository = settingsRepository,
         taskManager = taskManager,
         streakUseCase = streakUseCase,
+        subtaskUseCase = dev.tuandoan.tasktracker.domain.usecase.SubtaskUseCase(
+            dev.tuandoan.tasktracker.testutil.FakeSubtaskRepository(),
+        ),
         sortService = dev.tuandoan.tasktracker.domain.service.TaskSortService(),
     )
 

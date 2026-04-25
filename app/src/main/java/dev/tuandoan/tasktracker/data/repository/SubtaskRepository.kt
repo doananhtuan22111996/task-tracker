@@ -3,6 +3,7 @@ package dev.tuandoan.tasktracker.data.repository
 import androidx.room.withTransaction
 import dev.tuandoan.tasktracker.data.database.Subtask
 import dev.tuandoan.tasktracker.data.database.SubtaskDao
+import dev.tuandoan.tasktracker.data.database.SubtaskProgress
 import dev.tuandoan.tasktracker.data.database.TaskDatabase
 import dev.tuandoan.tasktracker.domain.repository.ISubtaskRepository
 import kotlinx.coroutines.flow.Flow
@@ -18,6 +19,8 @@ class SubtaskRepository @Inject constructor(
 ) : ISubtaskRepository {
 
     override fun observeSubtasks(taskId: Long): Flow<List<Subtask>> = subtaskDao.observeSubtasks(taskId)
+
+    override fun observeSubtaskProgress(): Flow<List<SubtaskProgress>> = subtaskDao.observeSubtaskProgress()
 
     override suspend fun getSubtasks(taskId: Long): List<Subtask> = subtaskDao.getSubtasks(taskId)
 
