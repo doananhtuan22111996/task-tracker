@@ -181,6 +181,18 @@
     <string name="label_pin_task">Aufgabe anheften</string>
     <string name="label_pin_task_description">Diese Aufgabe oben halten</string>
 
+    <!-- Subtasks -->
+    <string name="section_subtasks">Unteraufgaben</string>
+    <string name="label_add_subtask">Unteraufgabe hinzufügen</string>
+    <string name="hint_subtask_soft_cap">Lange Checklisten sind möglicherweise schwer lesbar</string>
+    <string name="cd_subtask_checkbox_checked">Erledigte Unteraufgabe: %1$s</string>
+    <string name="cd_subtask_checkbox_unchecked">Nicht erledigte Unteraufgabe: %1$s</string>
+    <string name="cd_remove_subtask">Unteraufgabe entfernen</string>
+    <string name="cd_drag_handle_subtask">Ziehpunkt, lange drücken zum Umsortieren der Unteraufgabe</string>
+    <string name="error_subtask_save">Einige Unteraufgaben konnten nicht gespeichert werden: %1$s</string>
+    <string name="label_subtask_progress">%1$d / %2$d</string>
+    <string name="cd_subtask_progress">%1$d von %2$d Unteraufgaben erledigt</string>
+
     <!-- Priority -->
     <string name="priority_low">Niedrig</string>
     <string name="priority_medium">Mittel</string>
