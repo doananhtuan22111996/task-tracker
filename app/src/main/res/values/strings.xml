@@ -180,6 +180,15 @@
     <string name="label_pin_task">Pin task</string>
     <string name="label_pin_task_description">Keep this task at the top</string>
 
+    <!-- Subtasks -->
+    <string name="section_subtasks">Subtasks</string>
+    <string name="label_add_subtask">Add subtask</string>
+    <string name="hint_subtask_soft_cap">Large checklists may be hard to read</string>
+    <string name="cd_subtask_checkbox_checked">Completed subtask: %1$s</string>
+    <string name="cd_subtask_checkbox_unchecked">Not completed subtask: %1$s</string>
+    <string name="cd_remove_subtask">Remove subtask</string>
+    <string name="error_subtask_save">Some subtasks could not be saved: %1$s</string>
+
     <!-- Priority -->
     <string name="priority_low">Low</string>
     <string name="priority_medium">Medium</string>

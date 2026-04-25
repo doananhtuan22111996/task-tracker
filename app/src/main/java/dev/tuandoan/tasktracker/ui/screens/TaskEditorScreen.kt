@@ -70,6 +70,7 @@ import dev.tuandoan.tasktracker.domain.model.ReminderOption
 import dev.tuandoan.tasktracker.ui.components.NotificationPermissionDialog
 import dev.tuandoan.tasktracker.ui.components.PermissionDeniedDialog
 import dev.tuandoan.tasktracker.ui.components.RecurrencePicker
+import dev.tuandoan.tasktracker.ui.components.SubtaskListSection
 import dev.tuandoan.tasktracker.ui.components.TimePickerDialog
 import dev.tuandoan.tasktracker.ui.manager.NotificationPermissionManager
 import dev.tuandoan.tasktracker.ui.viewmodel.TaskEditorEvent
@@ -106,6 +107,7 @@ fun TaskEditorScreen(
     val recurrenceInterval by viewModel.recurrenceInterval.collectAsStateWithLifecycle()
     val recurrenceDaysOfWeek by viewModel.recurrenceDaysOfWeek.collectAsStateWithLifecycle()
     val recurrenceEndDate by viewModel.recurrenceEndDate.collectAsStateWithLifecycle()
+    val subtasks by viewModel.subtasks.collectAsStateWithLifecycle()
     val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
     val errorMessage by viewModel.errorMessage.collectAsStateWithLifecycle()
     val isSaveEnabled by viewModel.isSaveEnabled.collectAsStateWithLifecycle(initialValue = false)
@@ -243,6 +245,15 @@ fun TaskEditorScreen(
                     capitalization = KeyboardCapitalization.Sentences,
                     imeAction = ImeAction.Next,
                 ),
+            )
+
+            // Subtasks section
+            SubtaskListSection(
+                subtasks = subtasks,
+                onAddSubtask = viewModel::addSubtaskDraft,
+                onToggleSubtask = viewModel::toggleSubtaskDraft,
+                onUpdateTitle = viewModel::updateSubtaskDraftTitle,
+                onRemoveSubtask = viewModel::removeSubtaskDraft,
             )
 
             // Organization section
