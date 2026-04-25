@@ -281,6 +281,7 @@ private class FakeStatsTaskManager : ITaskManager {
     override suspend fun setPinned(taskId: Long, pinned: Boolean) {}
     override suspend fun setPriority(taskId: Long, priority: Int) {}
     override suspend fun setPriorityBulk(ids: List<Long>, priority: Int) {}
+    override suspend fun setTagBulk(ids: List<Long>, tag: String?, tagColor: String?) {}
     override fun getArchivedTasks(): Flow<List<Task>> = MutableStateFlow(emptyList())
     override suspend fun archiveTask(taskId: Long) {}
     override suspend fun unarchiveTask(taskId: Long) {}

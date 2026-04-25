@@ -64,6 +64,8 @@ class TaskBulkActionManagerTest {
                 R.string.snackbar_tasks_permanently_deleted -> "$firstFormatArg tasks permanently deleted"
                 R.string.snackbar_failed_permanent_delete -> "Failed to permanently delete tasks: $firstFormatArg"
                 R.string.snackbar_tasks_priority_updated -> "Priority updated for $firstFormatArg tasks"
+                R.string.snackbar_tasks_tagged -> "Tag applied to $firstFormatArg tasks"
+                R.string.snackbar_tasks_tag_cleared -> "Tag cleared from $firstFormatArg tasks"
                 else -> "unknown string $resId"
             }
         }
@@ -303,6 +305,73 @@ class TaskBulkActionManagerTest {
         } catch (expected: IllegalArgumentException) {
             // expected
         }
+    }
+
+    // === bulkApplyTag ===
+
+    @Test
+    fun `bulkApplyTag sets tag and color on selected tasks and clears selection`() = runTest {
+        val tasks = listOf(
+            TestTaskFactory.createTask(id = 1),
+            TestTaskFactory.createTask(id = 2),
+            TestTaskFactory.createTask(id = 3),
+        )
+        repository.seed(*tasks.toTypedArray())
+        selectionManager.selectAll(listOf(1L, 2L))
+
+        var successMsg = ""
+        bulkManager.bulkApplyTag(this, tag = "work", tagColor = "blue", onSuccess = { successMsg = it })
+        advanceUntilIdle()
+
+        assertTrue(successMsg.contains("Tag applied"))
+        val snapshot = repository.getAllTasksSnapshot()
+        // Tag is normalized to uppercase by TagNormalizer at the manager layer.
+        assertEquals("WORK", snapshot.first { it.id == 1L }.tag)
+        assertEquals("blue", snapshot.first { it.id == 1L }.tagColor)
+        assertEquals("WORK", snapshot.first { it.id == 2L }.tag)
+        // Unselected untouched.
+        assertEquals(null, snapshot.first { it.id == 3L }.tag)
+        // Selection cleared.
+        assertTrue(selectionManager.selectedIds.value.isEmpty())
+    }
+
+    @Test
+    fun `bulkApplyTag with null tag clears tag and color on selected tasks`() = runTest {
+        // Pre-seed tasks with existing tags; factory doesn't expose tagColor so set it via copy.
+        val tasks = listOf(
+            TestTaskFactory.createTask(id = 1, tag = "work").copy(tagColor = "blue"),
+            TestTaskFactory.createTask(id = 2, tag = "personal").copy(tagColor = "green"),
+        )
+        repository.seed(*tasks.toTypedArray())
+        selectionManager.selectAll(listOf(1L, 2L))
+
+        var successMsg = ""
+        bulkManager.bulkApplyTag(this, tag = null, tagColor = null, onSuccess = { successMsg = it })
+        advanceUntilIdle()
+
+        assertTrue(successMsg.contains("Tag cleared"))
+        val snapshot = repository.getAllTasksSnapshot()
+        assertEquals(null, snapshot.first { it.id == 1L }.tag)
+        assertEquals(null, snapshot.first { it.id == 1L }.tagColor)
+        assertEquals(null, snapshot.first { it.id == 2L }.tag)
+        assertEquals(null, snapshot.first { it.id == 2L }.tagColor)
+    }
+
+    @Test
+    fun `bulkApplyTag with blank tag treats it as clear`() = runTest {
+        val tasks = listOf(TestTaskFactory.createTask(id = 1, tag = "work").copy(tagColor = "blue"))
+        repository.seed(*tasks.toTypedArray())
+        selectionManager.enterSelection(1L)
+
+        var successMsg = ""
+        bulkManager.bulkApplyTag(this, tag = "   ", tagColor = "red", onSuccess = { successMsg = it })
+        advanceUntilIdle()
+
+        // Blank tags are normalized to null; routed as clear.
+        assertTrue(successMsg.contains("Tag cleared"))
+        val snapshot = repository.getAllTasksSnapshot()
+        assertEquals(null, snapshot.first { it.id == 1L }.tag)
+        assertEquals(null, snapshot.first { it.id == 1L }.tagColor)
     }
 
     // === requestBulkPermanentDelete ===

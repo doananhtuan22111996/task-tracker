@@ -251,6 +251,33 @@ class TaskCrudUseCase @Inject constructor(
     }
 
     /**
+     * Bulk apply a tag (with optional tagColor) to multiple tasks. Passing `null` for both
+     * clears the tag and tagColor on every selected task. The tag value is normalized via
+     * [TagNormalizer] at the repository level; this use case emits a "cleared" snackbar when
+     * the normalized value is null, otherwise a "tagged" snackbar.
+     */
+    suspend fun bulkApplyTag(taskIds: List<Long>, tag: String?, tagColor: String?): Result<Unit> = try {
+        _isLoading.value = true
+        _errorMessage.value = null
+
+        taskManager.setTagBulk(taskIds, tag, tagColor)
+
+        val messageRes = if (tag.isNullOrBlank()) {
+            R.string.snackbar_tasks_tag_cleared
+        } else {
+            R.string.snackbar_tasks_tagged
+        }
+        _lastOperationSuccess.value = context.getString(messageRes, taskIds.size)
+        Result.success(Unit)
+    } catch (e: Exception) {
+        val errorMsg = e.message ?: context.getString(R.string.error_update_tasks)
+        _errorMessage.value = errorMsg
+        Result.failure(e)
+    } finally {
+        _isLoading.value = false
+    }
+
+    /**
      * Bulk apply a priority to multiple tasks. Priority must be in [0, 2] (LOW/MEDIUM/HIGH).
      */
     suspend fun bulkApplyPriority(taskIds: List<Long>, priority: Int): Result<Unit> = try {

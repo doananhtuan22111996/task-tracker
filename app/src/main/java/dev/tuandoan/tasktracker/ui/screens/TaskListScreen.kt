@@ -55,6 +55,7 @@ import dev.tuandoan.tasktracker.R
 import dev.tuandoan.tasktracker.navigation.StatsFilter
 import dev.tuandoan.tasktracker.navigation.TaskTrackerRoutes
 import dev.tuandoan.tasktracker.ui.components.BulkPriorityBottomSheet
+import dev.tuandoan.tasktracker.ui.components.BulkTagBottomSheet
 import dev.tuandoan.tasktracker.ui.components.SortBottomSheet
 import dev.tuandoan.tasktracker.ui.components.TaskListContent
 import dev.tuandoan.tasktracker.ui.components.TaskListTopBar
@@ -100,6 +101,7 @@ fun TaskListScreen(
     val isNonDefaultSort = currentSort != TaskListStateManager.DEFAULT_SORT
     var showSortSheet by remember { mutableStateOf(false) }
     var showPrioritySheet by remember { mutableStateOf(false) }
+    var showTagSheet by remember { mutableStateOf(false) }
 
     // Streak data
     val streakMap by viewModel.streakMap.collectAsStateWithLifecycle()
@@ -211,6 +213,7 @@ fun TaskListScreen(
                 onBulkMarkActive = viewModel::bulkMarkActive,
                 onBulkArchive = viewModel::requestBulkArchive,
                 onBulkChangePriority = { showPrioritySheet = true },
+                onBulkApplyTag = { showTagSheet = true },
                 onClearSelection = viewModel::clearSelection,
                 onSelectAll = { viewModel.selectAll(visibleTasks.map { it.id }) },
                 hasNonDefaultSort = isNonDefaultSort,
@@ -387,6 +390,20 @@ fun TaskListScreen(
                 showPrioritySheet = false
             },
             onDismiss = { showPrioritySheet = false },
+        )
+    }
+
+    // Bulk tag picker sheet (BO-07).
+    if (showTagSheet) {
+        BulkTagBottomSheet(
+            selectedCount = selectedCount,
+            availableTags = availableTags,
+            tagColorMap = tagColorMap,
+            onTagSelected = { tag, tagColor ->
+                viewModel.bulkApplyTag(tag, tagColor)
+                showTagSheet = false
+            },
+            onDismiss = { showTagSheet = false },
         )
     }
 }

@@ -247,6 +247,25 @@ class TaskCrudManager @Inject constructor(
     }
 
     /**
+     * Bulk apply a tag to multiple tasks. Passing `null` or a blank [tag] clears the tag.
+     */
+    suspend fun bulkApplyTag(taskIds: List<Long>, tag: String?, tagColor: String?): TaskOperationResult = try {
+        validateBulkOperationInput(taskIds, "apply tag")
+        crudUseCase.bulkApplyTag(taskIds, tag, tagColor)
+        val messageRes = if (tag.isNullOrBlank()) {
+            R.string.snackbar_tasks_tag_cleared
+        } else {
+            R.string.snackbar_tasks_tagged
+        }
+        TaskOperationResult.Success(context.getString(messageRes, taskIds.size))
+    } catch (e: IllegalArgumentException) {
+        TaskOperationResult.ValidationError(e.message ?: context.getString(R.string.error_validation_failed))
+    } catch (e: Exception) {
+        val errorMessage = e.message ?: context.getString(R.string.error_update_tasks)
+        TaskOperationResult.CrudError(errorMessage)
+    }
+
+    /**
      * Bulk apply a priority (0 = LOW, 1 = MEDIUM, 2 = HIGH) to multiple tasks.
      * @throws IllegalArgumentException if input validation fails or priority is out of range
      */

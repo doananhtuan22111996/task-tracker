@@ -80,6 +80,9 @@ interface TaskDao {
     @Query("UPDATE tasks SET priority = :priority WHERE id IN (:ids)")
     suspend fun setPriorityBulk(ids: List<Long>, priority: Int)
 
+    @Query("UPDATE tasks SET tag = :tag, tagColor = :tagColor WHERE id IN (:ids)")
+    suspend fun setTagBulk(ids: List<Long>, tag: String?, tagColor: String?)
+
     // Stats queries (exclude archived tasks)
     @Query("SELECT COUNT(*) FROM tasks WHERE isCompleted = 0 AND isArchived = 0")
     fun observeActiveCount(): Flow<Int>
