@@ -474,6 +474,22 @@ class TaskEditorViewModel @Inject constructor(
         updateHasChanges()
     }
 
+    /**
+     * Moves the subtask identified by [draftId] by one position in [direction] (+1 = down,
+     * -1 = up). No-op at list boundaries. Stable across multiple calls during a single drag
+     * gesture because it re-resolves the draft's current index from state each time, avoiding
+     * stale-index bugs when the drag callback closure captured the old position.
+     */
+    fun moveSubtaskDraftBy(draftId: Long, direction: Int) {
+        if (direction != 1 && direction != -1) return
+        val current = _subtasks.value
+        val from = current.indexOfFirst { it.id == draftId }
+        if (from < 0) return
+        val to = from + direction
+        if (to !in current.indices) return
+        moveSubtaskDraft(from, to)
+    }
+
     fun saveTask() {
         viewModelScope.launch {
             _isLoading.value = true

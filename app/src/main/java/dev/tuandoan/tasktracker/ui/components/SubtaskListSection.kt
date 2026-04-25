@@ -60,7 +60,7 @@ fun SubtaskListSection(
     onToggleSubtask: (Long) -> Unit,
     onUpdateTitle: (Long, String) -> Unit,
     onRemoveSubtask: (Long) -> Unit,
-    onMoveSubtask: (fromIndex: Int, toIndex: Int) -> Unit,
+    onMoveSubtaskBy: (draftId: Long, direction: Int) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -73,15 +73,13 @@ fun SubtaskListSection(
             fontWeight = FontWeight.SemiBold,
         )
 
-        subtasks.forEachIndexed { index, draft ->
+        subtasks.forEach { draft ->
             SubtaskRow(
                 draft = draft,
-                index = index,
-                totalCount = subtasks.size,
                 onToggle = { onToggleSubtask(draft.id) },
                 onUpdateTitle = { onUpdateTitle(draft.id, it) },
                 onRemove = { onRemoveSubtask(draft.id) },
-                onMove = onMoveSubtask,
+                onMoveBy = { direction -> onMoveSubtaskBy(draft.id, direction) },
             )
         }
 
@@ -100,12 +98,10 @@ fun SubtaskListSection(
 @Composable
 private fun SubtaskRow(
     draft: SubtaskDraft,
-    index: Int,
-    totalCount: Int,
     onToggle: () -> Unit,
     onUpdateTitle: (String) -> Unit,
     onRemove: () -> Unit,
-    onMove: (fromIndex: Int, toIndex: Int) -> Unit,
+    onMoveBy: (direction: Int) -> Unit,
 ) {
     val checkboxDescriptionResId = if (draft.isCompleted) {
         R.string.cd_subtask_checkbox_checked
@@ -121,11 +117,13 @@ private fun SubtaskRow(
     val dragHandleDescription = stringResource(R.string.cd_drag_handle_subtask)
 
     val density = LocalDensity.current
-    val rowHeightPx = with(density) { ROW_HEIGHT_DP.dp.toPx() }
+    val rowHeightPx = remember(density) { with(density) { ROW_HEIGHT_DP.dp.toPx() } }
 
     // Accumulates vertical drag offset across a single gesture. When it passes ±rowHeightPx the
-    // row swaps with its neighbor in that direction, and the accumulator is reset.
-    var dragAccumulator by remember(draft.id, totalCount) { mutableFloatStateOf(0f) }
+    // row swaps with its neighbor in that direction, and the accumulator is reset. Keyed only by
+    // draft.id — the gesture continues smoothly across swaps because onMoveBy uses the draft id
+    // and the ViewModel re-resolves the current index on each call (no stale-index bug).
+    var dragAccumulator by remember(draft.id) { mutableFloatStateOf(0f) }
 
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -139,19 +137,19 @@ private fun SubtaskRow(
             modifier = Modifier
                 .size(48.dp)
                 .padding(12.dp)
-                .pointerInput(draft.id, totalCount) {
+                .pointerInput(draft.id) {
                     detectDragGesturesAfterLongPress(
                         onDragStart = { dragAccumulator = 0f },
                         onDragEnd = { dragAccumulator = 0f },
                         onDragCancel = { dragAccumulator = 0f },
                         onDrag = { _, dragAmount ->
                             dragAccumulator += dragAmount.y
-                            while (dragAccumulator > rowHeightPx && index < totalCount - 1) {
-                                onMove(index, index + 1)
+                            while (dragAccumulator > rowHeightPx) {
+                                onMoveBy(1)
                                 dragAccumulator -= rowHeightPx
                             }
-                            while (dragAccumulator < -rowHeightPx && index > 0) {
-                                onMove(index, index - 1)
+                            while (dragAccumulator < -rowHeightPx) {
+                                onMoveBy(-1)
                                 dragAccumulator += rowHeightPx
                             }
                         },
