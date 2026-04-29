@@ -71,6 +71,15 @@
     <string name="title_archived">Đã lưu trữ</string>
     <string name="title_selected_count">%d mục đã chọn</string>
 
+    <!-- Batch Operations -->
+    <string name="action_apply_tag">Áp dụng thẻ</string>
+    <string name="action_clear_tag">Xóa thẻ</string>
+    <string name="title_apply_tag_for_count">Áp dụng thẻ cho %d công việc</string>
+    <string name="cd_apply_tag_selected">Áp dụng thẻ cho các mục đã chọn</string>
+    <string name="action_change_priority">Thay đổi mức ưu tiên</string>
+    <string name="cd_change_priority_selected">Thay đổi mức ưu tiên cho các mục đã chọn</string>
+    <string name="title_change_priority_for_count">Thay đổi mức ưu tiên cho %d công việc</string>
+
     <!-- Task List Screen -->
     <string name="snackbar_task_deleted">Đã xóa công việc</string>
     <string name="snackbar_tasks_deleted">Đã xóa %d công việc</string>
@@ -343,6 +352,9 @@
     <string name="snackbar_task_archived">Đã lưu trữ công việc</string>
     <string name="snackbar_tasks_marked_completed">Đã đánh dấu %d công việc là hoàn thành</string>
     <string name="snackbar_tasks_marked_active">Đã đánh dấu %d công việc là đang thực hiện</string>
+    <string name="snackbar_tasks_priority_updated">Đã cập nhật mức ưu tiên cho %d công việc</string>
+    <string name="snackbar_tasks_tagged">Đã áp dụng thẻ cho %d công việc</string>
+    <string name="snackbar_tasks_tag_cleared">Đã xóa thẻ khỏi %d công việc</string>
     <string name="snackbar_tasks_archived">Đã lưu trữ %d công việc</string>
     <string name="snackbar_tasks_restored">Đã khôi phục %d công việc từ lưu trữ</string>
     <string name="snackbar_failed_mark_completed">Không thể đánh dấu công việc là hoàn thành</string>

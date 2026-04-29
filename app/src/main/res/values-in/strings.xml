@@ -71,6 +71,15 @@
     <string name="title_archived">Diarsipkan</string>
     <string name="title_selected_count">%d dipilih</string>
 
+    <!-- Batch Operations -->
+    <string name="action_apply_tag">Terapkan tag</string>
+    <string name="action_clear_tag">Hapus tag</string>
+    <string name="title_apply_tag_for_count">Terapkan tag ke %d tugas</string>
+    <string name="cd_apply_tag_selected">Terapkan tag ke tugas terpilih</string>
+    <string name="action_change_priority">Ubah prioritas</string>
+    <string name="cd_change_priority_selected">Ubah prioritas tugas terpilih</string>
+    <string name="title_change_priority_for_count">Ubah prioritas %d tugas</string>
+
     <!-- Task List Screen -->
     <string name="snackbar_task_deleted">Tugas dihapus</string>
     <string name="snackbar_tasks_deleted">%d tugas dihapus</string>
@@ -343,6 +352,9 @@
     <string name="snackbar_task_archived">Tugas diarsipkan</string>
     <string name="snackbar_tasks_marked_completed">%d tugas ditandai selesai</string>
     <string name="snackbar_tasks_marked_active">%d tugas ditandai aktif</string>
+    <string name="snackbar_tasks_priority_updated">Prioritas diperbarui untuk %d tugas</string>
+    <string name="snackbar_tasks_tagged">Tag diterapkan ke %d tugas</string>
+    <string name="snackbar_tasks_tag_cleared">Tag dihapus dari %d tugas</string>
     <string name="snackbar_tasks_archived">%d tugas diarsipkan</string>
     <string name="snackbar_tasks_restored">%d tugas dipulihkan dari arsip</string>
     <string name="snackbar_failed_mark_completed">Gagal menandai tugas sebagai selesai</string>
