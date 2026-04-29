@@ -6,6 +6,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com).
 ## [Unreleased]
 
 ### Added
+- In-app help: two new FAQ sections in `HelpScreen` — Subtasks (add, reorder, recurrence reset, parent completion) and Batch Operations (selection mode, undo behavior, why-new-tags-don\'t-appear, exit selection) — translated across all 8 locales (RP-03)
 - Translations of 10 batch-operations strings (BO-07 apply/clear tag + BO-08 change priority) for `de`, `es`, `fr`, `hi`, `in`, `pt`, `vi` — 70 new entries (BO-11)
 - Bulk apply tag: new overflow action in the selection-mode top bar opens a `BulkTagBottomSheet` listing existing tags (with color chips) + a "Clear tag" row; applies the chosen tag (or clears) to every selected task via `ITaskRepository.setTagBulk` and clears the selection
 - English strings `action_apply_tag`, `action_clear_tag`, `title_apply_tag_for_count`, `cd_apply_tag_selected`, `snackbar_tasks_tagged`, `snackbar_tasks_tag_cleared`

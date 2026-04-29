@@ -53,6 +53,24 @@ private val faqSections = listOf(
         ),
     ),
     FaqSection(
+        R.string.help_section_subtasks,
+        listOf(
+            FaqItem(R.string.help_q_add_subtasks, R.string.help_a_add_subtasks),
+            FaqItem(R.string.help_q_reorder_subtasks, R.string.help_a_reorder_subtasks),
+            FaqItem(R.string.help_q_subtasks_recurrence, R.string.help_a_subtasks_recurrence),
+            FaqItem(R.string.help_q_subtasks_autocomplete, R.string.help_a_subtasks_autocomplete),
+        ),
+    ),
+    FaqSection(
+        R.string.help_section_batch_ops,
+        listOf(
+            FaqItem(R.string.help_q_bulk_actions, R.string.help_a_bulk_actions),
+            FaqItem(R.string.help_q_bulk_tag_missing, R.string.help_a_bulk_tag_missing),
+            FaqItem(R.string.help_q_bulk_undo, R.string.help_a_bulk_undo),
+            FaqItem(R.string.help_q_exit_selection, R.string.help_a_exit_selection),
+        ),
+    ),
+    FaqSection(
         R.string.help_section_reminders,
         listOf(
             FaqItem(R.string.help_q_no_reminder, R.string.help_a_no_reminder),
