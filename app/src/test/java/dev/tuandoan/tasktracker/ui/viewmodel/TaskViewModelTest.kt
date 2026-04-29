@@ -175,6 +175,23 @@ class TaskViewModelTest {
     }
 
     @Test
+    fun `availableTags emits a brand-new tag after task insert`() = runTest {
+        // Regression guard for the reported bug: creating a task with a never-seen tag
+        // must immediately appear in availableTags (used by the bulk-apply tag sheet).
+        viewModel = createViewModel()
+        advanceUntilIdle()
+
+        viewModel.availableTags.test {
+            assertEquals(emptyList<String>(), awaitItem())
+
+            repository.insertTask(TestTaskFactory.createTask(id = 42, tag = "urgent"))
+            advanceUntilIdle()
+
+            assertEquals(listOf("urgent"), awaitItem())
+        }
+    }
+
+    @Test
     fun `setTagFilter updates tag filter state`() {
         viewModel = createViewModel()
         viewModel.setTagFilter("work")
