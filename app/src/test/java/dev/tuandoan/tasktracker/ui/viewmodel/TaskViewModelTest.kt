@@ -192,6 +192,26 @@ class TaskViewModelTest {
     }
 
     @Test
+    fun `tagColorMap reflects a brand-new tag with its color after task insert`() = runTest {
+        // Sibling to availableTags: the sheet needs name + color. Both derivations share
+        // one upstream, so asserting color symmetry guards against future regressions
+        // if someone splits the derivations again.
+        viewModel = createViewModel()
+        advanceUntilIdle()
+
+        viewModel.tagColorMap.test {
+            assertEquals(emptyMap<String, String?>(), awaitItem())
+
+            repository.insertTask(
+                TestTaskFactory.createTask(id = 42, tag = "urgent").copy(tagColor = "red"),
+            )
+            advanceUntilIdle()
+
+            assertEquals(mapOf("urgent" to "red"), awaitItem())
+        }
+    }
+
+    @Test
     fun `setTagFilter updates tag filter state`() {
         viewModel = createViewModel()
         viewModel.setTagFilter("work")
