@@ -71,6 +71,15 @@
     <string name="title_archived">Archiviert</string>
     <string name="title_selected_count">%d ausgewählt</string>
 
+    <!-- Batch Operations -->
+    <string name="action_apply_tag">Tag anwenden</string>
+    <string name="action_clear_tag">Tag entfernen</string>
+    <string name="title_apply_tag_for_count">Tag auf %d Aufgaben anwenden</string>
+    <string name="cd_apply_tag_selected">Tag auf Auswahl anwenden</string>
+    <string name="action_change_priority">Priorität ändern</string>
+    <string name="cd_change_priority_selected">Priorität für Auswahl ändern</string>
+    <string name="title_change_priority_for_count">Priorität für %d Aufgaben ändern</string>
+
     <!-- Task List Screen -->
     <string name="snackbar_task_deleted">Aufgabe gelöscht</string>
     <string name="snackbar_tasks_deleted">%d Aufgaben gelöscht</string>
@@ -343,6 +352,9 @@
     <string name="snackbar_task_archived">Aufgabe archiviert</string>
     <string name="snackbar_tasks_marked_completed">%d Aufgaben als erledigt markiert</string>
     <string name="snackbar_tasks_marked_active">%d Aufgaben als aktiv markiert</string>
+    <string name="snackbar_tasks_priority_updated">Priorität für %d Aufgaben aktualisiert</string>
+    <string name="snackbar_tasks_tagged">Tag auf %d Aufgaben angewendet</string>
+    <string name="snackbar_tasks_tag_cleared">Tag von %d Aufgaben entfernt</string>
     <string name="snackbar_tasks_archived">%d Aufgaben archiviert</string>
     <string name="snackbar_tasks_restored">%d Aufgaben aus dem Archiv wiederhergestellt</string>
     <string name="snackbar_failed_mark_completed">Aufgaben konnten nicht als erledigt markiert werden</string>

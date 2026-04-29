@@ -71,6 +71,15 @@
     <string name="title_archived">Archivadas</string>
     <string name="title_selected_count">%d seleccionada(s)</string>
 
+    <!-- Batch Operations -->
+    <string name="action_apply_tag">Aplicar etiqueta</string>
+    <string name="action_clear_tag">Quitar etiqueta</string>
+    <string name="title_apply_tag_for_count">Aplicar etiqueta a %d tareas</string>
+    <string name="cd_apply_tag_selected">Aplicar etiqueta a las tareas seleccionadas</string>
+    <string name="action_change_priority">Cambiar prioridad</string>
+    <string name="cd_change_priority_selected">Cambiar prioridad de las tareas seleccionadas</string>
+    <string name="title_change_priority_for_count">Cambiar prioridad de %d tareas</string>
+
     <!-- Task List Screen -->
     <string name="snackbar_task_deleted">Tarea eliminada</string>
     <string name="snackbar_tasks_deleted">%d tarea(s) eliminada(s)</string>
@@ -343,6 +352,9 @@
     <string name="snackbar_task_archived">Tarea archivada</string>
     <string name="snackbar_tasks_marked_completed">%d tarea(s) marcadas como completadas</string>
     <string name="snackbar_tasks_marked_active">%d tarea(s) marcadas como activas</string>
+    <string name="snackbar_tasks_priority_updated">Prioridad actualizada en %d tareas</string>
+    <string name="snackbar_tasks_tagged">Etiqueta aplicada a %d tareas</string>
+    <string name="snackbar_tasks_tag_cleared">Etiqueta quitada de %d tareas</string>
     <string name="snackbar_tasks_archived">%d tarea(s) archivadas</string>
     <string name="snackbar_tasks_restored">%d tarea(s) restauradas del archivo</string>
     <string name="snackbar_failed_mark_completed">No se pudieron marcar tareas como completadas</string>

@@ -71,6 +71,15 @@
     <string name="title_archived">Archivées</string>
     <string name="title_selected_count">%d sélectionné(s)</string>
 
+    <!-- Batch Operations -->
+    <string name="action_apply_tag">Appliquer l\'étiquette</string>
+    <string name="action_clear_tag">Effacer l\'étiquette</string>
+    <string name="title_apply_tag_for_count">Appliquer l\'étiquette à %d tâches</string>
+    <string name="cd_apply_tag_selected">Appliquer l\'étiquette à la sélection</string>
+    <string name="action_change_priority">Changer la priorité</string>
+    <string name="cd_change_priority_selected">Changer la priorité de la sélection</string>
+    <string name="title_change_priority_for_count">Changer la priorité de %d tâches</string>
+
     <!-- Task List Screen -->
     <string name="snackbar_task_deleted">Tâche supprimée</string>
     <string name="snackbar_tasks_deleted">%d tâche(s) supprimée(s)</string>
@@ -343,6 +352,9 @@
     <string name="snackbar_task_archived">Tâche archivée</string>
     <string name="snackbar_tasks_marked_completed">%d tâche(s) marquée(s) comme terminée(s)</string>
     <string name="snackbar_tasks_marked_active">%d tâche(s) marquée(s) comme active(s)</string>
+    <string name="snackbar_tasks_priority_updated">Priorité mise à jour pour %d tâches</string>
+    <string name="snackbar_tasks_tagged">Étiquette appliquée à %d tâches</string>
+    <string name="snackbar_tasks_tag_cleared">Étiquette retirée de %d tâches</string>
     <string name="snackbar_tasks_archived">%d tâche(s) archivée(s)</string>
     <string name="snackbar_tasks_restored">%d tâche(s) restaurée(s) depuis l’archive</string>
     <string name="snackbar_failed_mark_completed">Impossible de marquer les tâches comme terminées</string>

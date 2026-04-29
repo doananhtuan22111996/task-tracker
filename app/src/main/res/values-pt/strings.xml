@@ -71,6 +71,15 @@
     <string name="title_archived">Arquivadas</string>
     <string name="title_selected_count">%d selecionadas</string>
 
+    <!-- Batch Operations -->
+    <string name="action_apply_tag">Aplicar etiqueta</string>
+    <string name="action_clear_tag">Remover etiqueta</string>
+    <string name="title_apply_tag_for_count">Aplicar etiqueta a %d tarefas</string>
+    <string name="cd_apply_tag_selected">Aplicar etiqueta às tarefas selecionadas</string>
+    <string name="action_change_priority">Alterar prioridade</string>
+    <string name="cd_change_priority_selected">Alterar prioridade das tarefas selecionadas</string>
+    <string name="title_change_priority_for_count">Alterar prioridade de %d tarefas</string>
+
     <!-- Task List Screen -->
     <string name="snackbar_task_deleted">Tarefa eliminada</string>
     <string name="snackbar_tasks_deleted">%d tarefas eliminadas</string>
@@ -343,6 +352,9 @@
     <string name="snackbar_task_archived">Tarefa arquivada</string>
     <string name="snackbar_tasks_marked_completed">%d tarefas marcadas como concluídas</string>
     <string name="snackbar_tasks_marked_active">%d tarefas marcadas como ativas</string>
+    <string name="snackbar_tasks_priority_updated">Prioridade atualizada em %d tarefas</string>
+    <string name="snackbar_tasks_tagged">Etiqueta aplicada a %d tarefas</string>
+    <string name="snackbar_tasks_tag_cleared">Etiqueta removida de %d tarefas</string>
     <string name="snackbar_tasks_archived">%d tarefas arquivadas</string>
     <string name="snackbar_tasks_restored">%d tarefas restauradas do arquivo</string>
     <string name="snackbar_failed_mark_completed">Falha ao marcar tarefas como concluídas</string>

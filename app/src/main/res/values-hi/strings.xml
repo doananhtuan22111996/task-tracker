@@ -71,6 +71,15 @@
     <string name="title_archived">संग्रहित</string>
     <string name="title_selected_count">%d चयनित</string>
 
+    <!-- Batch Operations -->
+    <string name="action_apply_tag">टैग लागू करें</string>
+    <string name="action_clear_tag">टैग हटाएँ</string>
+    <string name="title_apply_tag_for_count">%d कार्यों पर टैग लागू करें</string>
+    <string name="cd_apply_tag_selected">चयनित कार्यों पर टैग लागू करें</string>
+    <string name="action_change_priority">प्राथमिकता बदलें</string>
+    <string name="cd_change_priority_selected">चयनित कार्यों की प्राथमिकता बदलें</string>
+    <string name="title_change_priority_for_count">%d कार्यों की प्राथमिकता बदलें</string>
+
     <!-- Task List Screen -->
     <string name="snackbar_task_deleted">कार्य हटाया गया</string>
     <string name="snackbar_tasks_deleted">%d कार्य हटाए गए</string>
@@ -343,6 +352,9 @@
     <string name="snackbar_task_archived">कार्य संग्रहित किया गया</string>
     <string name="snackbar_tasks_marked_completed">%d कार्य पूर्ण चिह्नित किए गए</string>
     <string name="snackbar_tasks_marked_active">%d कार्य सक्रिय चिह्नित किए गए</string>
+    <string name="snackbar_tasks_priority_updated">%d कार्यों की प्राथमिकता अपडेट की गई</string>
+    <string name="snackbar_tasks_tagged">%d कार्यों पर टैग लागू किया गया</string>
+    <string name="snackbar_tasks_tag_cleared">%d कार्यों से टैग हटाया गया</string>
     <string name="snackbar_tasks_archived">%d कार्य संग्रहित किए गए</string>
     <string name="snackbar_tasks_restored">%d कार्य संग्रह से पुनर्स्थापित किए गए</string>
     <string name="snackbar_failed_mark_completed">कार्य पूर्ण चिह्नित करने में विफल</string>
