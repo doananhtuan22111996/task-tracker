@@ -61,6 +61,7 @@ fun TaskListTopBar(
     onBulkArchive: () -> Unit = {},
     onBulkChangePriority: () -> Unit = {},
     onBulkApplyTag: () -> Unit = {},
+    hasAnyTags: Boolean = false,
     onClearSelection: () -> Unit = {},
     onSelectAll: () -> Unit = {},
     hasNonDefaultSort: Boolean = false,
@@ -228,25 +229,27 @@ fun TaskListTopBar(
                                     )
                                 },
                             )
-                            DropdownMenuItem(
-                                text = {
-                                    Text(
-                                        stringResource(R.string.action_apply_tag),
-                                        style = MaterialTheme.typography.labelLarge,
-                                    )
-                                },
-                                onClick = {
-                                    onBulkApplyTag()
-                                    showMoreMenu = false
-                                },
-                                leadingIcon = {
-                                    Icon(
-                                        imageVector = Icons.Default.Label,
-                                        contentDescription = null,
-                                        tint = MaterialTheme.colorScheme.onSurface,
-                                    )
-                                },
-                            )
+                            if (hasAnyTags) {
+                                DropdownMenuItem(
+                                    text = {
+                                        Text(
+                                            stringResource(R.string.action_apply_tag),
+                                            style = MaterialTheme.typography.labelLarge,
+                                        )
+                                    },
+                                    onClick = {
+                                        onBulkApplyTag()
+                                        showMoreMenu = false
+                                    },
+                                    leadingIcon = {
+                                        Icon(
+                                            imageVector = Icons.Default.Label,
+                                            contentDescription = null,
+                                            tint = MaterialTheme.colorScheme.onSurface,
+                                        )
+                                    },
+                                )
+                            }
                         }
                     }
                 }

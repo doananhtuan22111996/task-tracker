@@ -35,6 +35,9 @@ import dev.tuandoan.tasktracker.ui.theme.AppSpacing
  * clear the tag entirely. The list is sourced from [availableTags] (distinct task tags) with
  * colors from [tagColorMap]. Out of scope: inline "create new tag" — the project creates tags
  * via the task editor first.
+ *
+ * Precondition: [availableTags] must be non-empty. The call site gates this sheet behind
+ * `hasAnyTags`; when no tags exist, the "Apply tag" overflow action is hidden entirely.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -65,24 +68,16 @@ fun BulkTagBottomSheet(
 
             ClearTagRow(onClick = { onTagSelected(null, null) })
 
-            if (availableTags.isNotEmpty()) {
-                HorizontalDivider(
-                    modifier = Modifier.padding(vertical = AppSpacing.small),
-                    color = MaterialTheme.colorScheme.outlineVariant,
-                )
-                availableTags.forEach { tagName ->
-                    TagRow(
-                        name = tagName,
-                        colorKey = tagColorMap[tagName],
-                        onClick = { onTagSelected(tagName, tagColorMap[tagName]) },
-                    )
-                }
-            } else {
-                Text(
-                    text = stringResource(R.string.label_no_tags_yet),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.padding(vertical = AppSpacing.medium),
+            // Caller gates the sheet behind hasAnyTags, so the divider + tag rows are always rendered.
+            HorizontalDivider(
+                modifier = Modifier.padding(vertical = AppSpacing.small),
+                color = MaterialTheme.colorScheme.outlineVariant,
+            )
+            availableTags.forEach { tagName ->
+                TagRow(
+                    name = tagName,
+                    colorKey = tagColorMap[tagName],
+                    onClick = { onTagSelected(tagName, tagColorMap[tagName]) },
                 )
             }
 

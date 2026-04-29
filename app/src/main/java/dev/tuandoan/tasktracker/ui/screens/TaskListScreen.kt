@@ -38,6 +38,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -99,9 +100,9 @@ fun TaskListScreen(
     val currentSort by viewModel.currentSort.collectAsStateWithLifecycle()
     val sortOptions = viewModel.sortOptions
     val isNonDefaultSort = currentSort != TaskListStateManager.DEFAULT_SORT
-    var showSortSheet by remember { mutableStateOf(false) }
-    var showPrioritySheet by remember { mutableStateOf(false) }
-    var showTagSheet by remember { mutableStateOf(false) }
+    var showSortSheet by rememberSaveable { mutableStateOf(false) }
+    var showPrioritySheet by rememberSaveable { mutableStateOf(false) }
+    var showTagSheet by rememberSaveable { mutableStateOf(false) }
 
     // Streak data
     val streakMap by viewModel.streakMap.collectAsStateWithLifecycle()
@@ -214,6 +215,7 @@ fun TaskListScreen(
                 onBulkArchive = viewModel::requestBulkArchive,
                 onBulkChangePriority = { showPrioritySheet = true },
                 onBulkApplyTag = { showTagSheet = true },
+                hasAnyTags = availableTags.isNotEmpty(),
                 onClearSelection = viewModel::clearSelection,
                 onSelectAll = { viewModel.selectAll(visibleTasks.map { it.id }) },
                 hasNonDefaultSort = isNonDefaultSort,

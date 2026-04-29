@@ -15,6 +15,7 @@ import dev.tuandoan.tasktracker.domain.model.TaskSort
 import dev.tuandoan.tasktracker.domain.service.TaskSortService
 import dev.tuandoan.tasktracker.domain.usecase.StreakUseCase
 import dev.tuandoan.tasktracker.domain.usecase.SubtaskUseCase
+import dev.tuandoan.tasktracker.domain.usecase.TagManagementUseCase
 import dev.tuandoan.tasktracker.ui.events.UiEvent
 import dev.tuandoan.tasktracker.ui.manager.TaskBulkActionManager
 import dev.tuandoan.tasktracker.ui.manager.TaskCrudManager
@@ -62,6 +63,7 @@ class TaskViewModel @Inject constructor(
     private val taskManager: ITaskManager,
     private val streakUseCase: StreakUseCase,
     private val subtaskUseCase: SubtaskUseCase,
+    private val tagManagementUseCase: TagManagementUseCase,
     private val sortService: TaskSortService,
 ) : ViewModel() {
 
@@ -174,24 +176,27 @@ class TaskViewModel @Inject constructor(
     val hasActiveTagFilter = listState.hasActiveTagFilter
     val isLoading = listState.isLoading
 
-    val availableTags: StateFlow<List<String>> = allTasks
-        .map { tasks ->
-            tasks.mapNotNull { it.tag }
-                .filter { it.isNotEmpty() }
-                .distinct()
-                .sorted()
-        }
+    // Single DISTINCT source for both the sorted name list and the color map. Sourcing
+    // both from one upstream (same Flow, same emission) prevents the two derivations from
+    // drifting out of sync when a brand-new tag is created — the bulk-apply sheet always
+    // reflects the same tag set as the tag-management screen.
+    private val availableTagItems = tagManagementUseCase.observeTags()
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),
             initialValue = emptyList(),
         )
 
-    val tagColorMap: StateFlow<Map<String, String?>> = allTasks
-        .map { tasks ->
-            tasks.filter { !it.tag.isNullOrBlank() }
-                .associate { it.tag!! to it.tagColor }
-        }
+    val availableTags: StateFlow<List<String>> = availableTagItems
+        .map { items -> items.map { it.name }.sorted() }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = emptyList(),
+        )
+
+    val tagColorMap: StateFlow<Map<String, String?>> = availableTagItems
+        .map { items -> items.associate { it.name to it.color } }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),

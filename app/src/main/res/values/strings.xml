@@ -39,7 +39,6 @@
     <string name="action_apply_tag">Apply tag</string>
     <string name="action_clear_tag">Clear tag</string>
     <string name="title_apply_tag_for_count">Apply tag to %d tasks</string>
-    <string name="label_no_tags_yet">No tags yet. Create one in a task editor first.</string>
     <string name="cd_more_options">More options</string>
     <string name="cd_sort_tasks">Sort tasks</string>
     <string name="cd_statistics">Statistics</string>

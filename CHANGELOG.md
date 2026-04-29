@@ -7,8 +7,12 @@ Format follows [Keep a Changelog](https://keepachangelog.com).
 
 ### Added
 - Bulk apply tag: new overflow action in the selection-mode top bar opens a `BulkTagBottomSheet` listing existing tags (with color chips) + a "Clear tag" row; applies the chosen tag (or clears) to every selected task via `ITaskRepository.setTagBulk` and clears the selection
-- English strings `action_apply_tag`, `action_clear_tag`, `title_apply_tag_for_count`, `cd_apply_tag_selected`, `label_no_tags_yet`, `snackbar_tasks_tagged`, `snackbar_tasks_tag_cleared`
+- English strings `action_apply_tag`, `action_clear_tag`, `title_apply_tag_for_count`, `cd_apply_tag_selected`, `snackbar_tasks_tagged`, `snackbar_tasks_tag_cleared`
 - 3 new `TaskBulkActionManagerTest` cases covering apply / clear / blank-as-clear (25 total)
+
+### Changed
+- `TaskViewModel.availableTags` and `tagColorMap` now derive from a single `TagManagementUseCase.observeTags()` (DB-level DISTINCT) instead of two independent in-memory derivations over `allTasks`. Prevents the bulk-apply tag sheet from missing a brand-new tag due to timing drift between the two flows.
+- Hide the "Apply tag" overflow action in selection mode when no tags exist; also persists sort / priority / tag sheet visibility across rotation via `rememberSaveable`.
 - Bulk change priority: new overflow action in the selection-mode top bar opens a `BulkPriorityBottomSheet` (Low / Medium / High) that applies the chosen priority to every selected task via `ITaskRepository.setPriorityBulk` and clears the selection
 - Back gesture now exits selection mode on `TaskListScreen` (clears selection)
 - English strings `action_change_priority`, `cd_change_priority_selected`, `title_change_priority_for_count`, `snackbar_tasks_priority_updated`
