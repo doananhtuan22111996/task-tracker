@@ -9,6 +9,7 @@ import dev.tuandoan.tasktracker.domain.model.TaskSort
 import dev.tuandoan.tasktracker.domain.service.TaskSortService
 import dev.tuandoan.tasktracker.domain.usecase.StreakUseCase
 import dev.tuandoan.tasktracker.domain.usecase.SubtaskUseCase
+import dev.tuandoan.tasktracker.domain.usecase.TagManagementUseCase
 import dev.tuandoan.tasktracker.domain.usecase.TaskCrudUseCase
 import dev.tuandoan.tasktracker.domain.usecase.TaskFilterUseCase
 import dev.tuandoan.tasktracker.domain.usecase.TaskFormUseCase
@@ -97,6 +98,7 @@ class TaskViewModelTest {
             taskManager,
             StreakUseCase(repository),
             SubtaskUseCase(FakeSubtaskRepository()),
+            TagManagementUseCase(repository),
             TaskSortService(),
         )
     }
@@ -169,6 +171,43 @@ class TaskViewModelTest {
         viewModel.availableTags.test {
             val tags = awaitItem()
             assertEquals(listOf("personal", "work"), tags)
+        }
+    }
+
+    @Test
+    fun `availableTags emits a brand-new tag after task insert`() = runTest {
+        // Regression guard for the reported bug: creating a task with a never-seen tag
+        // must immediately appear in availableTags (used by the bulk-apply tag sheet).
+        viewModel = createViewModel()
+        advanceUntilIdle()
+
+        viewModel.availableTags.test {
+            assertEquals(emptyList<String>(), awaitItem())
+
+            repository.insertTask(TestTaskFactory.createTask(id = 42, tag = "urgent"))
+            advanceUntilIdle()
+
+            assertEquals(listOf("urgent"), awaitItem())
+        }
+    }
+
+    @Test
+    fun `tagColorMap reflects a brand-new tag with its color after task insert`() = runTest {
+        // Sibling to availableTags: the sheet needs name + color. Both derivations share
+        // one upstream, so asserting color symmetry guards against future regressions
+        // if someone splits the derivations again.
+        viewModel = createViewModel()
+        advanceUntilIdle()
+
+        viewModel.tagColorMap.test {
+            assertEquals(emptyMap<String, String?>(), awaitItem())
+
+            repository.insertTask(
+                TestTaskFactory.createTask(id = 42, tag = "urgent").copy(tagColor = "red"),
+            )
+            advanceUntilIdle()
+
+            assertEquals(mapOf("urgent" to "red"), awaitItem())
         }
     }
 

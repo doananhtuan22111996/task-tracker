@@ -120,6 +120,12 @@ class FakeTaskRepository : ITaskRepository {
         tasks.value = tasks.value.map { if (it.id in ids) it.copy(priority = priority) else it }
     }
 
+    override suspend fun setTagBulk(ids: List<Long>, tag: String?, tagColor: String?) {
+        tasks.value = tasks.value.map {
+            if (it.id in ids) it.copy(tag = tag, tagColor = tagColor) else it
+        }
+    }
+
     override fun getArchivedTasks(): Flow<List<Task>> = tasks.map { list -> list.filter { it.isArchived } }
 
     override suspend fun archiveTask(taskId: Long) {

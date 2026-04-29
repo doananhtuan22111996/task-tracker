@@ -27,6 +27,7 @@ interface ITaskRepository {
     suspend fun setPinned(taskId: Long, pinned: Boolean)
     suspend fun setPriority(taskId: Long, priority: Int)
     suspend fun setPriorityBulk(ids: List<Long>, priority: Int)
+    suspend fun setTagBulk(ids: List<Long>, tag: String?, tagColor: String?)
 
     // Archive operations
     fun getArchivedTasks(): Flow<List<Task>>

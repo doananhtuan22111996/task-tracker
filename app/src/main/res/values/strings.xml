@@ -35,6 +35,10 @@
     <string name="cd_change_priority_selected">Change priority for selected</string>
     <string name="action_change_priority">Change priority</string>
     <string name="title_change_priority_for_count">Change priority for %d tasks</string>
+    <string name="cd_apply_tag_selected">Apply tag to selected</string>
+    <string name="action_apply_tag">Apply tag</string>
+    <string name="action_clear_tag">Clear tag</string>
+    <string name="title_apply_tag_for_count">Apply tag to %d tasks</string>
     <string name="cd_more_options">More options</string>
     <string name="cd_sort_tasks">Sort tasks</string>
     <string name="cd_statistics">Statistics</string>
@@ -390,6 +394,8 @@
     <string name="snackbar_tasks_marked_completed">%d tasks marked as completed</string>
     <string name="snackbar_tasks_marked_active">%d tasks marked as active</string>
     <string name="snackbar_tasks_priority_updated">Priority updated for %d tasks</string>
+    <string name="snackbar_tasks_tagged">Tag applied to %d tasks</string>
+    <string name="snackbar_tasks_tag_cleared">Tag cleared from %d tasks</string>
     <string name="snackbar_tasks_archived">%d tasks archived</string>
     <string name="snackbar_tasks_restored">%d tasks restored from archive</string>
     <string name="snackbar_failed_mark_completed">Failed to mark tasks as completed</string>

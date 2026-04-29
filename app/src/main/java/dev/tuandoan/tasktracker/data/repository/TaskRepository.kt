@@ -60,6 +60,9 @@ class TaskRepository @Inject constructor(private val taskDao: TaskDao, private v
 
     override suspend fun setPriorityBulk(ids: List<Long>, priority: Int) = taskDao.setPriorityBulk(ids, priority)
 
+    override suspend fun setTagBulk(ids: List<Long>, tag: String?, tagColor: String?) =
+        taskDao.setTagBulk(ids, tag, tagColor)
+
     // Archive operations
     override fun getArchivedTasks(): Flow<List<Task>> = taskDao.getArchivedTasks()
 

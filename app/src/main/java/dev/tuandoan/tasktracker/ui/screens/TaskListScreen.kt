@@ -38,6 +38,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -55,6 +56,7 @@ import dev.tuandoan.tasktracker.R
 import dev.tuandoan.tasktracker.navigation.StatsFilter
 import dev.tuandoan.tasktracker.navigation.TaskTrackerRoutes
 import dev.tuandoan.tasktracker.ui.components.BulkPriorityBottomSheet
+import dev.tuandoan.tasktracker.ui.components.BulkTagBottomSheet
 import dev.tuandoan.tasktracker.ui.components.SortBottomSheet
 import dev.tuandoan.tasktracker.ui.components.TaskListContent
 import dev.tuandoan.tasktracker.ui.components.TaskListTopBar
@@ -98,8 +100,9 @@ fun TaskListScreen(
     val currentSort by viewModel.currentSort.collectAsStateWithLifecycle()
     val sortOptions = viewModel.sortOptions
     val isNonDefaultSort = currentSort != TaskListStateManager.DEFAULT_SORT
-    var showSortSheet by remember { mutableStateOf(false) }
-    var showPrioritySheet by remember { mutableStateOf(false) }
+    var showSortSheet by rememberSaveable { mutableStateOf(false) }
+    var showPrioritySheet by rememberSaveable { mutableStateOf(false) }
+    var showTagSheet by rememberSaveable { mutableStateOf(false) }
 
     // Streak data
     val streakMap by viewModel.streakMap.collectAsStateWithLifecycle()
@@ -211,6 +214,8 @@ fun TaskListScreen(
                 onBulkMarkActive = viewModel::bulkMarkActive,
                 onBulkArchive = viewModel::requestBulkArchive,
                 onBulkChangePriority = { showPrioritySheet = true },
+                onBulkApplyTag = { showTagSheet = true },
+                hasAnyTags = availableTags.isNotEmpty(),
                 onClearSelection = viewModel::clearSelection,
                 onSelectAll = { viewModel.selectAll(visibleTasks.map { it.id }) },
                 hasNonDefaultSort = isNonDefaultSort,
@@ -387,6 +392,20 @@ fun TaskListScreen(
                 showPrioritySheet = false
             },
             onDismiss = { showPrioritySheet = false },
+        )
+    }
+
+    // Bulk tag picker sheet (BO-07).
+    if (showTagSheet) {
+        BulkTagBottomSheet(
+            selectedCount = selectedCount,
+            availableTags = availableTags,
+            tagColorMap = tagColorMap,
+            onTagSelected = { tag, tagColor ->
+                viewModel.bulkApplyTag(tag, tagColor)
+                showTagSheet = false
+            },
+            onDismiss = { showTagSheet = false },
         )
     }
 }

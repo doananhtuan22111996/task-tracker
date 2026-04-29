@@ -64,6 +64,9 @@ class RatingEligibilityTest {
         subtaskUseCase = dev.tuandoan.tasktracker.domain.usecase.SubtaskUseCase(
             dev.tuandoan.tasktracker.testutil.FakeSubtaskRepository(),
         ),
+        tagManagementUseCase = dev.tuandoan.tasktracker.domain.usecase.TagManagementUseCase(
+            dev.tuandoan.tasktracker.testutil.FakeTaskRepository(),
+        ),
         sortService = dev.tuandoan.tasktracker.domain.service.TaskSortService(),
     )
 

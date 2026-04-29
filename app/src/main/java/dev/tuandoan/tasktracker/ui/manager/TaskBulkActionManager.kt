@@ -156,6 +156,33 @@ class TaskBulkActionManager @Inject constructor(
     }
 
     /**
+     * Applies [tag] (with optional [tagColor]) to every selected task and clears the
+     * selection on success. Passing `null`/blank for [tag] clears the tag. No undo —
+     * tag changes are trivially reversible via the same picker.
+     */
+    fun bulkApplyTag(
+        scope: CoroutineScope,
+        tag: String?,
+        tagColor: String?,
+        onSuccess: (String) -> Unit = {},
+        onError: (String) -> Unit = {},
+    ) {
+        val clearing = tag.isNullOrBlank()
+        val successRes = if (clearing) R.string.snackbar_tasks_tag_cleared else R.string.snackbar_tasks_tagged
+        executeBulkOperation(
+            scope = scope,
+            operation = { taskIds ->
+                crudManager.bulkApplyTag(taskIds, tag, tagColor)
+            },
+            successMessage = { count -> context.getString(successRes, count) },
+            errorMessage = context.getString(R.string.error_update_tasks),
+            clearSelectionOnSuccess = true,
+            onSuccess = onSuccess,
+            onError = onError,
+        )
+    }
+
+    /**
      * Applies [priority] (0 = LOW, 1 = MEDIUM, 2 = HIGH) to every selected task and clears
      * the selection on success. No undo — priority changes are trivially reversible.
      */

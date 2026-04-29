@@ -318,6 +318,16 @@ class TaskManager @Inject constructor(
         widgetUpdater.requestUpdate()
     }
 
+    override suspend fun setTagBulk(ids: List<Long>, tag: String?, tagColor: String?) {
+        if (ids.isEmpty()) return
+        val normalized = TagNormalizer.normalize(tag)
+        // When clearing (normalized == null), force tagColor to null too so archived/existing
+        // rows don't carry an orphan colour (matches the v10→v11 invariant).
+        val resolvedColor = if (normalized == null) null else tagColor
+        repository.setTagBulk(ids, normalized, resolvedColor)
+        widgetUpdater.requestUpdate()
+    }
+
     // Archive operations
     override fun getArchivedTasks(): Flow<List<Task>> = repository.getArchivedTasks()
 

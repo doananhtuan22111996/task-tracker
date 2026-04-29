@@ -13,6 +13,7 @@ import androidx.compose.material.icons.filled.CheckBoxOutlineBlank
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Flag
+import androidx.compose.material.icons.filled.Label
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.SelectAll
@@ -59,6 +60,8 @@ fun TaskListTopBar(
     onBulkMarkActive: () -> Unit = {},
     onBulkArchive: () -> Unit = {},
     onBulkChangePriority: () -> Unit = {},
+    onBulkApplyTag: () -> Unit = {},
+    hasAnyTags: Boolean = false,
     onClearSelection: () -> Unit = {},
     onSelectAll: () -> Unit = {},
     hasNonDefaultSort: Boolean = false,
@@ -226,6 +229,27 @@ fun TaskListTopBar(
                                     )
                                 },
                             )
+                            if (hasAnyTags) {
+                                DropdownMenuItem(
+                                    text = {
+                                        Text(
+                                            stringResource(R.string.action_apply_tag),
+                                            style = MaterialTheme.typography.labelLarge,
+                                        )
+                                    },
+                                    onClick = {
+                                        onBulkApplyTag()
+                                        showMoreMenu = false
+                                    },
+                                    leadingIcon = {
+                                        Icon(
+                                            imageVector = Icons.Default.Label,
+                                            contentDescription = null,
+                                            tint = MaterialTheme.colorScheme.onSurface,
+                                        )
+                                    },
+                                )
+                            }
                         }
                     }
                 }
