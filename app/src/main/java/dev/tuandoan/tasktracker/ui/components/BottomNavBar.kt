@@ -3,9 +3,11 @@ package dev.tuandoan.tasktracker.ui.components
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Archive
 import androidx.compose.material.icons.filled.BarChart
+import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.outlined.Archive
 import androidx.compose.material.icons.outlined.BarChart
+import androidx.compose.material.icons.outlined.CalendarMonth
 import androidx.compose.material.icons.outlined.CheckCircle
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -29,6 +31,12 @@ enum class BottomNavTab(
         labelResId = R.string.nav_tab_tasks,
         selectedIcon = Icons.Filled.CheckCircle,
         unselectedIcon = Icons.Outlined.CheckCircle,
+    ),
+    CALENDAR(
+        route = TaskTrackerRoutes.CALENDAR,
+        labelResId = R.string.nav_tab_calendar,
+        selectedIcon = Icons.Filled.CalendarMonth,
+        unselectedIcon = Icons.Outlined.CalendarMonth,
     ),
     STATS(
         route = TaskTrackerRoutes.STATS,

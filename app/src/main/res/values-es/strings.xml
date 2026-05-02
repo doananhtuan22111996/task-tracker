@@ -6,6 +6,9 @@
     <string name="nav_tab_tasks">Tareas</string>
     <string name="nav_tab_stats">Estadísticas</string>
     <string name="nav_tab_archived">Archivadas</string>
+    <string name="nav_tab_calendar">Calendario</string>
+    <string name="calendar_placeholder_title">Calendario próximamente</string>
+    <string name="calendar_placeholder_body">La cuadrícula del mes, la agenda del día y las proyecciones de tareas recurrentes llegarán en próximas actualizaciones.</string>
 
     <!-- Navigation -->
     <string name="nav_all">Todas</string>

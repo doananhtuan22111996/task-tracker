@@ -5,6 +5,9 @@
     <string name="nav_tab_tasks">Tasks</string>
     <string name="nav_tab_stats">Stats</string>
     <string name="nav_tab_archived">Archived</string>
+    <string name="nav_tab_calendar">Calendar</string>
+    <string name="calendar_placeholder_title">Calendar coming soon</string>
+    <string name="calendar_placeholder_body">The month grid, day agenda, and recurring-task projections will land in follow-up updates.</string>
 
     <!-- Task Filter Chips -->
     <string name="nav_all">All</string>

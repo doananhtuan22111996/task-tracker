@@ -13,6 +13,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com).
 - `CalendarUseCase.observeMonthDecorations(monthStart, monthEnd)` — aggregates concrete dated tasks and recurrence projections into a reactive `Flow<Map<LocalDate, DayDecoration>>` for the v1.11.0 calendar month grid. Hilt-injected `@Singleton`; honors archive + completion state; `hasRecurringProjection` flag is true only when a day has no concrete row (CAL-05)
 
 - `CalendarViewModel` — Hilt-injected; holds `visibleMonth`/`selectedDay`, exposes `StateFlow<CalendarUiState>` over `CalendarUseCase.observeMonthDecorations`. Events: `onMonthChange(delta)` / `onDaySelect(date)` / `onTodayClick()` / `onJumpToMonth(target)`. Both month and day survive process death via `SavedStateHandle` (ISO string keys `calendar_visible_month` / `calendar_selected_day`) (CAL-08)
+- Calendar bottom-nav destination (between Tasks and Stats) + route `calendar` + `CalendarScreen` placeholder scaffold with localized `LLLL yyyy` month title. Enum tab count: 3 → 4. Full 8-locale translations for `nav_tab_calendar` + two placeholder strings (CAL-02, CAL-03)
 
 ### Fixed
 - Weekly recurrence with a single-day bitmask and `interval = 1` now correctly advances one week instead of collapsing back to the same day. A Monday-only rule from a Monday used to return the same Monday because both `daysUntilNextMonday` and `weeksToSkip` resolved to zero (caught while implementing CAL-05)

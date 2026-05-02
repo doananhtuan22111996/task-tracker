@@ -12,13 +12,18 @@ class BottomNavBarTest {
     // === Tab Configuration ===
 
     @Test
-    fun `BottomNavTab has exactly 3 entries`() {
-        assertEquals(3, BottomNavTab.entries.size)
+    fun `BottomNavTab has exactly 4 entries`() {
+        assertEquals(4, BottomNavTab.entries.size)
     }
 
     @Test
     fun `TASKS tab has correct route`() {
         assertEquals(TaskTrackerRoutes.TASK_LIST_BASE, BottomNavTab.TASKS.route)
+    }
+
+    @Test
+    fun `CALENDAR tab has correct route`() {
+        assertEquals(TaskTrackerRoutes.CALENDAR, BottomNavTab.CALENDAR.route)
     }
 
     @Test
@@ -37,6 +42,11 @@ class BottomNavBarTest {
     }
 
     @Test
+    fun `CALENDAR tab has correct label resource`() {
+        assertEquals(R.string.nav_tab_calendar, BottomNavTab.CALENDAR.labelResId)
+    }
+
+    @Test
     fun `STATS tab has correct label resource`() {
         assertEquals(R.string.nav_tab_stats, BottomNavTab.STATS.labelResId)
     }
@@ -49,11 +59,12 @@ class BottomNavBarTest {
     // === Tab Order ===
 
     @Test
-    fun `tab order is Tasks, Stats, Archived`() {
+    fun `tab order is Tasks, Calendar, Stats, Archived`() {
         val tabs = BottomNavTab.entries
         assertEquals(BottomNavTab.TASKS, tabs[0])
-        assertEquals(BottomNavTab.STATS, tabs[1])
-        assertEquals(BottomNavTab.ARCHIVED, tabs[2])
+        assertEquals(BottomNavTab.CALENDAR, tabs[1])
+        assertEquals(BottomNavTab.STATS, tabs[2])
+        assertEquals(BottomNavTab.ARCHIVED, tabs[3])
     }
 
     // === Icon Configuration ===
@@ -92,6 +103,12 @@ class BottomNavBarTest {
     fun `archived route matches ARCHIVED tab`() {
         val route = "archived"
         assertTrue(route.startsWith(BottomNavTab.ARCHIVED.route))
+    }
+
+    @Test
+    fun `calendar route matches CALENDAR tab`() {
+        val route = "calendar"
+        assertTrue(route.startsWith(BottomNavTab.CALENDAR.route))
     }
 
     @Test

@@ -6,6 +6,9 @@
     <string name="nav_tab_tasks">Tugas</string>
     <string name="nav_tab_stats">Statistik</string>
     <string name="nav_tab_archived">Diarsipkan</string>
+    <string name="nav_tab_calendar">Kalender</string>
+    <string name="calendar_placeholder_title">Kalender segera hadir</string>
+    <string name="calendar_placeholder_body">Tampilan bulan, agenda harian, dan proyeksi tugas berulang akan hadir pada pembaruan berikutnya.</string>
 
     <!-- Navigation -->
     <string name="nav_all">Semua</string>

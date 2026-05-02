@@ -7,6 +7,7 @@ object TaskTrackerRoutes {
     const val TASK_LIST = "task_list?statsFilter={statsFilter}"
     const val TASK_LIST_BASE = "task_list"
     const val ARCHIVED = "archived"
+    const val CALENDAR = "calendar"
     const val STATS = "stats"
     const val SETTINGS = "settings"
     const val ONBOARDING = "onboarding"
