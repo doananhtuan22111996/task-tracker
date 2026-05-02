@@ -265,7 +265,8 @@ class FakeTaskRepository : ITaskRepository {
         .filter { !it.isArchived }
         .filter { it.id == rootId || it.parentRecurringTaskId == rootId }
         .filter { it.dueAt != null && it.dueAt >= startMillis && it.dueAt < endMillis }
-        .minByOrNull { it.dueAt!! }
+        .sortedBy { it.dueAt }
+        .firstOrNull()
 
     // Tag management operations
     override fun getDistinctTagsWithCount(): Flow<List<TagInfo>> = tasks.map { list ->

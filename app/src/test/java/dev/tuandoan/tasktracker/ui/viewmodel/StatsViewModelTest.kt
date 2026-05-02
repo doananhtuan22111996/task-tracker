@@ -24,6 +24,8 @@ import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
+import java.time.LocalDate
+import java.time.ZoneId
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class StatsViewModelTest {
@@ -220,11 +222,7 @@ private class FakeStatsTaskManager : ITaskManager {
     override fun observeCompletedCountPerDay(startMillis: Long, endMillis: Long): Flow<List<DailyCount>> =
         completedPerDayFlow
 
-    override suspend fun materializeProjectedOccurrence(
-        parentId: Long,
-        date: java.time.LocalDate,
-        zone: java.time.ZoneId,
-    ): Long? = null
+    override suspend fun materializeProjectedOccurrence(parentId: Long, date: LocalDate, zone: ZoneId): Long? = null
 
     override fun getAllTasks(): Flow<List<Task>> = MutableStateFlow(emptyList())
     override suspend fun getTaskById(id: Long): Task? = null

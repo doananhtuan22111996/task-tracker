@@ -507,7 +507,14 @@ class TaskManager @Inject constructor(
             parentRecurringTaskId = rootId,
         )
         val newId = repository.insertTask(materialized)
-        scheduleReminderIfNeeded(newId, materialized.title, dueAt, materialized.reminderOffsetMinutes)
+        // Only schedule when the due time is still in the future. Users can materialize a
+        // past-date projection (e.g., by scrolling backward in the calendar); the reminder
+        // scheduler would throw IllegalArgumentException in that case — and bubbling an
+        // exception up from a "tap on projected row" path would violate the materialize-then-
+        // open contract. Mirrors what buildNextTask's rolling "next occurrence" gets for free.
+        if (dueAt > now) {
+            scheduleReminderIfNeeded(newId, materialized.title, dueAt, materialized.reminderOffsetMinutes)
+        }
         widgetUpdater.requestUpdate()
         return newId
     }

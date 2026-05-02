@@ -657,4 +657,28 @@ class TaskManagerRecurrenceTest {
 
         assertNull(result)
     }
+
+    @Test
+    fun `materializeProjectedOccurrence skips reminder scheduling for past-dated projections`() = runTest {
+        // Guards against IllegalArgumentException from scheduleReminderIfNeeded when the user
+        // materializes a projection whose reminder time has already passed (e.g., scrolled
+        // backward in the calendar before tapping). The row must still be inserted.
+        val baseDate = LocalDate.of(2020, 1, 1)
+        repository.seed(
+            TestTaskFactory.createTask(
+                id = 1L,
+                title = "Standup",
+                dueAt = baseDate.atStartOfDay(zone).toInstant().toEpochMilli(),
+                reminderOffsetMinutes = 30,
+                recurrenceType = RecurrenceType.DAILY.value,
+            ),
+        )
+        val pastTarget = LocalDate.of(2020, 1, 5) // well before "now"
+
+        val newId = taskManager.materializeProjectedOccurrence(parentId = 1L, date = pastTarget, zone = zone)
+
+        assertNotNull(newId) // row still materialized
+        val inserted = repository.getAllTasksSnapshot().single { it.id == newId }
+        assertEquals(pastTarget.atStartOfDay(zone).toInstant().toEpochMilli(), inserted.dueAt)
+    }
 }
