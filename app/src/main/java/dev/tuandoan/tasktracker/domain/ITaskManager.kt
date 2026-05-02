@@ -3,6 +3,8 @@ package dev.tuandoan.tasktracker.domain
 import dev.tuandoan.tasktracker.data.database.DailyCount
 import dev.tuandoan.tasktracker.data.database.Task
 import kotlinx.coroutines.flow.Flow
+import java.time.LocalDate
+import java.time.ZoneId
 
 interface ITaskManager {
     // Data access
@@ -85,6 +87,26 @@ interface ITaskManager {
     suspend fun unarchiveTasks(ids: List<Long>)
     suspend fun hardDeleteTask(taskId: Long)
     suspend fun hardDeleteTasks(ids: List<Long>)
+
+    /**
+     * Materializes a projected recurrence occurrence for [parentId] anchored to [date] into a
+     * concrete `tasks` row, and returns its id (CAL-23).
+     *
+     * Idempotent: if a concrete row already exists for this chain on [date], its id is returned
+     * without inserting. Callers don't need to pre-check; rapid repeat taps on the same
+     * projected row collapse into a single insert.
+     *
+     * `dueAt` on the new row uses the parent's `dueAtHasTime` flag:
+     *   - when false, `dueAt = start-of-day(date, zone)`
+     *   - when true, the hour/minute is copied from the parent's `dueAt`
+     *
+     * Returns `null` if [parentId] doesn't exist, is archived, or is not recurring.
+     */
+    suspend fun materializeProjectedOccurrence(
+        parentId: Long,
+        date: LocalDate,
+        zone: ZoneId = ZoneId.systemDefault(),
+    ): Long?
 
     // Stats operations (exclude archived tasks)
     fun observeActiveCount(): Flow<Int>

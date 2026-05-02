@@ -1077,4 +1077,10 @@ private class FakeEditorTaskManager : ITaskManager {
     override fun observeOverdueCount(nowMillis: Long): Flow<Int> = MutableStateFlow(0)
     override fun observeCompletedCountPerDay(startMillis: Long, endMillis: Long): Flow<List<DailyCount>> =
         MutableStateFlow(emptyList())
+
+    override suspend fun materializeProjectedOccurrence(
+        parentId: Long,
+        date: java.time.LocalDate,
+        zone: java.time.ZoneId,
+    ): Long? = null
 }

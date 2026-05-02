@@ -10,6 +10,9 @@ import dev.tuandoan.tasktracker.domain.scheduler.WidgetUpdater
 import dev.tuandoan.tasktracker.domain.service.RecurrenceCalculator
 import dev.tuandoan.tasktracker.domain.service.TagNormalizer
 import kotlinx.coroutines.flow.Flow
+import java.time.Instant
+import java.time.LocalDate
+import java.time.ZoneId
 import javax.inject.Inject
 
 /**
@@ -464,6 +467,49 @@ class TaskManager @Inject constructor(
         } else {
             repository.archiveTask(task.id)
         }
+    }
+
+    override suspend fun materializeProjectedOccurrence(parentId: Long, date: LocalDate, zone: ZoneId): Long? {
+        // Locate the chain origin. The projection layer always keys off parent ids
+        // (parentRecurringTaskId == null for root), but callers may pass a child id if the UI
+        // rendered the projection off a generated row — normalize either way.
+        val anchor = repository.getTaskById(parentId) ?: return null
+        val rootId = anchor.parentRecurringTaskId ?: anchor.id
+        val root = if (rootId == anchor.id) anchor else repository.getTaskById(rootId) ?: return null
+
+        if (root.isArchived) return null
+        if (RecurrenceType.fromValue(root.recurrenceType) == RecurrenceType.NONE) return null
+
+        // Idempotency: if a concrete row already exists on [date] for this chain, return it
+        // instead of inserting a second row. Uses a half-open window so the test is tz-consistent
+        // with observeTasksInRange.
+        val startMillis = date.atStartOfDay(zone).toInstant().toEpochMilli()
+        val endMillis = date.plusDays(1).atStartOfDay(zone).toInstant().toEpochMilli()
+        repository.findChainTaskOnDate(rootId, startMillis, endMillis)?.let { return it.id }
+
+        // Materialize. Copy recurrence fields from the root so the chain stays coherent; dueAt
+        // uses the parent's time-of-day when dueAtHasTime is true, else start-of-day.
+        val dueAt = if (root.dueAtHasTime && root.dueAt != null) {
+            val rootTime = Instant.ofEpochMilli(root.dueAt).atZone(zone).toLocalTime()
+            date.atTime(rootTime).atZone(zone).toInstant().toEpochMilli()
+        } else {
+            startMillis
+        }
+        val now = System.currentTimeMillis()
+        val materialized = root.copy(
+            id = 0,
+            createdAt = now,
+            isCompleted = false,
+            completedAt = null,
+            isArchived = false,
+            archivedAt = null,
+            dueAt = dueAt,
+            parentRecurringTaskId = rootId,
+        )
+        val newId = repository.insertTask(materialized)
+        scheduleReminderIfNeeded(newId, materialized.title, dueAt, materialized.reminderOffsetMinutes)
+        widgetUpdater.requestUpdate()
+        return newId
     }
 
     // Helper method for scheduling reminders

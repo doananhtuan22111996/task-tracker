@@ -60,6 +60,9 @@ interface ITaskRepository {
     suspend fun getCompletedTasksForChains(rootIds: List<Long>): List<Task>
     suspend fun getActiveRecurringRootIds(): List<Long>
 
+    // Calendar projection materialization (CAL-23).
+    suspend fun findChainTaskOnDate(rootId: Long, startMillis: Long, endMillis: Long): Task?
+
     // Tag management operations
     fun getDistinctTagsWithCount(): Flow<List<TagInfo>>
     suspend fun updateTagName(oldName: String, newName: String)

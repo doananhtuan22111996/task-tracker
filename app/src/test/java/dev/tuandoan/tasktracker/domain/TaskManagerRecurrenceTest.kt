@@ -483,4 +483,178 @@ class TaskManagerRecurrenceTest {
         assertEquals(1L, allSubtasks.first().taskId)
         assertTrue(allSubtasks.first().isCompleted)
     }
+
+    // ── materializeProjectedOccurrence (CAL-23) ───────────────────────────────────────────
+
+    @Test
+    fun `materializeProjectedOccurrence inserts concrete row on projected date`() = runTest {
+        val baseDate = LocalDate.of(2026, 5, 4)
+        repository.seed(
+            TestTaskFactory.createTask(
+                id = 1L,
+                title = "Standup",
+                dueAt = baseDate.atStartOfDay(zone).toInstant().toEpochMilli(),
+                recurrenceType = RecurrenceType.DAILY.value,
+            ),
+        )
+        val target = LocalDate.of(2026, 5, 7)
+
+        val newId = taskManager.materializeProjectedOccurrence(parentId = 1L, date = target, zone = zone)
+
+        assertNotNull(newId)
+        val inserted = repository.getAllTasksSnapshot().single { it.id == newId }
+        assertEquals(1L, inserted.parentRecurringTaskId)
+        assertEquals(target.atStartOfDay(zone).toInstant().toEpochMilli(), inserted.dueAt)
+        assertEquals("Standup", inserted.title)
+        assertFalse(inserted.isCompleted)
+        assertFalse(inserted.isArchived)
+    }
+
+    @Test
+    fun `materializeProjectedOccurrence is idempotent when chain already has row on date`() = runTest {
+        val baseDate = LocalDate.of(2026, 5, 4)
+        val existingDate = LocalDate.of(2026, 5, 11)
+        repository.seed(
+            TestTaskFactory.createTask(
+                id = 1L,
+                title = "Standup",
+                dueAt = baseDate.atStartOfDay(zone).toInstant().toEpochMilli(),
+                recurrenceType = RecurrenceType.DAILY.value,
+            ),
+            TestTaskFactory.createTask(
+                id = 42L,
+                title = "Standup",
+                dueAt = existingDate.atStartOfDay(zone).toInstant().toEpochMilli(),
+                recurrenceType = RecurrenceType.DAILY.value,
+                parentRecurringTaskId = 1L,
+            ),
+        )
+        val countBefore = repository.getAllTasksSnapshot().size
+
+        val returnedId = taskManager.materializeProjectedOccurrence(parentId = 1L, date = existingDate, zone = zone)
+
+        assertEquals(42L, returnedId)
+        assertEquals(countBefore, repository.getAllTasksSnapshot().size) // no duplicate insert
+    }
+
+    @Test
+    fun `materializeProjectedOccurrence called twice produces only one row`() = runTest {
+        val baseDate = LocalDate.of(2026, 5, 4)
+        repository.seed(
+            TestTaskFactory.createTask(
+                id = 1L,
+                title = "Standup",
+                dueAt = baseDate.atStartOfDay(zone).toInstant().toEpochMilli(),
+                recurrenceType = RecurrenceType.DAILY.value,
+            ),
+        )
+        val target = LocalDate.of(2026, 5, 5)
+
+        val first = taskManager.materializeProjectedOccurrence(parentId = 1L, date = target, zone = zone)
+        val second = taskManager.materializeProjectedOccurrence(parentId = 1L, date = target, zone = zone)
+
+        assertEquals(first, second)
+        val chainCount = repository.getAllTasksSnapshot().count { it.id == 1L || it.parentRecurringTaskId == 1L }
+        assertEquals(2, chainCount) // root + exactly one materialized child
+    }
+
+    @Test
+    fun `materializeProjectedOccurrence preserves time-of-day when parent has dueAtHasTime`() = runTest {
+        val baseDate = LocalDate.of(2026, 5, 4)
+        val parentDueAt = baseDate.atTime(9, 30).atZone(zone).toInstant().toEpochMilli()
+        repository.seed(
+            TestTaskFactory.createTask(
+                id = 1L,
+                title = "Standup",
+                dueAt = parentDueAt,
+                dueAtHasTime = true,
+                recurrenceType = RecurrenceType.DAILY.value,
+            ),
+        )
+        val target = LocalDate.of(2026, 5, 7)
+
+        val newId = taskManager.materializeProjectedOccurrence(parentId = 1L, date = target, zone = zone)
+
+        val inserted = repository.getAllTasksSnapshot().single { it.id == newId }
+        val expectedDueAt = target.atTime(9, 30).atZone(zone).toInstant().toEpochMilli()
+        assertEquals(expectedDueAt, inserted.dueAt)
+        assertTrue(inserted.dueAtHasTime)
+    }
+
+    @Test
+    fun `materializeProjectedOccurrence resolves root when called with child id`() = runTest {
+        // Calendar UI may render projection off the latest generated child. Caller passes its
+        // id; the helper must still anchor to the chain root.
+        val baseDate = LocalDate.of(2026, 5, 4)
+        repository.seed(
+            TestTaskFactory.createTask(
+                id = 1L,
+                title = "Standup",
+                dueAt = baseDate.atStartOfDay(zone).toInstant().toEpochMilli(),
+                recurrenceType = RecurrenceType.DAILY.value,
+            ),
+            TestTaskFactory.createTask(
+                id = 2L,
+                title = "Standup",
+                dueAt = baseDate.plusDays(1).atStartOfDay(zone).toInstant().toEpochMilli(),
+                recurrenceType = RecurrenceType.DAILY.value,
+                parentRecurringTaskId = 1L,
+            ),
+        )
+        val target = LocalDate.of(2026, 5, 6)
+
+        val newId = taskManager.materializeProjectedOccurrence(parentId = 2L, date = target, zone = zone)
+
+        val inserted = repository.getAllTasksSnapshot().single { it.id == newId }
+        assertEquals(1L, inserted.parentRecurringTaskId) // root, not the child we passed in
+    }
+
+    @Test
+    fun `materializeProjectedOccurrence returns null for non-recurring parent`() = runTest {
+        repository.seed(
+            TestTaskFactory.createTask(id = 1L, title = "One-off", recurrenceType = RecurrenceType.NONE.value),
+        )
+
+        val result = taskManager.materializeProjectedOccurrence(
+            parentId = 1L,
+            date = LocalDate.of(2026, 5, 10),
+            zone = zone,
+        )
+
+        assertNull(result)
+        assertEquals(1, repository.getAllTasksSnapshot().size) // no row inserted
+    }
+
+    @Test
+    fun `materializeProjectedOccurrence returns null for archived parent`() = runTest {
+        val baseDate = LocalDate.of(2026, 5, 4)
+        repository.seed(
+            TestTaskFactory.createTask(
+                id = 1L,
+                title = "Standup",
+                dueAt = baseDate.atStartOfDay(zone).toInstant().toEpochMilli(),
+                recurrenceType = RecurrenceType.DAILY.value,
+                isArchived = true,
+            ),
+        )
+
+        val result = taskManager.materializeProjectedOccurrence(
+            parentId = 1L,
+            date = LocalDate.of(2026, 5, 10),
+            zone = zone,
+        )
+
+        assertNull(result)
+    }
+
+    @Test
+    fun `materializeProjectedOccurrence returns null for unknown parent id`() = runTest {
+        val result = taskManager.materializeProjectedOccurrence(
+            parentId = 999L,
+            date = LocalDate.of(2026, 5, 10),
+            zone = zone,
+        )
+
+        assertNull(result)
+    }
 }

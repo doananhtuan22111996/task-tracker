@@ -220,6 +220,12 @@ private class FakeStatsTaskManager : ITaskManager {
     override fun observeCompletedCountPerDay(startMillis: Long, endMillis: Long): Flow<List<DailyCount>> =
         completedPerDayFlow
 
+    override suspend fun materializeProjectedOccurrence(
+        parentId: Long,
+        date: java.time.LocalDate,
+        zone: java.time.ZoneId,
+    ): Long? = null
+
     override fun getAllTasks(): Flow<List<Task>> = MutableStateFlow(emptyList())
     override suspend fun getTaskById(id: Long): Task? = null
     override suspend fun createTask(title: String, description: String): Long = 0
