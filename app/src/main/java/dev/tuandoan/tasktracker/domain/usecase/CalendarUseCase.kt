@@ -48,6 +48,21 @@ class CalendarUseCase @Inject constructor(private val taskRepository: ITaskRepos
         }
     }
 
+    /**
+     * Live list of concrete tasks whose `dueAt` falls on [day] (in [zone]). Used by the
+     * day-agenda bottom sheet (CAL-17). Ordered by `dueAt` ascending (matches
+     * [observeTasksInRange]'s order from CAL-06). Excludes archived. Includes completed.
+     *
+     * Projected recurrence occurrences for [day] are NOT included — the agenda currently
+     * surfaces persisted Room rows only. Materialization of projections is tracked as
+     * ADR-002 (CAL-23).
+     */
+    fun observeTasksForDay(day: LocalDate, zone: ZoneId = ZoneId.systemDefault()): Flow<List<Task>> {
+        val startMillis = day.atStartOfDay(zone).toInstant().toEpochMilli()
+        val endMillis = day.plusDays(1).atStartOfDay(zone).toInstant().toEpochMilli()
+        return taskRepository.observeTasksInRange(startMillis, endMillis)
+    }
+
     private fun buildDecorations(
         concreteInRange: List<Task>,
         allActiveTasks: List<Task>,

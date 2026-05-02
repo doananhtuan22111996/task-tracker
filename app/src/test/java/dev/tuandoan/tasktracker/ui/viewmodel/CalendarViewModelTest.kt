@@ -265,6 +265,61 @@ class CalendarViewModelTest {
 
     // ── Saved state persistence ──
 
+    // ── selectedDayTasks (CAL-17) ──
+
+    @Test
+    fun `uiState selectedDayTasks reflects tasks on the selected day`() = runTest {
+        val savedState = SavedStateHandle(
+            mapOf(
+                CalendarViewModel.KEY_VISIBLE_MONTH to "2026-05",
+                CalendarViewModel.KEY_SELECTED_DAY to "2026-05-10",
+            ),
+        )
+        val target = LocalDate.of(2026, 5, 10)
+        repo.seed(
+            TestTaskFactory.createTask(id = 1L, title = "Today", dueAt = dateEpoch(target)),
+            TestTaskFactory.createTask(id = 2L, title = "Other day", dueAt = dateEpoch(target.minusDays(1))),
+        )
+        val vm = createViewModel(savedState)
+
+        vm.uiState.test {
+            val state = awaitItem()
+            assertEquals(listOf(1L), state.selectedDayTasks.map { it.id })
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `uiState selectedDayTasks updates when selectedDay changes`() = runTest {
+        val savedState = SavedStateHandle(
+            mapOf(
+                CalendarViewModel.KEY_VISIBLE_MONTH to "2026-05",
+                CalendarViewModel.KEY_SELECTED_DAY to "2026-05-10",
+            ),
+        )
+        repo.seed(
+            TestTaskFactory.createTask(id = 1L, title = "On 10", dueAt = dateEpoch(LocalDate.of(2026, 5, 10))),
+            TestTaskFactory.createTask(id = 2L, title = "On 20", dueAt = dateEpoch(LocalDate.of(2026, 5, 20))),
+        )
+        val vm = createViewModel(savedState)
+
+        vm.uiState.test {
+            val first = awaitItem()
+            assertEquals(listOf(1L), first.selectedDayTasks.map { it.id })
+
+            vm.onDaySelect(LocalDate.of(2026, 5, 20))
+
+            var latest = awaitItem()
+            while (latest.selectedDay != LocalDate.of(2026, 5, 20) ||
+                latest.selectedDayTasks.map { it.id } != listOf(2L)
+            ) {
+                latest = awaitItem()
+            }
+            assertEquals(listOf(2L), latest.selectedDayTasks.map { it.id })
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
     @Test
     fun `SavedStateHandle contains the latest values after mutations`() = runTest {
         val savedState = SavedStateHandle()

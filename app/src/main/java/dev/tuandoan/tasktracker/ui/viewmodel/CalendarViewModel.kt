@@ -4,6 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dev.tuandoan.tasktracker.data.database.Task
 import dev.tuandoan.tasktracker.domain.model.DayDecoration
 import dev.tuandoan.tasktracker.domain.usecase.CalendarUseCase
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -58,15 +59,23 @@ class CalendarViewModel @Inject constructor(
             )
         }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private val selectedDayTasksFlow: Flow<List<Task>> =
+        _selectedDay.flatMapLatest { day ->
+            calendarUseCase.observeTasksForDay(day, zone)
+        }
+
     val uiState: StateFlow<CalendarUiState> = combine(
         _visibleMonth,
         _selectedDay,
         decorationsFlow,
-    ) { month, day, decorations ->
+        selectedDayTasksFlow,
+    ) { month, day, decorations, dayTasks ->
         CalendarUiState(
             visibleMonth = month,
             selectedDay = day,
             decorations = decorations,
+            selectedDayTasks = dayTasks,
         )
     }.stateIn(
         scope = viewModelScope,
@@ -127,4 +136,5 @@ data class CalendarUiState(
     val visibleMonth: YearMonth,
     val selectedDay: LocalDate,
     val decorations: Map<LocalDate, DayDecoration> = emptyMap(),
+    val selectedDayTasks: List<Task> = emptyList(),
 )

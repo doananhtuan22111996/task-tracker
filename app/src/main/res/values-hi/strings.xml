@@ -10,6 +10,7 @@
     <string name="action_calendar_today">आज</string>
     <string name="cd_calendar_prev_month">पिछला महीना</string>
     <string name="cd_calendar_next_month">अगला महीना</string>
+    <string name="calendar_agenda_empty">इस दिन कोई कार्य नहीं।</string>
 
     <!-- Navigation -->
     <string name="nav_all">सभी</string>

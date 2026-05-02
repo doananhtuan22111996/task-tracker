@@ -260,6 +260,9 @@ fun TaskTrackerApp(
                     val calendarViewModel: CalendarViewModel = hiltViewModel()
                     CalendarScreen(
                         viewModel = calendarViewModel,
+                        onNavigateToEditor = { taskId ->
+                            navController.navigate(TaskTrackerRoutes.taskEditorEdit(taskId))
+                        },
                         bottomBarPadding = bottomBarPadding,
                     )
                 }
