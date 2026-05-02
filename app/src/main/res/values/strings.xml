@@ -10,6 +10,7 @@
     <string name="cd_calendar_prev_month">Previous month</string>
     <string name="cd_calendar_next_month">Next month</string>
     <string name="calendar_agenda_empty">No tasks on this day.</string>
+    <string name="cd_agenda_add_task">Add task for this day</string>
 
     <!-- Task Filter Chips -->
     <string name="nav_all">All</string>

@@ -31,6 +31,7 @@ import dev.tuandoan.tasktracker.ui.components.DayAgendaSheet
 import dev.tuandoan.tasktracker.ui.theme.AppSpacing
 import dev.tuandoan.tasktracker.ui.viewmodel.CalendarViewModel
 import java.time.YearMonth
+import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
@@ -38,14 +39,17 @@ import java.util.Locale
  * v1.11.0 Calendar screen. Hosts the [CalendarMonthView] (CAL-11/12) with a top bar that
  * shows the visible-month title and provides chevron navigation + a Today action (CAL-14).
  * Horizontal swipe paging is handled inside [CalendarMonthView] (CAL-15). Tapping a day
- * opens a [DayAgendaSheet] showing that day's tasks (CAL-17). The empty-state hint card
- * for zero dated tasks (CAL-16) and full-featured agenda rows (CAL-18..22) land later.
+ * opens a [DayAgendaSheet] showing that day's tasks, rendered with the full [TaskItem]
+ * composable (CAL-17 + CAL-18). The sheet's FAB opens the task editor with `dueDate`
+ * prefilled to the selected day (CAL-19). Empty-state hint card (CAL-16), swipe/multi-select
+ * (CAL-20/21), and empty-day polish (CAL-22) land in follow-up tickets.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CalendarScreen(
     viewModel: CalendarViewModel,
     onNavigateToEditor: (Long) -> Unit,
+    onNavigateToCreateForDay: (Long) -> Unit,
     bottomBarPadding: Dp = 0.dp,
     modifier: Modifier = Modifier,
 ) {
@@ -94,6 +98,14 @@ fun CalendarScreen(
                 onToggleComplete = viewModel::onToggleTaskComplete,
                 onArchive = viewModel::onArchiveTask,
                 onTogglePin = viewModel::onTogglePin,
+                onAddTaskClick = {
+                    isAgendaOpen = false
+                    val epoch = uiState.selectedDay
+                        .atStartOfDay(ZoneId.systemDefault())
+                        .toInstant()
+                        .toEpochMilli()
+                    onNavigateToCreateForDay(epoch)
+                },
                 onDismiss = { isAgendaOpen = false },
             )
         }

@@ -114,10 +114,15 @@ class CalendarUseCaseTest {
         }
     }
 
+    // ── Recurrence projection behavior (CAL-37) ─────────────────────────────────────────
+    // Before CAL-37, decorations included projected recurrence occurrences. That produced
+    // a UX bug: dots rendered on every projected day but the agenda (which only surfaces
+    // concrete Room rows) was empty — "dots but no tasks". Projections now stay out of the
+    // grid until CAL-23/24 materializes them into the agenda.
+
     @Test
-    fun `recurring WEEKLY task projects onto every matching day in window`() = runTest {
+    fun `recurring WEEKLY task only decorates its concrete base date, not projected occurrences`() = runTest {
         val repo = FakeTaskRepository()
-        // Base Mon 2026-05-04, rule = every Monday
         val baseDate = LocalDate.of(2026, 5, 4)
         repo.seed(
             TestTaskFactory.createTask(
@@ -132,50 +137,18 @@ class CalendarUseCaseTest {
         val useCase = CalendarUseCase(repo)
         useCase.observeMonthDecorations(monthStart, monthEnd, zone).test {
             val emitted = awaitItem()
-            // Expect Mondays in May 2026: 4, 11, 18, 25.
-            assertEquals(
-                setOf(
-                    LocalDate.of(2026, 5, 4),
-                    LocalDate.of(2026, 5, 11),
-                    LocalDate.of(2026, 5, 18),
-                    LocalDate.of(2026, 5, 25),
-                ),
-                emitted.keys,
-            )
+            // Only the concrete base Monday is decorated. 5/11, 5/18, 5/25 stay empty
+            // because projecting them would lie: the agenda has no row to show there.
+            assertEquals(setOf(baseDate), emitted.keys)
+            assertFalse(emitted.getValue(baseDate).hasRecurringProjection)
             cancelAndIgnoreRemainingEvents()
         }
     }
 
     @Test
-    fun `projection does not mark base date as recurring when it is concrete`() = runTest {
+    fun `recurring task with base before window produces no decorations`() = runTest {
         val repo = FakeTaskRepository()
-        val base = LocalDate.of(2026, 5, 4) // Mon — inside window
-        repo.seed(
-            TestTaskFactory.createTask(
-                id = 1L,
-                dueAt = dateEpoch(base),
-                priority = 1,
-                recurrenceType = RecurrenceType.WEEKLY.value,
-                recurrenceDaysOfWeek = RecurrenceCalculatorDayOfWeekBit.MONDAY,
-            ),
-        )
-
-        val useCase = CalendarUseCase(repo)
-        useCase.observeMonthDecorations(monthStart, monthEnd, zone).test {
-            val emitted = awaitItem()
-            // Base day: has concrete row → hasRecurringProjection must be false.
-            assertFalse(emitted.getValue(base).hasRecurringProjection)
-            // Subsequent projected Mondays: concrete-less → flag true.
-            assertTrue(emitted.getValue(LocalDate.of(2026, 5, 11)).hasRecurringProjection)
-            assertTrue(emitted.getValue(LocalDate.of(2026, 5, 18)).hasRecurringProjection)
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
-    fun `recurring task with base before window still projects into window`() = runTest {
-        val repo = FakeTaskRepository()
-        // Base far before window
+        // Base far before window — no concrete rows will land in May.
         val base = LocalDate.of(2026, 2, 2) // Mon
         repo.seed(
             TestTaskFactory.createTask(
@@ -189,17 +162,8 @@ class CalendarUseCaseTest {
         val useCase = CalendarUseCase(repo)
         useCase.observeMonthDecorations(monthStart, monthEnd, zone).test {
             val emitted = awaitItem()
-            // Only projections (no concrete in May).
-            val expectedMondays = setOf(
-                LocalDate.of(2026, 5, 4),
-                LocalDate.of(2026, 5, 11),
-                LocalDate.of(2026, 5, 18),
-                LocalDate.of(2026, 5, 25),
-            )
-            assertEquals(expectedMondays, emitted.keys)
-            expectedMondays.forEach { day ->
-                assertTrue("$day should be marked as projection", emitted.getValue(day).hasRecurringProjection)
-            }
+            // No projection decorations — agenda has nothing to show on those Mondays.
+            assertTrue(emitted.isEmpty())
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -227,15 +191,13 @@ class CalendarUseCaseTest {
     }
 
     @Test
-    fun `generated recurring children do not cause double-count or re-projection`() = runTest {
+    fun `generated recurring children decorate their concrete dates without projecting future days`() = runTest {
         // Simulates a WEEKLY-Monday rule completed twice, so the DB holds:
         //   parent (id=1, dueAt=5/4, completed)
         //   child  (id=2, parentRecurringTaskId=1, dueAt=5/11, completed)
         //   child  (id=3, parentRecurringTaskId=1, dueAt=5/18, active)
-        // All three inherit recurrenceType=WEEKLY + MONDAY bitmask from buildNextTask.
-        //
-        // Projections should only enumerate from the parent; each concrete Monday already in
-        // the window (5/4, 5/11, 5/18) is skipped. 5/25 remains the sole projected day.
+        // Each concrete Monday gets exactly one dot (no chain double-counting). 5/25 stays
+        // empty until the next child is actually generated — no projection is added.
         val repo = FakeTaskRepository()
         val mondayBitmask = RecurrenceCalculatorDayOfWeekBit.MONDAY
         repo.seed(
@@ -274,22 +236,17 @@ class CalendarUseCaseTest {
             assertEquals(1, emitted.getValue(LocalDate.of(2026, 5, 11)).taskCount)
             assertEquals(1, emitted.getValue(LocalDate.of(2026, 5, 18)).taskCount)
 
-            // Concrete days never flag as projection.
+            // All decorated days are concrete — the projection flag is always false under CAL-37.
             assertFalse(emitted.getValue(LocalDate.of(2026, 5, 4)).hasRecurringProjection)
             assertFalse(emitted.getValue(LocalDate.of(2026, 5, 11)).hasRecurringProjection)
             assertFalse(emitted.getValue(LocalDate.of(2026, 5, 18)).hasRecurringProjection)
 
-            // 5/25 is purely projected (no concrete), flagged.
-            val projected = emitted.getValue(LocalDate.of(2026, 5, 25))
-            assertEquals(1, projected.taskCount)
-            assertTrue(projected.hasRecurringProjection)
-
+            // 5/25 has no concrete row yet → absent from the map.
             assertEquals(
                 setOf(
                     LocalDate.of(2026, 5, 4),
                     LocalDate.of(2026, 5, 11),
                     LocalDate.of(2026, 5, 18),
-                    LocalDate.of(2026, 5, 25),
                 ),
                 emitted.keys,
             )

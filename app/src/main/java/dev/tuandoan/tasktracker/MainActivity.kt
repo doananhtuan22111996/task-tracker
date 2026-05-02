@@ -263,6 +263,9 @@ fun TaskTrackerApp(
                         onNavigateToEditor = { taskId ->
                             navController.navigate(TaskTrackerRoutes.taskEditorEdit(taskId))
                         },
+                        onNavigateToCreateForDay = { initialDueAt ->
+                            navController.navigate(TaskTrackerRoutes.taskEditorCreateWithDueDate(initialDueAt))
+                        },
                         bottomBarPadding = bottomBarPadding,
                     )
                 }
@@ -329,7 +332,15 @@ fun TaskTrackerApp(
                     )
                 }
 
-                composable(TaskTrackerRoutes.TASK_EDITOR_CREATE) {
+                composable(
+                    route = TaskTrackerRoutes.TASK_EDITOR_CREATE_PATTERN,
+                    arguments = listOf(
+                        navArgument("initialDueAt") {
+                            type = NavType.LongType
+                            defaultValue = -1L // sentinel for "not provided"; VM treats negative as null
+                        },
+                    ),
+                ) {
                     TaskEditorScreen(
                         navController = navController,
                         notificationPermissionManager = notificationPermissionManager,

@@ -20,9 +20,14 @@ Format follows [Keep a Changelog](https://keepachangelog.com).
 - Horizontal swipe paging on the calendar month grid. `CalendarMonthView` now seeds `rememberCalendarState` with a `visibleMonth ± 240 months` window, and a `snapshotFlow` observer forwards user-driven swipes to `CalendarViewModel.onJumpToMonth`. Library state persists across month changes (no more regeneration on every VM tick) (CAL-15)
 - Day agenda bottom sheet: tapping a calendar day opens a `ModalBottomSheet` with the localized `FULL` date title and a simple list of that day's tasks. Tapping a row opens the task editor. Empty day shows a localized "No tasks" message. Full `TaskItem` visuals (priority stripe, subtask progress) + FAB + multi-select + swipe actions land in follow-up CAL-18..22 tickets. New `CalendarUseCase.observeTasksForDay(day)` + `CalendarUiState.selectedDayTasks` flow piping. 5 new JVM tests (3 use case + 2 ViewModel). 1 new i18n key × 8 locales (CAL-17)
 - Day agenda rows now use the full `TaskItem` composable — priority stripe, tag chips, subtask progress indicator, pin icon, overflow menu — matching the main task list exactly. `CalendarViewModel` gained `onToggleTaskComplete` / `onArchiveTask` / `onTogglePin` event handlers routed to `ITaskManager`. `CalendarUiState.subtaskProgress` added (fed by `SubtaskUseCase.observeProgressByTaskId`). 3 new VM tests. Duplicate + skip-occurrence remain on the task list for now (CAL-18)
+- Day agenda FAB opens the task editor with `dueDate` prefilled to the selected day. New optional `initialDueAt` query arg on the create route (`task_editor?initialDueAt={epochMillis}`); `TaskEditorViewModel` seeds `_dueAt` when the arg is present in create mode, leaving `dueAtHasTime = false` per PRD OQ-04 decision. 2 new editor-VM tests (seed + sentinel-negative-ignored). 1 new i18n key × 8 locales (CAL-19)
 
 ### Fixed
 - Weekly recurrence with a single-day bitmask and `interval = 1` now correctly advances one week instead of collapsing back to the same day. A Monday-only rule from a Monday used to return the same Monday because both `daysUntilNextMonday` and `weeksToSkip` resolved to zero (caught while implementing CAL-05)
+- Calendar month grid no longer paints dot indicators on projected recurrence occurrences. A daily rule seeded today previously dotted every future day, but tapping any of them opened an empty agenda sheet because `observeTasksForDay` only returns persisted Room rows. Dots now track concrete tasks 1:1; projections re-enter the grid once CAL-23/24 materialize them into the agenda (CAL-37)
+
+### Changed
+- `CalendarUseCase.observeMonthDecorations` now derives decorations from `observeTasksInRange` alone; `getAllTasks` + `RecurrenceCalculator.projectOccurrences` no longer participate. `DayDecoration.hasRecurringProjection` is retained on the model (always `false`) as a forward-looking flag for CAL-23 (CAL-37)
 
 ## [1.10.0] - 2026-05-02
 

@@ -64,10 +64,13 @@ class TaskEditorViewModelTest {
         Dispatchers.resetMain()
     }
 
-    private fun createViewModel(taskId: Long? = null): TaskEditorViewModel {
+    private fun createViewModel(taskId: Long? = null, initialDueAt: Long? = null): TaskEditorViewModel {
         val savedStateHandle = SavedStateHandle().apply {
             if (taskId != null) {
                 set("taskId", taskId)
+            }
+            if (initialDueAt != null) {
+                set("initialDueAt", initialDueAt)
             }
         }
         return TaskEditorViewModel(
@@ -98,6 +101,40 @@ class TaskEditorViewModelTest {
         assertEquals("", viewModel.tag.value)
         assertEquals(1, viewModel.priority.value) // MEDIUM default
         assertFalse(viewModel.isPinned.value)
+    }
+
+    // ── Create mode with prefilled dueAt (CAL-19) ──
+
+    @Test
+    fun `create mode - initialDueAt seeds dueAt without time-of-day`() {
+        val targetMillis = 1_735_689_600_000L // 2025-01-01 00:00 UTC
+        val viewModel = createViewModel(initialDueAt = targetMillis)
+
+        assertEquals(targetMillis, viewModel.dueAt.value)
+        assertFalse(viewModel.dueAtHasTime.value)
+    }
+
+    @Test
+    fun `create mode - sentinel negative initialDueAt is ignored`() {
+        // MainActivity uses -1L as "no value" since NavType.LongType is non-nullable.
+        val viewModel = createViewModel(initialDueAt = -1L)
+        assertNull(viewModel.dueAt.value)
+    }
+
+    @Test
+    fun `edit mode - taskId wins over initialDueAt when both are present`() = runTest {
+        // Defensive guard: MainActivity never passes both today, but the VM init's
+        // `else if` contract must keep edit-mode loading as the single source of truth
+        // if anyone ever wires both args on the same route.
+        val taskDueAt = 1_700_000_000_000L
+        val seedDueAt = 1_735_689_600_000L
+        val task = TestTaskFactory.createTask(id = 1, title = "Existing", dueAt = taskDueAt)
+        fakeTaskManager.taskToReturn = task
+
+        val viewModel = createViewModel(taskId = 1L, initialDueAt = seedDueAt)
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        assertEquals(taskDueAt, viewModel.dueAt.value)
     }
 
     @Test
