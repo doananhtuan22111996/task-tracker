@@ -162,6 +162,14 @@ class FakeTaskRepository : ITaskRepository {
         tasks.value = tasks.value.filter { it.id !in ids }
     }
 
+    override fun observeTasksInRange(startMillis: Long, endMillis: Long): Flow<List<Task>> = tasks.map { list ->
+        list.filter {
+            !it.isArchived &&
+                it.dueAt != null &&
+                it.dueAt in startMillis until endMillis
+        }.sortedBy { it.dueAt }
+    }
+
     override fun observeActiveCount(): Flow<Int> =
         tasks.map { list -> list.count { !it.isCompleted && !it.isArchived } }
 

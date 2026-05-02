@@ -83,6 +83,14 @@ interface TaskDao {
     @Query("UPDATE tasks SET tag = :tag, tagColor = :tagColor WHERE id IN (:ids)")
     suspend fun setTagBulk(ids: List<Long>, tag: String?, tagColor: String?)
 
+    // Calendar queries (CAL-06): tasks whose dueAt falls in the visible window, excluding archived.
+    // Completed tasks are included — the calendar renders them as dimmed dots.
+    @Query(
+        "SELECT * FROM tasks WHERE isArchived = 0 AND dueAt IS NOT NULL " +
+            "AND dueAt >= :startMillis AND dueAt < :endMillis ORDER BY dueAt ASC",
+    )
+    fun observeTasksInRange(startMillis: Long, endMillis: Long): Flow<List<Task>>
+
     // Stats queries (exclude archived tasks)
     @Query("SELECT COUNT(*) FROM tasks WHERE isCompleted = 0 AND isArchived = 0")
     fun observeActiveCount(): Flow<Int>
