@@ -507,13 +507,18 @@ class TaskManager @Inject constructor(
             parentRecurringTaskId = rootId,
         )
         val newId = repository.insertTask(materialized)
-        // Only schedule when the due time is still in the future. Users can materialize a
-        // past-date projection (e.g., by scrolling backward in the calendar); the reminder
-        // scheduler would throw IllegalArgumentException in that case — and bubbling an
-        // exception up from a "tap on projected row" path would violate the materialize-then-
-        // open contract. Mirrors what buildNextTask's rolling "next occurrence" gets for free.
-        if (dueAt > now) {
+        // Swallow past-reminder IllegalArgumentException specifically. The real throw
+        // condition inside scheduleReminderIfNeeded is `dueAt - offsetMinutes` ≤ now — which
+        // can trip even with a future dueAt if the offset is long enough, or trivially when
+        // the user taps a back-scrolled past projection. Bubbling that up from a "tap on
+        // projected row" path would violate the materialize-then-open contract. The row is
+        // still inserted; the reminder is silently dropped (the user would not have received
+        // it anyway). Any other exception (DB failure, coroutine cancellation, etc.)
+        // continues to propagate normally.
+        try {
             scheduleReminderIfNeeded(newId, materialized.title, dueAt, materialized.reminderOffsetMinutes)
+        } catch (_: IllegalArgumentException) {
+            // past reminder — see comment above
         }
         widgetUpdater.requestUpdate()
         return newId

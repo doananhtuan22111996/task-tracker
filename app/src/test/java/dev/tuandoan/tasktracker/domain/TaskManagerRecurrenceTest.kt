@@ -659,10 +659,12 @@ class TaskManagerRecurrenceTest {
     }
 
     @Test
-    fun `materializeProjectedOccurrence skips reminder scheduling for past-dated projections`() = runTest {
+    fun `materializeProjectedOccurrence swallows past-reminder exception when dueAt is in the past`() = runTest {
         // Guards against IllegalArgumentException from scheduleReminderIfNeeded when the user
-        // materializes a projection whose reminder time has already passed (e.g., scrolled
-        // backward in the calendar before tapping). The row must still be inserted.
+        // materializes a projection whose due-time is already in the past. The row must still
+        // be inserted; the reminder is silently dropped. FakeReminderScheduler only enforces
+        // the past-reminder rule when currentTimeMillis is set.
+        reminderScheduler.currentTimeMillis = System.currentTimeMillis()
         val baseDate = LocalDate.of(2020, 1, 1)
         repository.seed(
             TestTaskFactory.createTask(
@@ -673,12 +675,40 @@ class TaskManagerRecurrenceTest {
                 recurrenceType = RecurrenceType.DAILY.value,
             ),
         )
-        val pastTarget = LocalDate.of(2020, 1, 5) // well before "now"
+        val pastTarget = LocalDate.of(2020, 1, 5)
 
         val newId = taskManager.materializeProjectedOccurrence(parentId = 1L, date = pastTarget, zone = zone)
 
-        assertNotNull(newId) // row still materialized
+        assertNotNull(newId)
         val inserted = repository.getAllTasksSnapshot().single { it.id == newId }
         assertEquals(pastTarget.atStartOfDay(zone).toInstant().toEpochMilli(), inserted.dueAt)
+        assertTrue(reminderScheduler.scheduledReminders.isEmpty()) // silently dropped
+    }
+
+    @Test
+    fun `materializeProjectedOccurrence swallows scheduler failure for future row`() = runTest {
+        // Even when the materialized row is in the future, the scheduler can still report
+        // failure (e.g., exact-alarm permission revoked, OS throttling). The earlier guard
+        // `if (dueAt > now)` missed this. Force the fake to refuse and verify the row is
+        // still inserted and no exception leaks.
+        reminderScheduler.shouldScheduleSucceed = false
+        val baseDate = LocalDate.of(2026, 5, 4)
+        repository.seed(
+            TestTaskFactory.createTask(
+                id = 1L,
+                title = "Standup",
+                dueAt = baseDate.atStartOfDay(zone).toInstant().toEpochMilli(),
+                reminderOffsetMinutes = 30,
+                recurrenceType = RecurrenceType.DAILY.value,
+            ),
+        )
+        val futureTarget = LocalDate.of(2030, 5, 4) // well into the future, won't match root
+
+        val newId = taskManager.materializeProjectedOccurrence(parentId = 1L, date = futureTarget, zone = zone)
+
+        assertNotNull(newId)
+        val inserted = repository.getAllTasksSnapshot().single { it.id == newId }
+        assertEquals(futureTarget.atStartOfDay(zone).toInstant().toEpochMilli(), inserted.dueAt)
+        assertTrue(reminderScheduler.scheduledReminders.isEmpty())
     }
 }
