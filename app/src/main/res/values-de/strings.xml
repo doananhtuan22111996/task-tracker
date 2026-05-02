@@ -11,6 +11,7 @@
     <string name="cd_calendar_prev_month">Vorheriger Monat</string>
     <string name="cd_calendar_next_month">Nächster Monat</string>
     <string name="calendar_agenda_empty">Keine Aufgaben an diesem Tag.</string>
+    <string name="cd_agenda_add_task">Aufgabe für diesen Tag hinzufügen</string>
 
     <!-- Navigation -->
     <string name="nav_all">Alle</string>

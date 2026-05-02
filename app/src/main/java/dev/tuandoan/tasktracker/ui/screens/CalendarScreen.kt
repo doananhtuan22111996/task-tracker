@@ -46,6 +46,7 @@ import java.util.Locale
 fun CalendarScreen(
     viewModel: CalendarViewModel,
     onNavigateToEditor: (Long) -> Unit,
+    onNavigateToCreateForDay: (Long) -> Unit,
     bottomBarPadding: Dp = 0.dp,
     modifier: Modifier = Modifier,
 ) {
@@ -94,6 +95,14 @@ fun CalendarScreen(
                 onToggleComplete = viewModel::onToggleTaskComplete,
                 onArchive = viewModel::onArchiveTask,
                 onTogglePin = viewModel::onTogglePin,
+                onAddTaskClick = {
+                    isAgendaOpen = false
+                    val epoch = uiState.selectedDay
+                        .atStartOfDay(java.time.ZoneId.systemDefault())
+                        .toInstant()
+                        .toEpochMilli()
+                    onNavigateToCreateForDay(epoch)
+                },
                 onDismiss = { isAgendaOpen = false },
             )
         }

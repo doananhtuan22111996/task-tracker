@@ -48,9 +48,17 @@ class TaskEditorViewModel @Inject constructor(
 
     companion object {
         private const val TASK_ID_ARG = "taskId"
+        private const val INITIAL_DUE_AT_ARG = "initialDueAt"
     }
 
     private val taskId: Long? = savedStateHandle.get<Long>(TASK_ID_ARG)
+
+    /**
+     * Optional prefilled due date for create-mode entry from the calendar FAB (CAL-19).
+     * MainActivity passes -1L as the sentinel "no value" since NavType.LongType can't be nullable.
+     */
+    private val initialDueAt: Long? = savedStateHandle.get<Long>(INITIAL_DUE_AT_ARG)
+        ?.takeIf { it >= 0L }
 
     // Form fields
     private val _taskTitle = MutableStateFlow("")
@@ -234,6 +242,10 @@ class TaskEditorViewModel @Inject constructor(
     init {
         if (isEditMode && taskId != null) {
             loadTask(taskId)
+        } else if (initialDueAt != null) {
+            _dueAt.value = initialDueAt
+            _dueAtHasTime.value = false
+            updateHasChanges()
         }
     }
 
