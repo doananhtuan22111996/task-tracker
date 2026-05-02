@@ -9,6 +9,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com).
 - `com.kizitonwose.calendar:compose` dependency (pinned 2.6.2) — month-grid engine for the v1.11.0 Calendar surface (ADR-001, CAL-01)
 - `DayDecoration` domain model — per-day aggregate (date, taskCount, priorityBuckets, completedCount, hasRecurringProjection) that drives the calendar month-grid cell renderer (CAL-04)
 - `ITaskRepository.observeTasksInRange(start, end)` + `TaskDao` query — reactive stream of tasks whose `dueAt` falls in the half-open window `[start, end)`, including completed, excluding archived; ordered by `dueAt` ascending (CAL-06)
+- `RecurrenceCalculator.projectOccurrences(task, windowStart, windowEnd)` — enumerates recurring-task occurrences as `List<LocalDate>` for the inclusive window, honoring `recurrenceEndDate` and a `maxOccurrences` cap (default 200). Pure in-memory; no DB write. Used by the calendar surface to show projected recurrences before a concrete Room row exists (CAL-07)
 
 ## [1.10.0] - 2026-05-02
 
