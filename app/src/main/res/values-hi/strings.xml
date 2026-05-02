@@ -7,8 +7,6 @@
     <string name="nav_tab_stats">आँकड़े</string>
     <string name="nav_tab_archived">संग्रहीत</string>
     <string name="nav_tab_calendar">कैलेंडर</string>
-    <string name="calendar_placeholder_title">कैलेंडर जल्द आ रहा है</string>
-    <string name="calendar_placeholder_body">मासिक ग्रिड, दैनिक एजेंडा और आवर्ती कार्यों के प्रक्षेपण आगामी अपडेट में आएंगे।</string>
 
     <!-- Navigation -->
     <string name="nav_all">सभी</string>

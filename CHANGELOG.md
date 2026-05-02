@@ -14,6 +14,8 @@ Format follows [Keep a Changelog](https://keepachangelog.com).
 
 - `CalendarViewModel` — Hilt-injected; holds `visibleMonth`/`selectedDay`, exposes `StateFlow<CalendarUiState>` over `CalendarUseCase.observeMonthDecorations`. Events: `onMonthChange(delta)` / `onDaySelect(date)` / `onTodayClick()` / `onJumpToMonth(target)`. Both month and day survive process death via `SavedStateHandle` (ISO string keys `calendar_visible_month` / `calendar_selected_day`) (CAL-08)
 - Calendar bottom-nav destination (between Tasks and Stats) + route `calendar` + `CalendarScreen` placeholder scaffold with localized `LLLL yyyy` month title. Enum tab count: 3 → 4. Full 8-locale translations for `nav_tab_calendar` + two placeholder strings (CAL-02, CAL-03)
+- `CalendarMonthView` — thin wrapper around Kizitonwose `HorizontalCalendar` (ADR-001) that hides the library types and accepts our domain primitives (`YearMonth`, `LocalDate`, `Map<LocalDate, DayDecoration>`, `(LocalDate) -> Unit`). Auto-scrolls to `visibleMonth` changes. First-day-of-week from device locale. Minimal inline weekday header (CAL-13 will replace) (CAL-11)
+- `DayCell` composable — 48dp cell with today-highlight filled circle, selected-highlight border/container, up to 3 descending priority-color dots, dimmed-when-fully-completed alpha, out-of-month opacity, clickable routing to `onDayClick(date)`. Pure-Kotlin `dotsFor`/`hasDotOverflow` helpers with 7 JVM tests (CAL-12)
 
 ### Fixed
 - Weekly recurrence with a single-day bitmask and `interval = 1` now correctly advances one week instead of collapsing back to the same day. A Monday-only rule from a Monday used to return the same Monday because both `daysUntilNextMonday` and `weeksToSkip` resolved to zero (caught while implementing CAL-05)
