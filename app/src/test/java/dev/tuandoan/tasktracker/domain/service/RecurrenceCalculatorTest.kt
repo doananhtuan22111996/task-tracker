@@ -169,6 +169,16 @@ class RecurrenceCalculatorTest {
     }
 
     @Test
+    fun `weekly single day Monday interval 1 advances one week`() {
+        // Regression guard: prior implementation collapsed Monday-only + interval=1 back to
+        // the same Monday because `daysUntilNextMonday` was 0 AND `weeksToSkip` was 0.
+        val mask = bitmask(DayOfWeek.MONDAY)
+        val task = recurringTask(dueAt = dateToEpoch(2026, 3, 23), type = RecurrenceType.WEEKLY, daysOfWeek = mask)
+        val next = RecurrenceCalculator.nextDueDate(task)!!
+        assertEquals(LocalDate.of(2026, 3, 30), epochToDate(next)) // Next Monday
+    }
+
+    @Test
     fun `weekly Mon-Wed-Fri interval 2 from Friday jumps 2 weeks to Monday`() {
         val mask = bitmask(DayOfWeek.MONDAY, DayOfWeek.WEDNESDAY, DayOfWeek.FRIDAY)
         val task = recurringTask(

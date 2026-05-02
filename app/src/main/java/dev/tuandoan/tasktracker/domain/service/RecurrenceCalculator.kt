@@ -76,8 +76,8 @@ object RecurrenceCalculator {
      *
      * If bitmask is 0 (no specific days), advance by [interval] weeks from current date.
      * If bitmask is set, find the next selected day after the current day-of-week.
-     * If no more selected days remain in the current week, jump [interval] weeks forward
-     * and pick the first selected day.
+     * If no more selected days remain in the current week, jump to the first selected day
+     * of the next interval cycle (current week's Monday + [interval] weeks + firstDay offset).
      */
     private fun nextWeeklyDate(date: LocalDate, interval: Int, bitmask: Int): LocalDate {
         if (bitmask == 0) return date.plusWeeks(interval.toLong())
@@ -94,12 +94,14 @@ object RecurrenceCalculator {
             // Same week, just advance to the next selected day
             date.plusDays((nextInWeek.value - currentDow.value).toLong())
         } else {
-            // Jump to the start of the next interval week and pick the first selected day
-            val daysUntilNextMonday = (DayOfWeek.MONDAY.value - currentDow.value + 7) % 7
-            val weeksToSkip = if (nextInWeek != null) interval.toLong() else (interval.toLong() - 1).coerceAtLeast(0)
-            val nextWeekMonday = date.plusDays(daysUntilNextMonday.toLong()).plusWeeks(weeksToSkip)
+            // No more selected days this week (or interval > 1): advance to the first
+            // selected day of the next interval cycle. Using "this week's Monday + N weeks"
+            // guarantees the result is strictly later than `date` even when the current
+            // day is itself the only selected day (e.g. Monday-only rule from a Monday).
+            val thisWeekMonday = date.minusDays((currentDow.value - DayOfWeek.MONDAY.value).toLong())
+            val nextCycleMonday = thisWeekMonday.plusWeeks(interval.toLong())
             val firstDay = selectedDays.first()
-            nextWeekMonday.plusDays((firstDay.value - DayOfWeek.MONDAY.value).toLong())
+            nextCycleMonday.plusDays((firstDay.value - DayOfWeek.MONDAY.value).toLong())
         }
     }
 
