@@ -86,10 +86,14 @@ fun CalendarScreen(
             DayAgendaSheet(
                 selectedDay = uiState.selectedDay,
                 tasks = uiState.selectedDayTasks,
+                subtaskProgress = uiState.subtaskProgress,
                 onTaskClick = { taskId ->
                     isAgendaOpen = false
                     onNavigateToEditor(taskId)
                 },
+                onToggleComplete = viewModel::onToggleTaskComplete,
+                onArchive = viewModel::onArchiveTask,
+                onTogglePin = viewModel::onTogglePin,
                 onDismiss = { isAgendaOpen = false },
             )
         }
