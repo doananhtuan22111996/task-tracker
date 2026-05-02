@@ -143,4 +143,102 @@ object RecurrenceCalculator {
      * Converts a [DayOfWeek] to its bitmask value.
      */
     fun dayOfWeekToBitmask(day: DayOfWeek): Int = 1 shl (day.value - 1)
+
+    /**
+     * Projects all occurrences of a recurring [task] into the **inclusive** date window
+     * `[windowStart, windowEnd]`. The task's own `dueAt` date is included if it falls in
+     * the window. Returns an empty list for non-recurring tasks, tasks without `dueAt`,
+     * empty/inverted windows, or when the base date is past `windowEnd`.
+     *
+     * Projections are purely in-memory; callers must not persist them. Used by the v1.11.0
+     * calendar surface to show recurring-task occurrences on each projected date before a
+     * concrete Room row exists (CAL-07, FR-09).
+     *
+     * `maxOccurrences` is a safety cap. A 6-week visible window with a DAILY rule produces
+     * at most 42 occurrences, so the 200 default is generous headroom for pathological
+     * inputs (malformed rules, very large windows).
+     *
+     * Respects `task.recurrenceEndDate` — enumeration stops once the next candidate would
+     * exceed the end date.
+     */
+    fun projectOccurrences(
+        task: Task,
+        windowStart: LocalDate,
+        windowEnd: LocalDate,
+        zone: ZoneId = ZoneId.systemDefault(),
+        maxOccurrences: Int = 200,
+    ): List<LocalDate> {
+        val type = RecurrenceType.fromValue(task.recurrenceType)
+        if (type == RecurrenceType.NONE) return emptyList()
+        if (windowStart.isAfter(windowEnd)) return emptyList()
+
+        val dueAt = task.dueAt ?: return emptyList()
+        val interval = task.recurrenceInterval.coerceAtLeast(1)
+        val bitmask = task.recurrenceDaysOfWeek
+
+        val endDate: LocalDate? = task.recurrenceEndDate?.let {
+            Instant.ofEpochMilli(it).atZone(zone).toLocalDate()
+        }
+
+        val effectiveEnd = if (endDate != null && endDate.isBefore(windowEnd)) endDate else windowEnd
+        val baseDate = Instant.ofEpochMilli(dueAt).atZone(zone).toLocalDate()
+        if (baseDate.isAfter(effectiveEnd)) return emptyList()
+
+        val results = mutableListOf<LocalDate>()
+        var current: LocalDate? = baseDate
+
+        // For MONTHLY/YEARLY, remember the base day-of-month so clamps (e.g. Feb 28)
+        // don't permanently shorten future steps. The next MONTHLY step after Jan 31 must
+        // land on Mar 31, not Mar 28.
+        val baseDayOfMonth = baseDate.dayOfMonth
+
+        // Fast-forward to the first candidate inside the window, capped to prevent
+        // unbounded iteration if `dueAt` is far in the past (e.g., imported backup).
+        var fastForwardSteps = 0
+        while (current != null && current.isBefore(windowStart) && fastForwardSteps < MAX_FAST_FORWARD_STEPS) {
+            current = advanceFromBase(current, baseDayOfMonth, type, interval, bitmask)
+            fastForwardSteps++
+        }
+        // If the cap was hit without reaching the window, treat as no projection.
+        if (current != null && current.isBefore(windowStart)) return emptyList()
+
+        while (current != null && !current.isAfter(effectiveEnd) && results.size < maxOccurrences) {
+            results.add(current)
+            current = advanceFromBase(current, baseDayOfMonth, type, interval, bitmask)
+        }
+
+        return results
+    }
+
+    /**
+     * Upper bound on fast-forward iterations when `dueAt` is far before `windowStart`.
+     * 10_000 covers ~27 years of DAILY recurrence — well beyond any realistic user history.
+     */
+    private const val MAX_FAST_FORWARD_STEPS = 10_000
+
+    /**
+     * Projection-specific step that re-anchors MONTHLY and YEARLY rules to the original
+     * base day-of-month after each step. Prevents the "Feb 28 sticks forever" drift that
+     * [advanceDate] exhibits when iterated (unavoidable for single-step [nextDueDate]).
+     */
+    private fun advanceFromBase(
+        current: LocalDate,
+        baseDayOfMonth: Int,
+        type: RecurrenceType,
+        interval: Int,
+        bitmask: Int,
+    ): LocalDate? = when (type) {
+        RecurrenceType.NONE -> null
+        RecurrenceType.DAILY, RecurrenceType.WEEKLY -> advanceDate(current, type, interval, bitmask)
+        RecurrenceType.MONTHLY -> {
+            val next = current.plusMonths(interval.toLong())
+            val maxDay = next.lengthOfMonth()
+            next.withDayOfMonth(minOf(baseDayOfMonth, maxDay))
+        }
+        RecurrenceType.YEARLY -> {
+            val next = current.plusYears(interval.toLong())
+            val maxDay = next.lengthOfMonth()
+            next.withDayOfMonth(minOf(baseDayOfMonth, maxDay))
+        }
+    }
 }
