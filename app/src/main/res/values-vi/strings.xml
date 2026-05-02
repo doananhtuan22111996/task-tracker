@@ -7,8 +7,6 @@
     <string name="nav_tab_stats">Thống kê</string>
     <string name="nav_tab_archived">Đã lưu trữ</string>
     <string name="nav_tab_calendar">Lịch</string>
-    <string name="calendar_placeholder_title">Lịch sắp ra mắt</string>
-    <string name="calendar_placeholder_body">Lưới tháng, lịch ngày và các lần xuất hiện định kỳ sẽ có trong các bản cập nhật sắp tới.</string>
 
     <!-- Navigation -->
     <string name="nav_all">Tất cả</string>

@@ -7,8 +7,6 @@
     <string name="nav_tab_stats">Estatísticas</string>
     <string name="nav_tab_archived">Arquivadas</string>
     <string name="nav_tab_calendar">Calendário</string>
-    <string name="calendar_placeholder_title">Calendário em breve</string>
-    <string name="calendar_placeholder_body">A grelha do mês, a agenda diária e as projeções de tarefas recorrentes chegarão em atualizações futuras.</string>
 
     <!-- Navigation -->
     <string name="nav_all">Todas</string>
