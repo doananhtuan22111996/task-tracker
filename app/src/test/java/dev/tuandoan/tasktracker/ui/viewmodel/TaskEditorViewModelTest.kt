@@ -122,6 +122,22 @@ class TaskEditorViewModelTest {
     }
 
     @Test
+    fun `edit mode - taskId wins over initialDueAt when both are present`() = runTest {
+        // Defensive guard: MainActivity never passes both today, but the VM init's
+        // `else if` contract must keep edit-mode loading as the single source of truth
+        // if anyone ever wires both args on the same route.
+        val taskDueAt = 1_700_000_000_000L
+        val seedDueAt = 1_735_689_600_000L
+        val task = TestTaskFactory.createTask(id = 1, title = "Existing", dueAt = taskDueAt)
+        fakeTaskManager.taskToReturn = task
+
+        val viewModel = createViewModel(taskId = 1L, initialDueAt = seedDueAt)
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        assertEquals(taskDueAt, viewModel.dueAt.value)
+    }
+
+    @Test
     fun `updateTitle updates taskTitle state`() {
         val viewModel = createViewModel()
         viewModel.updateTitle("New Task")
