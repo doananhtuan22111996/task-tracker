@@ -38,6 +38,7 @@ import dev.tuandoan.tasktracker.navigation.TaskTrackerRoutes
 import dev.tuandoan.tasktracker.ui.components.BottomNavBar
 import dev.tuandoan.tasktracker.ui.manager.NotificationPermissionManager
 import dev.tuandoan.tasktracker.ui.screens.ArchivedScreen
+import dev.tuandoan.tasktracker.ui.screens.CalendarScreen
 import dev.tuandoan.tasktracker.ui.screens.HelpScreen
 import dev.tuandoan.tasktracker.ui.screens.OnboardingScreen
 import dev.tuandoan.tasktracker.ui.screens.SettingsScreen
@@ -46,6 +47,7 @@ import dev.tuandoan.tasktracker.ui.screens.TagManagementScreen
 import dev.tuandoan.tasktracker.ui.screens.TaskEditorScreen
 import dev.tuandoan.tasktracker.ui.screens.TaskListScreen
 import dev.tuandoan.tasktracker.ui.theme.TaskTrackerTheme
+import dev.tuandoan.tasktracker.ui.viewmodel.CalendarViewModel
 import dev.tuandoan.tasktracker.ui.viewmodel.SettingsViewModel
 import dev.tuandoan.tasktracker.ui.viewmodel.StatsViewModel
 import dev.tuandoan.tasktracker.ui.viewmodel.TagManagementViewModel
@@ -124,6 +126,7 @@ class MainActivity : AppCompatActivity() {
 /** Routes that show the bottom navigation bar. */
 private val TAB_ROUTES = setOf(
     TaskTrackerRoutes.TASK_LIST_BASE,
+    TaskTrackerRoutes.CALENDAR,
     TaskTrackerRoutes.STATS,
     TaskTrackerRoutes.ARCHIVED,
 )
@@ -243,6 +246,20 @@ fun TaskTrackerApp(
                     val viewModel: TaskViewModel = hiltViewModel()
                     ArchivedScreen(
                         viewModel = viewModel,
+                        bottomBarPadding = bottomBarPadding,
+                    )
+                }
+
+                composable(
+                    TaskTrackerRoutes.CALENDAR,
+                    enterTransition = { EnterTransition.None },
+                    exitTransition = { ExitTransition.None },
+                    popEnterTransition = { EnterTransition.None },
+                    popExitTransition = { ExitTransition.None },
+                ) {
+                    val calendarViewModel: CalendarViewModel = hiltViewModel()
+                    CalendarScreen(
+                        viewModel = calendarViewModel,
                         bottomBarPadding = bottomBarPadding,
                     )
                 }
