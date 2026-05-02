@@ -38,6 +38,9 @@ interface ITaskRepository {
     suspend fun hardDeleteTask(taskId: Long)
     suspend fun hardDeleteTasks(ids: List<Long>)
 
+    // Calendar operations (CAL-06): observe tasks whose dueAt falls in [startMillis, endMillis).
+    fun observeTasksInRange(startMillis: Long, endMillis: Long): Flow<List<Task>>
+
     // Stats operations (exclude archived tasks)
     fun observeActiveCount(): Flow<Int>
     fun observeCompletedCount(): Flow<Int>

@@ -121,6 +121,10 @@ class TaskRepository @Inject constructor(private val taskDao: TaskDao, private v
 
     override suspend fun getActiveRecurringRootIds(): List<Long> = taskDao.getActiveRecurringRootIds()
 
+    // Calendar operations (CAL-06)
+    override fun observeTasksInRange(startMillis: Long, endMillis: Long): Flow<List<Task>> =
+        taskDao.observeTasksInRange(startMillis, endMillis)
+
     // Stats operations (exclude archived tasks)
     override fun observeActiveCount(): Flow<Int> = taskDao.observeActiveCount()
 
