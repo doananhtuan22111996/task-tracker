@@ -2,8 +2,13 @@ package dev.tuandoan.tasktracker.ui.viewmodel
 
 import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
+import dev.tuandoan.tasktracker.domain.TaskManager
 import dev.tuandoan.tasktracker.domain.usecase.CalendarUseCase
+import dev.tuandoan.tasktracker.domain.usecase.SubtaskUseCase
+import dev.tuandoan.tasktracker.testutil.FakeReminderScheduler
+import dev.tuandoan.tasktracker.testutil.FakeSubtaskRepository
 import dev.tuandoan.tasktracker.testutil.FakeTaskRepository
+import dev.tuandoan.tasktracker.testutil.FakeWidgetUpdater
 import dev.tuandoan.tasktracker.testutil.TestTaskFactory
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -13,6 +18,7 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -28,13 +34,19 @@ class CalendarViewModelTest {
     private val zone: ZoneId = ZoneId.systemDefault()
 
     private lateinit var repo: FakeTaskRepository
+    private lateinit var subtaskRepo: FakeSubtaskRepository
     private lateinit var useCase: CalendarUseCase
+    private lateinit var subtaskUseCase: SubtaskUseCase
+    private lateinit var taskManager: TaskManager
 
     @Before
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
         repo = FakeTaskRepository()
+        subtaskRepo = FakeSubtaskRepository()
         useCase = CalendarUseCase(repo)
+        subtaskUseCase = SubtaskUseCase(subtaskRepo)
+        taskManager = TaskManager(repo, subtaskRepo, FakeReminderScheduler(), FakeWidgetUpdater())
     }
 
     @After
@@ -43,7 +55,7 @@ class CalendarViewModelTest {
     }
 
     private fun createViewModel(savedState: SavedStateHandle = SavedStateHandle()): CalendarViewModel =
-        CalendarViewModel(useCase, savedState)
+        CalendarViewModel(useCase, savedState, taskManager, subtaskUseCase)
 
     private fun dateEpoch(date: LocalDate): Long = date.atStartOfDay(zone).toInstant().toEpochMilli()
 
@@ -340,5 +352,53 @@ class CalendarViewModelTest {
 
         assertNull(savedState.get<String>(CalendarViewModel.KEY_VISIBLE_MONTH))
         assertNull(savedState.get<String>(CalendarViewModel.KEY_SELECTED_DAY))
+    }
+
+    // ── Agenda-row actions (CAL-18) ──
+
+    @Test
+    fun `onToggleTaskComplete flips task completion state`() = runTest {
+        val task = TestTaskFactory.createTask(
+            id = 1L,
+            dueAt = dateEpoch(LocalDate.of(2026, 5, 10)),
+            isCompleted = false,
+        )
+        repo.seed(task)
+        val vm = createViewModel()
+
+        vm.onToggleTaskComplete(task)
+
+        assertTrue(repo.getAllTasksSnapshot().single { it.id == 1L }.isCompleted)
+    }
+
+    @Test
+    fun `onArchiveTask marks task archived`() = runTest {
+        val task = TestTaskFactory.createTask(
+            id = 1L,
+            dueAt = dateEpoch(LocalDate.of(2026, 5, 10)),
+        )
+        repo.seed(task)
+        val vm = createViewModel()
+
+        vm.onArchiveTask(task)
+
+        assertTrue(repo.getAllTasksSnapshot().single { it.id == 1L }.isArchived)
+    }
+
+    @Test
+    fun `onTogglePin flips pinned state`() = runTest {
+        val task = TestTaskFactory.createTask(
+            id = 1L,
+            dueAt = dateEpoch(LocalDate.of(2026, 5, 10)),
+            isPinned = false,
+        )
+        repo.seed(task)
+        val vm = createViewModel()
+
+        vm.onTogglePin(task)
+        assertTrue(repo.getAllTasksSnapshot().single { it.id == 1L }.isPinned)
+
+        vm.onTogglePin(repo.getAllTasksSnapshot().single { it.id == 1L })
+        assertFalse(repo.getAllTasksSnapshot().single { it.id == 1L }.isPinned)
     }
 }
