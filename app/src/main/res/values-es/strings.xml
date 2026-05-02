@@ -7,6 +7,9 @@
     <string name="nav_tab_stats">Estadísticas</string>
     <string name="nav_tab_archived">Archivadas</string>
     <string name="nav_tab_calendar">Calendario</string>
+    <string name="action_calendar_today">Hoy</string>
+    <string name="cd_calendar_prev_month">Mes anterior</string>
+    <string name="cd_calendar_next_month">Mes siguiente</string>
 
     <!-- Navigation -->
     <string name="nav_all">Todas</string>

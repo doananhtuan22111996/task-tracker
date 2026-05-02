@@ -7,6 +7,9 @@
     <string name="nav_tab_stats">Statistik</string>
     <string name="nav_tab_archived">Diarsipkan</string>
     <string name="nav_tab_calendar">Kalender</string>
+    <string name="action_calendar_today">Hari ini</string>
+    <string name="cd_calendar_prev_month">Bulan sebelumnya</string>
+    <string name="cd_calendar_next_month">Bulan berikutnya</string>
 
     <!-- Navigation -->
     <string name="nav_all">Semua</string>

@@ -7,6 +7,9 @@
     <string name="nav_tab_stats">Thống kê</string>
     <string name="nav_tab_archived">Đã lưu trữ</string>
     <string name="nav_tab_calendar">Lịch</string>
+    <string name="action_calendar_today">Hôm nay</string>
+    <string name="cd_calendar_prev_month">Tháng trước</string>
+    <string name="cd_calendar_next_month">Tháng sau</string>
 
     <!-- Navigation -->
     <string name="nav_all">Tất cả</string>
