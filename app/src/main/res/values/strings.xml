@@ -6,6 +6,9 @@
     <string name="nav_tab_stats">Stats</string>
     <string name="nav_tab_archived">Archived</string>
     <string name="nav_tab_calendar">Calendar</string>
+    <string name="action_calendar_today">Today</string>
+    <string name="cd_calendar_prev_month">Previous month</string>
+    <string name="cd_calendar_next_month">Next month</string>
 
     <!-- Task Filter Chips -->
     <string name="nav_all">All</string>

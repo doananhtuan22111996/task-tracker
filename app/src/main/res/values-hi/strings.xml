@@ -7,6 +7,9 @@
     <string name="nav_tab_stats">आँकड़े</string>
     <string name="nav_tab_archived">संग्रहीत</string>
     <string name="nav_tab_calendar">कैलेंडर</string>
+    <string name="action_calendar_today">आज</string>
+    <string name="cd_calendar_prev_month">पिछला महीना</string>
+    <string name="cd_calendar_next_month">अगला महीना</string>
 
     <!-- Navigation -->
     <string name="nav_all">सभी</string>
