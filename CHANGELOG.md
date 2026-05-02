@@ -24,6 +24,10 @@ Format follows [Keep a Changelog](https://keepachangelog.com).
 
 ### Fixed
 - Weekly recurrence with a single-day bitmask and `interval = 1` now correctly advances one week instead of collapsing back to the same day. A Monday-only rule from a Monday used to return the same Monday because both `daysUntilNextMonday` and `weeksToSkip` resolved to zero (caught while implementing CAL-05)
+- Calendar month grid no longer paints dot indicators on projected recurrence occurrences. A daily rule seeded today previously dotted every future day, but tapping any of them opened an empty agenda sheet because `observeTasksForDay` only returns persisted Room rows. Dots now track concrete tasks 1:1; projections re-enter the grid once CAL-23/24 materialize them into the agenda (CAL-37)
+
+### Changed
+- `CalendarUseCase.observeMonthDecorations` now derives decorations from `observeTasksInRange` alone; `getAllTasks` + `RecurrenceCalculator.projectOccurrences` no longer participate. `DayDecoration.hasRecurringProjection` is retained on the model (always `false`) as a forward-looking flag for CAL-23 (CAL-37)
 
 ## [1.10.0] - 2026-05-02
 

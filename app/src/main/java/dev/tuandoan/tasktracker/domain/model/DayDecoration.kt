@@ -11,12 +11,13 @@ import java.time.LocalDate
  * 1 = MEDIUM, 2 = HIGH). The cell renders one dot per bucket; overflow beyond three
  * is shown as `+N`.
  *
- * `hasRecurringProjection` is true when at least one task on [date] is a projected
- * recurrence occurrence (no DB row yet). Drives the small "recurring" hint in the
- * agenda per ADR-002 (CAL-23).
+ * `hasRecurringProjection` is a forward-looking flag for ADR-002 (CAL-23 + CAL-24) —
+ * it will mark days whose only content is a projected recurrence occurrence (no DB row).
+ * Currently always `false`: before CAL-37, projections were fed into the grid even though
+ * the agenda didn't render them, producing "dots but empty sheet". Once CAL-23/24 land
+ * (materialize projections into the agenda), this flag flips back on.
  *
- * A day with `taskCount == 0` and `hasRecurringProjection == false` is not emitted —
- * callers treat a missing entry as "no tasks".
+ * A day with `taskCount == 0` is not emitted — callers treat a missing entry as "no tasks".
  */
 data class DayDecoration(
     val date: LocalDate,
