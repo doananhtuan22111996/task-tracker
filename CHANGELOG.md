@@ -5,6 +5,9 @@ Format follows [Keep a Changelog](https://keepachangelog.com).
 
 ## [Unreleased]
 
+### Added
+- `com.kizitonwose.calendar:compose` dependency (pinned 2.6.2) — month-grid engine for the v1.11.0 Calendar surface (ADR-001, CAL-01)
+
 ## [1.10.0] - 2026-05-02
 
 ### Added
