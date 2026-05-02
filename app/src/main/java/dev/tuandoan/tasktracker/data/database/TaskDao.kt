@@ -148,6 +148,18 @@ interface TaskDao {
     )
     suspend fun getActiveRecurringRootIds(): List<Long>
 
+    // Calendar projection materialization (CAL-23): returns the concrete row (if any) whose
+    // parent chain is [rootId] and whose dueAt falls inside the half-open window. Used to
+    // keep TaskManager.materializeProjectedOccurrence idempotent — if a row already exists
+    // for this chain on this day, materializing must return its id instead of inserting.
+    @Query(
+        "SELECT * FROM tasks WHERE isArchived = 0 " +
+            "AND (id = :rootId OR parentRecurringTaskId = :rootId) " +
+            "AND dueAt IS NOT NULL AND dueAt >= :startMillis AND dueAt < :endMillis " +
+            "ORDER BY dueAt ASC LIMIT 1",
+    )
+    suspend fun findChainTaskOnDate(rootId: Long, startMillis: Long, endMillis: Long): Task?
+
     // Widget query
     @Query(
         "SELECT * FROM tasks WHERE isCompleted = 0 AND isArchived = 0 " +

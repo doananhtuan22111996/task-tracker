@@ -32,6 +32,8 @@ import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
+import java.time.LocalDate
+import java.time.ZoneId
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class TaskEditorViewModelTest {
@@ -1077,4 +1079,6 @@ private class FakeEditorTaskManager : ITaskManager {
     override fun observeOverdueCount(nowMillis: Long): Flow<Int> = MutableStateFlow(0)
     override fun observeCompletedCountPerDay(startMillis: Long, endMillis: Long): Flow<List<DailyCount>> =
         MutableStateFlow(emptyList())
+
+    override suspend fun materializeProjectedOccurrence(parentId: Long, date: LocalDate, zone: ZoneId): Long? = null
 }

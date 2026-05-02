@@ -216,6 +216,8 @@ private class FakeWidgetTaskDao : dev.tuandoan.tasktracker.data.database.TaskDao
     override suspend fun getCompletedTasksByChain(rootId: Long) = throw UnsupportedOperationException()
     override suspend fun getCompletedTasksForChains(rootIds: List<Long>) = throw UnsupportedOperationException()
     override suspend fun getActiveRecurringRootIds() = throw UnsupportedOperationException()
+    override suspend fun findChainTaskOnDate(rootId: Long, startMillis: Long, endMillis: Long) =
+        throw UnsupportedOperationException()
     override fun getDistinctTagsWithCount() = throw UnsupportedOperationException()
     override suspend fun updateTagName(oldName: String, newName: String) = throw UnsupportedOperationException()
     override suspend fun clearTag(tagName: String) = throw UnsupportedOperationException()

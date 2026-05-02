@@ -261,6 +261,13 @@ class FakeTaskRepository : ITaskRepository {
         .map { it.parentRecurringTaskId ?: it.id }
         .distinct()
 
+    override suspend fun findChainTaskOnDate(rootId: Long, startMillis: Long, endMillis: Long): Task? = tasks.value
+        .filter { !it.isArchived }
+        .filter { it.id == rootId || it.parentRecurringTaskId == rootId }
+        .filter { it.dueAt != null && it.dueAt >= startMillis && it.dueAt < endMillis }
+        .sortedBy { it.dueAt }
+        .firstOrNull()
+
     // Tag management operations
     override fun getDistinctTagsWithCount(): Flow<List<TagInfo>> = tasks.map { list ->
         list.filter { !it.tag.isNullOrBlank() && !it.isArchived }
