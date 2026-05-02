@@ -5,37 +5,9 @@ Format follows [Keep a Changelog](https://keepachangelog.com).
 
 ## [Unreleased]
 
-### Added
-- In-app help: two new FAQ sections in `HelpScreen` — Subtasks (add, reorder, recurrence reset, parent completion) and Batch Operations (selection mode, undo behavior, why-new-tags-don\'t-appear, exit selection) — translated across all 8 locales (RP-03)
-- Translations of 10 batch-operations strings (BO-07 apply/clear tag + BO-08 change priority) for `de`, `es`, `fr`, `hi`, `in`, `pt`, `vi` — 70 new entries (BO-11)
-- Bulk apply tag: new overflow action in the selection-mode top bar opens a `BulkTagBottomSheet` listing existing tags (with color chips) + a "Clear tag" row; applies the chosen tag (or clears) to every selected task via `ITaskRepository.setTagBulk` and clears the selection
-- English strings `action_apply_tag`, `action_clear_tag`, `title_apply_tag_for_count`, `cd_apply_tag_selected`, `snackbar_tasks_tagged`, `snackbar_tasks_tag_cleared`
-- 3 new `TaskBulkActionManagerTest` cases covering apply / clear / blank-as-clear (25 total)
+## [1.10.0] - 2026-05-02
 
-### Changed
-- Selection count in the contextual top bar is a `liveRegion = Polite` — TalkBack announces "N selected" as the count changes (BO-12)
-- `TaskViewModel.availableTags` and `tagColorMap` now derive from a single `TagManagementUseCase.observeTags()` (DB-level DISTINCT) instead of two independent in-memory derivations over `allTasks`. Prevents the bulk-apply tag sheet from missing a brand-new tag due to timing drift between the two flows.
-- Hide the "Apply tag" overflow action in selection mode when no tags exist; also persists sort / priority / tag sheet visibility across rotation via `rememberSaveable`.
-- Bulk change priority: new overflow action in the selection-mode top bar opens a `BulkPriorityBottomSheet` (Low / Medium / High) that applies the chosen priority to every selected task via `ITaskRepository.setPriorityBulk` and clears the selection
-- Back gesture now exits selection mode on `TaskListScreen` (clears selection)
-- English strings `action_change_priority`, `cd_change_priority_selected`, `title_change_priority_for_count`, `snackbar_tasks_priority_updated`
-- 2 new `TaskBulkActionManagerTest` cases covering bulk priority apply + invalid-priority rejection (22 total)
-- TalkBack-accessible reorder: `CustomAccessibilityAction` "Move up" / "Move down" on each subtask row (with boundary omission — first row has no "Move up", last has no "Move down"); drag remains for sighted users
-- English + 7-locale translations for `action_move_up_subtask` / `action_move_down_subtask` (16 new entries)
-- Translations of all 10 subtasks/progress/drag-reorder strings for `de`, `es`, `fr`, `hi`, `in`, `pt`, `vi` (70 new entries)
-- Drag-to-reorder for subtasks in the task editor: long-press the drag handle and move vertically to reorder. Final order is persisted atomically on save.
-- English string `cd_drag_handle_subtask` for drag handle content description
-- 4 new `TaskEditorViewModelTest` cases covering move / no-op / out-of-bounds / hasChanges propagation (55 total editor tests)
-- Inline subtask progress indicator ("m / n" + slim bar) on each task row in `TaskListScreen` — only rendered when the task has at least one subtask; TalkBack reads "X of Y subtasks completed"
-- `SubtaskProgress` projection + `SubtaskDao.observeSubtaskProgress` aggregate query (GROUP BY taskId) for live per-task progress
-- `ISubtaskRepository.observeSubtaskProgress` + `SubtaskUseCase.observeProgressByTaskId` for O(1) UI lookup
-- English strings `label_subtask_progress`, `cd_subtask_progress`
-- 2 new `SubtaskUseCaseTest` cases covering the progress flow (26 total)
-- `SubtaskListSection` Composable: inline checklist inside the task editor with checkbox, inline text edit, delete, and "Add subtask" row (IME Done commits)
-- Soft-cap hint at 50 subtasks per task (non-blocking advisory text)
-- `TaskEditorViewModel` state + events for subtask drafts (add / update title / toggle / remove) with diff-on-save persistence
-- English strings for subtasks: `section_subtasks`, `label_add_subtask`, `hint_subtask_soft_cap`, content-description keys for checkbox + remove icon
-- 9 new `TaskEditorViewModelTest` cases covering subtask CRUD, validation, hasChanges, save persistence
+### Added
 - `Subtask` Room entity with foreign key to `tasks` (cascade delete) and index on `taskId`
 - `SubtaskDao` with observe/CRUD/reset-completion operations
 - Room migration v11→v12 creating the `subtasks` table
@@ -55,6 +27,31 @@ Format follows [Keep a Changelog](https://keepachangelog.com).
 - `ImportBackupUseCase` now restores subtasks, trims oversized titles, and drops blank-title subtasks
 - `SubtaskBackupTest` — 7 round-trip tests (JSON + CSV, special characters, v2 backward compat, empty cell)
 - `ImportBackupSubtaskTest` — 3 end-to-end tests covering subtask persistence, blank-parent filtering, and oversize-title truncation
+- `SubtaskListSection` Composable: inline checklist inside the task editor with checkbox, inline text edit, delete, and "Add subtask" row (IME Done commits)
+- Soft-cap hint at 50 subtasks per task (non-blocking advisory text)
+- `TaskEditorViewModel` state + events for subtask drafts (add / update title / toggle / remove) with diff-on-save persistence
+- English strings for subtasks: `section_subtasks`, `label_add_subtask`, `hint_subtask_soft_cap`, content-description keys for checkbox + remove icon
+- 9 new `TaskEditorViewModelTest` cases covering subtask CRUD, validation, hasChanges, save persistence
+- Inline subtask progress indicator ("m / n" + slim bar) on each task row in `TaskListScreen` — only rendered when the task has at least one subtask; TalkBack reads "X of Y subtasks completed"
+- `SubtaskProgress` projection + `SubtaskDao.observeSubtaskProgress` aggregate query (GROUP BY taskId) for live per-task progress
+- `ISubtaskRepository.observeSubtaskProgress` + `SubtaskUseCase.observeProgressByTaskId` for O(1) UI lookup
+- English strings `label_subtask_progress`, `cd_subtask_progress`
+- 2 new `SubtaskUseCaseTest` cases covering the progress flow (26 total)
+- Drag-to-reorder for subtasks in the task editor: long-press the drag handle and move vertically to reorder. Final order is persisted atomically on save.
+- English string `cd_drag_handle_subtask` for drag handle content description
+- 4 new `TaskEditorViewModelTest` cases covering move / no-op / out-of-bounds / hasChanges propagation (55 total editor tests)
+- Translations of all 10 subtasks/progress/drag-reorder strings for `de`, `es`, `fr`, `hi`, `in`, `pt`, `vi` (70 new entries)
+- TalkBack-accessible reorder: `CustomAccessibilityAction` "Move up" / "Move down" on each subtask row (with boundary omission — first row has no "Move up", last has no "Move down"); drag remains for sighted users
+- English + 7-locale translations for `action_move_up_subtask` / `action_move_down_subtask` (16 new entries)
+- Bulk change priority: new overflow action in the selection-mode top bar opens a `BulkPriorityBottomSheet` (Low / Medium / High) that applies the chosen priority to every selected task via `ITaskRepository.setPriorityBulk` and clears the selection
+- Back gesture now exits selection mode on `TaskListScreen` (clears selection)
+- English strings `action_change_priority`, `cd_change_priority_selected`, `title_change_priority_for_count`, `snackbar_tasks_priority_updated`
+- 2 new `TaskBulkActionManagerTest` cases covering bulk priority apply + invalid-priority rejection (22 total)
+- Bulk apply tag: new overflow action in the selection-mode top bar opens a `BulkTagBottomSheet` listing existing tags (with color chips) + a "Clear tag" row; applies the chosen tag (or clears) to every selected task via `ITaskRepository.setTagBulk` and clears the selection
+- English strings `action_apply_tag`, `action_clear_tag`, `title_apply_tag_for_count`, `cd_apply_tag_selected`, `snackbar_tasks_tagged`, `snackbar_tasks_tag_cleared`
+- 3 new `TaskBulkActionManagerTest` cases covering apply / clear / blank-as-clear (25 total)
+- Translations of 10 batch-operations strings (BO-07 apply/clear tag + BO-08 change priority) for `de`, `es`, `fr`, `hi`, `in`, `pt`, `vi` — 70 new entries (BO-11)
+- In-app help: two new FAQ sections in `HelpScreen` — Subtasks (add, reorder, recurrence reset, parent completion) and Batch Operations (selection mode, undo behavior, why-new-tags-don\'t-appear, exit selection) — translated across all 8 locales (RP-03)
 
 ### Changed
 - `TaskViewModel` constructor now takes `SubtaskUseCase`
@@ -64,6 +61,9 @@ Format follows [Keep a Changelog](https://keepachangelog.com).
 - `BackupMetadata.CURRENT_SCHEMA_VERSION` bumped from 2 to 3
 - `ExportBackupUseCase` now injects `ISubtaskRepository` to hydrate subtasks during export
 - CSV backup header gains a trailing `subtasks` column (JSON-in-cell encoding); import tolerates 13/14/19/20/21 column counts
+- Hide the "Apply tag" overflow action in selection mode when no tags exist; also persists sort / priority / tag sheet visibility across rotation via `rememberSaveable`
+- `TaskViewModel.availableTags` and `tagColorMap` now derive from a single `TagManagementUseCase.observeTags()` (DB-level DISTINCT) instead of two independent in-memory derivations over `allTasks`. Prevents the bulk-apply tag sheet from missing a brand-new tag due to timing drift between the two flows
+- Selection count in the contextual top bar is a `liveRegion = Polite` — TalkBack announces "N selected" as the count changes (BO-12)
 
 ### Fixed
 - `SubtaskUseCase` mutations now re-throw `CancellationException` instead of wrapping it in `Result.failure`, preserving structured-concurrency cancellation semantics
