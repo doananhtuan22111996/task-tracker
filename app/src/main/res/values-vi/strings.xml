@@ -10,6 +10,7 @@
     <string name="action_calendar_today">Hôm nay</string>
     <string name="cd_calendar_prev_month">Tháng trước</string>
     <string name="cd_calendar_next_month">Tháng sau</string>
+    <string name="calendar_agenda_empty">Không có việc nào trong ngày này.</string>
 
     <!-- Navigation -->
     <string name="nav_all">Tất cả</string>

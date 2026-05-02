@@ -361,6 +361,56 @@ class CalendarUseCaseTest {
         }
     }
 
+    // ── observeTasksForDay (CAL-17) ──
+
+    @Test
+    fun `observeTasksForDay returns only tasks on that day`() = runTest {
+        val day = LocalDate.of(2026, 5, 10)
+        val repo = FakeTaskRepository()
+        repo.seed(
+            TestTaskFactory.createTask(id = 1L, title = "Hit", dueAt = dateEpoch(day)),
+            TestTaskFactory.createTask(id = 2L, title = "Day before", dueAt = dateEpoch(day.minusDays(1))),
+            TestTaskFactory.createTask(id = 3L, title = "Day after", dueAt = dateEpoch(day.plusDays(1))),
+        )
+        val useCase = CalendarUseCase(repo)
+
+        useCase.observeTasksForDay(day, zone).test {
+            val emitted = awaitItem()
+            assertEquals(listOf(1L), emitted.map { it.id })
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `observeTasksForDay emits empty list for a day with no tasks`() = runTest {
+        val repo = FakeTaskRepository()
+        repo.seed(TestTaskFactory.createTask(id = 1L, dueAt = dateEpoch(LocalDate.of(2026, 5, 10))))
+        val useCase = CalendarUseCase(repo)
+
+        useCase.observeTasksForDay(LocalDate.of(2026, 5, 11), zone).test {
+            val emitted = awaitItem()
+            assertTrue(emitted.isEmpty())
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `observeTasksForDay re-emits when a task is inserted on that day`() = runTest {
+        val day = LocalDate.of(2026, 5, 10)
+        val repo = FakeTaskRepository()
+        val useCase = CalendarUseCase(repo)
+
+        useCase.observeTasksForDay(day, zone).test {
+            assertTrue(awaitItem().isEmpty())
+
+            repo.insertTask(TestTaskFactory.createTask(id = 0L, dueAt = dateEpoch(day)))
+
+            val populated = awaitItem()
+            assertEquals(1, populated.size)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
     @Test
     fun `missing entry means no tasks`() = runTest {
         val repo = FakeTaskRepository()
