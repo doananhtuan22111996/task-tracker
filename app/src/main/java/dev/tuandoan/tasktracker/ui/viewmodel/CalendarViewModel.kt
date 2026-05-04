@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dev.tuandoan.tasktracker.data.database.SubtaskProgress
+import dev.tuandoan.tasktracker.data.database.Task
 import dev.tuandoan.tasktracker.domain.ITaskManager
 import dev.tuandoan.tasktracker.domain.model.AgendaItem
 import dev.tuandoan.tasktracker.domain.model.DayDecoration
@@ -151,14 +152,13 @@ class CalendarViewModel @Inject constructor(
      * get the full row (materialize returns only the new id). Null if materialize declines
      * (archived/non-recurring/unknown parent — shouldn't happen from a live agenda).
      */
-    private suspend fun resolveConcreteTask(item: AgendaItem): dev.tuandoan.tasktracker.data.database.Task? =
-        when (item) {
-            is AgendaItem.Concrete -> item.task
-            is AgendaItem.Projected -> {
-                val newId = taskManager.materializeProjectedOccurrence(item.parentTaskId, item.date, zone)
-                newId?.let { taskManager.getTaskById(it) }
-            }
+    private suspend fun resolveConcreteTask(item: AgendaItem): Task? = when (item) {
+        is AgendaItem.Concrete -> item.task
+        is AgendaItem.Projected -> {
+            val newId = taskManager.materializeProjectedOccurrence(item.parentTaskId, item.date, zone)
+            newId?.let { taskManager.getTaskById(it) }
         }
+    }
 
     fun onMonthChange(delta: Int) {
         val next = _visibleMonth.value.plusMonths(delta.toLong())
