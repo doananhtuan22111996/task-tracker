@@ -3,6 +3,8 @@ package dev.tuandoan.tasktracker.ui.viewmodel
 import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
 import dev.tuandoan.tasktracker.domain.TaskManager
+import dev.tuandoan.tasktracker.domain.model.AgendaItem
+import dev.tuandoan.tasktracker.domain.model.RecurrenceType
 import dev.tuandoan.tasktracker.domain.usecase.CalendarUseCase
 import dev.tuandoan.tasktracker.domain.usecase.SubtaskUseCase
 import dev.tuandoan.tasktracker.testutil.FakeReminderScheduler
@@ -277,10 +279,10 @@ class CalendarViewModelTest {
 
     // ── Saved state persistence ──
 
-    // ── selectedDayTasks (CAL-17) ──
+    // ── agendaItems (CAL-17 / CAL-23 / CAL-24) ──
 
     @Test
-    fun `uiState selectedDayTasks reflects tasks on the selected day`() = runTest {
+    fun `uiState agendaItems wraps concrete tasks for the selected day`() = runTest {
         val savedState = SavedStateHandle(
             mapOf(
                 CalendarViewModel.KEY_VISIBLE_MONTH to "2026-05",
@@ -296,38 +298,39 @@ class CalendarViewModelTest {
 
         vm.uiState.test {
             val state = awaitItem()
-            assertEquals(listOf(1L), state.selectedDayTasks.map { it.id })
+            val concrete = state.agendaItems.filterIsInstance<AgendaItem.Concrete>()
+            assertEquals(listOf(1L), concrete.map { it.task.id })
             cancelAndIgnoreRemainingEvents()
         }
     }
 
     @Test
-    fun `uiState selectedDayTasks updates when selectedDay changes`() = runTest {
+    fun `uiState agendaItems includes projected occurrences for recurring rules hitting selected day`() = runTest {
+        val selected = LocalDate.of(2026, 5, 11) // Monday
         val savedState = SavedStateHandle(
             mapOf(
                 CalendarViewModel.KEY_VISIBLE_MONTH to "2026-05",
-                CalendarViewModel.KEY_SELECTED_DAY to "2026-05-10",
+                CalendarViewModel.KEY_SELECTED_DAY to selected.toString(),
             ),
         )
+        // Base before selected, rule = every Monday → projects onto 2026-05-11.
         repo.seed(
-            TestTaskFactory.createTask(id = 1L, title = "On 10", dueAt = dateEpoch(LocalDate.of(2026, 5, 10))),
-            TestTaskFactory.createTask(id = 2L, title = "On 20", dueAt = dateEpoch(LocalDate.of(2026, 5, 20))),
+            TestTaskFactory.createTask(
+                id = 7L,
+                title = "Standup",
+                dueAt = dateEpoch(LocalDate.of(2026, 2, 2)),
+                recurrenceType = RecurrenceType.WEEKLY.value,
+                recurrenceDaysOfWeek = 1, // Monday bit
+            ),
         )
         val vm = createViewModel(savedState)
 
         vm.uiState.test {
-            val first = awaitItem()
-            assertEquals(listOf(1L), first.selectedDayTasks.map { it.id })
-
-            vm.onDaySelect(LocalDate.of(2026, 5, 20))
-
-            var latest = awaitItem()
-            while (latest.selectedDay != LocalDate.of(2026, 5, 20) ||
-                latest.selectedDayTasks.map { it.id } != listOf(2L)
-            ) {
-                latest = awaitItem()
-            }
-            assertEquals(listOf(2L), latest.selectedDayTasks.map { it.id })
+            val state = awaitItem()
+            val projected = state.agendaItems.filterIsInstance<AgendaItem.Projected>()
+            assertEquals(1, projected.size)
+            assertEquals(7L, projected.single().parentTaskId)
+            assertEquals(selected, projected.single().date)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -354,10 +357,78 @@ class CalendarViewModelTest {
         assertNull(savedState.get<String>(CalendarViewModel.KEY_SELECTED_DAY))
     }
 
-    // ── Agenda-row actions (CAL-18) ──
+    // ── Agenda-row actions (CAL-24) ──
+
+    private fun concreteItem(task: dev.tuandoan.tasktracker.data.database.Task): AgendaItem.Concrete =
+        AgendaItem.Concrete(task = task, date = LocalDate.of(2026, 5, 10))
+
+    private fun projectedItem(parentId: Long, date: LocalDate): AgendaItem.Projected = AgendaItem.Projected(
+        parentTaskId = parentId,
+        date = date,
+        title = "Standup",
+        description = "",
+        priority = 1,
+        tag = null,
+        tagColor = null,
+        dueAtHasTime = false,
+        reminderOffsetMinutes = null,
+        recurrenceType = RecurrenceType.DAILY.value,
+        recurrenceInterval = 1,
+        recurrenceDaysOfWeek = 0,
+        recurrenceEndDate = null,
+    )
 
     @Test
-    fun `onToggleTaskComplete flips task completion state`() = runTest {
+    fun `onAgendaItemClick Concrete forwards task id to navigate callback`() = runTest {
+        val task = TestTaskFactory.createTask(id = 42L, dueAt = dateEpoch(LocalDate.of(2026, 5, 10)))
+        repo.seed(task)
+        val vm = createViewModel()
+        var navigatedTo: Long? = null
+
+        vm.onAgendaItemClick(concreteItem(task)) { navigatedTo = it }
+
+        assertEquals(42L, navigatedTo)
+    }
+
+    @Test
+    fun `onAgendaItemClick Projected materializes then navigates to new id`() = runTest {
+        val parentDate = LocalDate.of(2026, 5, 4)
+        repo.seed(
+            TestTaskFactory.createTask(
+                id = 1L,
+                title = "Standup",
+                dueAt = dateEpoch(parentDate),
+                recurrenceType = RecurrenceType.DAILY.value,
+            ),
+        )
+        val vm = createViewModel()
+        var navigatedTo: Long? = null
+        val targetDate = LocalDate.of(2026, 5, 7)
+
+        vm.onAgendaItemClick(projectedItem(parentId = 1L, date = targetDate)) { navigatedTo = it }
+
+        val id = navigatedTo
+        assertTrue("expected a materialized id", id != null && id > 0)
+        val inserted = repo.getAllTasksSnapshot().single { it.id == id }
+        assertEquals(1L, inserted.parentRecurringTaskId)
+        assertEquals(dateEpoch(targetDate), inserted.dueAt)
+    }
+
+    @Test
+    fun `onAgendaItemClick Projected with unknown parent does not invoke navigate`() = runTest {
+        val vm = createViewModel()
+        var navigateInvoked = false
+
+        vm.onAgendaItemClick(projectedItem(parentId = 999L, date = LocalDate.of(2026, 5, 5))) {
+            navigateInvoked = true
+        }
+
+        assertFalse(navigateInvoked)
+        assertTrue(repo.getAllTasksSnapshot().isEmpty())
+    }
+
+    @Test
+    fun `onAgendaItemToggleComplete Concrete flips completion`() = runTest {
         val task = TestTaskFactory.createTask(
             id = 1L,
             dueAt = dateEpoch(LocalDate.of(2026, 5, 10)),
@@ -366,39 +437,100 @@ class CalendarViewModelTest {
         repo.seed(task)
         val vm = createViewModel()
 
-        vm.onToggleTaskComplete(task)
+        vm.onAgendaItemToggleComplete(concreteItem(task))
 
         assertTrue(repo.getAllTasksSnapshot().single { it.id == 1L }.isCompleted)
     }
 
     @Test
-    fun `onArchiveTask marks task archived`() = runTest {
-        val task = TestTaskFactory.createTask(
-            id = 1L,
-            dueAt = dateEpoch(LocalDate.of(2026, 5, 10)),
+    fun `onAgendaItemToggleComplete Projected materializes then completes (regenerates next)`() = runTest {
+        val parentDate = LocalDate.of(2026, 5, 4)
+        repo.seed(
+            TestTaskFactory.createTask(
+                id = 1L,
+                title = "Standup",
+                dueAt = dateEpoch(parentDate),
+                recurrenceType = RecurrenceType.DAILY.value,
+            ),
         )
+        val vm = createViewModel()
+        val targetDate = LocalDate.of(2026, 5, 7)
+
+        vm.onAgendaItemToggleComplete(projectedItem(parentId = 1L, date = targetDate))
+
+        // At least one new row exists. The materialized row got completed; completing a
+        // recurring row generates the next occurrence, so the snapshot may also contain a
+        // freshly-generated child.
+        val materialized = repo.getAllTasksSnapshot().filter { it.parentRecurringTaskId == 1L }
+        assertTrue(materialized.any { it.isCompleted && it.dueAt == dateEpoch(targetDate) })
+    }
+
+    @Test
+    fun `onAgendaItemArchive Concrete marks archived`() = runTest {
+        val task = TestTaskFactory.createTask(id = 1L, dueAt = dateEpoch(LocalDate.of(2026, 5, 10)))
         repo.seed(task)
         val vm = createViewModel()
 
-        vm.onArchiveTask(task)
+        vm.onAgendaItemArchive(concreteItem(task))
 
         assertTrue(repo.getAllTasksSnapshot().single { it.id == 1L }.isArchived)
     }
 
     @Test
-    fun `onTogglePin flips pinned state`() = runTest {
-        val task = TestTaskFactory.createTask(
-            id = 1L,
-            dueAt = dateEpoch(LocalDate.of(2026, 5, 10)),
-            isPinned = false,
+    fun `onAgendaItemArchive Projected materializes then archives the new row`() = runTest {
+        val parentDate = LocalDate.of(2026, 5, 4)
+        repo.seed(
+            TestTaskFactory.createTask(
+                id = 1L,
+                title = "Standup",
+                dueAt = dateEpoch(parentDate),
+                recurrenceType = RecurrenceType.DAILY.value,
+            ),
         )
+        val vm = createViewModel()
+        val targetDate = LocalDate.of(2026, 5, 7)
+
+        vm.onAgendaItemArchive(projectedItem(parentId = 1L, date = targetDate))
+
+        // The materialized child is archived; the root is untouched.
+        val materialized = repo.getAllTasksSnapshot().single { it.parentRecurringTaskId == 1L }
+        assertTrue(materialized.isArchived)
+        assertFalse(repo.getAllTasksSnapshot().single { it.id == 1L }.isArchived)
+    }
+
+    @Test
+    fun `onAgendaItemTogglePin Concrete flips pinned state`() = runTest {
+        val task = TestTaskFactory.createTask(id = 1L, dueAt = dateEpoch(LocalDate.of(2026, 5, 10)))
         repo.seed(task)
         val vm = createViewModel()
 
-        vm.onTogglePin(task)
+        vm.onAgendaItemTogglePin(concreteItem(task))
         assertTrue(repo.getAllTasksSnapshot().single { it.id == 1L }.isPinned)
 
-        vm.onTogglePin(repo.getAllTasksSnapshot().single { it.id == 1L })
+        vm.onAgendaItemTogglePin(concreteItem(repo.getAllTasksSnapshot().single { it.id == 1L }))
         assertFalse(repo.getAllTasksSnapshot().single { it.id == 1L }.isPinned)
+    }
+
+    @Test
+    fun `onAgendaItemTogglePin Projected materializes then pins the new row`() = runTest {
+        val parentDate = LocalDate.of(2026, 5, 4)
+        repo.seed(
+            TestTaskFactory.createTask(
+                id = 1L,
+                title = "Standup",
+                dueAt = dateEpoch(parentDate),
+                recurrenceType = RecurrenceType.DAILY.value,
+            ),
+        )
+        val vm = createViewModel()
+        val targetDate = LocalDate.of(2026, 5, 7)
+
+        vm.onAgendaItemTogglePin(projectedItem(parentId = 1L, date = targetDate))
+
+        // Root is untouched; materialized child is pinned.
+        assertFalse(repo.getAllTasksSnapshot().single { it.id == 1L }.isPinned)
+        val materialized = repo.getAllTasksSnapshot().single { it.parentRecurringTaskId == 1L }
+        assertTrue(materialized.isPinned)
+        assertEquals(dateEpoch(targetDate), materialized.dueAt)
     }
 }
