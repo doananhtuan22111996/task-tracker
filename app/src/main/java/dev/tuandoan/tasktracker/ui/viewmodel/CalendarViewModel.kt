@@ -5,8 +5,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dev.tuandoan.tasktracker.data.database.SubtaskProgress
-import dev.tuandoan.tasktracker.data.database.Task
 import dev.tuandoan.tasktracker.domain.ITaskManager
+import dev.tuandoan.tasktracker.domain.model.AgendaItem
 import dev.tuandoan.tasktracker.domain.model.DayDecoration
 import dev.tuandoan.tasktracker.domain.usecase.CalendarUseCase
 import dev.tuandoan.tasktracker.domain.usecase.SubtaskUseCase
@@ -28,16 +28,19 @@ import javax.inject.Inject
  * Drives the v1.11.0 Calendar screen. Exposes [CalendarUiState] combining:
  * - `visibleMonth` + `selectedDay` (persisted via [SavedStateHandle] — ISO `YYYY-MM` and
  *   `YYYY-MM-DD` keys respectively; both default to today on first launch).
- * - `decorations` — per-day aggregates for the visible month (CAL-05).
- * - `selectedDayTasks` — live list of tasks on `selectedDay`, for the day agenda sheet (CAL-17).
- * - `subtaskProgress` — `Map<Long, SubtaskProgress>` feeding agenda rows' progress indicator
- *   (CAL-18).
+ * - `decorations` — per-day aggregates for the visible month including projected
+ *   recurrence occurrences (CAL-24 re-enabled this post-CAL-37).
+ * - `agendaItems` — live list of [AgendaItem]s on `selectedDay` (concrete rows merged
+ *   with projected occurrences; projections materialize on interaction, CAL-23 + CAL-24).
+ * - `subtaskProgress` — `Map<Long, SubtaskProgress>` feeding agenda rows' progress indicator.
  *
  * Events:
  * - Navigation: `onMonthChange` / `onJumpToMonth` / `onDaySelect` / `onTodayClick`.
- * - Agenda-row actions (CAL-18): `onToggleTaskComplete` / `onArchiveTask` / `onTogglePin`.
- *   All delegate to [ITaskManager] on [viewModelScope]; duplicate + skip-occurrence stay on
- *   the main task list for now (wired as `{}` defaults in `TaskItem`).
+ * - Agenda-row actions: [onAgendaItemClick] / [onAgendaItemToggleComplete] /
+ *   [onAgendaItemArchive] / [onAgendaItemTogglePin]. Each branches on [AgendaItem]:
+ *   [AgendaItem.Concrete] dispatches directly; [AgendaItem.Projected] first materializes
+ *   the occurrence via [ITaskManager.materializeProjectedOccurrence] (ADR-002 option c —
+ *   materialize-then-open) and then routes to the concrete handler.
  */
 @HiltViewModel
 class CalendarViewModel @Inject constructor(
@@ -73,9 +76,9 @@ class CalendarViewModel @Inject constructor(
         }
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    private val selectedDayTasksFlow: Flow<List<Task>> =
+    private val agendaFlow: Flow<List<AgendaItem>> =
         _selectedDay.flatMapLatest { day ->
-            calendarUseCase.observeTasksForDay(day, zone)
+            calendarUseCase.observeAgendaForDay(day, zone)
         }
 
     private val subtaskProgressFlow: Flow<Map<Long, SubtaskProgress>> =
@@ -85,14 +88,14 @@ class CalendarViewModel @Inject constructor(
         _visibleMonth,
         _selectedDay,
         decorationsFlow,
-        selectedDayTasksFlow,
+        agendaFlow,
         subtaskProgressFlow,
-    ) { month, day, decorations, dayTasks, progress ->
+    ) { month, day, decorations, items, progress ->
         CalendarUiState(
             visibleMonth = month,
             selectedDay = day,
             decorations = decorations,
-            selectedDayTasks = dayTasks,
+            agendaItems = items,
             subtaskProgress = progress,
         )
     }.stateIn(
@@ -104,18 +107,53 @@ class CalendarViewModel @Inject constructor(
         ),
     )
 
-    // ── Agenda-row actions (CAL-18). All delegate to ITaskManager on viewModelScope. ──
+    // ── Agenda-row actions (CAL-24) ───────────────────────────────────────────────────────
+    // Each handler takes an [AgendaItem]. Concrete dispatches directly; Projected first
+    // materializes via ITaskManager.materializeProjectedOccurrence then routes to the
+    // concrete handler using the returned id. Materialize is idempotent (CAL-23 pt1), so
+    // rapid double-taps collapse safely.
 
-    fun onToggleTaskComplete(task: Task) {
-        viewModelScope.launch { taskManager.toggleTaskCompletion(task) }
+    fun onAgendaItemClick(item: AgendaItem, onNavigateToEditor: (Long) -> Unit) {
+        when (item) {
+            is AgendaItem.Concrete -> onNavigateToEditor(item.task.id)
+            is AgendaItem.Projected -> viewModelScope.launch {
+                val newId = taskManager.materializeProjectedOccurrence(item.parentTaskId, item.date, zone)
+                if (newId != null) onNavigateToEditor(newId)
+            }
+        }
     }
 
-    fun onArchiveTask(task: Task) {
-        viewModelScope.launch { taskManager.archiveTask(task.id) }
+    fun onAgendaItemToggleComplete(item: AgendaItem) {
+        viewModelScope.launch {
+            val concreteId = ensureConcrete(item) ?: return@launch
+            val task = taskManager.getTaskById(concreteId) ?: return@launch
+            taskManager.toggleTaskCompletion(task)
+        }
     }
 
-    fun onTogglePin(task: Task) {
-        viewModelScope.launch { taskManager.setPinned(task.id, !task.isPinned) }
+    fun onAgendaItemArchive(item: AgendaItem) {
+        viewModelScope.launch {
+            val concreteId = ensureConcrete(item) ?: return@launch
+            taskManager.archiveTask(concreteId)
+        }
+    }
+
+    fun onAgendaItemTogglePin(item: AgendaItem) {
+        viewModelScope.launch {
+            val concreteId = ensureConcrete(item) ?: return@launch
+            val task = taskManager.getTaskById(concreteId) ?: return@launch
+            taskManager.setPinned(concreteId, !task.isPinned)
+        }
+    }
+
+    /**
+     * Returns the concrete task id for [item], materializing a projection if needed. Null
+     * if materialize declines (archived/non-recurring/unknown parent — shouldn't happen
+     * from a live agenda but guarded for safety).
+     */
+    private suspend fun ensureConcrete(item: AgendaItem): Long? = when (item) {
+        is AgendaItem.Concrete -> item.task.id
+        is AgendaItem.Projected -> taskManager.materializeProjectedOccurrence(item.parentTaskId, item.date, zone)
     }
 
     fun onMonthChange(delta: Int) {
@@ -168,6 +206,6 @@ data class CalendarUiState(
     val visibleMonth: YearMonth,
     val selectedDay: LocalDate,
     val decorations: Map<LocalDate, DayDecoration> = emptyMap(),
-    val selectedDayTasks: List<Task> = emptyList(),
+    val agendaItems: List<AgendaItem> = emptyList(),
     val subtaskProgress: Map<Long, SubtaskProgress> = emptyMap(),
 )

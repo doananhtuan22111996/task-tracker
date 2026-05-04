@@ -27,7 +27,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import dev.tuandoan.tasktracker.R
 import dev.tuandoan.tasktracker.data.database.SubtaskProgress
-import dev.tuandoan.tasktracker.data.database.Task
+import dev.tuandoan.tasktracker.domain.model.AgendaItem
 import dev.tuandoan.tasktracker.ui.theme.AppSpacing
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -35,13 +35,13 @@ import java.time.format.FormatStyle
 import java.util.Locale
 
 /**
- * Day agenda bottom sheet (CAL-17 + CAL-18 + CAL-19). Opens on day tap from
- * [CalendarMonthView]; shows a localized date title, the day's tasks rendered with the full
- * [TaskItem] composable, and a FAB (CAL-19) that opens the task editor prefilled with the
- * selected day's date.
+ * Day agenda bottom sheet (CAL-17 + CAL-18 + CAL-19 + CAL-24). Renders a mixed list of
+ * [AgendaItem.Concrete] (full [TaskItem]) and [AgendaItem.Projected] (read-only
+ * [ProjectedAgendaRow]). All interaction handlers take the [AgendaItem] so the VM can
+ * materialize projections before dispatching to the concrete handler (ADR-002 option c).
  *
  * Scope for the calendar agenda context:
- * - `onToggleComplete`, `onEditClick`, `onArchiveClick`, `onPinClick` wired through the VM.
+ * - `onClick` / `onToggleComplete` / `onArchive` / `onTogglePin` wired through the VM.
  * - `onDuplicateClick` / `onSkipOccurrence` left at `TaskItem`'s `{}` defaults — users
  *   duplicate/skip from the task list.
  * - Multi-select and swipe-to-archive land in CAL-20 / CAL-21.
@@ -51,12 +51,12 @@ import java.util.Locale
 @Composable
 fun DayAgendaSheet(
     selectedDay: LocalDate,
-    tasks: List<Task>,
+    items: List<AgendaItem>,
     subtaskProgress: Map<Long, SubtaskProgress>,
-    onTaskClick: (Long) -> Unit,
-    onToggleComplete: (Task) -> Unit,
-    onArchive: (Task) -> Unit,
-    onTogglePin: (Task) -> Unit,
+    onItemClick: (AgendaItem) -> Unit,
+    onToggleComplete: (AgendaItem) -> Unit,
+    onArchive: (AgendaItem) -> Unit,
+    onTogglePin: (AgendaItem) -> Unit,
     onAddTaskClick: () -> Unit,
     onDismiss: () -> Unit,
 ) {
@@ -80,7 +80,7 @@ fun DayAgendaSheet(
                 modifier = Modifier.padding(bottom = AppSpacing.small),
             )
 
-            if (tasks.isEmpty()) {
+            if (items.isEmpty()) {
                 Spacer(Modifier.height(AppSpacing.medium))
                 Text(
                     text = stringResource(R.string.calendar_agenda_empty),
@@ -93,15 +93,21 @@ fun DayAgendaSheet(
                     modifier = Modifier.fillMaxWidth(),
                     verticalArrangement = Arrangement.spacedBy(AppSpacing.small),
                 ) {
-                    items(items = tasks, key = { it.id }) { task ->
-                        TaskItem(
-                            task = task,
-                            subtaskProgress = subtaskProgress[task.id],
-                            onToggleComplete = { onToggleComplete(task) },
-                            onEditClick = { onTaskClick(task.id) },
-                            onArchiveClick = { onArchive(task) },
-                            onPinClick = { onTogglePin(task) },
-                        )
+                    items(items = items, key = { agendaItemKey(it) }) { item ->
+                        when (item) {
+                            is AgendaItem.Concrete -> TaskItem(
+                                task = item.task,
+                                subtaskProgress = subtaskProgress[item.task.id],
+                                onToggleComplete = { onToggleComplete(item) },
+                                onEditClick = { onItemClick(item) },
+                                onArchiveClick = { onArchive(item) },
+                                onPinClick = { onTogglePin(item) },
+                            )
+                            is AgendaItem.Projected -> ProjectedAgendaRow(
+                                projected = item,
+                                onClick = { onItemClick(item) },
+                            )
+                        }
                     }
                 }
             }
@@ -134,6 +140,14 @@ fun DayAgendaSheet(
             }
         }
     }
+}
+
+// Stable LazyColumn key. Concrete and Projected must never collide even if their underlying
+// id and parentTaskId happen to match (they can — Projected.parentTaskId is the chain root
+// which may also be a Concrete elsewhere in the same list). Namespace with a prefix.
+private fun agendaItemKey(item: AgendaItem): String = when (item) {
+    is AgendaItem.Concrete -> "concrete-${item.task.id}"
+    is AgendaItem.Projected -> "projected-${item.parentTaskId}-${item.date}"
 }
 
 // Locale-aware "full day of week, full date" formatter — e.g. "Tuesday, May 12, 2026".

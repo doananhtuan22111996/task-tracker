@@ -12,6 +12,7 @@
     <string name="cd_calendar_next_month">Mes siguiente</string>
     <string name="calendar_agenda_empty">No hay tareas en este día.</string>
     <string name="cd_agenda_add_task">Añadir tarea para este día</string>
+    <string name="agenda_upcoming_badge">Próxima</string>
 
     <!-- Navigation -->
     <string name="nav_all">Todas</string>

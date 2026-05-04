@@ -8,7 +8,6 @@ import dev.tuandoan.tasktracker.domain.repository.ITaskRepository
 import dev.tuandoan.tasktracker.domain.service.RecurrenceCalculator
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.map
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
@@ -16,19 +15,22 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 /**
- * Aggregates concrete dated tasks into a `Map<LocalDate, DayDecoration>` for the v1.11.0
- * calendar month grid (CAL-05, FR-03, FR-06..09).
+ * Aggregates concrete dated tasks and projected recurrence occurrences into a
+ * `Map<LocalDate, DayDecoration>` for the v1.11.0 calendar month grid (CAL-05, CAL-23, CAL-24).
  *
- * Emits reactively whenever tasks change. Each day's decoration reflects persisted Room
- * rows whose `dueAt` falls on that day (from [`ITaskRepository.observeTasksInRange`]).
+ * Emits reactively whenever tasks change. Each day's decoration reflects every task that
+ * falls on that day — both persisted Room rows and projected occurrences from
+ * [RecurrenceCalculator.projectOccurrences] for recurring parents whose window extends into
+ * the visible month.
  *
- * Recurrence projections are intentionally NOT included — prior to CAL-37 the grid also
- * fed projected occurrences into the decoration, which produced "dots but empty agenda"
- * because [observeTasksForDay] only surfaces concrete rows. Materializing projections so
- * they render in both places is tracked as ADR-002 (CAL-23) + CAL-24.
+ * `hasRecurringProjection` on [DayDecoration] is set only when a day's content comes solely
+ * from a projected occurrence; a concrete row always takes precedence.
  *
- * Days with no concrete tasks are absent from the map; callers treat a missing entry as
- * "no tasks".
+ * Days with no content are absent from the map; callers treat a missing entry as "no tasks".
+ *
+ * History: CAL-37 temporarily reduced this to concrete-only to eliminate a "dots but empty
+ * agenda" UX lie (observeTasksForDay returned concrete rows only). CAL-24 re-enables the
+ * projection feed now that the agenda surfaces projections too via [observeAgendaForDay].
  */
 @Singleton
 class CalendarUseCase @Inject constructor(private val taskRepository: ITaskRepository) {
@@ -42,41 +44,25 @@ class CalendarUseCase @Inject constructor(private val taskRepository: ITaskRepos
         // Exclusive end: observeTasksInRange uses a half-open window, so we advance one day.
         val endMillis = monthEnd.plusDays(1).atStartOfDay(zone).toInstant().toEpochMilli()
 
-        return taskRepository.observeTasksInRange(startMillis, endMillis)
-            .map { concreteInRange -> buildDecorations(concreteInRange, zone) }
-    }
-
-    /**
-     * Live list of concrete tasks whose `dueAt` falls on [day] (in [zone]). Used by the
-     * day-agenda bottom sheet (CAL-17). Ordered by `dueAt` ascending (matches
-     * [observeTasksInRange]'s order from CAL-06). Excludes archived. Includes completed.
-     *
-     * Projected recurrence occurrences for [day] are NOT included — the agenda currently
-     * surfaces persisted Room rows only. Materialization of projections is tracked as
-     * ADR-002 (CAL-23).
-     */
-    fun observeTasksForDay(day: LocalDate, zone: ZoneId = ZoneId.systemDefault()): Flow<List<Task>> {
-        val startMillis = day.atStartOfDay(zone).toInstant().toEpochMilli()
-        val endMillis = day.plusDays(1).atStartOfDay(zone).toInstant().toEpochMilli()
-        return taskRepository.observeTasksInRange(startMillis, endMillis)
+        return combine(
+            taskRepository.observeTasksInRange(startMillis, endMillis),
+            taskRepository.getAllTasks(),
+        ) { concreteInRange, allActiveTasks ->
+            buildDecorations(concreteInRange, allActiveTasks, monthStart, monthEnd, zone)
+        }
     }
 
     /**
      * Live list of [AgendaItem]s for [day] (CAL-23 part 2). Merges persisted concrete rows
-     * with projected recurrence occurrences so the agenda sheet has something to render on
-     * every day a dot will appear on post-CAL-24.
+     * with projected recurrence occurrences so every day that carries a dot in the month
+     * grid has something tappable in the agenda sheet.
      *
-     * Ordering: concrete rows first (ascending by `dueAt`, same as [observeTasksForDay]),
-     * then projected occurrences (sorted by `parentTaskId` for deterministic test output).
+     * Ordering: concrete rows first (ascending by `dueAt`, matching
+     * [ITaskRepository.observeTasksInRange]), then projected occurrences (sorted by
+     * `parentTaskId` for deterministic output).
      *
      * Dedup: if a concrete row already exists for a recurrence chain on [day], the chain's
-     * projection for [day] is suppressed — concrete wins. Prevents the "chain doubles up on
-     * its own regeneration day" bug CAL-05 originally solved for decorations; same principle
-     * applies here.
-     *
-     * Not yet consumed by any screen — CAL-24 wires this into [CalendarViewModel] and
-     * replaces the existing `observeTasksForDay` call. Kept additive in this PR so the
-     * agenda UX doesn't regress while the UI change is in review.
+     * projection for [day] is suppressed — concrete wins.
      */
     fun observeAgendaForDay(day: LocalDate, zone: ZoneId = ZoneId.systemDefault()): Flow<List<AgendaItem>> {
         val startMillis = day.atStartOfDay(zone).toInstant().toEpochMilli()
@@ -98,9 +84,6 @@ class CalendarUseCase @Inject constructor(private val taskRepository: ITaskRepos
     ): List<AgendaItem> {
         val concreteItems = concreteOnDay.map { task -> AgendaItem.Concrete(task = task, date = day) }
 
-        // Root ids of chains that already have a concrete row on [day]. Those chains must
-        // not produce a Projected item, otherwise the agenda shows two rows for what the
-        // user perceives as "today's instance of a repeating task".
         val concreteChainRoots: Set<Long> = concreteOnDay
             .map { it.parentRecurringTaskId ?: it.id }
             .toSet()
@@ -108,15 +91,10 @@ class CalendarUseCase @Inject constructor(private val taskRepository: ITaskRepos
         val projectedItems = buildList {
             for (task in allActiveTasks) {
                 if (task.isArchived) continue
-                // Project only from chain roots. Generated children inherit the parent's
-                // recurrence fields (see TaskManager.buildNextTask), so projecting from them
-                // would re-enumerate dates the root already covers.
                 if (task.parentRecurringTaskId != null) continue
                 if (RecurrenceType.fromValue(task.recurrenceType) == RecurrenceType.NONE) continue
                 if (task.id in concreteChainRoots) continue
 
-                // Query the projection for a single-day window. Reuses CAL-07's
-                // safety caps (maxOccurrences, fast-forward bound).
                 val hits = RecurrenceCalculator.projectOccurrences(
                     task = task,
                     windowStart = day,
@@ -143,18 +121,60 @@ class CalendarUseCase @Inject constructor(private val taskRepository: ITaskRepos
                     ),
                 )
             }
-        }.sortedBy { it.parentTaskId } // deterministic test output; UI will sort visually
+        }.sortedBy { it.parentTaskId }
 
         return concreteItems + projectedItems
     }
 
-    private fun buildDecorations(concreteInRange: List<Task>, zone: ZoneId): Map<LocalDate, DayDecoration> {
+    private fun buildDecorations(
+        concreteInRange: List<Task>,
+        allActiveTasks: List<Task>,
+        monthStart: LocalDate,
+        monthEnd: LocalDate,
+        zone: ZoneId,
+    ): Map<LocalDate, DayDecoration> {
         val buckets = mutableMapOf<LocalDate, DayBucket>()
+
+        // 1) Concrete tasks — the authoritative source for each day they appear on.
         for (task in concreteInRange) {
             val dueAt = task.dueAt ?: continue
             val date = Instant.ofEpochMilli(dueAt).atZone(zone).toLocalDate()
             buckets.getOrPut(date) { DayBucket() }.addConcrete(task)
         }
+
+        // 2) Recurrence projections — enumerate only from chain roots. Concrete dates
+        //    already claimed by the chain (parent + materialized children inside the window)
+        //    are subtracted so a Monday with both the root and this-week's concrete child
+        //    still counts as exactly one dot on that Monday.
+        val chainConcreteDatesByRoot: Map<Long, Set<LocalDate>> = concreteInRange
+            .filter { it.dueAt != null }
+            .groupBy { it.parentRecurringTaskId ?: it.id }
+            .mapValues { (_, tasks) ->
+                tasks.mapTo(mutableSetOf()) { task ->
+                    Instant.ofEpochMilli(task.dueAt!!).atZone(zone).toLocalDate()
+                }
+            }
+
+        for (task in allActiveTasks) {
+            if (task.isArchived) continue
+            if (task.parentRecurringTaskId != null) continue
+            if (RecurrenceType.fromValue(task.recurrenceType) == RecurrenceType.NONE) continue
+
+            val projectedDates = RecurrenceCalculator.projectOccurrences(
+                task = task,
+                windowStart = monthStart,
+                windowEnd = monthEnd,
+                zone = zone,
+            )
+            if (projectedDates.isEmpty()) continue
+
+            val concreteDatesForChain = chainConcreteDatesByRoot[task.id].orEmpty()
+            for (date in projectedDates) {
+                if (date in concreteDatesForChain) continue
+                buckets.getOrPut(date) { DayBucket() }.addProjection(task)
+            }
+        }
+
         return buckets.mapValues { (date, bucket) -> bucket.toDecoration(date) }
     }
 
@@ -163,11 +183,20 @@ class CalendarUseCase @Inject constructor(private val taskRepository: ITaskRepos
         private var taskCount: Int = 0
         private var completedCount: Int = 0
         private val priorityBuckets: MutableSet<Int> = mutableSetOf()
+        private var hasConcrete: Boolean = false
+        private var hasProjection: Boolean = false
 
         fun addConcrete(task: Task) {
             taskCount++
             if (task.isCompleted) completedCount++
             priorityBuckets.add(task.priority)
+            hasConcrete = true
+        }
+
+        fun addProjection(task: Task) {
+            taskCount++
+            priorityBuckets.add(task.priority)
+            hasProjection = true
         }
 
         fun toDecoration(date: LocalDate): DayDecoration = DayDecoration(
@@ -175,8 +204,8 @@ class CalendarUseCase @Inject constructor(private val taskRepository: ITaskRepos
             taskCount = taskCount,
             priorityBuckets = priorityBuckets.toSet(),
             completedCount = completedCount,
-            // Always false until CAL-23/24 materialize projections into the agenda.
-            hasRecurringProjection = false,
+            // true only when the day's content is exclusively projection; concrete wins.
+            hasRecurringProjection = hasProjection && !hasConcrete,
         )
     }
 }

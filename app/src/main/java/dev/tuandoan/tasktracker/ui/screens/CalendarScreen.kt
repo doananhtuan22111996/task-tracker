@@ -89,15 +89,15 @@ fun CalendarScreen(
         if (isAgendaOpen) {
             DayAgendaSheet(
                 selectedDay = uiState.selectedDay,
-                tasks = uiState.selectedDayTasks,
+                items = uiState.agendaItems,
                 subtaskProgress = uiState.subtaskProgress,
-                onTaskClick = { taskId ->
+                onItemClick = { item ->
                     isAgendaOpen = false
-                    onNavigateToEditor(taskId)
+                    viewModel.onAgendaItemClick(item, onNavigateToEditor)
                 },
-                onToggleComplete = viewModel::onToggleTaskComplete,
-                onArchive = viewModel::onArchiveTask,
-                onTogglePin = viewModel::onTogglePin,
+                onToggleComplete = viewModel::onAgendaItemToggleComplete,
+                onArchive = viewModel::onAgendaItemArchive,
+                onTogglePin = viewModel::onAgendaItemTogglePin,
                 onAddTaskClick = {
                     isAgendaOpen = false
                     val epoch = uiState.selectedDay
