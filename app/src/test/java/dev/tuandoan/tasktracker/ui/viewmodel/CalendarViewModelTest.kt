@@ -510,4 +510,27 @@ class CalendarViewModelTest {
         vm.onAgendaItemTogglePin(concreteItem(repo.getAllTasksSnapshot().single { it.id == 1L }))
         assertFalse(repo.getAllTasksSnapshot().single { it.id == 1L }.isPinned)
     }
+
+    @Test
+    fun `onAgendaItemTogglePin Projected materializes then pins the new row`() = runTest {
+        val parentDate = LocalDate.of(2026, 5, 4)
+        repo.seed(
+            TestTaskFactory.createTask(
+                id = 1L,
+                title = "Standup",
+                dueAt = dateEpoch(parentDate),
+                recurrenceType = RecurrenceType.DAILY.value,
+            ),
+        )
+        val vm = createViewModel()
+        val targetDate = LocalDate.of(2026, 5, 7)
+
+        vm.onAgendaItemTogglePin(projectedItem(parentId = 1L, date = targetDate))
+
+        // Root is untouched; materialized child is pinned.
+        assertFalse(repo.getAllTasksSnapshot().single { it.id == 1L }.isPinned)
+        val materialized = repo.getAllTasksSnapshot().single { it.parentRecurringTaskId == 1L }
+        assertTrue(materialized.isPinned)
+        assertEquals(dateEpoch(targetDate), materialized.dueAt)
+    }
 }

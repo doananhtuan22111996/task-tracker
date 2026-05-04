@@ -125,36 +125,40 @@ class CalendarViewModel @Inject constructor(
 
     fun onAgendaItemToggleComplete(item: AgendaItem) {
         viewModelScope.launch {
-            val concreteId = ensureConcrete(item) ?: return@launch
-            val task = taskManager.getTaskById(concreteId) ?: return@launch
+            val task = resolveConcreteTask(item) ?: return@launch
             taskManager.toggleTaskCompletion(task)
         }
     }
 
     fun onAgendaItemArchive(item: AgendaItem) {
         viewModelScope.launch {
-            val concreteId = ensureConcrete(item) ?: return@launch
-            taskManager.archiveTask(concreteId)
+            val task = resolveConcreteTask(item) ?: return@launch
+            taskManager.archiveTask(task.id)
         }
     }
 
     fun onAgendaItemTogglePin(item: AgendaItem) {
         viewModelScope.launch {
-            val concreteId = ensureConcrete(item) ?: return@launch
-            val task = taskManager.getTaskById(concreteId) ?: return@launch
-            taskManager.setPinned(concreteId, !task.isPinned)
+            val task = resolveConcreteTask(item) ?: return@launch
+            taskManager.setPinned(task.id, !task.isPinned)
         }
     }
 
     /**
-     * Returns the concrete task id for [item], materializing a projection if needed. Null
-     * if materialize declines (archived/non-recurring/unknown parent — shouldn't happen
-     * from a live agenda but guarded for safety).
+     * Returns the concrete [Task] for [item], materializing a projection if needed. For
+     * Concrete items we already have the full Task on hand — return it directly to avoid a
+     * redundant DB roundtrip. For Projected items we have to fetch after materialize to
+     * get the full row (materialize returns only the new id). Null if materialize declines
+     * (archived/non-recurring/unknown parent — shouldn't happen from a live agenda).
      */
-    private suspend fun ensureConcrete(item: AgendaItem): Long? = when (item) {
-        is AgendaItem.Concrete -> item.task.id
-        is AgendaItem.Projected -> taskManager.materializeProjectedOccurrence(item.parentTaskId, item.date, zone)
-    }
+    private suspend fun resolveConcreteTask(item: AgendaItem): dev.tuandoan.tasktracker.data.database.Task? =
+        when (item) {
+            is AgendaItem.Concrete -> item.task
+            is AgendaItem.Projected -> {
+                val newId = taskManager.materializeProjectedOccurrence(item.parentTaskId, item.date, zone)
+                newId?.let { taskManager.getTaskById(it) }
+            }
+        }
 
     fun onMonthChange(delta: Int) {
         val next = _visibleMonth.value.plusMonths(delta.toLong())
