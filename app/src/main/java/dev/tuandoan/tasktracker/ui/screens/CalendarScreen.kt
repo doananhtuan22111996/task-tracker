@@ -11,16 +11,23 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -28,6 +35,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dev.tuandoan.tasktracker.R
 import dev.tuandoan.tasktracker.ui.components.CalendarMonthView
 import dev.tuandoan.tasktracker.ui.components.DayAgendaSheet
+import dev.tuandoan.tasktracker.ui.events.UiEvent
 import dev.tuandoan.tasktracker.ui.theme.AppSpacing
 import dev.tuandoan.tasktracker.ui.viewmodel.CalendarViewModel
 import java.time.YearMonth
@@ -41,8 +49,10 @@ import java.util.Locale
  * Horizontal swipe paging is handled inside [CalendarMonthView] (CAL-15). Tapping a day
  * opens a [DayAgendaSheet] showing that day's tasks, rendered with the full [TaskItem]
  * composable (CAL-17 + CAL-18). The sheet's FAB opens the task editor with `dueDate`
- * prefilled to the selected day (CAL-19). Empty-state hint card (CAL-16), swipe/multi-select
- * (CAL-20/21), and empty-day polish (CAL-22) land in follow-up tickets.
+ * prefilled to the selected day (CAL-19). Archive actions surface a Snackbar with UNDO
+ * (CAL-21). Projected rows use [ProjectedAgendaRow] and materialize on tap (CAL-23 + CAL-24).
+ * Empty-state hint card (CAL-16), multi-select (CAL-20), and empty-day polish (CAL-22) land
+ * in follow-up tickets.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -55,6 +65,35 @@ fun CalendarScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var isAgendaOpen by rememberSaveable { mutableStateOf(false) }
+    val snackbarHostState = remember { SnackbarHostState() }
+    val context = LocalContext.current
+
+    // CAL-21: collect archive-with-undo events from the VM and surface them as Snackbars.
+    LaunchedEffect(viewModel) {
+        viewModel.uiEvent.collect { event ->
+            when (event) {
+                is UiEvent.ShowUndoDelete -> {
+                    val message = event.message
+                        ?: context.getString(R.string.snackbar_task_archived)
+                    val result = snackbarHostState.showSnackbar(
+                        message = message,
+                        actionLabel = context.getString(R.string.action_undo),
+                        duration = SnackbarDuration.Short,
+                    )
+                    if (result == SnackbarResult.ActionPerformed) {
+                        event.onUndo()
+                    }
+                }
+                is UiEvent.ShowSnackbar -> {
+                    snackbarHostState.showSnackbar(
+                        message = event.message,
+                        duration = SnackbarDuration.Short,
+                    )
+                }
+                is UiEvent.ShowRatingPrompt -> Unit // not emitted from this screen
+            }
+        }
+    }
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -66,6 +105,7 @@ fun CalendarScreen(
                 onTodayClick = viewModel::onTodayClick,
             )
         },
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
     ) { paddingValues ->
         Column(
             modifier = Modifier

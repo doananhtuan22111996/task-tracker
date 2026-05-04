@@ -12,6 +12,9 @@ import dev.tuandoan.tasktracker.testutil.FakeSubtaskRepository
 import dev.tuandoan.tasktracker.testutil.FakeTaskRepository
 import dev.tuandoan.tasktracker.testutil.FakeWidgetUpdater
 import dev.tuandoan.tasktracker.testutil.TestTaskFactory
+import dev.tuandoan.tasktracker.ui.events.UiEvent
+import io.mockk.every
+import io.mockk.mockk
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -40,6 +43,9 @@ class CalendarViewModelTest {
     private lateinit var useCase: CalendarUseCase
     private lateinit var subtaskUseCase: SubtaskUseCase
     private lateinit var taskManager: TaskManager
+    private val context: android.content.Context = mockk(relaxed = true) {
+        every { getString(any()) } returns "Task archived"
+    }
 
     @Before
     fun setUp() {
@@ -57,7 +63,7 @@ class CalendarViewModelTest {
     }
 
     private fun createViewModel(savedState: SavedStateHandle = SavedStateHandle()): CalendarViewModel =
-        CalendarViewModel(useCase, savedState, taskManager, subtaskUseCase)
+        CalendarViewModel(context, useCase, savedState, taskManager, subtaskUseCase)
 
     private fun dateEpoch(date: LocalDate): Long = date.atStartOfDay(zone).toInstant().toEpochMilli()
 
@@ -532,5 +538,84 @@ class CalendarViewModelTest {
         val materialized = repo.getAllTasksSnapshot().single { it.parentRecurringTaskId == 1L }
         assertTrue(materialized.isPinned)
         assertEquals(dateEpoch(targetDate), materialized.dueAt)
+    }
+
+    // ── Snackbar undo on archive (CAL-21) ──
+
+    @Test
+    fun `onAgendaItemArchive Concrete emits ShowUndoDelete with archived task`() = runTest {
+        val task = TestTaskFactory.createTask(id = 1L, dueAt = dateEpoch(LocalDate.of(2026, 5, 10)))
+        repo.seed(task)
+        val vm = createViewModel()
+
+        vm.uiEvent.test {
+            vm.onAgendaItemArchive(concreteItem(task))
+            val event = awaitItem()
+            assertTrue(event is UiEvent.ShowUndoDelete)
+            val undo = event as UiEvent.ShowUndoDelete
+            assertEquals(listOf(1L), undo.tasks.map { it.id })
+            assertTrue(repo.getAllTasksSnapshot().single { it.id == 1L }.isArchived)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `undo action from ShowUndoDelete re-activates the archived task`() = runTest {
+        val task = TestTaskFactory.createTask(id = 1L, dueAt = dateEpoch(LocalDate.of(2026, 5, 10)))
+        repo.seed(task)
+        val vm = createViewModel()
+
+        vm.uiEvent.test {
+            vm.onAgendaItemArchive(concreteItem(task))
+            val undo = awaitItem() as UiEvent.ShowUndoDelete
+            assertTrue(repo.getAllTasksSnapshot().single { it.id == 1L }.isArchived)
+
+            undo.onUndo()
+
+            testDispatcher.scheduler.advanceUntilIdle()
+            assertFalse(repo.getAllTasksSnapshot().single { it.id == 1L }.isArchived)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `onAgendaItemArchive Projected materializes then emits ShowUndoDelete for new row`() = runTest {
+        val parentDate = LocalDate.of(2026, 5, 4)
+        repo.seed(
+            TestTaskFactory.createTask(
+                id = 1L,
+                title = "Standup",
+                dueAt = dateEpoch(parentDate),
+                recurrenceType = RecurrenceType.DAILY.value,
+            ),
+        )
+        val vm = createViewModel()
+        val targetDate = LocalDate.of(2026, 5, 7)
+
+        vm.uiEvent.test {
+            vm.onAgendaItemArchive(projectedItem(parentId = 1L, date = targetDate))
+            val undo = awaitItem() as UiEvent.ShowUndoDelete
+            // The materialized child got archived, not the root.
+            val materialized = repo.getAllTasksSnapshot().single { it.parentRecurringTaskId == 1L }
+            assertTrue(materialized.isArchived)
+            assertEquals(materialized.id, undo.tasks.single().id)
+
+            undo.onUndo()
+
+            testDispatcher.scheduler.advanceUntilIdle()
+            val refreshed = repo.getAllTasksSnapshot().single { it.id == materialized.id }
+            assertFalse(refreshed.isArchived)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `onUndoArchive with unknown id is a safe no-op`() = runTest {
+        val vm = createViewModel()
+
+        vm.onUndoArchive(taskId = 9999L)
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        assertTrue(repo.getAllTasksSnapshot().isEmpty())
     }
 }

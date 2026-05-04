@@ -1,9 +1,12 @@
 package dev.tuandoan.tasktracker.ui.viewmodel
 
+import android.content.Context
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
+import dev.tuandoan.tasktracker.R
 import dev.tuandoan.tasktracker.data.database.SubtaskProgress
 import dev.tuandoan.tasktracker.data.database.Task
 import dev.tuandoan.tasktracker.domain.ITaskManager
@@ -11,11 +14,15 @@ import dev.tuandoan.tasktracker.domain.model.AgendaItem
 import dev.tuandoan.tasktracker.domain.model.DayDecoration
 import dev.tuandoan.tasktracker.domain.usecase.CalendarUseCase
 import dev.tuandoan.tasktracker.domain.usecase.SubtaskUseCase
+import dev.tuandoan.tasktracker.ui.events.UiEvent
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
@@ -42,9 +49,13 @@ import javax.inject.Inject
  *   [AgendaItem.Concrete] dispatches directly; [AgendaItem.Projected] first materializes
  *   the occurrence via [ITaskManager.materializeProjectedOccurrence] (ADR-002 option c —
  *   materialize-then-open) and then routes to the concrete handler.
+ * - One-shot UI events emitted via [uiEvent] for Snackbar/undo handling (CAL-21). Archive
+ *   emits [UiEvent.ShowUndoDelete]; the screen collects it and triggers [onUndoArchive]
+ *   if the user hits UNDO.
  */
 @HiltViewModel
 class CalendarViewModel @Inject constructor(
+    @ApplicationContext private val context: Context,
     private val calendarUseCase: CalendarUseCase,
     private val savedStateHandle: SavedStateHandle,
     private val taskManager: ITaskManager,
@@ -84,6 +95,10 @@ class CalendarViewModel @Inject constructor(
 
     private val subtaskProgressFlow: Flow<Map<Long, SubtaskProgress>> =
         subtaskUseCase.observeProgressByTaskId()
+
+    /** One-shot UI events (Snackbar + undo, CAL-21). */
+    private val _uiEvent = MutableSharedFlow<UiEvent>()
+    val uiEvent: SharedFlow<UiEvent> = _uiEvent.asSharedFlow()
 
     val uiState: StateFlow<CalendarUiState> = combine(
         _visibleMonth,
@@ -135,7 +150,23 @@ class CalendarViewModel @Inject constructor(
         viewModelScope.launch {
             val task = resolveConcreteTask(item) ?: return@launch
             taskManager.archiveTask(task.id)
+            // CAL-21: emit an undo event so the screen can surface a Snackbar that
+            // reverses the archive on tap. Captures the concrete id so a Projected that
+            // just materialized + archived un-archives exactly the row we just created,
+            // not some sibling in the chain.
+            _uiEvent.emit(
+                UiEvent.ShowUndoDelete(
+                    tasks = listOf(task),
+                    onUndo = { onUndoArchive(task.id) },
+                    message = context.getString(R.string.snackbar_task_archived),
+                ),
+            )
         }
+    }
+
+    /** Un-archives the row with [taskId]. Invoked by the Snackbar UNDO action (CAL-21). */
+    fun onUndoArchive(taskId: Long) {
+        viewModelScope.launch { taskManager.unarchiveTask(taskId) }
     }
 
     fun onAgendaItemTogglePin(item: AgendaItem) {
