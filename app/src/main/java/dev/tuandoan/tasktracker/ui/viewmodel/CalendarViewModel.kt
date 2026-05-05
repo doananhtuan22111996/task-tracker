@@ -96,7 +96,14 @@ class CalendarViewModel @Inject constructor(
     private val subtaskProgressFlow: Flow<Map<Long, SubtaskProgress>> =
         subtaskUseCase.observeProgressByTaskId()
 
-    /** One-shot UI events (Snackbar + undo, CAL-21). */
+    /**
+     * One-shot UI events (Snackbar + undo, CAL-21). Default `MutableSharedFlow()` is what we
+     * want here: `emit` suspends when no collector is attached and resumes when one reattaches
+     * (e.g., during a brief configuration-change teardown). Adding `extraBufferCapacity = 1`
+     * would let emits succeed immediately — but the buffer only serves slow *existing*
+     * collectors, not late subscribers, so an archive event fired during a collector gap
+     * would land in the buffer and never be delivered to the next subscriber.
+     */
     private val _uiEvent = MutableSharedFlow<UiEvent>()
     val uiEvent: SharedFlow<UiEvent> = _uiEvent.asSharedFlow()
 
