@@ -11,6 +11,7 @@
     <string name="cd_calendar_prev_month">Mois précédent</string>
     <string name="cd_calendar_next_month">Mois suivant</string>
     <string name="calendar_agenda_empty">Aucune tâche ce jour-là.</string>
+    <string name="calendar_agenda_empty_on_date">Aucune tâche le %1$s.</string>
     <string name="cd_agenda_add_task">Ajouter une tâche pour ce jour</string>
     <string name="agenda_upcoming_badge">À venir</string>
 
