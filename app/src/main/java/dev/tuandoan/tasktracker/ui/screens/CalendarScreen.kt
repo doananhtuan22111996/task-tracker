@@ -144,14 +144,7 @@ fun CalendarScreen(
                     viewModel.onAgendaItemClick(item, onNavigateToEditor)
                 },
                 onToggleComplete = viewModel::onAgendaItemToggleComplete,
-                onArchive = { item ->
-                    // CAL-21: close the sheet before firing archive so the Snackbar, which
-                    // renders in CalendarScreen's Scaffold, isn't obscured by the
-                    // ModalBottomSheet's scrim. Without this, the UNDO snackbar is
-                    // emitted and queued but never visible to the user.
-                    isAgendaOpen = false
-                    viewModel.onAgendaItemArchive(item)
-                },
+                onArchive = viewModel::onAgendaItemArchive,
                 onTogglePin = viewModel::onAgendaItemTogglePin,
                 onAddTaskClick = {
                     isAgendaOpen = false

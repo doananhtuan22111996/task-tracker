@@ -20,6 +20,7 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -29,6 +30,7 @@ import dev.tuandoan.tasktracker.R
 import dev.tuandoan.tasktracker.data.database.SubtaskProgress
 import dev.tuandoan.tasktracker.domain.model.AgendaItem
 import dev.tuandoan.tasktracker.ui.theme.AppSpacing
+import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
@@ -61,8 +63,21 @@ fun DayAgendaSheet(
     onDismiss: () -> Unit,
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = false)
+    val coroutineScope = rememberCoroutineScope()
     val dateFormatter = dayTitleFormatter(Locale.getDefault())
     val dateTitle = selectedDay.format(dateFormatter)
+
+    // CAL-21: for archive, animate the sheet closed first so the CalendarScreen's
+    // SnackbarHost isn't obscured by the ModalBottomSheet scrim when the UNDO
+    // snackbar appears. Tap-to-edit and FAB use simple dismiss because navigation
+    // replaces the screen anyway.
+    val archiveThenDismiss: (AgendaItem) -> Unit = { item ->
+        coroutineScope.launch {
+            sheetState.hide()
+            onDismiss()
+            onArchive(item)
+        }
+    }
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
@@ -100,7 +115,7 @@ fun DayAgendaSheet(
                                 subtaskProgress = subtaskProgress[item.task.id],
                                 onToggleComplete = { onToggleComplete(item) },
                                 onEditClick = { onItemClick(item) },
-                                onArchiveClick = { onArchive(item) },
+                                onArchiveClick = { archiveThenDismiss(item) },
                                 onPinClick = { onTogglePin(item) },
                             )
                             is AgendaItem.Projected -> ProjectedAgendaRow(
