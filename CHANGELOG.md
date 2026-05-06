@@ -31,6 +31,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com).
 - Calendar month title in `CalendarTopBar` now applies `Modifier.semantics { liveRegion = LiveRegionMode.Polite; heading() }` so TalkBack announces the visible month on every change (chevron tap, Today, swipe paging, out-of-month tap) without stealing focus, and marks the title as a navigable heading. Chevrons already had `contentDescription` (CAL-14); this closes the "what month am I on?" gap for blind users (CAL-29)
 
 ### Changed
+- `DayDecoration` marked `@Immutable` so Compose skips `DayCell` recomposition when the instance is structurally equal to its prior value. Previously the embedded `Set<Int>` caused Compose to treat the whole data class as unstable, re-running every cell on every upstream `decorations` map emission. No runtime behavior change — purely a compose-compiler stability hint; `DayDecoration` instances are already produced via immutable `toSet()` snapshots in `CalendarUseCase.buildDecorations` (CAL-31)
 - `CalendarUiState.selectedDayTasks: List<Task>` renamed to `agendaItems: List<AgendaItem>` to reflect the mixed concrete/projected contents (CAL-24)
 
 ### Removed

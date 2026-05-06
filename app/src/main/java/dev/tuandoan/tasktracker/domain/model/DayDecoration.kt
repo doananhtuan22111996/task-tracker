@@ -1,5 +1,6 @@
 package dev.tuandoan.tasktracker.domain.model
 
+import androidx.compose.runtime.Immutable
 import java.time.LocalDate
 
 /**
@@ -17,7 +18,21 @@ import java.time.LocalDate
  * the day has at least one concrete row, this flag is `false` — concrete always wins.
  *
  * A day with `taskCount == 0` is not emitted — callers treat a missing entry as "no tasks".
+ *
+ * Marked [@Immutable][androidx.compose.runtime.Immutable] for CAL-31 so Compose can skip
+ * `DayCell` recomposition when the instance is structurally equal to the previous value.
+ * Without the annotation, Compose conservatively treats the embedded `Set<Int>` as unstable
+ * and re-runs every cell on every `decorations` map emission, even for days whose decoration
+ * is unchanged. The contract: instances are never mutated after construction; the builder
+ * inside `CalendarUseCase.buildDecorations` produces a fresh instance per emission and
+ * `Set<Int>` is a read-only `toSet()` snapshot.
+ *
+ * Note: the annotation introduces a compile-time dependency from `domain/model` on
+ * `androidx.compose.runtime`. Acceptable in this single-module app; if the project later
+ * splits `:app`/`:domain`, move this via a Compose stability-configuration file to keep the
+ * domain layer compose-free.
  */
+@Immutable
 data class DayDecoration(
     val date: LocalDate,
     val taskCount: Int = 0,
