@@ -21,12 +21,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.kizitonwose.calendar.core.CalendarDay
 import com.kizitonwose.calendar.core.DayPosition
+import dev.tuandoan.tasktracker.R
 import dev.tuandoan.tasktracker.domain.model.DayDecoration
 import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 /**
  * Minimum touch-target height for a day cell (PRD NFR a11y).
@@ -61,6 +68,11 @@ fun DayCell(
     val isInMonth = day.position == DayPosition.MonthDate
     val shape = RoundedCornerShape(12.dp)
 
+    // CAL-28: TalkBack description. Only announced for in-month cells; leading/trailing days
+    // are decorative, announcing them would chatter at screen-reader users. The library still
+    // keeps them focusable, but Compose's default text-based semantics suffice there.
+    val contentDescription = if (isInMonth) dayCellContentDescription(day.date, decoration, today, selected) else null
+
     val background: Color = when {
         today && isInMonth -> MaterialTheme.colorScheme.primary
         selected && isInMonth -> MaterialTheme.colorScheme.primaryContainer
@@ -79,6 +91,15 @@ fun DayCell(
             .size(CellHeight)
             .clip(shape)
             .clickable { onClick(day.date) }
+            .then(
+                if (contentDescription != null) {
+                    Modifier.semantics(mergeDescendants = true) {
+                        this.contentDescription = contentDescription
+                    }
+                } else {
+                    Modifier
+                },
+            )
             .background(background, shape)
             .let {
                 // Selected-but-not-today: add an outline ring on top of primaryContainer.
@@ -153,6 +174,55 @@ private fun priorityColor(priority: Int): Color = when (priority) {
     1 -> MaterialTheme.colorScheme.tertiary // MEDIUM
     0 -> MaterialTheme.colorScheme.primary // LOW
     else -> MaterialTheme.colorScheme.outline
+}
+
+/**
+ * Resolves locale-aware tokens and delegates to [buildDayCellContentDescription]. Kept in
+ * the Composable layer so the pure builder stays JVM-testable (no `Context` or `Resources`).
+ *
+ * HIGH priority count is derived from `decoration.priorityBuckets` — a presence indicator, not
+ * the actual count of HIGH-priority tasks. Consistent with the dot renderer.
+ */
+@Composable
+private fun dayCellContentDescription(
+    date: LocalDate,
+    decoration: DayDecoration?,
+    isToday: Boolean,
+    isSelected: Boolean,
+): String {
+    val locale = Locale.getDefault()
+    val dateText = date.format(DateTimeFormatter.ofPattern("EEEE, MMMM d", locale))
+
+    val taskCount = decoration?.taskCount ?: 0
+    val taskCountText = if (taskCount > 0) {
+        pluralStringResource(R.plurals.a11y_day_cell_tasks, taskCount, taskCount)
+    } else {
+        null
+    }
+
+    // Presence of a HIGH bucket (priority = 2) in the dots; count reflects bucket presence,
+    // not actual row count — matches what the user sees visually.
+    val highPriorityPresent = decoration?.priorityBuckets?.contains(2) == true
+    val highPriorityText = if (highPriorityPresent) {
+        // Quantity 1 here: we announce "1 high priority" because there's one HIGH bucket.
+        // Accurate row-count would require a schema change; presence is the right a11y signal.
+        pluralStringResource(R.plurals.a11y_day_cell_high_priority, 1, 1)
+    } else {
+        null
+    }
+
+    val todayPrefix = if (isToday) stringResource(R.string.a11y_day_cell_today_prefix) else null
+    val selectedSuffix = if (isSelected) stringResource(R.string.a11y_day_cell_selected_suffix) else null
+
+    return buildDayCellContentDescription(
+        dateText = dateText,
+        taskCountText = taskCountText,
+        highPriorityText = highPriorityText,
+        isToday = isToday,
+        isSelected = isSelected,
+        todayPrefix = todayPrefix,
+        selectedSuffix = selectedSuffix,
+    )
 }
 
 /**
