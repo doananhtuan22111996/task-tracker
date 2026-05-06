@@ -31,10 +31,10 @@ class WeekdayHeaderTest {
     }
 
     @Test
-    fun `Saturday-first Arabic-style rotation starts with Saturday`() {
-        // Arabic locales commonly use Saturday as the first day of week. Locale fallback for
-        // Arabic display names is available in the JVM default; assert rotation rather than
-        // exact text since names depend on the test JVM's ICU data.
+    fun `Saturday-first rotation returns Sat through Fri in US locale`() {
+        // Some Arabic locales use Saturday as first-day-of-week; this test locks the
+        // rotation in a stable locale (US) so it doesn't flake on ICU changes. The
+        // locale-specific translation path is covered by the German test below.
         val names = weekdayShortNames(DayOfWeek.SATURDAY, Locale.US)
 
         assertEquals(7, names.size)
