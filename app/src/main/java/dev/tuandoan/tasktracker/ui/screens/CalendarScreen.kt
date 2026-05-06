@@ -22,6 +22,10 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.LiveRegionMode
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.liveRegion
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -130,7 +134,17 @@ private fun CalendarTopBar(
                 )
             }
         },
-        title = { Text(monthTitle) },
+        title = {
+            // CAL-29: TalkBack announces the new month title on every change, without stealing
+            // focus. `heading()` marks it as a section header so users can navigate headings.
+            Text(
+                text = monthTitle,
+                modifier = Modifier.semantics {
+                    liveRegion = LiveRegionMode.Polite
+                    heading()
+                },
+            )
+        },
         actions = {
             IconButton(onClick = onNextMonth) {
                 Icon(
