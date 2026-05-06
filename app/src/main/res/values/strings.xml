@@ -12,6 +12,13 @@
     <string name="calendar_agenda_empty_on_date">No tasks on %1$s.</string>
     <string name="cd_agenda_add_task">Add task for this day</string>
     <string name="agenda_upcoming_badge">Upcoming</string>
+    <string name="a11y_day_cell_today_prefix">Today</string>
+    <string name="a11y_day_cell_selected_suffix">selected</string>
+    <plurals name="a11y_day_cell_tasks">
+        <item quantity="one">%1$d task</item>
+        <item quantity="other">%1$d tasks</item>
+    </plurals>
+    <string name="a11y_day_cell_has_high_priority">with high priority</string>
 
     <!-- Task Filter Chips -->
     <string name="nav_all">All</string>

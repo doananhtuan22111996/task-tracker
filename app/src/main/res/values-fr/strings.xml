@@ -11,6 +11,13 @@
     <string name="cd_calendar_prev_month">Mois précédent</string>
     <string name="cd_calendar_next_month">Mois suivant</string>
     <string name="calendar_agenda_empty_on_date">Aucune tâche le %1$s.</string>
+    <string name="a11y_day_cell_today_prefix">Aujourd\'hui</string>
+    <string name="a11y_day_cell_selected_suffix">sélectionné</string>
+    <plurals name="a11y_day_cell_tasks">
+        <item quantity="one">%1$d tâche</item>
+        <item quantity="other">%1$d tâches</item>
+    </plurals>
+    <string name="a11y_day_cell_has_high_priority">avec priorité élevée</string>
     <string name="cd_agenda_add_task">Ajouter une tâche pour ce jour</string>
     <string name="agenda_upcoming_badge">À venir</string>
 
