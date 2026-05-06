@@ -10,7 +10,7 @@
     <string name="action_calendar_today">Hôm nay</string>
     <string name="cd_calendar_prev_month">Tháng trước</string>
     <string name="cd_calendar_next_month">Tháng sau</string>
-    <string name="calendar_agenda_empty">Không có việc nào trong ngày này.</string>
+    <string name="calendar_agenda_empty_on_date">Không có việc nào vào %1$s.</string>
     <string name="cd_agenda_add_task">Thêm việc cho ngày này</string>
     <string name="agenda_upcoming_badge">Sắp tới</string>
 

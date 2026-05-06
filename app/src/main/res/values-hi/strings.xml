@@ -10,7 +10,7 @@
     <string name="action_calendar_today">आज</string>
     <string name="cd_calendar_prev_month">पिछला महीना</string>
     <string name="cd_calendar_next_month">अगला महीना</string>
-    <string name="calendar_agenda_empty">इस दिन कोई कार्य नहीं।</string>
+    <string name="calendar_agenda_empty_on_date">%1$s को कोई कार्य नहीं।</string>
     <string name="cd_agenda_add_task">इस दिन के लिए कार्य जोड़ें</string>
     <string name="agenda_upcoming_badge">आगामी</string>
 
