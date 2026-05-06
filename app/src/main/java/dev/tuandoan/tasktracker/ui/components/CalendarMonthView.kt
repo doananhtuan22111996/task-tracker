@@ -1,18 +1,10 @@
 package dev.tuandoan.tasktracker.ui.components
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
 import com.kizitonwose.calendar.compose.HorizontalCalendar
 import com.kizitonwose.calendar.compose.rememberCalendarState
 import com.kizitonwose.calendar.core.DayPosition
@@ -22,8 +14,6 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.drop
 import java.time.LocalDate
 import java.time.YearMonth
-import java.time.format.TextStyle
-import java.util.Locale
 
 /**
  * Thin wrapper around [HorizontalCalendar] (ADR-001). Hides the library's types so the rest of
@@ -40,8 +30,9 @@ import java.util.Locale
  * - When the ViewModel drives a change (today-click, saved-state restore, chevron tap),
  *   [LaunchedEffect] re-scrolls the library. The resulting `firstVisibleMonth` change is
  *   re-forwarded to `onJumpToMonth` which is idempotent against identical input — no loop.
- * - Default Kizitonwose month-header is used. CAL-13 extracts the inline version into a
- *   reusable, screenshot-testable component.
+ * - Weekday header delegated to [WeekdayHeader] (CAL-13) — reusable component with JVM-
+ *   testable `weekdayShortNames` helper. Takes the same `firstDayOfWeek` the grid uses so
+ *   the header and the grid stay column-aligned.
  * - `firstDayOfWeekFromLocale()` honors device locale (Sun-first `en-US`, Mon-first `de/fr`).
  */
 // ~20 years each direction — realistic user lifetime, still cheap because Kizitonwose is lazy.
@@ -110,25 +101,8 @@ fun CalendarMonthView(
                 },
             )
         },
-        monthHeader = { month ->
-            // Minimal fallback header until CAL-13 lands. Shows weekday short names using the
-            // calendar state's firstDayOfWeek so the order matches the rendered grid.
-            val daysOfWeek = month.weekDays.first().map { it.date.dayOfWeek }
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 8.dp),
-                horizontalArrangement = Arrangement.SpaceAround,
-            ) {
-                daysOfWeek.forEach { dow ->
-                    Text(
-                        text = dow.getDisplayName(TextStyle.SHORT, Locale.getDefault()),
-                        style = MaterialTheme.typography.labelSmall,
-                        fontWeight = FontWeight.Medium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                }
-            }
+        monthHeader = {
+            WeekdayHeader(firstDayOfWeek = state.firstDayOfWeek)
         },
     )
 }
