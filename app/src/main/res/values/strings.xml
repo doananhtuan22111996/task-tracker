@@ -18,10 +18,7 @@
         <item quantity="one">%1$d task</item>
         <item quantity="other">%1$d tasks</item>
     </plurals>
-    <plurals name="a11y_day_cell_high_priority">
-        <item quantity="one">%1$d high priority</item>
-        <item quantity="other">%1$d high priority</item>
-    </plurals>
+    <string name="a11y_day_cell_has_high_priority">with high priority</string>
 
     <!-- Task Filter Chips -->
     <string name="nav_all">All</string>

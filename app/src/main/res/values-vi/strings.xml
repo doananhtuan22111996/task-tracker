@@ -17,10 +17,7 @@
         <item quantity="one">%1$d việc</item>
         <item quantity="other">%1$d việc</item>
     </plurals>
-    <plurals name="a11y_day_cell_high_priority">
-        <item quantity="one">%1$d ưu tiên cao</item>
-        <item quantity="other">%1$d ưu tiên cao</item>
-    </plurals>
+    <string name="a11y_day_cell_has_high_priority">có ưu tiên cao</string>
     <string name="cd_agenda_add_task">Thêm việc cho ngày này</string>
     <string name="agenda_upcoming_badge">Sắp tới</string>
 

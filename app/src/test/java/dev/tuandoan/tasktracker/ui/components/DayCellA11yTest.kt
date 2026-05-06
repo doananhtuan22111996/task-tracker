@@ -31,14 +31,14 @@ class DayCellA11yTest {
         val result = buildDayCellContentDescription(
             dateText = "Tuesday, May 12",
             taskCountText = "3 tasks",
-            highPriorityText = "1 high priority",
+            highPriorityText = "with high priority",
             isToday = true,
             isSelected = true,
             todayPrefix = "Today",
             selectedSuffix = "selected",
         )
 
-        assertEquals("Today, Tuesday, May 12, 3 tasks, 1 high priority, selected", result)
+        assertEquals("Today, Tuesday, May 12, 3 tasks, with high priority, selected", result)
     }
 
     @Test

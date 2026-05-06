@@ -16,6 +16,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -180,8 +181,10 @@ private fun priorityColor(priority: Int): Color = when (priority) {
  * Resolves locale-aware tokens and delegates to [buildDayCellContentDescription]. Kept in
  * the Composable layer so the pure builder stays JVM-testable (no `Context` or `Resources`).
  *
- * HIGH priority count is derived from `decoration.priorityBuckets` — a presence indicator, not
- * the actual count of HIGH-priority tasks. Consistent with the dot renderer.
+ * HIGH priority is announced as a **presence** ("with high priority"), not a count —
+ * `DayDecoration.priorityBuckets` is a Set, so the actual HIGH-task count isn't available at
+ * this layer. Announcing a fake count (always "1 high priority") would mislead users into
+ * thinking 1 of N tasks is high priority when all N might be. Presence is the honest signal.
  */
 @Composable
 private fun dayCellContentDescription(
@@ -191,7 +194,8 @@ private fun dayCellContentDescription(
     isSelected: Boolean,
 ): String {
     val locale = Locale.getDefault()
-    val dateText = date.format(DateTimeFormatter.ofPattern("EEEE, MMMM d", locale))
+    val formatter = remember(locale) { DateTimeFormatter.ofPattern("EEEE, MMMM d", locale) }
+    val dateText = date.format(formatter)
 
     val taskCount = decoration?.taskCount ?: 0
     val taskCountText = if (taskCount > 0) {
@@ -200,13 +204,9 @@ private fun dayCellContentDescription(
         null
     }
 
-    // Presence of a HIGH bucket (priority = 2) in the dots; count reflects bucket presence,
-    // not actual row count — matches what the user sees visually.
     val highPriorityPresent = decoration?.priorityBuckets?.contains(2) == true
     val highPriorityText = if (highPriorityPresent) {
-        // Quantity 1 here: we announce "1 high priority" because there's one HIGH bucket.
-        // Accurate row-count would require a schema change; presence is the right a11y signal.
-        pluralStringResource(R.plurals.a11y_day_cell_high_priority, 1, 1)
+        stringResource(R.string.a11y_day_cell_has_high_priority)
     } else {
         null
     }

@@ -17,10 +17,7 @@
         <item quantity="one">%1$d Aufgabe</item>
         <item quantity="other">%1$d Aufgaben</item>
     </plurals>
-    <plurals name="a11y_day_cell_high_priority">
-        <item quantity="one">%1$d hoher Priorität</item>
-        <item quantity="other">%1$d hoher Priorität</item>
-    </plurals>
+    <string name="a11y_day_cell_has_high_priority">mit hoher Priorität</string>
     <string name="cd_agenda_add_task">Aufgabe für diesen Tag hinzufügen</string>
     <string name="agenda_upcoming_badge">Demnächst</string>
 

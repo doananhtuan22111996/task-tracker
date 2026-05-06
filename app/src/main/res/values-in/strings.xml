@@ -17,10 +17,7 @@
         <item quantity="one">%1$d tugas</item>
         <item quantity="other">%1$d tugas</item>
     </plurals>
-    <plurals name="a11y_day_cell_high_priority">
-        <item quantity="one">%1$d prioritas tinggi</item>
-        <item quantity="other">%1$d prioritas tinggi</item>
-    </plurals>
+    <string name="a11y_day_cell_has_high_priority">dengan prioritas tinggi</string>
     <string name="cd_agenda_add_task">Tambah tugas untuk hari ini</string>
     <string name="agenda_upcoming_badge">Akan Datang</string>
 

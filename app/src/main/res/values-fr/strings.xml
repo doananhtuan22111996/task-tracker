@@ -17,10 +17,7 @@
         <item quantity="one">%1$d tâche</item>
         <item quantity="other">%1$d tâches</item>
     </plurals>
-    <plurals name="a11y_day_cell_high_priority">
-        <item quantity="one">%1$d priorité élevée</item>
-        <item quantity="other">%1$d priorités élevées</item>
-    </plurals>
+    <string name="a11y_day_cell_has_high_priority">avec priorité élevée</string>
     <string name="cd_agenda_add_task">Ajouter une tâche pour ce jour</string>
     <string name="agenda_upcoming_badge">À venir</string>
 
