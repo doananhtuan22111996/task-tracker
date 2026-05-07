@@ -30,10 +30,12 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dev.tuandoan.tasktracker.R
+import dev.tuandoan.tasktracker.ui.components.CalendarEmptyStateCard
 import dev.tuandoan.tasktracker.ui.components.CalendarMonthView
 import dev.tuandoan.tasktracker.ui.components.DayAgendaSheet
 import dev.tuandoan.tasktracker.ui.theme.AppSpacing
 import dev.tuandoan.tasktracker.ui.viewmodel.CalendarViewModel
+import java.time.LocalDate
 import java.time.YearMonth
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -45,8 +47,9 @@ import java.util.Locale
  * Horizontal swipe paging is handled inside [CalendarMonthView] (CAL-15). Tapping a day
  * opens a [DayAgendaSheet] showing that day's tasks, rendered with the full [TaskItem]
  * composable (CAL-17 + CAL-18). The sheet's FAB opens the task editor with `dueDate`
- * prefilled to the selected day (CAL-19). Empty-state hint card (CAL-16), swipe/multi-select
- * (CAL-20/21), and empty-day polish (CAL-22) land in follow-up tickets.
+ * prefilled to the selected day (CAL-19). A [CalendarEmptyStateCard] sits above the grid
+ * when the database holds zero dated tasks (CAL-16). Swipe/multi-select (CAL-20/21) land
+ * in follow-up tickets.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -78,6 +81,21 @@ fun CalendarScreen(
                 .padding(bottom = bottomBarPadding)
                 .padding(horizontal = AppSpacing.medium),
         ) {
+            if (!uiState.hasAnyDatedTask) {
+                // CAL-16: hint card sits above the grid when the database holds zero
+                // dated tasks. Adding a due date to any task — through either the CTA
+                // or the normal editor — auto-dismisses it.
+                CalendarEmptyStateCard(
+                    onAddTaskClick = {
+                        val epoch = LocalDate.now(ZoneId.systemDefault())
+                            .atStartOfDay(ZoneId.systemDefault())
+                            .toInstant()
+                            .toEpochMilli()
+                        onNavigateToCreateForDay(epoch)
+                    },
+                    modifier = Modifier.padding(bottom = AppSpacing.medium),
+                )
+            }
             CalendarMonthView(
                 visibleMonth = uiState.visibleMonth,
                 selectedDay = uiState.selectedDay,

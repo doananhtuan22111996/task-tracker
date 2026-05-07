@@ -128,6 +128,9 @@ class TaskRepository @Inject constructor(private val taskDao: TaskDao, private v
     override fun observeTasksInRange(startMillis: Long, endMillis: Long): Flow<List<Task>> =
         taskDao.observeTasksInRange(startMillis, endMillis)
 
+    // Calendar empty-state (CAL-16)
+    override fun observeDatedTaskCount(): Flow<Int> = taskDao.observeDatedTaskCount()
+
     // Stats operations (exclude archived tasks)
     override fun observeActiveCount(): Flow<Int> = taskDao.observeActiveCount()
 

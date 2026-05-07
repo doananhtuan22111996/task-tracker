@@ -252,7 +252,13 @@ class CalendarViewModelTest {
 
             repo.insertTask(TestTaskFactory.createTask(id = 0L, dueAt = dateEpoch(LocalDate.of(2026, 5, 12))))
 
-            val populated = awaitItem()
+            // Multiple upstream flows participate in the uiState combine (decorations,
+            // agenda, hasAnyDatedTask). An insert touches several at once, so we may see an
+            // intermediate state where the flag flipped but decorations haven't caught up.
+            var populated = awaitItem()
+            while (!populated.decorations.containsKey(LocalDate.of(2026, 5, 12))) {
+                populated = awaitItem()
+            }
             assertEquals(setOf(LocalDate.of(2026, 5, 12)), populated.decorations.keys)
             cancelAndIgnoreRemainingEvents()
         }
@@ -532,5 +538,27 @@ class CalendarViewModelTest {
         val materialized = repo.getAllTasksSnapshot().single { it.parentRecurringTaskId == 1L }
         assertTrue(materialized.isPinned)
         assertEquals(dateEpoch(targetDate), materialized.dueAt)
+    }
+
+    // ── CAL-16: hasAnyDatedTask in UI state ──────────────────────────────────────────────
+
+    @Test
+    fun `uiState hasAnyDatedTask reflects repository as tasks are added`() = runTest {
+        // Start with an undated task so the initial emission is explicit about the false case.
+        repo.seed(TestTaskFactory.createTask(id = 1L, dueAt = null))
+        val vm = createViewModel()
+
+        vm.uiState.test {
+            // The stateIn initialValue defaults to true (don't flash the hint during cold
+            // start); the first downstream emission reflects the repository.
+            val firstReal = awaitItem().takeIf { !it.hasAnyDatedTask } ?: awaitItem()
+            assertFalse(firstReal.hasAnyDatedTask)
+
+            repo.insertTask(TestTaskFactory.createTask(id = 2L, dueAt = dateEpoch(LocalDate.of(2026, 5, 10))))
+            val afterInsert = awaitItem()
+            assertTrue(afterInsert.hasAnyDatedTask)
+
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 }

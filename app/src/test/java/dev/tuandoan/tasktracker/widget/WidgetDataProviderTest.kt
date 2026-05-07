@@ -212,6 +212,7 @@ private class FakeWidgetTaskDao : dev.tuandoan.tasktracker.data.database.TaskDao
     override fun observeOverdueCount(nowMillis: Long) = throw UnsupportedOperationException()
     override fun observeCompletedCountPerDay(startMillis: Long, endMillis: Long) = throw UnsupportedOperationException()
     override fun observeTasksInRange(startMillis: Long, endMillis: Long) = throw UnsupportedOperationException()
+    override fun observeDatedTaskCount() = throw UnsupportedOperationException()
     override suspend fun getLatestGeneratedTask(parentId: Long) = throw UnsupportedOperationException()
     override suspend fun getCompletedTasksByChain(rootId: Long) = throw UnsupportedOperationException()
     override suspend fun getCompletedTasksForChains(rootIds: List<Long>) = throw UnsupportedOperationException()

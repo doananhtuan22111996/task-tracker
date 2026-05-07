@@ -170,6 +170,9 @@ class FakeTaskRepository : ITaskRepository {
         }.sortedBy { it.dueAt }
     }
 
+    override fun observeDatedTaskCount(): Flow<Int> =
+        tasks.map { list -> list.count { !it.isArchived && it.dueAt != null } }
+
     override fun observeActiveCount(): Flow<Int> =
         tasks.map { list -> list.count { !it.isCompleted && !it.isArchived } }
 

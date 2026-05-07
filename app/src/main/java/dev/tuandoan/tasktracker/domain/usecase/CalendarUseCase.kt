@@ -8,6 +8,7 @@ import dev.tuandoan.tasktracker.domain.repository.ITaskRepository
 import dev.tuandoan.tasktracker.domain.service.RecurrenceCalculator
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
@@ -51,6 +52,16 @@ class CalendarUseCase @Inject constructor(private val taskRepository: ITaskRepos
             buildDecorations(concreteInRange, allActiveTasks, monthStart, monthEnd, zone)
         }
     }
+
+    /**
+     * True when **any** non-archived task in the database has a `dueAt`. Drives the
+     * CAL-16 empty-state hint card: when this is `false`, the calendar surface shows a
+     * prompt to "Add a due date to a task to see it here" above the month grid.
+     *
+     * Completed dated tasks still count — once the user has demonstrated use of due
+     * dates, the hint stays gone even after they've completed everything.
+     */
+    fun observeHasAnyDatedTask(): Flow<Boolean> = taskRepository.observeDatedTaskCount().map { it > 0 }
 
     /**
      * Live list of [AgendaItem]s for [day] (CAL-23 part 2). Merges persisted concrete rows

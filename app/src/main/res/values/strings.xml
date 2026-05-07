@@ -10,6 +10,9 @@
     <string name="cd_calendar_prev_month">Previous month</string>
     <string name="cd_calendar_next_month">Next month</string>
     <string name="calendar_agenda_empty_on_date">No tasks on %1$s.</string>
+    <string name="calendar_empty_state_title">No dated tasks yet</string>
+    <string name="calendar_empty_state_body">Add a due date to a task to see it on the calendar.</string>
+    <string name="calendar_empty_state_cta">Add a task</string>
     <string name="cd_agenda_add_task">Add task for this day</string>
     <string name="agenda_upcoming_badge">Upcoming</string>
     <string name="a11y_day_cell_today_prefix">Today</string>
