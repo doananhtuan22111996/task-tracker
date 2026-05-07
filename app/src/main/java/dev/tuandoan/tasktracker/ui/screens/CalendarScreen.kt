@@ -18,6 +18,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -62,6 +63,10 @@ fun CalendarScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var isAgendaOpen by rememberSaveable { mutableStateOf(false) }
+    // Cache the zone so today's-epoch lookups inside click handlers don't re-read the
+    // system default on every invocation. Matches the `zone` cache in `CalendarViewModel`.
+    val zone = remember { ZoneId.systemDefault() }
+    val showEmptyStateHint = !uiState.hasAnyDatedTask
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -81,14 +86,14 @@ fun CalendarScreen(
                 .padding(bottom = bottomBarPadding)
                 .padding(horizontal = AppSpacing.medium),
         ) {
-            if (!uiState.hasAnyDatedTask) {
+            if (showEmptyStateHint) {
                 // CAL-16: hint card sits above the grid when the database holds zero
                 // dated tasks. Adding a due date to any task — through either the CTA
                 // or the normal editor — auto-dismisses it.
                 CalendarEmptyStateCard(
                     onAddTaskClick = {
-                        val epoch = LocalDate.now(ZoneId.systemDefault())
-                            .atStartOfDay(ZoneId.systemDefault())
+                        val epoch = LocalDate.now(zone)
+                            .atStartOfDay(zone)
                             .toInstant()
                             .toEpochMilli()
                         onNavigateToCreateForDay(epoch)
@@ -123,7 +128,7 @@ fun CalendarScreen(
                 onAddTaskClick = {
                     isAgendaOpen = false
                     val epoch = uiState.selectedDay
-                        .atStartOfDay(ZoneId.systemDefault())
+                        .atStartOfDay(zone)
                         .toInstant()
                         .toEpochMilli()
                     onNavigateToCreateForDay(epoch)

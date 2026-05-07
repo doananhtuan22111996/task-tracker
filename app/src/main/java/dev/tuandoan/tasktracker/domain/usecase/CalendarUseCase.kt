@@ -8,6 +8,7 @@ import dev.tuandoan.tasktracker.domain.repository.ITaskRepository
 import dev.tuandoan.tasktracker.domain.service.RecurrenceCalculator
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import java.time.Instant
 import java.time.LocalDate
@@ -60,8 +61,15 @@ class CalendarUseCase @Inject constructor(private val taskRepository: ITaskRepos
      *
      * Completed dated tasks still count — once the user has demonstrated use of due
      * dates, the hint stays gone even after they've completed everything.
+     *
+     * `distinctUntilChanged` dedupes: the upstream count re-emits on any tasks-table
+     * change (insert / update / delete), but downstream only cares about the zero
+     * boundary. Without this the outer `combine` in `CalendarViewModel.uiState` would
+     * re-run on every unrelated task write.
      */
-    fun observeHasAnyDatedTask(): Flow<Boolean> = taskRepository.observeDatedTaskCount().map { it > 0 }
+    fun observeHasAnyDatedTask(): Flow<Boolean> = taskRepository.observeDatedTaskCount()
+        .map { it > 0 }
+        .distinctUntilChanged()
 
     /**
      * Live list of [AgendaItem]s for [day] (CAL-23 part 2). Merges persisted concrete rows
