@@ -474,7 +474,7 @@
     <string name="help_q_calendar_where">Où se trouve la vue calendrier ?</string>
     <string name="help_a_calendar_where">Touchez l\'onglet Calendrier dans la barre de navigation inférieure pour voir vos tâches sur une grille mensuelle. Touchez un jour pour ouvrir son agenda.</string>
     <string name="help_q_calendar_dots">Que signifient les points sur chaque jour ?</string>
-    <string name="help_a_calendar_dots">Chaque point représente un niveau de priorité distinct présent ce jour-là, avec les mêmes couleurs que la bande de priorité de votre liste de tâches. Les points sont ordonnés de la priorité la plus élevée à gauche. Jusqu\'à trois points s\'affichent ; les priorités supplémentaires apparaissent sous la forme \"+N\".</string>
+    <string name="help_a_calendar_dots">Chaque point représente un niveau de priorité distinct présent ce jour-là. Les points sont ordonnés de la priorité la plus élevée à gauche. Jusqu\'à trois points s\'affichent ; les priorités supplémentaires apparaissent sous la forme \"+N\".</string>
     <string name="help_q_calendar_projection">Pourquoi est-ce que je vois des tâches récurrentes futures que je n\'ai pas encore créées ?</string>
     <string name="help_a_calendar_projection">Les tâches récurrentes sont projetées sur leurs prochaines dates d\'échéance pour vous permettre de planifier à l\'avance. Touchez une occurrence projetée pour la transformer en véritable tâche à cette date — vous pouvez ensuite la modifier, la terminer ou l\'archiver comme n\'importe quelle autre.</string>
     <string name="help_q_calendar_add_for_day">Puis-je ajouter une tâche pour un jour précis ?</string>

@@ -474,7 +474,7 @@
     <string name="help_q_calendar_where">Chế độ xem lịch nằm ở đâu?</string>
     <string name="help_a_calendar_where">Nhấn vào tab Lịch trên thanh điều hướng dưới cùng để xem các công việc trên lưới tháng. Nhấn vào bất kỳ ngày nào để mở lịch trình của ngày đó.</string>
     <string name="help_q_calendar_dots">Các chấm trên mỗi ngày có nghĩa là gì?</string>
-    <string name="help_a_calendar_dots">Mỗi chấm đại diện cho một mức ưu tiên khác nhau có trong ngày đó, sử dụng cùng màu sắc với vạch ưu tiên trên danh sách công việc của bạn. Các chấm được sắp xếp với mức ưu tiên cao nhất ở bên trái. Hiển thị tối đa ba chấm; các mức ưu tiên dư sẽ hiển thị dưới dạng \"+N\".</string>
+    <string name="help_a_calendar_dots">Mỗi chấm đại diện cho một mức ưu tiên khác nhau có trong ngày đó. Các chấm được sắp xếp với mức ưu tiên cao nhất ở bên trái. Hiển thị tối đa ba chấm; các mức ưu tiên dư sẽ hiển thị dưới dạng \"+N\".</string>
     <string name="help_q_calendar_projection">Vì sao tôi thấy các công việc lặp lại trong tương lai mà tôi chưa tạo?</string>
     <string name="help_a_calendar_projection">Các công việc lặp lại được dự đoán tới những ngày đáo hạn sắp tới để bạn có thể lên kế hoạch trước. Nhấn vào một lần xuất hiện được dự đoán để biến nó thành công việc thật vào ngày đó — sau đó bạn có thể chỉnh sửa, hoàn thành hoặc lưu trữ như bất kỳ công việc nào khác.</string>
     <string name="help_q_calendar_add_for_day">Tôi có thể thêm công việc cho một ngày cụ thể không?</string>

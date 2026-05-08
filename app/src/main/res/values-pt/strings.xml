@@ -474,7 +474,7 @@
     <string name="help_q_calendar_where">Onde fica a vista de calendário?</string>
     <string name="help_a_calendar_where">Toque no separador Calendário na barra de navegação inferior para ver as suas tarefas numa grelha mensal. Toque em qualquer dia para abrir a respetiva agenda.</string>
     <string name="help_q_calendar_dots">O que significam os pontos em cada dia?</string>
-    <string name="help_a_calendar_dots">Cada ponto representa um nível de prioridade diferente presente nesse dia, com as mesmas cores da faixa de prioridade da sua lista de tarefas. Os pontos são ordenados com a prioridade mais alta à esquerda. São mostrados até três pontos; prioridades extra aparecem como \"+N\".</string>
+    <string name="help_a_calendar_dots">Cada ponto representa um nível de prioridade diferente presente nesse dia. Os pontos são ordenados com a prioridade mais alta à esquerda. São mostrados até três pontos; prioridades extra aparecem como \"+N\".</string>
     <string name="help_q_calendar_projection">Porque vejo tarefas recorrentes futuras que ainda não criei?</string>
     <string name="help_a_calendar_projection">As tarefas recorrentes são projetadas nas suas próximas datas de vencimento para que possa planear com antecedência. Toque numa ocorrência projetada para a transformar numa tarefa real nessa data — depois pode editá-la, concluí-la ou arquivá-la como qualquer outra.</string>
     <string name="help_q_calendar_add_for_day">Posso adicionar uma tarefa para um dia específico?</string>

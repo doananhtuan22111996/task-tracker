@@ -474,7 +474,7 @@
     <string name="help_q_calendar_where">Wo finde ich die Kalenderansicht?</string>
     <string name="help_a_calendar_where">Tippen Sie in der unteren Navigation auf den Tab \"Kalender\", um Ihre Aufgaben im Monatsraster zu sehen. Tippen Sie auf einen Tag, um die Tagesagenda zu öffnen.</string>
     <string name="help_q_calendar_dots">Was bedeuten die Punkte auf jedem Tag?</string>
-    <string name="help_a_calendar_dots">Jeder Punkt steht für eine andere an diesem Tag vorhandene Prioritätsstufe und verwendet dieselben Farben wie der Prioritätsstreifen in Ihrer Aufgabenliste. Die Punkte sind nach absteigender Priorität angeordnet — die höchste zuerst. Maximal drei Punkte werden angezeigt; zusätzliche Prioritäten erscheinen als \"+N\".</string>
+    <string name="help_a_calendar_dots">Jeder Punkt steht für eine andere an diesem Tag vorhandene Prioritätsstufe. Die Punkte sind nach absteigender Priorität angeordnet — die höchste zuerst. Maximal drei Punkte werden angezeigt; zusätzliche Prioritäten erscheinen als \"+N\".</string>
     <string name="help_q_calendar_projection">Warum sehe ich zukünftige wiederkehrende Aufgaben, die ich noch nicht erstellt habe?</string>
     <string name="help_a_calendar_projection">Wiederkehrende Aufgaben werden auf ihre nächsten Fälligkeitstermine projiziert, damit Sie voraus planen können. Tippen Sie auf eine projizierte Instanz, um sie an diesem Tag in eine echte Aufgabe umzuwandeln — danach können Sie sie wie jede andere bearbeiten, abschließen oder archivieren.</string>
     <string name="help_q_calendar_add_for_day">Kann ich eine Aufgabe für einen bestimmten Tag hinzufügen?</string>
