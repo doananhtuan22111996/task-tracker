@@ -470,6 +470,15 @@
     <string name="help_a_change_priority">Abre el editor de tareas (toca una tarea) y selecciona Baja, Media o Alta.</string>
     <string name="help_q_multi_select">¿Puedo seleccionar varias tareas a la vez?</string>
     <string name="help_a_multi_select">Sí. Mantén presionada cualquier tarea para entrar en modo de selección múltiple y luego toca las tareas que desees seleccionar.</string>
+    <string name="help_section_calendar">Calendario</string>
+    <string name="help_q_calendar_where">¿Dónde está la vista de calendario?</string>
+    <string name="help_a_calendar_where">Toca la pestaña Calendario en la barra de navegación inferior para ver tus tareas en una cuadrícula mensual. Toca cualquier día para abrir su agenda.</string>
+    <string name="help_q_calendar_dots">¿Qué significan los puntos en cada día?</string>
+    <string name="help_a_calendar_dots">Cada punto indica una prioridad presente ese día — ALTA en rojo, MEDIA en amarillo, BAJA en verde. Hasta tres puntos; las prioridades adicionales se muestran como \"+N\".</string>
+    <string name="help_q_calendar_projection">¿Por qué veo tareas recurrentes futuras que aún no he creado?</string>
+    <string name="help_a_calendar_projection">Las tareas recurrentes se proyectan sobre sus próximas fechas de vencimiento para que puedas planificar con antelación. Toca una instancia proyectada para convertirla en una tarea real en esa fecha — luego puedes editarla, completarla o archivarla como cualquier otra.</string>
+    <string name="help_q_calendar_add_for_day">¿Puedo añadir una tarea para un día concreto?</string>
+    <string name="help_a_calendar_add_for_day">Sí. Toca el día para abrir la hoja diaria y luego toca el botón +; la nueva tarea se crea con esa fecha prellenada. Si el calendario está vacío, aparece también una tarjeta \"Añadir una tarea\" sobre la cuadrícula, que empieza con la fecha de hoy.</string>
     <string name="help_section_subtasks">Subtareas</string>
     <string name="help_q_add_subtasks">¿Cómo añado subtareas a una tarea?</string>
     <string name="help_a_add_subtasks">Abre una tarea y desplázate hasta la sección Subtareas. Escribe en la fila «Añadir subtarea» y pulsa Listo para añadir otra.</string>

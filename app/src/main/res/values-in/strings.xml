@@ -470,6 +470,15 @@
     <string name="help_a_change_priority">Buka editor tugas (ketuk tugas) dan pilih Rendah, Sedang, atau Tinggi.</string>
     <string name="help_q_multi_select">Bisakah saya memilih beberapa tugas sekaligus?</string>
     <string name="help_a_multi_select">Ya. Tekan lama pada tugas mana pun untuk masuk ke mode pilih ganda, lalu ketuk tugas untuk memilihnya.</string>
+    <string name="help_section_calendar">Kalender</string>
+    <string name="help_q_calendar_where">Di mana tampilan kalender?</string>
+    <string name="help_a_calendar_where">Ketuk tab Kalender di navigasi bawah untuk melihat tugas Anda pada grid bulanan. Ketuk hari mana pun untuk membuka agenda harinya.</string>
+    <string name="help_q_calendar_dots">Apa arti titik-titik pada setiap hari?</string>
+    <string name="help_a_calendar_dots">Setiap titik menandakan sebuah prioritas yang ada pada hari itu — TINGGI merah, SEDANG kuning, RENDAH hijau. Maksimum tiga titik; prioritas tambahan ditampilkan sebagai \"+N\".</string>
+    <string name="help_q_calendar_projection">Mengapa saya melihat tugas berulang di masa depan yang belum saya buat?</string>
+    <string name="help_a_calendar_projection">Tugas berulang diproyeksikan ke tanggal jatuh tempo berikutnya sehingga Anda dapat merencanakan ke depan. Ketuk kejadian yang diproyeksikan untuk mengubahnya menjadi tugas nyata pada tanggal tersebut — Anda kemudian dapat mengeditnya, menyelesaikannya, atau mengarsipkannya seperti tugas lainnya.</string>
+    <string name="help_q_calendar_add_for_day">Bisakah saya menambahkan tugas untuk hari tertentu?</string>
+    <string name="help_a_calendar_add_for_day">Ya. Ketuk hari tersebut untuk membuka lembar harian, lalu ketuk tombol + — tugas baru sudah terisi dengan tanggal itu. Kalender yang kosong juga menampilkan kartu \"Tambah tugas\" di atas grid, yang dimulai dengan tanggal hari ini.</string>
     <string name="help_section_subtasks">Subtugas</string>
     <string name="help_q_add_subtasks">Bagaimana menambahkan subtugas ke sebuah tugas?</string>
     <string name="help_a_add_subtasks">Buka tugas dan gulir ke bagian Subtugas. Ketik di baris "Tambah subtugas" dan tekan Selesai untuk menambah lagi.</string>

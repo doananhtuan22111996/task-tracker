@@ -470,6 +470,15 @@
     <string name="help_a_change_priority">Öffnen Sie den Aufgaben-Editor (tippen Sie auf eine Aufgabe) und wählen Sie Niedrig, Mittel oder Hoch.</string>
     <string name="help_q_multi_select">Kann ich mehrere Aufgaben gleichzeitig auswählen?</string>
     <string name="help_a_multi_select">Ja. Halten Sie eine Aufgabe lange gedrückt, um den Mehrfachauswahlmodus zu aktivieren, und tippen Sie dann auf weitere Aufgaben.</string>
+    <string name="help_section_calendar">Kalender</string>
+    <string name="help_q_calendar_where">Wo finde ich die Kalenderansicht?</string>
+    <string name="help_a_calendar_where">Tippen Sie in der unteren Navigation auf den Tab \"Kalender\", um Ihre Aufgaben im Monatsraster zu sehen. Tippen Sie auf einen Tag, um die Tagesagenda zu öffnen.</string>
+    <string name="help_q_calendar_dots">Was bedeuten die Punkte auf jedem Tag?</string>
+    <string name="help_a_calendar_dots">Jeder Punkt steht für eine an diesem Tag vorhandene Priorität — HOCH ist rot, MITTEL gelb, NIEDRIG grün. Maximal drei Punkte; zusätzliche Prioritäten werden als \"+N\" angezeigt.</string>
+    <string name="help_q_calendar_projection">Warum sehe ich zukünftige wiederkehrende Aufgaben, die ich noch nicht erstellt habe?</string>
+    <string name="help_a_calendar_projection">Wiederkehrende Aufgaben werden auf ihre nächsten Fälligkeitstermine projiziert, damit Sie voraus planen können. Tippen Sie auf eine projizierte Instanz, um sie an diesem Tag in eine echte Aufgabe umzuwandeln — danach können Sie sie wie jede andere bearbeiten, abschließen oder archivieren.</string>
+    <string name="help_q_calendar_add_for_day">Kann ich eine Aufgabe für einen bestimmten Tag hinzufügen?</string>
+    <string name="help_a_calendar_add_for_day">Ja. Tippen Sie auf den Tag, um das Tagesblatt zu öffnen, und tippen Sie dann auf +. Die neue Aufgabe ist mit diesem Datum vorausgefüllt. Bei leerem Kalender erscheint außerdem eine Karte \"Aufgabe hinzufügen\" über dem Raster, die mit dem heutigen Datum startet.</string>
     <string name="help_section_subtasks">Unteraufgaben</string>
     <string name="help_q_add_subtasks">Wie füge ich Unteraufgaben zu einer Aufgabe hinzu?</string>
     <string name="help_a_add_subtasks">Öffnen Sie eine Aufgabe und scrollen Sie zum Bereich Unteraufgaben. Tippen Sie in die Zeile „Unteraufgabe hinzufügen" und drücken Sie Fertig, um weitere hinzuzufügen.</string>

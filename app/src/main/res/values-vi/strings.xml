@@ -470,6 +470,15 @@
     <string name="help_a_change_priority">Mở trình chỉnh sửa công việc (nhấn vào một công việc) và chọn Thấp, Trung bình hoặc Cao.</string>
     <string name="help_q_multi_select">Tôi có thể chọn nhiều công việc cùng lúc không?</string>
     <string name="help_a_multi_select">Có. Nhấn giữ bất kỳ công việc nào để vào chế độ chọn nhiều, rồi nhấn vào các công việc để chọn.</string>
+    <string name="help_section_calendar">Lịch</string>
+    <string name="help_q_calendar_where">Chế độ xem lịch nằm ở đâu?</string>
+    <string name="help_a_calendar_where">Nhấn vào tab Lịch trên thanh điều hướng dưới cùng để xem các công việc trên lưới tháng. Nhấn vào bất kỳ ngày nào để mở lịch trình của ngày đó.</string>
+    <string name="help_q_calendar_dots">Các chấm trên mỗi ngày có nghĩa là gì?</string>
+    <string name="help_a_calendar_dots">Mỗi chấm tượng trưng cho một mức ưu tiên có trong ngày đó — CAO màu đỏ, TRUNG BÌNH màu vàng, THẤP màu xanh lá. Tối đa ba chấm; các mức ưu tiên dư sẽ hiển thị dưới dạng \"+N\".</string>
+    <string name="help_q_calendar_projection">Vì sao tôi thấy các công việc lặp lại trong tương lai mà tôi chưa tạo?</string>
+    <string name="help_a_calendar_projection">Các công việc lặp lại được dự đoán tới những ngày đáo hạn sắp tới để bạn có thể lên kế hoạch trước. Nhấn vào một lần xuất hiện được dự đoán để biến nó thành công việc thật vào ngày đó — sau đó bạn có thể chỉnh sửa, hoàn thành hoặc lưu trữ như bất kỳ công việc nào khác.</string>
+    <string name="help_q_calendar_add_for_day">Tôi có thể thêm công việc cho một ngày cụ thể không?</string>
+    <string name="help_a_calendar_add_for_day">Có. Nhấn vào ngày đó để mở bảng ngày, rồi nhấn nút + — công việc mới sẽ được điền sẵn với ngày đó. Khi lịch trống, phía trên lưới còn hiện một thẻ \"Thêm việc mới\" bắt đầu bằng ngày hôm nay.</string>
     <string name="help_section_subtasks">Công việc phụ</string>
     <string name="help_q_add_subtasks">Làm thế nào để thêm công việc phụ vào một công việc?</string>
     <string name="help_a_add_subtasks">Mở một công việc và kéo xuống phần Công việc phụ. Gõ vào ô "Thêm công việc phụ" rồi nhấn Xong để thêm mục tiếp theo.</string>
