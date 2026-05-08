@@ -475,6 +475,15 @@
     <string name="help_a_change_priority">Open the task editor (tap a task) and select Low, Medium, or High.</string>
     <string name="help_q_multi_select">Can I select multiple tasks at once?</string>
     <string name="help_a_multi_select">Yes. Long-press any task to enter multi-select mode, then tap tasks to select them.</string>
+    <string name="help_section_calendar">Calendar</string>
+    <string name="help_q_calendar_where">Where is the calendar view?</string>
+    <string name="help_a_calendar_where">Tap the Calendar tab in the bottom nav to see your tasks on a month grid. Tap any day to view that day\'s agenda.</string>
+    <string name="help_q_calendar_dots">What do the dots on each day mean?</string>
+    <string name="help_a_calendar_dots">Each dot represents a different priority level present on that day. Dots are ordered with the highest priority on the left. Up to three dots show; extra priorities appear as "+N".</string>
+    <string name="help_q_calendar_projection">Why do I see future repeating tasks I haven\'t created yet?</string>
+    <string name="help_a_calendar_projection">Repeating tasks are projected onto their upcoming due dates so you can plan ahead. Tap a projected occurrence to turn it into a real task on that date — you can then edit, complete, or archive it like any other task.</string>
+    <string name="help_q_calendar_add_for_day">Can I add a task for a specific day?</string>
+    <string name="help_a_calendar_add_for_day">Yes. Tap the day to open the day sheet, then tap the + button — the new task is pre-filled with that date. An empty calendar also shows an "Add a task" card above the grid that starts with today\'s date.</string>
     <string name="help_section_subtasks">Subtasks</string>
     <string name="help_q_add_subtasks">How do I add subtasks to a task?</string>
     <string name="help_a_add_subtasks">Open a task and scroll to the Subtasks section. Type in the "Add subtask" row and press Done to add another.</string>

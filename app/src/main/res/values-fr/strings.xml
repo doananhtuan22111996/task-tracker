@@ -470,6 +470,15 @@
     <string name="help_a_change_priority">Ouvrez l\'éditeur de tâches (touchez une tâche) et sélectionnez Faible, Moyenne ou Élevée.</string>
     <string name="help_q_multi_select">Puis-je sélectionner plusieurs tâches à la fois ?</string>
     <string name="help_a_multi_select">Oui. Appuyez longuement sur une tâche pour activer le mode de sélection multiple, puis touchez les tâches à sélectionner.</string>
+    <string name="help_section_calendar">Calendrier</string>
+    <string name="help_q_calendar_where">Où se trouve la vue calendrier ?</string>
+    <string name="help_a_calendar_where">Touchez l\'onglet Calendrier dans la barre de navigation inférieure pour voir vos tâches sur une grille mensuelle. Touchez un jour pour ouvrir son agenda.</string>
+    <string name="help_q_calendar_dots">Que signifient les points sur chaque jour ?</string>
+    <string name="help_a_calendar_dots">Chaque point représente un niveau de priorité distinct présent ce jour-là. Les points sont ordonnés de la priorité la plus élevée à gauche. Jusqu\'à trois points s\'affichent ; les priorités supplémentaires apparaissent sous la forme \"+N\".</string>
+    <string name="help_q_calendar_projection">Pourquoi est-ce que je vois des tâches récurrentes futures que je n\'ai pas encore créées ?</string>
+    <string name="help_a_calendar_projection">Les tâches récurrentes sont projetées sur leurs prochaines dates d\'échéance pour vous permettre de planifier à l\'avance. Touchez une occurrence projetée pour la transformer en véritable tâche à cette date — vous pouvez ensuite la modifier, la terminer ou l\'archiver comme n\'importe quelle autre.</string>
+    <string name="help_q_calendar_add_for_day">Puis-je ajouter une tâche pour un jour précis ?</string>
+    <string name="help_a_calendar_add_for_day">Oui. Touchez le jour pour ouvrir la feuille du jour, puis touchez le bouton + ; la nouvelle tâche est préremplie avec cette date. Si le calendrier est vide, une carte \"Ajouter une tâche\" apparaît également au-dessus de la grille et démarre avec la date d\'aujourd\'hui.</string>
     <string name="help_section_subtasks">Sous-tâches</string>
     <string name="help_q_add_subtasks">Comment ajouter des sous-tâches à une tâche ?</string>
     <string name="help_a_add_subtasks">Ouvrez une tâche et faites défiler jusqu\'à la section Sous-tâches. Saisissez dans la ligne « Ajouter une sous-tâche » et appuyez sur OK pour en ajouter une autre.</string>

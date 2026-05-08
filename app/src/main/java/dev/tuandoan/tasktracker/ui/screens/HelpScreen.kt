@@ -53,6 +53,15 @@ private val faqSections = listOf(
         ),
     ),
     FaqSection(
+        R.string.help_section_calendar,
+        listOf(
+            FaqItem(R.string.help_q_calendar_where, R.string.help_a_calendar_where),
+            FaqItem(R.string.help_q_calendar_dots, R.string.help_a_calendar_dots),
+            FaqItem(R.string.help_q_calendar_projection, R.string.help_a_calendar_projection),
+            FaqItem(R.string.help_q_calendar_add_for_day, R.string.help_a_calendar_add_for_day),
+        ),
+    ),
+    FaqSection(
         R.string.help_section_subtasks,
         listOf(
             FaqItem(R.string.help_q_add_subtasks, R.string.help_a_add_subtasks),

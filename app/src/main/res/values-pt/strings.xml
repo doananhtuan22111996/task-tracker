@@ -470,6 +470,15 @@
     <string name="help_a_change_priority">Abra o editor de tarefas (toque numa tarefa) e selecione Baixa, Média ou Alta.</string>
     <string name="help_q_multi_select">Posso selecionar várias tarefas de uma vez?</string>
     <string name="help_a_multi_select">Sim. Mantenha premida qualquer tarefa para entrar no modo de seleção múltipla e depois toque nas tarefas para selecioná-las.</string>
+    <string name="help_section_calendar">Calendário</string>
+    <string name="help_q_calendar_where">Onde fica a vista de calendário?</string>
+    <string name="help_a_calendar_where">Toque no separador Calendário na barra de navegação inferior para ver as suas tarefas numa grelha mensal. Toque em qualquer dia para abrir a respetiva agenda.</string>
+    <string name="help_q_calendar_dots">O que significam os pontos em cada dia?</string>
+    <string name="help_a_calendar_dots">Cada ponto representa um nível de prioridade diferente presente nesse dia. Os pontos são ordenados com a prioridade mais alta à esquerda. São mostrados até três pontos; prioridades extra aparecem como \"+N\".</string>
+    <string name="help_q_calendar_projection">Porque vejo tarefas recorrentes futuras que ainda não criei?</string>
+    <string name="help_a_calendar_projection">As tarefas recorrentes são projetadas nas suas próximas datas de vencimento para que possa planear com antecedência. Toque numa ocorrência projetada para a transformar numa tarefa real nessa data — depois pode editá-la, concluí-la ou arquivá-la como qualquer outra.</string>
+    <string name="help_q_calendar_add_for_day">Posso adicionar uma tarefa para um dia específico?</string>
+    <string name="help_a_calendar_add_for_day">Sim. Toque no dia para abrir a folha diária e depois toque no botão + — a nova tarefa fica pré-preenchida com essa data. Se o calendário estiver vazio, aparece também um cartão \"Adicionar tarefa\" acima da grelha, que começa com a data de hoje.</string>
     <string name="help_section_subtasks">Subtarefas</string>
     <string name="help_q_add_subtasks">Como adiciono subtarefas a uma tarefa?</string>
     <string name="help_a_add_subtasks">Abra uma tarefa e desça até à secção Subtarefas. Escreva na linha «Adicionar subtarefa» e toque em Concluído para adicionar outra.</string>
