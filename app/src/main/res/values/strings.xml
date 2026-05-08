@@ -479,7 +479,7 @@
     <string name="help_q_calendar_where">Where is the calendar view?</string>
     <string name="help_a_calendar_where">Tap the Calendar tab in the bottom nav to see your tasks on a month grid. Tap any day to view that day\'s agenda.</string>
     <string name="help_q_calendar_dots">What do the dots on each day mean?</string>
-    <string name="help_a_calendar_dots">Each dot shows a priority present on that day — HIGH is red, MEDIUM is yellow, LOW is green. Up to three dots; extra priorities are shown as "+N".</string>
+    <string name="help_a_calendar_dots">Each dot represents a different priority level present on that day, using the same colors as the priority stripe on your task list. Dots are ordered with the highest priority on the left. Up to three dots show; extra priorities appear as "+N".</string>
     <string name="help_q_calendar_projection">Why do I see future repeating tasks I haven\'t created yet?</string>
     <string name="help_a_calendar_projection">Repeating tasks are projected onto their upcoming due dates so you can plan ahead. Tap a projected occurrence to turn it into a real task on that date — you can then edit, complete, or archive it like any other task.</string>
     <string name="help_q_calendar_add_for_day">Can I add a task for a specific day?</string>

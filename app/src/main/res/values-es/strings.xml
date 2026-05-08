@@ -474,7 +474,7 @@
     <string name="help_q_calendar_where">¿Dónde está la vista de calendario?</string>
     <string name="help_a_calendar_where">Toca la pestaña Calendario en la barra de navegación inferior para ver tus tareas en una cuadrícula mensual. Toca cualquier día para abrir su agenda.</string>
     <string name="help_q_calendar_dots">¿Qué significan los puntos en cada día?</string>
-    <string name="help_a_calendar_dots">Cada punto indica una prioridad presente ese día — ALTA en rojo, MEDIA en amarillo, BAJA en verde. Hasta tres puntos; las prioridades adicionales se muestran como \"+N\".</string>
+    <string name="help_a_calendar_dots">Cada punto representa un nivel de prioridad distinto presente ese día, con los mismos colores que la franja de prioridad de tu lista de tareas. Los puntos se ordenan con la prioridad más alta a la izquierda. Se muestran hasta tres puntos; las prioridades adicionales aparecen como \"+N\".</string>
     <string name="help_q_calendar_projection">¿Por qué veo tareas recurrentes futuras que aún no he creado?</string>
     <string name="help_a_calendar_projection">Las tareas recurrentes se proyectan sobre sus próximas fechas de vencimiento para que puedas planificar con antelación. Toca una instancia proyectada para convertirla en una tarea real en esa fecha — luego puedes editarla, completarla o archivarla como cualquier otra.</string>
     <string name="help_q_calendar_add_for_day">¿Puedo añadir una tarea para un día concreto?</string>

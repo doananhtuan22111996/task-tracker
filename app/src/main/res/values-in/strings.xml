@@ -474,7 +474,7 @@
     <string name="help_q_calendar_where">Di mana tampilan kalender?</string>
     <string name="help_a_calendar_where">Ketuk tab Kalender di navigasi bawah untuk melihat tugas Anda pada grid bulanan. Ketuk hari mana pun untuk membuka agenda harinya.</string>
     <string name="help_q_calendar_dots">Apa arti titik-titik pada setiap hari?</string>
-    <string name="help_a_calendar_dots">Setiap titik menandakan sebuah prioritas yang ada pada hari itu — TINGGI merah, SEDANG kuning, RENDAH hijau. Maksimum tiga titik; prioritas tambahan ditampilkan sebagai \"+N\".</string>
+    <string name="help_a_calendar_dots">Setiap titik mewakili tingkat prioritas yang berbeda yang ada pada hari itu, dengan warna yang sama seperti garis prioritas di daftar tugas Anda. Titik-titik diurutkan dengan prioritas tertinggi di sebelah kiri. Maksimum tiga titik ditampilkan; prioritas tambahan muncul sebagai \"+N\".</string>
     <string name="help_q_calendar_projection">Mengapa saya melihat tugas berulang di masa depan yang belum saya buat?</string>
     <string name="help_a_calendar_projection">Tugas berulang diproyeksikan ke tanggal jatuh tempo berikutnya sehingga Anda dapat merencanakan ke depan. Ketuk kejadian yang diproyeksikan untuk mengubahnya menjadi tugas nyata pada tanggal tersebut — Anda kemudian dapat mengeditnya, menyelesaikannya, atau mengarsipkannya seperti tugas lainnya.</string>
     <string name="help_q_calendar_add_for_day">Bisakah saya menambahkan tugas untuk hari tertentu?</string>
