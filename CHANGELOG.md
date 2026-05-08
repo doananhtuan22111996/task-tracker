@@ -3,7 +3,7 @@
 All notable changes to the Task Tracker app will be documented in this file.
 Format follows [Keep a Changelog](https://keepachangelog.com).
 
-## [Unreleased]
+## [1.11.0] - 2026-05-09
 
 ### Added
 - `com.kizitonwose.calendar:compose` dependency (pinned 2.6.2) — month-grid engine for the v1.11.0 Calendar surface (ADR-001, CAL-01)
