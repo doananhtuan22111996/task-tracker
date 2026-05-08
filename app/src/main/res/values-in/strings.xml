@@ -11,6 +11,9 @@
     <string name="cd_calendar_prev_month">Bulan sebelumnya</string>
     <string name="cd_calendar_next_month">Bulan berikutnya</string>
     <string name="calendar_agenda_empty_on_date">Tidak ada tugas pada %1$s.</string>
+    <string name="calendar_empty_state_title">Belum ada tugas bertanggal</string>
+    <string name="calendar_empty_state_body">Tambahkan tanggal jatuh tempo ke sebuah tugas untuk melihatnya di kalender.</string>
+    <string name="calendar_empty_state_cta">Tambah tugas</string>
     <string name="a11y_day_cell_today_prefix">Hari ini</string>
     <string name="a11y_day_cell_selected_suffix">dipilih</string>
     <plurals name="a11y_day_cell_tasks">

@@ -11,6 +11,9 @@
     <string name="cd_calendar_prev_month">Mes anterior</string>
     <string name="cd_calendar_next_month">Mes siguiente</string>
     <string name="calendar_agenda_empty_on_date">No hay tareas el %1$s.</string>
+    <string name="calendar_empty_state_title">Aún no hay tareas con fecha</string>
+    <string name="calendar_empty_state_body">Añade una fecha de vencimiento a una tarea para verla en el calendario.</string>
+    <string name="calendar_empty_state_cta">Añadir una tarea</string>
     <string name="a11y_day_cell_today_prefix">Hoy</string>
     <string name="a11y_day_cell_selected_suffix">seleccionado</string>
     <plurals name="a11y_day_cell_tasks">

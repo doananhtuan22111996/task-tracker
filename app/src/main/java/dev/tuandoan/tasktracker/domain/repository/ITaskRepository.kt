@@ -41,6 +41,9 @@ interface ITaskRepository {
     // Calendar operations (CAL-06): observe tasks whose dueAt falls in [startMillis, endMillis).
     fun observeTasksInRange(startMillis: Long, endMillis: Long): Flow<List<Task>>
 
+    // Calendar empty-state signal (CAL-16).
+    fun observeDatedTaskCount(): Flow<Int>
+
     // Stats operations (exclude archived tasks)
     fun observeActiveCount(): Flow<Int>
     fun observeCompletedCount(): Flow<Int>

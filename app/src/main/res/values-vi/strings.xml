@@ -11,6 +11,9 @@
     <string name="cd_calendar_prev_month">Tháng trước</string>
     <string name="cd_calendar_next_month">Tháng sau</string>
     <string name="calendar_agenda_empty_on_date">Không có việc nào vào %1$s.</string>
+    <string name="calendar_empty_state_title">Chưa có việc nào có ngày hạn</string>
+    <string name="calendar_empty_state_body">Thêm ngày hạn cho một việc để thấy nó trên lịch.</string>
+    <string name="calendar_empty_state_cta">Thêm việc mới</string>
     <string name="a11y_day_cell_today_prefix">Hôm nay</string>
     <string name="a11y_day_cell_selected_suffix">đã chọn</string>
     <plurals name="a11y_day_cell_tasks">

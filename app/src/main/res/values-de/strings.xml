@@ -11,6 +11,9 @@
     <string name="cd_calendar_prev_month">Vorheriger Monat</string>
     <string name="cd_calendar_next_month">Nächster Monat</string>
     <string name="calendar_agenda_empty_on_date">Keine Aufgaben am %1$s.</string>
+    <string name="calendar_empty_state_title">Noch keine Aufgaben mit Datum</string>
+    <string name="calendar_empty_state_body">Füge einer Aufgabe ein Fälligkeitsdatum hinzu, um sie im Kalender zu sehen.</string>
+    <string name="calendar_empty_state_cta">Aufgabe hinzufügen</string>
     <string name="a11y_day_cell_today_prefix">Heute</string>
     <string name="a11y_day_cell_selected_suffix">ausgewählt</string>
     <plurals name="a11y_day_cell_tasks">

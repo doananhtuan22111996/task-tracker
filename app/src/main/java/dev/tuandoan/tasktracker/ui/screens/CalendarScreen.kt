@@ -18,6 +18,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -30,10 +31,12 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dev.tuandoan.tasktracker.R
+import dev.tuandoan.tasktracker.ui.components.CalendarEmptyStateCard
 import dev.tuandoan.tasktracker.ui.components.CalendarMonthView
 import dev.tuandoan.tasktracker.ui.components.DayAgendaSheet
 import dev.tuandoan.tasktracker.ui.theme.AppSpacing
 import dev.tuandoan.tasktracker.ui.viewmodel.CalendarViewModel
+import java.time.LocalDate
 import java.time.YearMonth
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -45,8 +48,9 @@ import java.util.Locale
  * Horizontal swipe paging is handled inside [CalendarMonthView] (CAL-15). Tapping a day
  * opens a [DayAgendaSheet] showing that day's tasks, rendered with the full [TaskItem]
  * composable (CAL-17 + CAL-18). The sheet's FAB opens the task editor with `dueDate`
- * prefilled to the selected day (CAL-19). Empty-state hint card (CAL-16), swipe/multi-select
- * (CAL-20/21), and empty-day polish (CAL-22) land in follow-up tickets.
+ * prefilled to the selected day (CAL-19). A [CalendarEmptyStateCard] sits above the grid
+ * when the database holds zero dated tasks (CAL-16). Swipe/multi-select (CAL-20/21) land
+ * in follow-up tickets.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -59,6 +63,10 @@ fun CalendarScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var isAgendaOpen by rememberSaveable { mutableStateOf(false) }
+    // Cache the zone so today's-epoch lookups inside click handlers don't re-read the
+    // system default on every invocation. Matches the `zone` cache in `CalendarViewModel`.
+    val zone = remember { ZoneId.systemDefault() }
+    val showEmptyStateHint = !uiState.hasAnyDatedTask
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -78,6 +86,21 @@ fun CalendarScreen(
                 .padding(bottom = bottomBarPadding)
                 .padding(horizontal = AppSpacing.medium),
         ) {
+            if (showEmptyStateHint) {
+                // CAL-16: hint card sits above the grid when the database holds zero
+                // dated tasks. Adding a due date to any task — through either the CTA
+                // or the normal editor — auto-dismisses it.
+                CalendarEmptyStateCard(
+                    onAddTaskClick = {
+                        val epoch = LocalDate.now(zone)
+                            .atStartOfDay(zone)
+                            .toInstant()
+                            .toEpochMilli()
+                        onNavigateToCreateForDay(epoch)
+                    },
+                    modifier = Modifier.padding(bottom = AppSpacing.medium),
+                )
+            }
             CalendarMonthView(
                 visibleMonth = uiState.visibleMonth,
                 selectedDay = uiState.selectedDay,
@@ -105,7 +128,7 @@ fun CalendarScreen(
                 onAddTaskClick = {
                     isAgendaOpen = false
                     val epoch = uiState.selectedDay
-                        .atStartOfDay(ZoneId.systemDefault())
+                        .atStartOfDay(zone)
                         .toInstant()
                         .toEpochMilli()
                     onNavigateToCreateForDay(epoch)

@@ -352,6 +352,91 @@ class CalendarUseCaseTest {
             cancelAndIgnoreRemainingEvents()
         }
     }
+    // ── CAL-16: hasAnyDatedTask signal ──────────────────────────────────────────────────
+
+    @Test
+    fun `observeHasAnyDatedTask is false when repository is empty`() = runTest {
+        val repo = FakeTaskRepository()
+        val useCase = CalendarUseCase(repo)
+
+        useCase.observeHasAnyDatedTask().test {
+            assertFalse(awaitItem())
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `observeHasAnyDatedTask is false when tasks exist but none have dueAt`() = runTest {
+        val repo = FakeTaskRepository()
+        repo.seed(
+            TestTaskFactory.createTask(id = 1L, dueAt = null),
+            TestTaskFactory.createTask(id = 2L, dueAt = null),
+        )
+
+        val useCase = CalendarUseCase(repo)
+        useCase.observeHasAnyDatedTask().test {
+            assertFalse(awaitItem())
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `observeHasAnyDatedTask is true when at least one non-archived task has dueAt`() = runTest {
+        val repo = FakeTaskRepository()
+        repo.seed(
+            TestTaskFactory.createTask(id = 1L, dueAt = null),
+            TestTaskFactory.createTask(id = 2L, dueAt = dateEpoch(LocalDate.of(2026, 5, 10))),
+        )
+
+        val useCase = CalendarUseCase(repo)
+        useCase.observeHasAnyDatedTask().test {
+            assertTrue(awaitItem())
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `observeHasAnyDatedTask still true when the only dated task is completed`() = runTest {
+        // Completed dated tasks count — once the user has shown they use due dates, the
+        // hint stays gone even after everything is finished. Regression guard for the
+        // reappearance foot-gun where we'd filter to isCompleted = 0.
+        val repo = FakeTaskRepository()
+        repo.seed(
+            TestTaskFactory.createTask(
+                id = 1L,
+                dueAt = dateEpoch(LocalDate.of(2026, 5, 10)),
+                isCompleted = true,
+                completedAt = 1L,
+            ),
+        )
+
+        val useCase = CalendarUseCase(repo)
+        useCase.observeHasAnyDatedTask().test {
+            assertTrue(awaitItem())
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `observeHasAnyDatedTask excludes archived tasks`() = runTest {
+        // Archived tasks don't participate in the calendar surface; if the user archives
+        // their only dated task the hint should reappear.
+        val repo = FakeTaskRepository()
+        repo.seed(
+            TestTaskFactory.createTask(
+                id = 1L,
+                dueAt = dateEpoch(LocalDate.of(2026, 5, 10)),
+                isArchived = true,
+                archivedAt = 1L,
+            ),
+        )
+
+        val useCase = CalendarUseCase(repo)
+        useCase.observeHasAnyDatedTask().test {
+            assertFalse(awaitItem())
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
 }
 
 /**

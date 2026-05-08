@@ -11,6 +11,9 @@
     <string name="cd_calendar_prev_month">Mois précédent</string>
     <string name="cd_calendar_next_month">Mois suivant</string>
     <string name="calendar_agenda_empty_on_date">Aucune tâche le %1$s.</string>
+    <string name="calendar_empty_state_title">Aucune tâche datée pour l\'instant</string>
+    <string name="calendar_empty_state_body">Ajoute une date d\'échéance à une tâche pour la voir dans le calendrier.</string>
+    <string name="calendar_empty_state_cta">Ajouter une tâche</string>
     <string name="a11y_day_cell_today_prefix">Aujourd\'hui</string>
     <string name="a11y_day_cell_selected_suffix">sélectionné</string>
     <plurals name="a11y_day_cell_tasks">

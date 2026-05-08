@@ -111,6 +111,12 @@ interface TaskDao {
     @Query("SELECT COUNT(*) FROM tasks WHERE isCompleted = 0 AND isArchived = 0 AND dueAt < :nowMillis")
     fun observeOverdueCount(nowMillis: Long): Flow<Int>
 
+    // Calendar empty-state (CAL-16): drives the "Add a due date to a task to see it here"
+    // hint card. Counts every non-archived task with a due date — completed dated tasks
+    // still count so the hint stays gone once the user has demonstrated use of due-dates.
+    @Query("SELECT COUNT(*) FROM tasks WHERE isArchived = 0 AND dueAt IS NOT NULL")
+    fun observeDatedTaskCount(): Flow<Int>
+
     // Weekly breakdown query (completed tasks grouped by day)
     @Query(
         "SELECT date(completedAt / 1000, 'unixepoch', 'localtime') AS date, COUNT(*) AS count " +

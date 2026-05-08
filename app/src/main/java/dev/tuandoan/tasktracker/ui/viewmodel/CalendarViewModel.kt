@@ -85,19 +85,32 @@ class CalendarViewModel @Inject constructor(
     private val subtaskProgressFlow: Flow<Map<Long, SubtaskProgress>> =
         subtaskUseCase.observeProgressByTaskId()
 
+    private val hasAnyDatedTaskFlow: Flow<Boolean> = calendarUseCase.observeHasAnyDatedTask()
+
+    /**
+     * Agenda content is two concurrent flows bound to the same surface — the list of items
+     * plus their subtask-progress map. We fold them here so the outer uiState `combine` stays
+     * inside the 5-slot typed-overload limit after CAL-16 adds [hasAnyDatedTaskFlow].
+     */
+    private val agendaWithProgressFlow: Flow<AgendaPayload> =
+        combine(agendaFlow, subtaskProgressFlow) { items, progress ->
+            AgendaPayload(items = items, progress = progress)
+        }
+
     val uiState: StateFlow<CalendarUiState> = combine(
         _visibleMonth,
         _selectedDay,
         decorationsFlow,
-        agendaFlow,
-        subtaskProgressFlow,
-    ) { month, day, decorations, items, progress ->
+        agendaWithProgressFlow,
+        hasAnyDatedTaskFlow,
+    ) { month, day, decorations, agenda, hasDated ->
         CalendarUiState(
             visibleMonth = month,
             selectedDay = day,
             decorations = decorations,
-            agendaItems = items,
-            subtaskProgress = progress,
+            agendaItems = agenda.items,
+            subtaskProgress = agenda.progress,
+            hasAnyDatedTask = hasDated,
         )
     }.stateIn(
         scope = viewModelScope,
@@ -205,6 +218,9 @@ class CalendarViewModel @Inject constructor(
 /**
  * Immutable snapshot rendered by [dev.tuandoan.tasktracker.ui.screens.CalendarScreen].
  * A day without an entry in [decorations] has no tasks — the UI treats a missing key as empty.
+ *
+ * [hasAnyDatedTask] gates the CAL-16 empty-state hint card; defaults to `true` so we don't
+ * flash the card during cold start before the first emission from the DAO.
  */
 data class CalendarUiState(
     val visibleMonth: YearMonth,
@@ -212,4 +228,8 @@ data class CalendarUiState(
     val decorations: Map<LocalDate, DayDecoration> = emptyMap(),
     val agendaItems: List<AgendaItem> = emptyList(),
     val subtaskProgress: Map<Long, SubtaskProgress> = emptyMap(),
+    val hasAnyDatedTask: Boolean = true,
 )
+
+/** Internal-only tuple so the uiState `combine` stays within the 5-slot typed overload. */
+private data class AgendaPayload(val items: List<AgendaItem>, val progress: Map<Long, SubtaskProgress>)
