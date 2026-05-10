@@ -14,6 +14,9 @@ Format follows [Keep a Changelog](https://keepachangelog.com).
 ### Fixed
 - `PrivacyRepository` now degrades gracefully when the `privacy.preferences_pb` file is unreadable (disk full, corrupt, filesystem permission drift). Both the reactive `diagnosticsOptIn: Flow<Boolean>` and the startup-critical static `readOptInOnce(context)` now catch `IOException` from DataStore and fall back to `false` (the opt-out default per ADR-003), which prevents `TaskTrackerApplication.onCreate` from crashing the app over a diagnostics-layer disk glitch. Non-IO throwables (e.g. future schema bugs) still propagate so real programmer errors surface. 3 new JVM tests using injected throwing `DataStore<Preferences>` doubles (FB-06 self-review follow-up)
 
+### Tooling
+- `scripts/measure-cold-start.sh` — dev-only cold-start regression harness for FB-23. Wraps `adb shell am start -W -S` in a 10-iteration loop with pre-flight adb + package checks, a discarded warm-up run, and a summary block reporting `TotalTime` / `WaitTime` median + p95. Output line is paste-ready for the FB-23 Notion page. Zero APK-size / build-time impact; not wired into Gradle. Budgets per ADR-003: opt-out baseline + 100 ms, opt-in baseline + 300 ms; breach triggers escalation to ADR-003 Option B (`@EntryPoint` async init) (FB-23)
+
 ## [1.11.0] - 2026-05-09
 
 ### Added
