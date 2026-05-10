@@ -581,4 +581,23 @@
     <string name="cd_day_selected">đã chọn</string>
     <string name="cd_day_not_selected">chưa chọn</string>
     <string name="sort_due_date_earliest">Ngày hết hạn: Sớm nhất trước</string>
+
+    <!-- Privacy (v1.12.0, FB-07 + FB-08) -->
+    <string name="settings_section_privacy">Quyền riêng tư</string>
+    <string name="settings_diagnostics">Gửi dữ liệu chẩn đoán</string>
+    <string name="settings_diagnostics_desc">Giúp cải thiện Task Tracker bằng cách chia sẻ báo cáo sự cố và dữ liệu sử dụng ẩn danh. Không thu thập thông tin cá nhân hoặc nội dung công việc.</string>
+    <string name="settings_whats_collected">Thu thập những gì?</string>
+    <string name="whats_collected_title">Dữ liệu chẩn đoán nào được thu thập</string>
+    <string name="whats_collected_crashlytics_header">Báo cáo sự cố (Crashlytics)</string>
+    <string name="whats_collected_crashlytics_1">Dấu vết ngăn xếp khi ứng dụng gặp sự cố</string>
+    <string name="whats_collected_crashlytics_2">Mẫu thiết bị và phiên bản Android</string>
+    <string name="whats_collected_crashlytics_3">ID cài đặt ngẫu nhiên — không liên kết với tài khoản của bạn</string>
+    <string name="whats_collected_analytics_header">Sự kiện sử dụng (Analytics)</string>
+    <string name="whats_collected_analytics_1">Bạn mở những màn hình nào và sử dụng những tính năng nào</string>
+    <string name="whats_collected_analytics_2">Phiên bản ứng dụng và ngôn ngữ</string>
+    <string name="whats_collected_analytics_3">Không bao giờ: tiêu đề công việc, mô tả, thẻ hoặc thời gian nhắc</string>
+    <string name="whats_collected_performance_header">Hiệu suất (Performance Monitoring)</string>
+    <string name="whats_collected_performance_1">Thời gian khởi động ứng dụng và thời gian hiển thị màn hình</string>
+    <string name="whats_collected_performance_2">Thời gian dành cho các thao tác chậm</string>
+    <string name="whats_collected_performance_3">Không bao giờ: nội dung màn hình của bạn</string>
 </resources>

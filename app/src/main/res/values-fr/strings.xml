@@ -581,4 +581,23 @@
     <string name="cd_day_selected">sélectionné</string>
     <string name="cd_day_not_selected">non sélectionné</string>
     <string name="sort_due_date_earliest">Date d\'échéance : Plus proche en premier</string>
+
+    <!-- Privacy (v1.12.0, FB-07 + FB-08) -->
+    <string name="settings_section_privacy">Confidentialité</string>
+    <string name="settings_diagnostics">Envoyer les diagnostics</string>
+    <string name="settings_diagnostics_desc">Aidez à améliorer Task Tracker en partageant des rapports de plantage anonymes et des données d\'utilisation. Aucune information personnelle ni contenu de tâche n\'est collecté.</string>
+    <string name="settings_whats_collected">Que collectons-nous ?</string>
+    <string name="whats_collected_title">Quelles données de diagnostic sont collectées</string>
+    <string name="whats_collected_crashlytics_header">Rapports de plantage (Crashlytics)</string>
+    <string name="whats_collected_crashlytics_1">Traces de pile lorsque l\'application plante</string>
+    <string name="whats_collected_crashlytics_2">Modèle de l\'appareil et version d\'Android</string>
+    <string name="whats_collected_crashlytics_3">Un identifiant d\'installation aléatoire — non lié à votre compte</string>
+    <string name="whats_collected_analytics_header">Événements d\'utilisation (Analytics)</string>
+    <string name="whats_collected_analytics_1">Quels écrans vous ouvrez et quelles fonctionnalités vous utilisez</string>
+    <string name="whats_collected_analytics_2">Version de l\'application et langue</string>
+    <string name="whats_collected_analytics_3">Jamais : titres des tâches, descriptions, étiquettes ni heures de rappel</string>
+    <string name="whats_collected_performance_header">Performance (Performance Monitoring)</string>
+    <string name="whats_collected_performance_1">Temps de démarrage de l\'application et temps de rendu des écrans</string>
+    <string name="whats_collected_performance_2">Temps passé sur les opérations lentes</string>
+    <string name="whats_collected_performance_3">Jamais : le contenu de vos écrans</string>
 </resources>

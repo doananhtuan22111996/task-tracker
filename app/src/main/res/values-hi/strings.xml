@@ -581,4 +581,23 @@
     <string name="cd_day_selected">चयनित</string>
     <string name="cd_day_not_selected">अचयनित</string>
     <string name="sort_due_date_earliest">नियत तिथि: पहले सबसे पुरानी</string>
+
+    <!-- Privacy (v1.12.0, FB-07 + FB-08) -->
+    <string name="settings_section_privacy">गोपनीयता</string>
+    <string name="settings_diagnostics">डायग्नोस्टिक्स भेजें</string>
+    <string name="settings_diagnostics_desc">गुमनाम क्रैश रिपोर्ट और उपयोग डेटा साझा करके Task Tracker को बेहतर बनाने में मदद करें। कोई व्यक्तिगत जानकारी या कार्य सामग्री एकत्र नहीं की जाती है।</string>
+    <string name="settings_whats_collected">क्या एकत्र किया जाता है?</string>
+    <string name="whats_collected_title">कौन सा डायग्नोस्टिक्स डेटा एकत्र किया जाता है</string>
+    <string name="whats_collected_crashlytics_header">क्रैश रिपोर्ट (Crashlytics)</string>
+    <string name="whats_collected_crashlytics_1">ऐप के क्रैश होने पर स्टैक ट्रेस</string>
+    <string name="whats_collected_crashlytics_2">डिवाइस मॉडल और Android संस्करण</string>
+    <string name="whats_collected_crashlytics_3">एक यादृच्छिक इंस्टॉल ID — आपके खाते से जुड़ी नहीं</string>
+    <string name="whats_collected_analytics_header">उपयोग ईवेंट (Analytics)</string>
+    <string name="whats_collected_analytics_1">आप कौन सी स्क्रीन खोलते हैं और किन सुविधाओं का उपयोग करते हैं</string>
+    <string name="whats_collected_analytics_2">ऐप संस्करण और भाषा</string>
+    <string name="whats_collected_analytics_3">कभी नहीं: कार्य शीर्षक, विवरण, टैग या अनुस्मारक समय</string>
+    <string name="whats_collected_performance_header">प्रदर्शन (Performance Monitoring)</string>
+    <string name="whats_collected_performance_1">ऐप प्रारंभ समय और स्क्रीन रेंडर समय</string>
+    <string name="whats_collected_performance_2">धीमे कार्यों पर बिताया गया समय</string>
+    <string name="whats_collected_performance_3">कभी नहीं: आपकी स्क्रीन की सामग्री</string>
 </resources>
