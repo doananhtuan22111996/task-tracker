@@ -3,6 +3,11 @@
 All notable changes to the Task Tracker app will be documented in this file.
 Format follows [Keep a Changelog](https://keepachangelog.com).
 
+## [Unreleased]
+
+### Added
+- Firebase BOM 33.10.0 + Crashlytics/Analytics/Performance Monitoring submodules on the app classpath, along with the `google-services`, `firebase-crashlytics`, and `firebase-perf` Gradle plugins (FB-01 catalog + FB-02 application). No runtime behavior yet — SDK collection is inert until the FB-06 consent gate lands in `TaskTrackerApplication.onCreate`. Release-APK size delta: +0.96 MB (9.85 MB → 10.81 MB), well inside the 15 MB budget from ADR-003 (FB-02)
+
 ## [1.11.0] - 2026-05-09
 
 ### Added
