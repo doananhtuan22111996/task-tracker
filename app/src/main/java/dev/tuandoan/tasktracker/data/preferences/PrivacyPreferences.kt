@@ -5,13 +5,16 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.preferencesDataStore
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.runBlocking
+import java.io.IOException
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -50,6 +53,19 @@ class PrivacyRepository internal constructor(private val dataStore: DataStore<Pr
      * on unrelated DataStore writes.
      */
     val diagnosticsOptIn: Flow<Boolean> = dataStore.data
+        .catch { cause ->
+            // DataStore's official recovery pattern: IOException on read (corrupt file,
+            // disk full, filesystem permission drift) must degrade gracefully, not crash
+            // the collector. Falling back to emptyPreferences() makes the downstream
+            // `map` return `false` — the safe default per ADR-003's structural opt-out.
+            // Non-IO throwables (e.g. a key-type mismatch) are real bugs; rethrow so we
+            // surface them rather than silently masking.
+            if (cause is IOException) {
+                emit(emptyPreferences())
+            } else {
+                throw cause
+            }
+        }
         .map { prefs -> prefs[DIAGNOSTICS_OPT_IN] ?: false }
         .distinctUntilChanged()
 
@@ -69,7 +85,7 @@ class PrivacyRepository internal constructor(private val dataStore: DataStore<Pr
      * callers should collect [diagnosticsOptIn] to stay reactive. Pre-Hilt startup path
      * uses [Companion.readOptInOnce] instead since it doesn't need the Hilt-bound Context.
      */
-    suspend fun getDiagnosticsOptInOnce(): Boolean = dataStore.data.map { it[DIAGNOSTICS_OPT_IN] ?: false }.first()
+    suspend fun getDiagnosticsOptInOnce(): Boolean = diagnosticsOptIn.first()
 
     companion object {
         internal val DIAGNOSTICS_OPT_IN = booleanPreferencesKey("diagnostics_opt_in")
@@ -88,6 +104,17 @@ class PrivacyRepository internal constructor(private val dataStore: DataStore<Pr
          */
         fun readOptInOnce(context: Context): Boolean = runBlocking {
             context.privacyDataStore.data
+                .catch { cause ->
+                    // Same recovery contract as the [diagnosticsOptIn] Flow — an IOException
+                    // here would otherwise propagate up the `runBlocking` and crash
+                    // `Application.onCreate` before any other startup code runs. Fall back
+                    // to the opt-out default (safe per ADR-003); let non-IO bugs surface.
+                    if (cause is IOException) {
+                        emit(emptyPreferences())
+                    } else {
+                        throw cause
+                    }
+                }
                 .map { it[DIAGNOSTICS_OPT_IN] ?: false }
                 .first()
         }

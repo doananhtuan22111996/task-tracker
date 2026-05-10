@@ -3,9 +3,12 @@ package dev.tuandoan.tasktracker.data.preferences
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.emptyPreferences
 import app.cash.turbine.test
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
@@ -16,6 +19,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TemporaryFolder
 import java.io.File
+import java.io.IOException
 
 /**
  * Contract test for [PrivacyRepository] (FB-04).
@@ -118,6 +122,45 @@ class PrivacyRepositoryTest {
     }
 
     @Test
+    fun `diagnosticsOptIn falls back to false when DataStore throws IOException`() =
+        runTest(UnconfinedTestDispatcher()) {
+            // If the `.preferences_pb` file is corrupt, the disk fills up, or the FS
+            // permissions drift, DataStore's `data` Flow surfaces an IOException. The
+            // repository's `.catch` contract must degrade to the opt-out default rather
+            // than propagate — otherwise Application.onCreate crashes before any other
+            // startup code runs, and the user loses access to the app over a diagnostics-
+            // layer issue.
+            val repo = PrivacyRepository(IoThrowingDataStore)
+            repo.diagnosticsOptIn.test {
+                assertFalse(awaitItem())
+                awaitComplete()
+            }
+        }
+
+    @Test
+    fun `getDiagnosticsOptInOnce returns false when DataStore throws IOException`() =
+        runTest(UnconfinedTestDispatcher()) {
+            // Mirror check for the suspend one-shot path used by Settings and tests.
+            val repo = PrivacyRepository(IoThrowingDataStore)
+            assertFalse(repo.getDiagnosticsOptInOnce())
+        }
+
+    @Test
+    fun `diagnosticsOptIn rethrows non-IO exceptions to surface real bugs`() = runTest(UnconfinedTestDispatcher()) {
+        // A ClassCastException (e.g. future schema bug reading a boolean key as int)
+        // or any non-IOException must propagate. Silently defaulting would mask
+        // programmer errors indefinitely.
+        val repo = PrivacyRepository(RuntimeThrowingDataStore)
+        repo.diagnosticsOptIn.test {
+            val error = awaitError()
+            assertTrue(
+                "Expected IllegalStateException to surface, got: $error",
+                error is IllegalStateException,
+            )
+        }
+    }
+
+    @Test
     fun `persistence survives new repository over same store`() = runTest(UnconfinedTestDispatcher()) {
         // Simulates app restart: the opt-in state must not rely on in-memory caching —
         // FB-06's runBlocking read depends on file-based persistence through a fresh
@@ -130,5 +173,31 @@ class PrivacyRepositoryTest {
 
         val freshRepo = PrivacyRepository(store)
         assertEquals(true, freshRepo.getDiagnosticsOptInOnce())
+    }
+
+    /**
+     * Test double: a `DataStore<Preferences>` whose `data` Flow throws [IOException]
+     * on first collection. Exercises the read-failure recovery path.
+     */
+    private object IoThrowingDataStore : DataStore<Preferences> {
+        override val data: Flow<Preferences> = flow {
+            throw IOException("simulated corrupt privacy.preferences_pb")
+        }
+
+        override suspend fun updateData(transform: suspend (Preferences) -> Preferences): Preferences =
+            emptyPreferences()
+    }
+
+    /**
+     * Test double: throws a non-IO runtime exception on read, used to assert that
+     * real programmer errors are not silently swallowed by the `.catch` contract.
+     */
+    private object RuntimeThrowingDataStore : DataStore<Preferences> {
+        override val data: Flow<Preferences> = flow {
+            throw IllegalStateException("simulated non-IO bug")
+        }
+
+        override suspend fun updateData(transform: suspend (Preferences) -> Preferences): Preferences =
+            emptyPreferences()
     }
 }
