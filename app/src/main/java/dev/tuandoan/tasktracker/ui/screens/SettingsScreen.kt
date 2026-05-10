@@ -75,6 +75,8 @@ import dev.tuandoan.tasktracker.R
 import dev.tuandoan.tasktracker.data.preferences.ThemeMode
 import dev.tuandoan.tasktracker.domain.backup.model.BackupFormat
 import dev.tuandoan.tasktracker.ui.components.RatingPromptManager
+import dev.tuandoan.tasktracker.ui.components.WhatsCollectedBottomSheet
+import dev.tuandoan.tasktracker.ui.theme.AppSpacing
 import dev.tuandoan.tasktracker.ui.viewmodel.SettingsViewModel
 import dev.tuandoan.tasktracker.utils.findActivity
 import java.time.LocalDateTime
@@ -108,6 +110,7 @@ fun SettingsScreen(
     val snackbarHostState = remember { SnackbarHostState() }
 
     var showLanguageDialog by remember { mutableStateOf(false) }
+    var showWhatsCollectedSheet by remember { mutableStateOf(false) }
 
     // Resolve app version
     val appVersion = remember {
@@ -392,7 +395,7 @@ fun SettingsScreen(
                 )
 
                 // =============================================
-                // Privacy Section (FB-07)
+                // Privacy Section (FB-07 + FB-08)
                 // =============================================
                 SectionHeader(text = stringResource(R.string.settings_section_privacy))
 
@@ -401,6 +404,16 @@ fun SettingsScreen(
                     enabled = diagnosticsOptIn,
                     onToggle = { viewModel.setDiagnosticsOptIn(it) },
                 )
+
+                // "What's collected?" trigger (FB-08). Aligned with the ListItem's
+                // supporting-text indent so it reads as a follow-on to the toggle
+                // description rather than a separate settings row.
+                TextButton(
+                    onClick = { showWhatsCollectedSheet = true },
+                    modifier = Modifier.padding(start = AppSpacing.large),
+                ) {
+                    Text(text = stringResource(R.string.settings_whats_collected))
+                }
 
                 // =============================================
                 // Help & FAQ Section
@@ -690,6 +703,13 @@ fun SettingsScreen(
                 showLanguageDialog = false
             },
             onDismiss = { showLanguageDialog = false },
+        )
+    }
+
+    // "What's collected?" bottom sheet (FB-08)
+    if (showWhatsCollectedSheet) {
+        WhatsCollectedBottomSheet(
+            onDismiss = { showWhatsCollectedSheet = false },
         )
     }
 
