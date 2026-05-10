@@ -4,6 +4,9 @@ import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.google.firebase.perf.FirebasePerformance
 import dev.tuandoan.tasktracker.data.preferences.PrivacyRepository
+import dev.tuandoan.tasktracker.diagnostics.di.DiagnosticsScope
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -40,6 +43,8 @@ class PrivacyManager @Inject constructor(
     private val crashlytics: FirebaseCrashlytics,
     private val analytics: FirebaseAnalytics,
     private val performance: FirebasePerformance,
+    private val keysWriter: CrashlyticsKeysWriter,
+    @DiagnosticsScope private val diagnosticsScope: CoroutineScope,
 ) {
 
     /**
@@ -51,16 +56,28 @@ class PrivacyManager @Inject constructor(
      *
      * Separate from [setEnabled] because startup MUST NOT overwrite the persisted
      * flag; it reads and reflects it.
+     *
+     * On opt-in, the Crashlytics custom keys (FB-10) are written asynchronously on
+     * the diagnostics coroutine scope — Crashlytics is tolerant of keys arriving
+     * shortly after the first frame, and blocking `onCreate` on DataStore + DB
+     * reads would eat into ADR-003's cold-start budget.
      */
     fun initCollectionState(optIn: Boolean) {
         crashlytics.setCrashlyticsCollectionEnabled(optIn)
         analytics.setAnalyticsCollectionEnabled(optIn)
         performance.isPerformanceCollectionEnabled = optIn
+        if (optIn) {
+            diagnosticsScope.launch { keysWriter.writeAll() }
+        }
     }
 
     /**
      * Persists the opt-in value AND fans out to the three SDKs. Called from the
      * Settings toggle handler (FB-07) when the user flips the Diagnostics switch.
+     *
+     * On enable, writes the Crashlytics custom keys (FB-10) inline — we're already
+     * in a suspend scope so the main thread isn't blocked, and keys written here
+     * attach to any crash later in the session.
      *
      * On disable, also calls [FirebaseCrashlytics.deleteUnsentReports] to discard any
      * crash reports queued for upload — best-effort, async, not awaitable per the
@@ -72,7 +89,9 @@ class PrivacyManager @Inject constructor(
         crashlytics.setCrashlyticsCollectionEnabled(optIn)
         analytics.setAnalyticsCollectionEnabled(optIn)
         performance.isPerformanceCollectionEnabled = optIn
-        if (!optIn) {
+        if (optIn) {
+            keysWriter.writeAll()
+        } else {
             crashlytics.deleteUnsentReports()
         }
     }
