@@ -581,4 +581,23 @@
     <string name="cd_day_selected">selecionado</string>
     <string name="cd_day_not_selected">não selecionado</string>
     <string name="sort_due_date_earliest">Data de vencimento: Mais próxima primeiro</string>
+
+    <!-- Privacy (v1.12.0, FB-07 + FB-08) -->
+    <string name="settings_section_privacy">Privacidade</string>
+    <string name="settings_diagnostics">Enviar diagnósticos</string>
+    <string name="settings_diagnostics_desc">Ajude a melhorar o Task Tracker partilhando relatórios de falhas e dados de utilização anónimos. Não são recolhidos dados pessoais nem conteúdo de tarefas.</string>
+    <string name="settings_whats_collected">O que é recolhido?</string>
+    <string name="whats_collected_title">Que dados de diagnóstico são recolhidos</string>
+    <string name="whats_collected_crashlytics_header">Relatórios de falhas (Crashlytics)</string>
+    <string name="whats_collected_crashlytics_1">Rastreios de pilha quando a aplicação falha</string>
+    <string name="whats_collected_crashlytics_2">Modelo do dispositivo e versão do Android</string>
+    <string name="whats_collected_crashlytics_3">Um ID de instalação aleatório — não associado à sua conta</string>
+    <string name="whats_collected_analytics_header">Eventos de utilização (Analytics)</string>
+    <string name="whats_collected_analytics_1">Que ecrãs abre e que funcionalidades utiliza</string>
+    <string name="whats_collected_analytics_2">Versão da aplicação e idioma</string>
+    <string name="whats_collected_analytics_3">Nunca: títulos de tarefas, descrições, etiquetas ou horas de lembrete</string>
+    <string name="whats_collected_performance_header">Desempenho (Performance Monitoring)</string>
+    <string name="whats_collected_performance_1">Tempo de arranque da aplicação e tempos de renderização dos ecrãs</string>
+    <string name="whats_collected_performance_2">Tempo passado em operações lentas</string>
+    <string name="whats_collected_performance_3">Nunca: o conteúdo dos seus ecrãs</string>
 </resources>

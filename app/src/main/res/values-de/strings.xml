@@ -581,4 +581,23 @@
     <string name="cd_day_selected">ausgewählt</string>
     <string name="cd_day_not_selected">nicht ausgewählt</string>
     <string name="sort_due_date_earliest">Fälligkeitsdatum: Früheste zuerst</string>
+
+    <!-- Privacy (v1.12.0, FB-07 + FB-08) -->
+    <string name="settings_section_privacy">Datenschutz</string>
+    <string name="settings_diagnostics">Diagnosedaten senden</string>
+    <string name="settings_diagnostics_desc">Helfen Sie mit, Task Tracker zu verbessern, indem Sie anonyme Absturzberichte und Nutzungsdaten teilen. Es werden keine persönlichen Daten oder Aufgabeninhalte erfasst.</string>
+    <string name="settings_whats_collected">Was wird erfasst?</string>
+    <string name="whats_collected_title">Welche Diagnosedaten erfasst werden</string>
+    <string name="whats_collected_crashlytics_header">Absturzberichte (Crashlytics)</string>
+    <string name="whats_collected_crashlytics_1">Stack-Traces bei App-Abstürzen</string>
+    <string name="whats_collected_crashlytics_2">Gerätemodell und Android-Version</string>
+    <string name="whats_collected_crashlytics_3">Eine zufällige Installations-ID — nicht mit Ihrem Konto verknüpft</string>
+    <string name="whats_collected_analytics_header">Nutzungsereignisse (Analytics)</string>
+    <string name="whats_collected_analytics_1">Welche Bildschirme Sie öffnen und welche Funktionen Sie nutzen</string>
+    <string name="whats_collected_analytics_2">App-Version und Sprache</string>
+    <string name="whats_collected_analytics_3">Niemals: Aufgabentitel, Beschreibungen, Tags oder Erinnerungszeiten</string>
+    <string name="whats_collected_performance_header">Leistung (Performance Monitoring)</string>
+    <string name="whats_collected_performance_1">App-Startzeit und Bildschirm-Renderzeiten</string>
+    <string name="whats_collected_performance_2">Zeitaufwand für langsame Vorgänge</string>
+    <string name="whats_collected_performance_3">Niemals: der Inhalt Ihrer Bildschirme</string>
 </resources>

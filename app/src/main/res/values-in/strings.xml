@@ -581,4 +581,23 @@
     <string name="cd_day_selected">dipilih</string>
     <string name="cd_day_not_selected">tidak dipilih</string>
     <string name="sort_due_date_earliest">Tanggal jatuh tempo: Terdekat lebih dulu</string>
+
+    <!-- Privacy (v1.12.0, FB-07 + FB-08) -->
+    <string name="settings_section_privacy">Privasi</string>
+    <string name="settings_diagnostics">Kirim diagnostik</string>
+    <string name="settings_diagnostics_desc">Bantu meningkatkan Task Tracker dengan berbagi laporan kerusakan dan data penggunaan anonim. Tidak ada informasi pribadi atau konten tugas yang dikumpulkan.</string>
+    <string name="settings_whats_collected">Apa yang dikumpulkan?</string>
+    <string name="whats_collected_title">Data diagnostik apa yang dikumpulkan</string>
+    <string name="whats_collected_crashlytics_header">Laporan kerusakan (Crashlytics)</string>
+    <string name="whats_collected_crashlytics_1">Jejak tumpukan saat aplikasi mengalami kerusakan</string>
+    <string name="whats_collected_crashlytics_2">Model perangkat dan versi Android</string>
+    <string name="whats_collected_crashlytics_3">ID pemasangan acak — tidak terkait dengan akun Anda</string>
+    <string name="whats_collected_analytics_header">Peristiwa penggunaan (Analytics)</string>
+    <string name="whats_collected_analytics_1">Layar mana yang Anda buka dan fitur mana yang Anda gunakan</string>
+    <string name="whats_collected_analytics_2">Versi aplikasi dan bahasa</string>
+    <string name="whats_collected_analytics_3">Tidak pernah: judul tugas, deskripsi, tag, atau waktu pengingat</string>
+    <string name="whats_collected_performance_header">Kinerja (Performance Monitoring)</string>
+    <string name="whats_collected_performance_1">Waktu mulai aplikasi dan waktu render layar</string>
+    <string name="whats_collected_performance_2">Waktu yang dihabiskan untuk operasi lambat</string>
+    <string name="whats_collected_performance_3">Tidak pernah: isi layar Anda</string>
 </resources>

@@ -581,4 +581,23 @@
     <string name="cd_day_selected">seleccionado</string>
     <string name="cd_day_not_selected">no seleccionado</string>
     <string name="sort_due_date_earliest">Fecha de vencimiento: Más próxima primero</string>
+
+    <!-- Privacy (v1.12.0, FB-07 + FB-08) -->
+    <string name="settings_section_privacy">Privacidad</string>
+    <string name="settings_diagnostics">Enviar diagnósticos</string>
+    <string name="settings_diagnostics_desc">Ayuda a mejorar Task Tracker compartiendo informes de errores y datos de uso anónimos. No se recopila información personal ni contenido de tareas.</string>
+    <string name="settings_whats_collected">¿Qué se recopila?</string>
+    <string name="whats_collected_title">Qué datos de diagnóstico se recopilan</string>
+    <string name="whats_collected_crashlytics_header">Informes de errores (Crashlytics)</string>
+    <string name="whats_collected_crashlytics_1">Trazas de pila cuando la aplicación falla</string>
+    <string name="whats_collected_crashlytics_2">Modelo del dispositivo y versión de Android</string>
+    <string name="whats_collected_crashlytics_3">Un ID de instalación aleatorio — no vinculado a tu cuenta</string>
+    <string name="whats_collected_analytics_header">Eventos de uso (Analytics)</string>
+    <string name="whats_collected_analytics_1">Qué pantallas abres y qué funciones utilizas</string>
+    <string name="whats_collected_analytics_2">Versión de la aplicación e idioma</string>
+    <string name="whats_collected_analytics_3">Nunca: títulos de tareas, descripciones, etiquetas ni horas de recordatorio</string>
+    <string name="whats_collected_performance_header">Rendimiento (Performance Monitoring)</string>
+    <string name="whats_collected_performance_1">Tiempo de inicio de la aplicación y tiempos de renderizado de pantalla</string>
+    <string name="whats_collected_performance_2">Tiempo empleado en operaciones lentas</string>
+    <string name="whats_collected_performance_3">Nunca: el contenido de tus pantallas</string>
 </resources>
