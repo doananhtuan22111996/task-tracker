@@ -9,8 +9,10 @@ import io.mockk.coVerifyOrder
 import io.mockk.mockk
 import io.mockk.verify
 import io.mockk.verifyOrder
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
@@ -42,6 +44,8 @@ class PrivacyManagerTest {
     private lateinit var crashlytics: FirebaseCrashlytics
     private lateinit var analytics: FirebaseAnalytics
     private lateinit var performance: FirebasePerformance
+    private lateinit var keysWriter: CrashlyticsKeysWriter
+    private lateinit var diagnosticsScope: CoroutineScope
     private lateinit var manager: PrivacyManager
 
     @Before
@@ -50,7 +54,18 @@ class PrivacyManagerTest {
         crashlytics = mockk(relaxed = true)
         analytics = mockk(relaxed = true)
         performance = mockk(relaxed = true)
-        manager = PrivacyManager(repository, crashlytics, analytics, performance)
+        keysWriter = mockk(relaxed = true)
+        // Scope uses an UnconfinedTestDispatcher so launched coroutines in
+        // `initCollectionState(true)` complete synchronously under the test.
+        diagnosticsScope = CoroutineScope(UnconfinedTestDispatcher())
+        manager = PrivacyManager(
+            repository,
+            crashlytics,
+            analytics,
+            performance,
+            keysWriter,
+            diagnosticsScope,
+        )
     }
 
     // ── initCollectionState ──────────────────────────────────────────────────
@@ -175,5 +190,45 @@ class PrivacyManagerTest {
             performance.isPerformanceCollectionEnabled = false
             crashlytics.deleteUnsentReports()
         }
+    }
+
+    // ── Crashlytics custom keys (FB-10) ──────────────────────────────────────
+
+    @Test
+    fun `setEnabled true calls keysWriter writeAll`() = runTest(UnconfinedTestDispatcher()) {
+        // On opt-in the keys must be populated so a later-session crash has
+        // debug context. Called inline since setEnabled is already suspend.
+        manager.setEnabled(optIn = true)
+
+        coVerify(exactly = 1) { keysWriter.writeAll() }
+    }
+
+    @Test
+    fun `setEnabled false does not call keysWriter writeAll`() = runTest(UnconfinedTestDispatcher()) {
+        // On opt-out the SDKs are disabled and setCustomKey is a no-op anyway;
+        // reading DataStore + DB just to call no-ops is wasted work.
+        manager.setEnabled(optIn = false)
+
+        coVerify(exactly = 0) { keysWriter.writeAll() }
+    }
+
+    @Test
+    fun `initCollectionState true launches keysWriter writeAll on diagnostics scope`() =
+        runTest(UnconfinedTestDispatcher()) {
+            // Cold-start path: Application.onCreate can't suspend, so the write
+            // goes on the diagnostics scope. The UnconfinedTestDispatcher in
+            // setUp() makes the launched coroutine run synchronously here.
+            manager.initCollectionState(optIn = true)
+            advanceUntilIdle()
+
+            coVerify(exactly = 1) { keysWriter.writeAll() }
+        }
+
+    @Test
+    fun `initCollectionState false does not launch keysWriter writeAll`() = runTest(UnconfinedTestDispatcher()) {
+        manager.initCollectionState(optIn = false)
+        advanceUntilIdle()
+
+        coVerify(exactly = 0) { keysWriter.writeAll() }
     }
 }

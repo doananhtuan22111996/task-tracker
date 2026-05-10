@@ -9,6 +9,10 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import javax.inject.Qualifier
 import javax.inject.Singleton
 
 /**
@@ -38,4 +42,27 @@ object DiagnosticsModule {
     @Provides
     @Singleton
     fun provideFirebasePerformance(): FirebasePerformance = FirebasePerformance.getInstance()
+
+    /**
+     * Application-lifetime `CoroutineScope` used only by the diagnostics layer
+     * (FB-10). The cold-start opt-in path needs to launch the custom-keys write
+     * off the main thread, and since `Application.onCreate` has no `lifecycleScope`,
+     * the diagnostics layer owns its own scope.
+     *
+     * Qualifier-isolated so features outside `diagnostics/` don't reach for this
+     * scope and accumulate long-lived work on it. `SupervisorJob` so a failure in
+     * one diagnostics task never cancels unrelated work.
+     */
+    @Provides
+    @Singleton
+    @DiagnosticsScope
+    fun provideDiagnosticsScope(): CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
 }
+
+/**
+ * Hilt qualifier for the diagnostics-only application `CoroutineScope`. See
+ * [DiagnosticsModule.provideDiagnosticsScope] for the rationale.
+ */
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class DiagnosticsScope
