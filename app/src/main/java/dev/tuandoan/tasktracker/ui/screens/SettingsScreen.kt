@@ -392,6 +392,17 @@ fun SettingsScreen(
                 )
 
                 // =============================================
+                // Privacy Section (FB-07)
+                // =============================================
+                SectionHeader(text = stringResource(R.string.settings_section_privacy))
+
+                val diagnosticsOptIn by viewModel.diagnosticsOptIn.collectAsStateWithLifecycle()
+                DiagnosticsToggle(
+                    enabled = diagnosticsOptIn,
+                    onToggle = { viewModel.setDiagnosticsOptIn(it) },
+                )
+
+                // =============================================
                 // Help & FAQ Section
                 // =============================================
                 SectionHeader(text = stringResource(R.string.settings_help_faq))
@@ -832,6 +843,41 @@ private fun DynamicColorToggle(enabled: Boolean, onToggle: (Boolean) -> Unit) {
         modifier = Modifier
             .fillMaxWidth()
             .alpha(if (isDynamicColorAvailable) 1f else 0.6f),
+    )
+}
+
+/**
+ * Diagnostics opt-in toggle (FB-07). Flipping the switch routes through
+ * `SettingsViewModel.setDiagnosticsOptIn` → `PrivacyManager.setEnabled`, which
+ * persists the flag AND fans out to the three Firebase SDKs atomically per
+ * ADR-003. Default (fresh install / never-opted-in) = off.
+ */
+@Composable
+private fun DiagnosticsToggle(enabled: Boolean, onToggle: (Boolean) -> Unit) {
+    ListItem(
+        headlineContent = {
+            Text(
+                text = stringResource(R.string.settings_diagnostics),
+                style = MaterialTheme.typography.bodyLarge,
+            )
+        },
+        supportingContent = {
+            Text(
+                text = stringResource(R.string.settings_diagnostics_desc),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        },
+        trailingContent = {
+            Switch(
+                checked = enabled,
+                onCheckedChange = onToggle,
+            )
+        },
+        colors = ListItemDefaults.colors(
+            containerColor = MaterialTheme.colorScheme.surface,
+        ),
+        modifier = Modifier.fillMaxWidth(),
     )
 }
 

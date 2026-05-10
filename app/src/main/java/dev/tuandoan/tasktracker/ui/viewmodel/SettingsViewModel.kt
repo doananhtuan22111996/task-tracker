@@ -9,9 +9,11 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dev.tuandoan.tasktracker.R
+import dev.tuandoan.tasktracker.data.preferences.PrivacyRepository
 import dev.tuandoan.tasktracker.data.preferences.SettingsRepository
 import dev.tuandoan.tasktracker.data.preferences.ThemeMode
 import dev.tuandoan.tasktracker.data.preferences.UserPreferences
+import dev.tuandoan.tasktracker.diagnostics.PrivacyManager
 import dev.tuandoan.tasktracker.domain.backup.ExportBackupUseCase
 import dev.tuandoan.tasktracker.domain.backup.ImportBackupUseCase
 import dev.tuandoan.tasktracker.domain.backup.model.BackupFormat
@@ -39,6 +41,8 @@ class SettingsViewModel @Inject constructor(
     private val exportBackupUseCase: ExportBackupUseCase,
     private val importBackupUseCase: ImportBackupUseCase,
     private val settingsRepository: SettingsRepository,
+    private val privacyRepository: PrivacyRepository,
+    private val privacyManager: PrivacyManager,
 ) : ViewModel() {
 
     // --- User Preferences ---
@@ -205,5 +209,24 @@ class SettingsViewModel @Inject constructor(
 
     fun setTipStatsCardsShown() {
         viewModelScope.launch { settingsRepository.setTipShown(SettingsRepository.TipKeys.STATS_CARDS) }
+    }
+
+    // --- Privacy (FB-07) ---
+
+    /**
+     * Reactive view of the diagnostics opt-in flag for the Settings → Privacy switch.
+     * Initial value is `false` — the structural opt-out default from ADR-003 / FB-04.
+     */
+    val diagnosticsOptIn: StateFlow<Boolean> = privacyRepository.diagnosticsOptIn
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
+
+    /**
+     * User flipped the diagnostics toggle. Routes through [PrivacyManager.setEnabled] so
+     * the DataStore write AND the three Firebase SDK collection flags flip atomically.
+     * On disable, [PrivacyManager] also calls `Crashlytics.deleteUnsentReports()` to
+     * discard queued payloads (best-effort per the SDK contract).
+     */
+    fun setDiagnosticsOptIn(optIn: Boolean) {
+        viewModelScope.launch { privacyManager.setEnabled(optIn) }
     }
 }
