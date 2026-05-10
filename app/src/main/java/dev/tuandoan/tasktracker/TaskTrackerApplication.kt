@@ -10,6 +10,8 @@ import androidx.core.content.getSystemService
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
 import dagger.hilt.android.HiltAndroidApp
+import dev.tuandoan.tasktracker.data.preferences.PrivacyRepository
+import dev.tuandoan.tasktracker.diagnostics.PrivacyManager
 import javax.inject.Inject
 
 @HiltAndroidApp
@@ -20,16 +22,42 @@ class TaskTrackerApplication :
     @Inject
     lateinit var workerFactory: HiltWorkerFactory
 
+    @Inject
+    lateinit var privacyManager: PrivacyManager
+
     companion object {
         const val TASK_REMINDER_CHANNEL_ID = "task_reminders"
         private const val TAG = "TaskReminder"
     }
 
+    /**
+     * Startup ordering invariant (v1.12.0, FB-06 — ADR-003):
+     *
+     * **`applyDiagnosticsConsent()` MUST run before any Firebase-touching code.**
+     *
+     * Firebase's `FirebaseInitProvider` ContentProvider auto-initializes `FirebaseApp`
+     * before `Application.onCreate()` fires. The `firebase_*_collection_enabled=false`
+     * manifest defaults from FB-02 keep the three SDKs inert at that point. This
+     * method synchronously reads the persisted opt-in and reflects it to the SDKs
+     * via [PrivacyManager.initCollectionState] — if the user previously opted in,
+     * collection starts here; if not, the SDKs stay disabled.
+     *
+     * Do NOT insert any code that touches Crashlytics, Analytics, or Performance
+     * (including KTX property accessors like `Firebase.analytics`) before this call.
+     * A future refactor that violates this ordering would bypass the consent gate
+     * and leak telemetry on the opt-out path.
+     */
     override fun onCreate() {
         super.onCreate()
+        applyDiagnosticsConsent()
         Log.d(TAG, "TaskTrackerApplication.onCreate()")
         createNotificationChannel()
         logNotificationPermissionStatus()
+    }
+
+    private fun applyDiagnosticsConsent() {
+        val optIn = PrivacyRepository.readOptInOnce(this)
+        privacyManager.initCollectionState(optIn)
     }
 
     override val workManagerConfiguration: Configuration
