@@ -3,6 +3,11 @@
 All notable changes to the Task Tracker app will be documented in this file.
 Format follows [Keep a Changelog](https://keepachangelog.com).
 
+## [Unreleased]
+
+### Added
+- Firebase BOM 33.10.0 + Crashlytics/Analytics/Performance Monitoring submodules on the app classpath, along with the `google-services`, `firebase-crashlytics`, and `firebase-perf` Gradle plugins (FB-01 catalog + FB-02 application). SDK collection is disabled by default via `AndroidManifest.xml` meta-data (`firebase_crashlytics_collection_enabled=false`, `firebase_analytics_collection_enabled=false`, `firebase_performance_collection_enabled=false`) — this is the structural opt-out guarantee from ADR-003 and keeps the interim window between FB-02 and FB-06 free of network traffic. FB-06's runtime `setXxxCollectionEnabled(true)` will override the manifest defaults when the user opts in. Release-APK size delta: +0.96 MB (9.85 MB → 10.81 MB), well inside the 15 MB budget (FB-02)
+
 ## [1.11.0] - 2026-05-09
 
 ### Added

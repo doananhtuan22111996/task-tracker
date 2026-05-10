@@ -9,6 +9,9 @@ plugins {
     alias(libs.plugins.ksp)
     alias(libs.plugins.dagger.hilt.android)
     alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.google.services)
+    alias(libs.plugins.firebase.crashlytics.gradle)
+    alias(libs.plugins.firebase.perf.gradle)
 }
 
 android {
@@ -163,6 +166,19 @@ dependencies {
     implementation(libs.androidx.work.runtime.ktx)
     implementation(libs.androidx.hilt.work)
     ksp(libs.androidx.hilt.compiler)
+
+    // Firebase (FB-02) — Crashlytics + Analytics + Performance Monitoring.
+    // Collection is disabled by default via AndroidManifest.xml meta-data entries
+    // (firebase_*_collection_enabled = false); FB-06's consent gate flips them to
+    // true at runtime when the user opts in via Settings → Privacy. The manifest
+    // default is the structural safeguard: opt-out = zero network even between
+    // FB-02 merge and FB-06 implementation. ADR-003 for the integration architecture.
+    // BOM pins all three submodule versions; see `androidx-compose-bom` for the
+    // same pattern.
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.crashlytics)
+    implementation(libs.firebase.analytics)
+    implementation(libs.firebase.perf)
 
     testImplementation(libs.junit)
     testImplementation(libs.kotlinx.coroutines.test)
