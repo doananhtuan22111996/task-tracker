@@ -168,9 +168,13 @@ dependencies {
     ksp(libs.androidx.hilt.compiler)
 
     // Firebase (FB-02) — Crashlytics + Analytics + Performance Monitoring.
-    // Applied but inert until the consent gate in FB-06 enables collection.
+    // Collection is disabled by default via AndroidManifest.xml meta-data entries
+    // (firebase_*_collection_enabled = false); FB-06's consent gate flips them to
+    // true at runtime when the user opts in via Settings → Privacy. The manifest
+    // default is the structural safeguard: opt-out = zero network even between
+    // FB-02 merge and FB-06 implementation. ADR-003 for the integration architecture.
     // BOM pins all three submodule versions; see `androidx-compose-bom` for the
-    // same pattern. ADR-003 for the integration architecture.
+    // same pattern.
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.crashlytics)
     implementation(libs.firebase.analytics)
