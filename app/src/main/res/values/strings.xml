@@ -180,6 +180,11 @@
     <string name="settings_export_csv">Export as CSV</string>
     <string name="settings_export_csv_desc">Save all tasks as a CSV spreadsheet</string>
 
+    <!-- Privacy (FB-07 — 2026-05-10; non-EN locales land in FB-09) -->
+    <string name="settings_section_privacy">Privacy</string>
+    <string name="settings_diagnostics">Send diagnostics</string>
+    <string name="settings_diagnostics_desc">Help improve Task Tracker by sharing anonymous crash reports and usage data. No personal info or task content is collected.</string>
+
     <!-- Settings Dialogs -->
     <string name="dialog_replace_tasks_title">Replace all tasks?</string>
     <string name="dialog_replace_tasks_message">Importing a backup will replace all existing tasks. This action cannot be undone. Are you sure you want to continue?</string>

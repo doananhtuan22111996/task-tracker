@@ -2,9 +2,11 @@ package dev.tuandoan.tasktracker.ui.viewmodel
 
 import android.content.Context
 import app.cash.turbine.test
+import dev.tuandoan.tasktracker.data.preferences.PrivacyRepository
 import dev.tuandoan.tasktracker.data.preferences.SettingsRepository
 import dev.tuandoan.tasktracker.data.preferences.ThemeMode
 import dev.tuandoan.tasktracker.data.preferences.UserPreferences
+import dev.tuandoan.tasktracker.diagnostics.PrivacyManager
 import dev.tuandoan.tasktracker.domain.backup.ExportBackupUseCase
 import dev.tuandoan.tasktracker.domain.backup.ImportBackupUseCase
 import io.mockk.coVerify
@@ -35,7 +37,10 @@ class SettingsViewModelTest {
     private lateinit var exportBackupUseCase: ExportBackupUseCase
     private lateinit var importBackupUseCase: ImportBackupUseCase
     private lateinit var settingsRepository: SettingsRepository
+    private lateinit var privacyRepository: PrivacyRepository
+    private lateinit var privacyManager: PrivacyManager
     private lateinit var preferencesFlow: MutableStateFlow<UserPreferences>
+    private lateinit var diagnosticsOptInFlow: MutableStateFlow<Boolean>
     private lateinit var viewModel: SettingsViewModel
 
     @Before
@@ -46,15 +51,21 @@ class SettingsViewModelTest {
         exportBackupUseCase = mockk(relaxed = true)
         importBackupUseCase = mockk(relaxed = true)
         settingsRepository = mockk(relaxed = true)
+        privacyRepository = mockk(relaxed = true)
+        privacyManager = mockk(relaxed = true)
         preferencesFlow = MutableStateFlow(UserPreferences())
+        diagnosticsOptInFlow = MutableStateFlow(false)
 
         every { settingsRepository.userPreferences } returns preferencesFlow
+        every { privacyRepository.diagnosticsOptIn } returns diagnosticsOptInFlow
 
         viewModel = SettingsViewModel(
             context = context,
             exportBackupUseCase = exportBackupUseCase,
             importBackupUseCase = importBackupUseCase,
             settingsRepository = settingsRepository,
+            privacyRepository = privacyRepository,
+            privacyManager = privacyManager,
         )
     }
 
@@ -237,5 +248,52 @@ class SettingsViewModelTest {
         // Access private field indirectly by checking the flow
         viewModel.dismissError()
         assertEquals(null, viewModel.showErrorDialog.value)
+    }
+
+    // --- Privacy (FB-07) ---
+
+    @Test
+    fun `diagnosticsOptIn initial value is false`() = runTest {
+        // Structural opt-out guarantee: a user who has never opted in must see the
+        // switch as off on first render. Matches PrivacyRepository's DataStore default.
+        assertEquals(false, viewModel.diagnosticsOptIn.value)
+    }
+
+    @Test
+    fun `diagnosticsOptIn reflects repository updates`() = runTest {
+        viewModel.diagnosticsOptIn.test {
+            assertEquals(false, awaitItem())
+
+            diagnosticsOptInFlow.value = true
+            advanceUntilIdle()
+            assertEquals(true, awaitItem())
+
+            diagnosticsOptInFlow.value = false
+            advanceUntilIdle()
+            assertEquals(false, awaitItem())
+
+            cancel()
+        }
+    }
+
+    @Test
+    fun `setDiagnosticsOptIn true delegates to PrivacyManager`() = runTest {
+        // Handler routes through PrivacyManager.setEnabled (NOT PrivacyRepository.set...)
+        // because setEnabled is the path that persists AND fans out to the three Firebase
+        // SDKs atomically per FB-05's contract.
+        viewModel.setDiagnosticsOptIn(true)
+        advanceUntilIdle()
+
+        coVerify(exactly = 1) { privacyManager.setEnabled(true) }
+    }
+
+    @Test
+    fun `setDiagnosticsOptIn false delegates to PrivacyManager`() = runTest {
+        // Symmetric disable-path check. On disable, PrivacyManager also calls
+        // Crashlytics.deleteUnsentReports() per FB-05 — the VM doesn't need to know.
+        viewModel.setDiagnosticsOptIn(false)
+        advanceUntilIdle()
+
+        coVerify(exactly = 1) { privacyManager.setEnabled(false) }
     }
 }
