@@ -112,14 +112,18 @@ class PrivacyManagerTest {
     }
 
     @Test
-    fun `setEnabled true writes repository before enabling Crashlytics`() = runTest(UnconfinedTestDispatcher()) {
-        // Persistence-before-SDK ordering: protects against a disk failure leaving
-        // SDKs enabled with no persisted backing.
+    fun `setEnabled true writes repository before enabling any SDK`() = runTest(UnconfinedTestDispatcher()) {
+        // Persistence-before-SDK ordering across ALL three SDKs, not just Crashlytics.
+        // Protects against a disk failure leaving any SDK enabled with no persisted
+        // backing. A future refactor that accidentally moves `performance.isPerformance...`
+        // before the repository write would get caught here.
         manager.setEnabled(optIn = true)
 
         coVerifyOrder {
             repository.setDiagnosticsOptIn(true)
             crashlytics.setCrashlyticsCollectionEnabled(true)
+            analytics.setAnalyticsCollectionEnabled(true)
+            performance.isPerformanceCollectionEnabled = true
         }
     }
 
@@ -152,6 +156,23 @@ class PrivacyManagerTest {
 
         verifyOrder {
             crashlytics.setCrashlyticsCollectionEnabled(false)
+            crashlytics.deleteUnsentReports()
+        }
+    }
+
+    @Test
+    fun `setEnabled false writes repository before disabling any SDK`() = runTest(UnconfinedTestDispatcher()) {
+        // Symmetric with the enable path: persistence-before-SDK ordering across all
+        // three SDKs on the disable path too. Combined with the disable-before-delete
+        // test above, this nails down the full 5-step sequence (persist, disable x3,
+        // deleteUnsentReports) as a single invariant.
+        manager.setEnabled(optIn = false)
+
+        coVerifyOrder {
+            repository.setDiagnosticsOptIn(false)
+            crashlytics.setCrashlyticsCollectionEnabled(false)
+            analytics.setAnalyticsCollectionEnabled(false)
+            performance.isPerformanceCollectionEnabled = false
             crashlytics.deleteUnsentReports()
         }
     }
