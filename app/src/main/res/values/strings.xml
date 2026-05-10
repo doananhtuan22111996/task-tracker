@@ -185,6 +185,22 @@
     <string name="settings_diagnostics">Send diagnostics</string>
     <string name="settings_diagnostics_desc">Help improve Task Tracker by sharing anonymous crash reports and usage data. No personal info or task content is collected.</string>
 
+    <!-- Privacy — "What's collected?" bottom sheet (FB-08 — 2026-05-10; non-EN locales land in FB-09) -->
+    <string name="settings_whats_collected">What\'s collected?</string>
+    <string name="whats_collected_title">What diagnostics data is collected</string>
+    <string name="whats_collected_crashlytics_header">Crash reports (Crashlytics)</string>
+    <string name="whats_collected_crashlytics_1">Stack traces when the app crashes</string>
+    <string name="whats_collected_crashlytics_2">Device model and Android version</string>
+    <string name="whats_collected_crashlytics_3">A random install ID — not tied to your account</string>
+    <string name="whats_collected_analytics_header">Usage events (Analytics)</string>
+    <string name="whats_collected_analytics_1">Which screens you open and which features you use</string>
+    <string name="whats_collected_analytics_2">App version and locale</string>
+    <string name="whats_collected_analytics_3">Never: task titles, descriptions, tags, or reminder times</string>
+    <string name="whats_collected_performance_header">Performance (Performance Monitoring)</string>
+    <string name="whats_collected_performance_1">App start time and screen render times</string>
+    <string name="whats_collected_performance_2">Time spent on slow operations</string>
+    <string name="whats_collected_performance_3">Never: the contents of your screens</string>
+
     <!-- Settings Dialogs -->
     <string name="dialog_replace_tasks_title">Replace all tasks?</string>
     <string name="dialog_replace_tasks_message">Importing a backup will replace all existing tasks. This action cannot be undone. Are you sure you want to continue?</string>
