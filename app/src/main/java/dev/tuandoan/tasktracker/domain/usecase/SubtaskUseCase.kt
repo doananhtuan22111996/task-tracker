@@ -2,6 +2,8 @@ package dev.tuandoan.tasktracker.domain.usecase
 
 import dev.tuandoan.tasktracker.data.database.Subtask
 import dev.tuandoan.tasktracker.data.database.SubtaskProgress
+import dev.tuandoan.tasktracker.diagnostics.AnalyticsEvent
+import dev.tuandoan.tasktracker.diagnostics.AnalyticsLogger
 import dev.tuandoan.tasktracker.domain.repository.ISubtaskRepository
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.Flow
@@ -17,7 +19,10 @@ import javax.inject.Singleton
  * exceptions propagating through flows.
  */
 @Singleton
-class SubtaskUseCase @Inject constructor(private val repository: ISubtaskRepository) {
+class SubtaskUseCase @Inject constructor(
+    private val repository: ISubtaskRepository,
+    private val analyticsLogger: AnalyticsLogger,
+) {
 
     fun observeSubtasks(taskId: Long): Flow<List<Subtask>> = repository.observeSubtasks(taskId)
 
@@ -43,6 +48,9 @@ class SubtaskUseCase @Inject constructor(private val repository: ISubtaskReposit
             repository.insertSubtask(
                 Subtask(taskId = taskId, title = normalized, sortOrder = nextOrder),
             )
+        }.also { result ->
+            // FB-14: fire only on success so validation-failure paths above don't skew the metric.
+            if (result.isSuccess) analyticsLogger.log(AnalyticsEvent.SubtaskAdded)
         }
     }
 

@@ -13,6 +13,7 @@ import dev.tuandoan.tasktracker.domain.usecase.TagManagementUseCase
 import dev.tuandoan.tasktracker.domain.usecase.TaskFormUseCase
 import dev.tuandoan.tasktracker.testutil.FakeSubtaskRepository
 import dev.tuandoan.tasktracker.testutil.TestTaskFactory
+import dev.tuandoan.tasktracker.testutil.fakeAnalyticsLogger
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.Dispatchers
@@ -58,7 +59,7 @@ class TaskEditorViewModelTest {
         formUseCase = TaskFormUseCase(context)
         tagManagementUseCase = mockk(relaxed = true)
         subtaskRepository = FakeSubtaskRepository()
-        subtaskUseCase = SubtaskUseCase(subtaskRepository)
+        subtaskUseCase = SubtaskUseCase(subtaskRepository, fakeAnalyticsLogger())
     }
 
     @After

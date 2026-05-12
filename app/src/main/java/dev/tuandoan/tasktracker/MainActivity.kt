@@ -33,6 +33,8 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import dagger.hilt.android.AndroidEntryPoint
 import dev.tuandoan.tasktracker.data.preferences.SettingsRepository
+import dev.tuandoan.tasktracker.diagnostics.AnalyticsEvent
+import dev.tuandoan.tasktracker.diagnostics.AnalyticsLogger
 import dev.tuandoan.tasktracker.diagnostics.BreadcrumbCategory
 import dev.tuandoan.tasktracker.diagnostics.BreadcrumbLogger
 import dev.tuandoan.tasktracker.navigation.StatsFilter
@@ -80,6 +82,9 @@ class MainActivity : AppCompatActivity() {
     @Inject
     lateinit var breadcrumbLogger: BreadcrumbLogger
 
+    @Inject
+    lateinit var analyticsLogger: AnalyticsLogger
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -109,6 +114,7 @@ class MainActivity : AppCompatActivity() {
                         isOnboardingCompleted = prefs.onboardingCompleted,
                         deepLinkRoute = deepLinkRoute,
                         breadcrumbLogger = breadcrumbLogger,
+                        analyticsLogger = analyticsLogger,
                     )
                 }
             }
@@ -148,6 +154,7 @@ fun TaskTrackerApp(
     isOnboardingCompleted: Boolean = true,
     deepLinkRoute: String? = null,
     breadcrumbLogger: BreadcrumbLogger? = null,
+    analyticsLogger: AnalyticsLogger? = null,
 ) {
     val navController = rememberNavController()
     val startDestination = if (isOnboardingCompleted) {
@@ -172,10 +179,16 @@ fun TaskTrackerApp(
     // `TaskTrackerRoutes` — not user input — so logging the raw value is safe. We intentionally
     // do NOT include nav arguments (task ids, stats filters) because some routes carry a
     // task id and that's an opaque id in isolation but could correlate with user content.
+    // FB-14: piggybacks on the same LaunchedEffect — fires calendar_tab_opened when the route
+    // transitions into the calendar. De-duped by route change, not per VM init; matches the
+    // PRD funnel framing better than VM.init (which re-fires on config change).
     LaunchedEffect(currentRoute) {
         val route = currentRoute ?: return@LaunchedEffect
         val base = route.substringBefore('?').substringBefore('/')
         breadcrumbLogger?.log(BreadcrumbCategory.NAV, "route=$base")
+        if (base == TaskTrackerRoutes.CALENDAR) {
+            analyticsLogger?.log(AnalyticsEvent.CalendarTabOpened)
+        }
     }
 
     Surface(
@@ -345,6 +358,11 @@ fun TaskTrackerApp(
                     HelpScreen(
                         onNavigateBack = {
                             navController.popBackStack()
+                        },
+                        // FB-14: callback is hoisted rather than injecting AnalyticsLogger into the
+                        // stateless composable — keeps HelpScreen easy to preview/test.
+                        onFaqExpanded = { section ->
+                            analyticsLogger?.log(AnalyticsEvent.HelpFaqExpanded(section))
                         },
                     )
                 }

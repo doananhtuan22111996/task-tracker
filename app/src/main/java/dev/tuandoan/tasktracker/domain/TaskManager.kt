@@ -2,6 +2,9 @@ package dev.tuandoan.tasktracker.domain
 
 import dev.tuandoan.tasktracker.data.database.DailyCount
 import dev.tuandoan.tasktracker.data.database.Task
+import dev.tuandoan.tasktracker.diagnostics.AnalyticsEvent
+import dev.tuandoan.tasktracker.diagnostics.AnalyticsLogger
+import dev.tuandoan.tasktracker.diagnostics.AnalyticsPriority
 import dev.tuandoan.tasktracker.diagnostics.BreadcrumbCategory
 import dev.tuandoan.tasktracker.diagnostics.BreadcrumbLogger
 import dev.tuandoan.tasktracker.domain.model.RecurrenceType
@@ -28,6 +31,7 @@ class TaskManager @Inject constructor(
     private val reminderScheduler: TaskReminderScheduler,
     private val widgetUpdater: WidgetUpdater,
     private val breadcrumbLogger: BreadcrumbLogger,
+    private val analyticsLogger: AnalyticsLogger,
 ) : ITaskManager {
 
     // Data access
@@ -91,6 +95,16 @@ class TaskManager @Inject constructor(
         breadcrumbLogger.log(
             BreadcrumbCategory.TASK_ACTION,
             "create hasDue=${dueAt != null} hasReminder=${reminderOffsetMinutes != null} recurrence=$recurrenceType",
+        )
+        // FB-14: same shape signals as the breadcrumb, nothing more. Priority clamps via
+        // AnalyticsPriority.fromTaskPriority so an out-of-range int can't reach Firebase.
+        analyticsLogger.log(
+            AnalyticsEvent.TaskCreated(
+                hasDueDate = dueAt != null,
+                hasTag = !tag.isNullOrBlank(),
+                priority = AnalyticsPriority.fromTaskPriority(task.priority),
+                isRecurring = recurrenceType != RecurrenceType.NONE.value,
+            ),
         )
 
         return taskId
@@ -231,6 +245,9 @@ class TaskManager @Inject constructor(
             reminderScheduler.cancel(task.id)
             // Atomically complete + generate next occurrence
             completeAndGenerateNext(task, updatedTask, currentTime)
+            // FB-14: event fires only on the completion direction — un-complete is a
+            // correction path and intentionally has no matching event (not in FR-15).
+            analyticsLogger.log(AnalyticsEvent.TaskCompleted)
         } else {
             // Atomically un-complete + delete generated next instance
             uncompleteAndDeleteGenerated(task, updatedTask)
@@ -258,6 +275,9 @@ class TaskManager @Inject constructor(
             // Cancel reminder when marking as complete
             reminderScheduler.cancel(task.id)
             widgetUpdater.requestUpdate()
+            // FB-14: guarded by the isCompleted check above — idempotent call sites
+            // (e.g. notification-action "mark complete" tapped twice) don't double-fire.
+            analyticsLogger.log(AnalyticsEvent.TaskCompleted)
         }
     }
 
@@ -361,6 +381,9 @@ class TaskManager @Inject constructor(
         widgetUpdater.requestUpdate()
         // FB-12: id only.
         breadcrumbLogger.log(BreadcrumbCategory.TASK_ACTION, "archive id=$taskId")
+        // FB-14: event fires for single-task archive only; bulk archive goes through
+        // TaskBulkActionManager which logs BulkOperationApplied(ARCHIVE, selectionSize).
+        analyticsLogger.log(AnalyticsEvent.TaskArchived)
     }
 
     override suspend fun unarchiveTask(taskId: Long) {
@@ -372,6 +395,9 @@ class TaskManager @Inject constructor(
             scheduleReminderIfNeeded(taskId, task.title, task.dueAt, task.reminderOffsetMinutes)
         }
         widgetUpdater.requestUpdate()
+        // FB-14: "restored" in FR-15 = un-archive. Single-task path; bulk unarchive logs
+        // BulkOperationApplied(RESTORE, …) instead.
+        analyticsLogger.log(AnalyticsEvent.TaskRestored)
     }
 
     override suspend fun archiveTasks(ids: List<Long>) {
@@ -545,6 +571,9 @@ class TaskManager @Inject constructor(
         widgetUpdater.requestUpdate()
         // FB-12: chain-root id only, no titles/tags.
         breadcrumbLogger.log(BreadcrumbCategory.TASK_ACTION, "materialize parent=$rootId")
+        // FB-14: fires on concrete insert only — the idempotent early-return paths above
+        // (chain already has a row, root archived, non-recurring root) do NOT fire the event.
+        analyticsLogger.log(AnalyticsEvent.CalendarRecurrenceMaterialized)
         return newId
     }
 

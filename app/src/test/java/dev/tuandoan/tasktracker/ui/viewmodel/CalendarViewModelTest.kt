@@ -12,6 +12,7 @@ import dev.tuandoan.tasktracker.testutil.FakeSubtaskRepository
 import dev.tuandoan.tasktracker.testutil.FakeTaskRepository
 import dev.tuandoan.tasktracker.testutil.FakeWidgetUpdater
 import dev.tuandoan.tasktracker.testutil.TestTaskFactory
+import dev.tuandoan.tasktracker.testutil.fakeAnalyticsLogger
 import dev.tuandoan.tasktracker.testutil.fakeBreadcrumbLogger
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -48,9 +49,16 @@ class CalendarViewModelTest {
         repo = FakeTaskRepository()
         subtaskRepo = FakeSubtaskRepository()
         useCase = CalendarUseCase(repo)
-        subtaskUseCase = SubtaskUseCase(subtaskRepo)
+        subtaskUseCase = SubtaskUseCase(subtaskRepo, fakeAnalyticsLogger())
         taskManager =
-            TaskManager(repo, subtaskRepo, FakeReminderScheduler(), FakeWidgetUpdater(), fakeBreadcrumbLogger())
+            TaskManager(
+                repo,
+                subtaskRepo,
+                FakeReminderScheduler(),
+                FakeWidgetUpdater(),
+                fakeBreadcrumbLogger(),
+                fakeAnalyticsLogger(),
+            )
     }
 
     @After
@@ -59,7 +67,14 @@ class CalendarViewModelTest {
     }
 
     private fun createViewModel(savedState: SavedStateHandle = SavedStateHandle()): CalendarViewModel =
-        CalendarViewModel(useCase, savedState, taskManager, subtaskUseCase, fakeBreadcrumbLogger())
+        CalendarViewModel(
+            useCase,
+            savedState,
+            taskManager,
+            subtaskUseCase,
+            fakeBreadcrumbLogger(),
+            fakeAnalyticsLogger(),
+        )
 
     private fun dateEpoch(date: LocalDate): Long = date.atStartOfDay(zone).toInstant().toEpochMilli()
 
@@ -569,12 +584,45 @@ class CalendarViewModelTest {
     @Test
     fun `onDaySelect logs NAV calendar_day_tap breadcrumb and omits the date`() = runTest {
         val breadcrumbLogger = io.mockk.mockk<dev.tuandoan.tasktracker.diagnostics.BreadcrumbLogger>(relaxed = true)
-        val vm = CalendarViewModel(useCase, SavedStateHandle(), taskManager, subtaskUseCase, breadcrumbLogger)
+        val vm =
+            CalendarViewModel(
+                useCase,
+                SavedStateHandle(),
+                taskManager,
+                subtaskUseCase,
+                breadcrumbLogger,
+                io.mockk.mockk(relaxed = true),
+            )
         vm.onDaySelect(LocalDate.of(2026, 5, 12))
         io.mockk.verify {
             breadcrumbLogger.log(
                 dev.tuandoan.tasktracker.diagnostics.BreadcrumbCategory.NAV,
                 "calendar_day_tap",
+            )
+        }
+    }
+
+    // === FB-14: onDaySelect emits CalendarDayTapped with NO date param ===
+
+    @Test
+    fun `onDaySelect emits CalendarDayTapped without a date param`() = runTest {
+        val analyticsLogger = io.mockk.mockk<dev.tuandoan.tasktracker.diagnostics.AnalyticsLogger>(relaxed = true)
+        val vm =
+            CalendarViewModel(
+                useCase,
+                SavedStateHandle(),
+                taskManager,
+                subtaskUseCase,
+                fakeBreadcrumbLogger(),
+                analyticsLogger,
+            )
+        vm.onDaySelect(LocalDate.of(2026, 5, 12))
+        io.mockk.verify {
+            analyticsLogger.log(
+                match<dev.tuandoan.tasktracker.diagnostics.AnalyticsEvent> { event ->
+                    event is dev.tuandoan.tasktracker.diagnostics.AnalyticsEvent.CalendarDayTapped &&
+                        !event.params.containsKey("date")
+                },
             )
         }
     }

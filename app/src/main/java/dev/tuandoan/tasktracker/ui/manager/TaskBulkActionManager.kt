@@ -4,6 +4,9 @@ import android.content.Context
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dev.tuandoan.tasktracker.R
 import dev.tuandoan.tasktracker.data.database.Task
+import dev.tuandoan.tasktracker.diagnostics.AnalyticsEvent
+import dev.tuandoan.tasktracker.diagnostics.AnalyticsLogger
+import dev.tuandoan.tasktracker.diagnostics.BulkOpType
 import dev.tuandoan.tasktracker.ui.events.UiEvent
 import dev.tuandoan.tasktracker.ui.state.SelectionValidationResult
 import dev.tuandoan.tasktracker.ui.state.TaskSelectionStateManager
@@ -67,6 +70,7 @@ class TaskBulkActionManager @Inject constructor(
     @ApplicationContext private val context: Context,
     private val crudManager: TaskCrudManager,
     private val selectionStateManager: TaskSelectionStateManager,
+    private val analyticsLogger: AnalyticsLogger,
 ) {
 
     // === Constants ===
@@ -124,6 +128,7 @@ class TaskBulkActionManager @Inject constructor(
     fun bulkMarkCompleted(scope: CoroutineScope, onSuccess: (String) -> Unit = {}, onError: (String) -> Unit = {}) {
         executeBulkOperation(
             scope = scope,
+            opType = BulkOpType.COMPLETE,
             operation = { taskIds ->
                 crudManager.bulkMarkCompleted(taskIds)
             },
@@ -142,8 +147,13 @@ class TaskBulkActionManager @Inject constructor(
      * @param onError Callback executed on error
      */
     fun bulkMarkActive(scope: CoroutineScope, onSuccess: (String) -> Unit = {}, onError: (String) -> Unit = {}) {
+        // FB-14: un-complete is a correction path — matches `toggleTaskCompletion` which fires
+        // TaskCompleted only on the completing direction. Skipping the event here keeps Firebase
+        // funnel queries clean ("how many users bulk-completed?" won't be polluted by un-completes).
+        // The FB-12 breadcrumb still records the action for crash-report context.
         executeBulkOperation(
             scope = scope,
+            opType = null,
             operation = { taskIds ->
                 crudManager.bulkMarkActive(taskIds)
             },
@@ -171,6 +181,7 @@ class TaskBulkActionManager @Inject constructor(
         val successRes = if (clearing) R.string.snackbar_tasks_tag_cleared else R.string.snackbar_tasks_tagged
         executeBulkOperation(
             scope = scope,
+            opType = BulkOpType.SET_TAG,
             operation = { taskIds ->
                 crudManager.bulkApplyTag(taskIds, tag, tagColor)
             },
@@ -195,6 +206,7 @@ class TaskBulkActionManager @Inject constructor(
         require(priority in 0..2) { "Priority must be LOW (0), MEDIUM (1), or HIGH (2)" }
         executeBulkOperation(
             scope = scope,
+            opType = BulkOpType.SET_PRIORITY,
             operation = { taskIds ->
                 crudManager.bulkApplyPriority(taskIds, priority)
             },
@@ -283,6 +295,13 @@ class TaskBulkActionManager @Inject constructor(
                             UiEvent.ShowUndoDelete(
                                 tasks = tasksToDelete,
                                 onUndo = { restoreTasks(scope, tasksToDelete) },
+                            ),
+                        )
+                        // FB-14: bulk-delete doesn't flow through executeBulkOperation; log inline.
+                        analyticsLogger.log(
+                            AnalyticsEvent.BulkOperationApplied(
+                                opType = BulkOpType.DELETE,
+                                selectionSize = taskIds.size,
                             ),
                         )
                     }
@@ -396,6 +415,13 @@ class TaskBulkActionManager @Inject constructor(
                                 tasks = tasksToArchive,
                                 onUndo = { restoreArchivedTasks(scope, tasksToArchive) },
                                 message = context.getString(R.string.snackbar_tasks_archived, tasksToArchive.size),
+                            ),
+                        )
+                        // FB-14: bulk-archive path.
+                        analyticsLogger.log(
+                            AnalyticsEvent.BulkOperationApplied(
+                                opType = BulkOpType.ARCHIVE,
+                                selectionSize = taskIds.size,
                             ),
                         )
                     }
@@ -532,6 +558,7 @@ class TaskBulkActionManager @Inject constructor(
      */
     private fun executeBulkOperation(
         scope: CoroutineScope,
+        opType: BulkOpType?,
         operation: suspend (List<Long>) -> TaskOperationResult,
         successMessage: (Int) -> String,
         errorMessage: String,
@@ -583,6 +610,19 @@ class TaskBulkActionManager @Inject constructor(
                         onSuccess(message)
 
                         _uiEvent.emit(UiEvent.ShowSnackbar(message = message))
+
+                        // FB-14: one event per bulk operation, never per affected task. selection_size
+                        // is bucketed inside AnalyticsEvent.BulkOperationApplied; op_type is enum-backed
+                        // so a user-provided tag/priority can't slip through. A `null` opType means
+                        // the caller deliberately skips the event (see bulkMarkActive for the rationale).
+                        if (opType != null) {
+                            analyticsLogger.log(
+                                AnalyticsEvent.BulkOperationApplied(
+                                    opType = opType,
+                                    selectionSize = taskIds.size,
+                                ),
+                            )
+                        }
                     }
                     is TaskOperationResult.CrudError -> {
                         onError(result.message)
@@ -622,6 +662,7 @@ class TaskBulkActionManager @Inject constructor(
     fun bulkRestoreArchived(scope: CoroutineScope, onSuccess: (String) -> Unit = {}, onError: (String) -> Unit = {}) {
         executeBulkOperation(
             scope = scope,
+            opType = BulkOpType.RESTORE,
             operation = { taskIds ->
                 crudManager.bulkUnarchiveTasks(taskIds)
             },
@@ -712,6 +753,14 @@ class TaskBulkActionManager @Inject constructor(
                                     R.string.snackbar_tasks_permanently_deleted,
                                     tasksToDelete.size,
                                 ),
+                            ),
+                        )
+                        // FB-14: permanent delete bucketed into DELETE (no separate "hard delete"
+                        // op_type — same funnel step from an analytics perspective).
+                        analyticsLogger.log(
+                            AnalyticsEvent.BulkOperationApplied(
+                                opType = BulkOpType.DELETE,
+                                selectionSize = taskIds.size,
                             ),
                         )
                     }
