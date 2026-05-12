@@ -16,11 +16,14 @@ import dagger.assisted.AssistedInject
 import dev.tuandoan.tasktracker.MainActivity
 import dev.tuandoan.tasktracker.R
 import dev.tuandoan.tasktracker.TaskTrackerApplication
+import dev.tuandoan.tasktracker.diagnostics.BreadcrumbCategory
+import dev.tuandoan.tasktracker.diagnostics.BreadcrumbLogger
 
 @HiltWorker
 class TaskReminderWorker @AssistedInject constructor(
     @Assisted context: Context,
     @Assisted workerParams: WorkerParameters,
+    private val breadcrumbLogger: BreadcrumbLogger,
 ) : CoroutineWorker(context, workerParams) {
 
     companion object {
@@ -43,8 +46,14 @@ class TaskReminderWorker @AssistedInject constructor(
 
             if (taskId == -1L) {
                 Log.e(TAG, "Invalid task ID: $taskId")
+                // FB-12: CRITICAL — KEY_TASK_TITLE holds the user's task title. NEVER include
+                // `taskTitle` in any breadcrumb. id-only is the contract.
+                breadcrumbLogger.log(BreadcrumbCategory.REMINDER, "fired invalid_id")
                 return Result.failure()
             }
+
+            // FB-12: see caveat above — id is opaque, title is not.
+            breadcrumbLogger.log(BreadcrumbCategory.REMINDER, "fired id=$taskId")
 
             // Check notification permissions
             val notificationsEnabled = NotificationManagerCompat.from(applicationContext).areNotificationsEnabled()

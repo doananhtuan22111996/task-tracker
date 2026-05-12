@@ -2,6 +2,8 @@ package dev.tuandoan.tasktracker.domain
 
 import dev.tuandoan.tasktracker.data.database.DailyCount
 import dev.tuandoan.tasktracker.data.database.Task
+import dev.tuandoan.tasktracker.diagnostics.BreadcrumbCategory
+import dev.tuandoan.tasktracker.diagnostics.BreadcrumbLogger
 import dev.tuandoan.tasktracker.domain.model.RecurrenceType
 import dev.tuandoan.tasktracker.domain.repository.ISubtaskRepository
 import dev.tuandoan.tasktracker.domain.repository.ITaskRepository
@@ -25,6 +27,7 @@ class TaskManager @Inject constructor(
     private val subtaskRepository: ISubtaskRepository,
     private val reminderScheduler: TaskReminderScheduler,
     private val widgetUpdater: WidgetUpdater,
+    private val breadcrumbLogger: BreadcrumbLogger,
 ) : ITaskManager {
 
     // Data access
@@ -84,6 +87,12 @@ class TaskManager @Inject constructor(
         scheduleReminderIfNeeded(taskId, title.trim(), dueAt, reminderOffsetMinutes)
         widgetUpdater.requestUpdate()
 
+        // FB-12: breadcrumb carries ONLY booleans + recurrence int — never title/tag/description.
+        breadcrumbLogger.log(
+            BreadcrumbCategory.TASK_ACTION,
+            "create hasDue=${dueAt != null} hasReminder=${reminderOffsetMinutes != null} recurrence=$recurrenceType",
+        )
+
         return taskId
     }
 
@@ -98,9 +107,11 @@ class TaskManager @Inject constructor(
         repository.updateTask(normalizedTask)
 
         // Handle reminder rescheduling if due date or reminder changed
+        val dueDateChanged: Boolean
+        val reminderChanged: Boolean
         if (existingTask != null) {
-            val dueDateChanged = existingTask.dueAt != normalizedTask.dueAt
-            val reminderChanged = existingTask.reminderOffsetMinutes != normalizedTask.reminderOffsetMinutes
+            dueDateChanged = existingTask.dueAt != normalizedTask.dueAt
+            reminderChanged = existingTask.reminderOffsetMinutes != normalizedTask.reminderOffsetMinutes
 
             if (dueDateChanged || reminderChanged) {
                 // Cancel existing reminder
@@ -116,8 +127,17 @@ class TaskManager @Inject constructor(
                     )
                 }
             }
+        } else {
+            dueDateChanged = false
+            reminderChanged = false
         }
         widgetUpdater.requestUpdate()
+
+        // FB-12: id is opaque; flags only, no title/tag/description.
+        breadcrumbLogger.log(
+            BreadcrumbCategory.TASK_ACTION,
+            "update id=${normalizedTask.id} dueChanged=$dueDateChanged reminderChanged=$reminderChanged",
+        )
     }
 
     override suspend fun updateTaskContent(taskId: Long, title: String, description: String) {
@@ -339,6 +359,8 @@ class TaskManager @Inject constructor(
         reminderScheduler.cancel(taskId)
         repository.archiveTask(taskId)
         widgetUpdater.requestUpdate()
+        // FB-12: id only.
+        breadcrumbLogger.log(BreadcrumbCategory.TASK_ACTION, "archive id=$taskId")
     }
 
     override suspend fun unarchiveTask(taskId: Long) {
@@ -521,6 +543,8 @@ class TaskManager @Inject constructor(
             // past reminder — see comment above
         }
         widgetUpdater.requestUpdate()
+        // FB-12: chain-root id only, no titles/tags.
+        breadcrumbLogger.log(BreadcrumbCategory.TASK_ACTION, "materialize parent=$rootId")
         return newId
     }
 

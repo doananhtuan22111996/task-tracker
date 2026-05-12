@@ -16,6 +16,7 @@ import dev.tuandoan.tasktracker.testutil.FakeSubtaskRepository
 import dev.tuandoan.tasktracker.testutil.FakeTaskRepository
 import dev.tuandoan.tasktracker.testutil.FakeWidgetUpdater
 import dev.tuandoan.tasktracker.testutil.TestTaskFactory
+import dev.tuandoan.tasktracker.testutil.fakeBreadcrumbLogger
 import dev.tuandoan.tasktracker.ui.viewmodel.TaskFilter
 import io.mockk.every
 import io.mockk.mockk
@@ -52,7 +53,14 @@ class TaskListStateManagerTest {
             every { getString(any()) } returns "test"
             every { getString(any(), *anyVararg()) } returns "test"
         }
-        val taskManager = TaskManager(repository, FakeSubtaskRepository(), FakeReminderScheduler(), FakeWidgetUpdater())
+        val taskManager =
+            TaskManager(
+                repository,
+                FakeSubtaskRepository(),
+                FakeReminderScheduler(),
+                FakeWidgetUpdater(),
+                fakeBreadcrumbLogger(),
+            )
         val crudUseCase = TaskCrudUseCase(taskManager, context)
         searchUseCase = TaskSearchUseCase()
         filterUseCase = TaskFilterUseCase()

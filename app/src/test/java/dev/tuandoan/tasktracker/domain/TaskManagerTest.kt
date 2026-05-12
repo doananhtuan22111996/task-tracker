@@ -1,10 +1,14 @@
 package dev.tuandoan.tasktracker.domain
 
+import dev.tuandoan.tasktracker.diagnostics.BreadcrumbCategory
+import dev.tuandoan.tasktracker.diagnostics.BreadcrumbLogger
 import dev.tuandoan.tasktracker.testutil.FakeReminderScheduler
 import dev.tuandoan.tasktracker.testutil.FakeSubtaskRepository
 import dev.tuandoan.tasktracker.testutil.FakeTaskRepository
 import dev.tuandoan.tasktracker.testutil.FakeWidgetUpdater
 import dev.tuandoan.tasktracker.testutil.TestTaskFactory
+import io.mockk.mockk
+import io.mockk.verify
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -21,6 +25,7 @@ class TaskManagerTest {
     private lateinit var subtaskRepository: FakeSubtaskRepository
     private lateinit var scheduler: FakeReminderScheduler
     private lateinit var widgetUpdater: FakeWidgetUpdater
+    private lateinit var breadcrumbLogger: BreadcrumbLogger
     private lateinit var manager: TaskManager
 
     @Before
@@ -29,7 +34,8 @@ class TaskManagerTest {
         subtaskRepository = FakeSubtaskRepository()
         scheduler = FakeReminderScheduler()
         widgetUpdater = FakeWidgetUpdater()
-        manager = TaskManager(repository, subtaskRepository, scheduler, widgetUpdater)
+        breadcrumbLogger = mockk(relaxed = true)
+        manager = TaskManager(repository, subtaskRepository, scheduler, widgetUpdater, breadcrumbLogger)
     }
 
     // === createTask ===
@@ -559,5 +565,52 @@ class TaskManagerTest {
         repository.seed(task)
         manager.markTaskIncomplete(task)
         assertEquals(1, widgetUpdater.updateCount)
+    }
+
+    // === FB-12: breadcrumb PII-safety contracts ===
+
+    @Test
+    fun `createTask emits TASK_ACTION breadcrumb with flags only and no title or tag`() = runTest {
+        manager.createTask(
+            title = "Secret title should not leak",
+            description = "Sensitive notes",
+            dueAt = 1_700_000_000_000L,
+            dueAtHasTime = true,
+            reminderOffsetMinutes = 30,
+            tag = "work",
+            recurrenceType = 0,
+        )
+        verify {
+            breadcrumbLogger.log(
+                BreadcrumbCategory.TASK_ACTION,
+                "create hasDue=true hasReminder=true recurrence=0",
+            )
+        }
+    }
+
+    @Test
+    fun `updateTask emits TASK_ACTION breadcrumb with id and change flags only`() = runTest {
+        val original = TestTaskFactory.createTask(id = 42, title = "Top secret")
+        repository.seed(original)
+        val edited = original.copy(
+            title = "Still secret",
+            dueAt = 1_700_000_000_000L,
+            reminderOffsetMinutes = 15,
+        )
+        manager.updateTask(edited)
+        verify {
+            breadcrumbLogger.log(
+                BreadcrumbCategory.TASK_ACTION,
+                "update id=42 dueChanged=true reminderChanged=true",
+            )
+        }
+    }
+
+    @Test
+    fun `archiveTask emits TASK_ACTION breadcrumb carrying id only`() = runTest {
+        val task = TestTaskFactory.createTask(id = 7, title = "Private")
+        repository.seed(task)
+        manager.archiveTask(7L)
+        verify { breadcrumbLogger.log(BreadcrumbCategory.TASK_ACTION, "archive id=7") }
     }
 }

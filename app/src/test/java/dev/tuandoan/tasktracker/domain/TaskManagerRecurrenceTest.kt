@@ -1,5 +1,7 @@
 package dev.tuandoan.tasktracker.domain
 
+import dev.tuandoan.tasktracker.diagnostics.BreadcrumbCategory
+import dev.tuandoan.tasktracker.diagnostics.BreadcrumbLogger
 import dev.tuandoan.tasktracker.domain.model.RecurrenceType
 import dev.tuandoan.tasktracker.testutil.FakeReminderScheduler
 import dev.tuandoan.tasktracker.testutil.FakeSubtaskRepository
@@ -7,6 +9,8 @@ import dev.tuandoan.tasktracker.testutil.FakeTaskRepository
 import dev.tuandoan.tasktracker.testutil.FakeWidgetUpdater
 import dev.tuandoan.tasktracker.testutil.TestSubtaskFactory
 import dev.tuandoan.tasktracker.testutil.TestTaskFactory
+import io.mockk.mockk
+import io.mockk.verify
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -23,6 +27,7 @@ class TaskManagerRecurrenceTest {
     private lateinit var repository: FakeTaskRepository
     private lateinit var subtaskRepository: FakeSubtaskRepository
     private lateinit var reminderScheduler: FakeReminderScheduler
+    private lateinit var breadcrumbLogger: BreadcrumbLogger
     private lateinit var taskManager: TaskManager
 
     private val zone = ZoneId.systemDefault()
@@ -35,7 +40,14 @@ class TaskManagerRecurrenceTest {
         repository = FakeTaskRepository()
         subtaskRepository = FakeSubtaskRepository()
         reminderScheduler = FakeReminderScheduler()
-        taskManager = TaskManager(repository, subtaskRepository, reminderScheduler, FakeWidgetUpdater())
+        breadcrumbLogger = mockk(relaxed = true)
+        taskManager = TaskManager(
+            repository,
+            subtaskRepository,
+            reminderScheduler,
+            FakeWidgetUpdater(),
+            breadcrumbLogger,
+        )
     }
 
     // ── Complete generates next occurrence ──
@@ -710,5 +722,26 @@ class TaskManagerRecurrenceTest {
         val inserted = repository.getAllTasksSnapshot().single { it.id == newId }
         assertEquals(futureTarget.atStartOfDay(zone).toInstant().toEpochMilli(), inserted.dueAt)
         assertTrue(reminderScheduler.scheduledReminders.isEmpty())
+    }
+
+    // === FB-12 ───────────────────────────────────────────────────────────────
+
+    @Test
+    fun `materializeProjectedOccurrence emits TASK_ACTION breadcrumb with parent id only`() = runTest {
+        val baseDate = LocalDate.of(2026, 5, 4)
+        repository.seed(
+            TestTaskFactory.createTask(
+                id = 1L,
+                title = "Top secret standup",
+                dueAt = baseDate.atStartOfDay(zone).toInstant().toEpochMilli(),
+                recurrenceType = RecurrenceType.DAILY.value,
+            ),
+        )
+        taskManager.materializeProjectedOccurrence(
+            parentId = 1L,
+            date = LocalDate.of(2026, 5, 7),
+            zone = zone,
+        )
+        verify { breadcrumbLogger.log(BreadcrumbCategory.TASK_ACTION, "materialize parent=1") }
     }
 }

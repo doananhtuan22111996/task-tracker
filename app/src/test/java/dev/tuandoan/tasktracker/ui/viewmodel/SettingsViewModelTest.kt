@@ -6,6 +6,8 @@ import dev.tuandoan.tasktracker.data.preferences.PrivacyRepository
 import dev.tuandoan.tasktracker.data.preferences.SettingsRepository
 import dev.tuandoan.tasktracker.data.preferences.ThemeMode
 import dev.tuandoan.tasktracker.data.preferences.UserPreferences
+import dev.tuandoan.tasktracker.diagnostics.BreadcrumbCategory
+import dev.tuandoan.tasktracker.diagnostics.BreadcrumbLogger
 import dev.tuandoan.tasktracker.diagnostics.PrivacyManager
 import dev.tuandoan.tasktracker.domain.backup.ExportBackupUseCase
 import dev.tuandoan.tasktracker.domain.backup.ImportBackupUseCase
@@ -14,6 +16,7 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkStatic
 import io.mockk.unmockkStatic
+import io.mockk.verify
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -39,6 +42,7 @@ class SettingsViewModelTest {
     private lateinit var settingsRepository: SettingsRepository
     private lateinit var privacyRepository: PrivacyRepository
     private lateinit var privacyManager: PrivacyManager
+    private lateinit var breadcrumbLogger: BreadcrumbLogger
     private lateinit var preferencesFlow: MutableStateFlow<UserPreferences>
     private lateinit var diagnosticsOptInFlow: MutableStateFlow<Boolean>
     private lateinit var viewModel: SettingsViewModel
@@ -53,6 +57,7 @@ class SettingsViewModelTest {
         settingsRepository = mockk(relaxed = true)
         privacyRepository = mockk(relaxed = true)
         privacyManager = mockk(relaxed = true)
+        breadcrumbLogger = mockk(relaxed = true)
         preferencesFlow = MutableStateFlow(UserPreferences())
         diagnosticsOptInFlow = MutableStateFlow(false)
 
@@ -66,6 +71,7 @@ class SettingsViewModelTest {
             settingsRepository = settingsRepository,
             privacyRepository = privacyRepository,
             privacyManager = privacyManager,
+            breadcrumbLogger = breadcrumbLogger,
         )
     }
 
@@ -295,5 +301,33 @@ class SettingsViewModelTest {
         advanceUntilIdle()
 
         coVerify(exactly = 1) { privacyManager.setEnabled(false) }
+    }
+
+    // === FB-12: SETTINGS breadcrumbs — enum constants and booleans only, never raw user input ===
+
+    @Test
+    fun `setThemeMode logs SETTINGS breadcrumb with enum constant name`() = runTest {
+        viewModel.setThemeMode(ThemeMode.DARK)
+        verify { breadcrumbLogger.log(BreadcrumbCategory.SETTINGS, "theme=DARK") }
+    }
+
+    @Test
+    fun `setDynamicColor logs SETTINGS breadcrumb with boolean only`() = runTest {
+        viewModel.setDynamicColor(false)
+        verify { breadcrumbLogger.log(BreadcrumbCategory.SETTINGS, "dynamic_color=false") }
+    }
+
+    @Test
+    fun `setLanguageTag logs SETTINGS breadcrumb with BCP-47 tag only`() = runTest {
+        mockkStatic("androidx.appcompat.app.AppCompatDelegate")
+        viewModel.setLanguageTag("vi")
+        verify { breadcrumbLogger.log(BreadcrumbCategory.SETTINGS, "locale=vi") }
+        unmockkStatic("androidx.appcompat.app.AppCompatDelegate")
+    }
+
+    @Test
+    fun `setDiagnosticsOptIn logs SETTINGS breadcrumb with boolean`() = runTest {
+        viewModel.setDiagnosticsOptIn(true)
+        verify { breadcrumbLogger.log(BreadcrumbCategory.SETTINGS, "diagnostics=true") }
     }
 }

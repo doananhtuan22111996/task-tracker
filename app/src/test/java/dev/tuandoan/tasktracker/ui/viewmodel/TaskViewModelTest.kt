@@ -19,6 +19,7 @@ import dev.tuandoan.tasktracker.testutil.FakeSubtaskRepository
 import dev.tuandoan.tasktracker.testutil.FakeTaskRepository
 import dev.tuandoan.tasktracker.testutil.FakeWidgetUpdater
 import dev.tuandoan.tasktracker.testutil.TestTaskFactory
+import dev.tuandoan.tasktracker.testutil.fakeBreadcrumbLogger
 import dev.tuandoan.tasktracker.ui.manager.TaskBulkActionManager
 import dev.tuandoan.tasktracker.ui.manager.TaskCrudManager
 import dev.tuandoan.tasktracker.ui.state.TaskFormStateManager
@@ -72,7 +73,8 @@ class TaskViewModelTest {
     }
 
     private fun createViewModel(): TaskViewModel {
-        val taskManager = TaskManager(repository, FakeSubtaskRepository(), scheduler, FakeWidgetUpdater())
+        val taskManager =
+            TaskManager(repository, FakeSubtaskRepository(), scheduler, FakeWidgetUpdater(), fakeBreadcrumbLogger())
         val crudUseCase = TaskCrudUseCase(taskManager, context)
         val searchUseCase = TaskSearchUseCase()
         val filterUseCase = TaskFilterUseCase()
