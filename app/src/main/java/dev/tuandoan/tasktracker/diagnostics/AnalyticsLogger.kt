@@ -1,0 +1,258 @@
+package dev.tuandoan.tasktracker.diagnostics
+
+import android.os.Bundle
+import com.google.firebase.analytics.FirebaseAnalytics
+import javax.inject.Inject
+import javax.inject.Singleton
+
+/**
+ * Typed façade around [FirebaseAnalytics.logEvent] for the v1.12.0 Analytics event
+ * taxonomy (FR-15). Every event is a [AnalyticsEvent] sealed subtype — callers can't
+ * pass a raw string, and the params a subtype accepts are typed (booleans, bucketed
+ * counts, enum strings) so there's no code path that interpolates user content into
+ * an event parameter.
+ *
+ * **Why a typed sealed class instead of ****`logEvent(name, params)`**** passthrough:**
+ *  - Freeform `logEvent("task_completed", bundleOf("title" to task.title))` compiles
+ *    fine but violates FR-16 ("no PII in event parameters"). Typed subtypes close
+ *    that path: there's no way to pass a task title to [AnalyticsEvent.TaskCompleted]
+ *    because it doesn't take one.
+ *  - Count params ([AnalyticsEvent.BackupExported.taskCount] etc.) accept `Int` but
+ *    serialize as the 5-bucket string shared with FB-10 Crashlytics keys + FB-12
+ *    backup breadcrumbs. One source of truth for the bucketing rule is
+ *    [bucketTaskCount]; call sites pass raw ints, the façade applies the privacy
+ *    filter.
+ *
+ * **Why no explicit opt-out check:**
+ *  - [FirebaseAnalytics.logEvent] is a no-op while collection is disabled
+ *    ([PrivacyManager] toggles that via `setAnalyticsCollectionEnabled`). Gating
+ *    here would duplicate the SDK contract and require a DataStore read on every
+ *    UI event, the same rule `BreadcrumbLogger` (FB-11) documents.
+ *
+ * **Built-in events ****`app_open`****, ****`screen_view`****, ****`first_open`**** are NOT part of this
+ * sealed class** — Firebase's default auto-logging fires them and we don't want
+ * a second code path. The 12 events here are the ones we explicitly control.
+ *
+ * No production callers yet — call sites land in FB-14.
+ */
+@Singleton
+class AnalyticsLogger @Inject constructor(private val analytics: FirebaseAnalytics) {
+
+    /**
+     * Record an analytics event. The event's [AnalyticsEvent.eventName] and
+     * [AnalyticsEvent.params] are both produced by the sealed subtype so the
+     * façade can't accidentally drop or misroute fields.
+     *
+     * The subtype returns a typed [Map] and this fn converts to Firebase's
+     * [Bundle]; that way tests can assert on the map directly without needing
+     * Robolectric (the project's existing JVM-only testing convention).
+     */
+    fun log(event: AnalyticsEvent) {
+        analytics.logEvent(event.eventName, event.params.toBundle())
+    }
+
+    private fun Map<String, Any>.toBundle(): Bundle {
+        if (isEmpty()) return Bundle.EMPTY
+        val bundle = Bundle(size)
+        for ((key, value) in this) {
+            when (value) {
+                is Boolean -> bundle.putBoolean(key, value)
+                is Int -> bundle.putInt(key, value)
+                is Long -> bundle.putLong(key, value)
+                is Double -> bundle.putDouble(key, value)
+                is String -> bundle.putString(key, value)
+                else -> error("Unsupported Analytics param type: ${value::class.java.name}")
+            }
+        }
+        return bundle
+    }
+}
+
+/**
+ * Closed set of Analytics events for v1.12.0. Covers the 12 events we control; the
+ * 3 Firebase-built-in events (`app_open`, `screen_view`, `first_open`) fire from
+ * Firebase's own auto-logging and are intentionally not represented here.
+ *
+ * Every param is a boolean, a bucketed count, or a known-vocabulary enum. Adding
+ * a new variant requires a ticket + PRD update to keep the taxonomy stable.
+ */
+sealed class AnalyticsEvent {
+
+    /** The Firebase event name. Must be lowercase_snake_case and ≤ 40 chars per the SDK. */
+    abstract val eventName: String
+
+    /**
+     * Typed params map. Values are restricted to `Boolean` / `Int` / `Long` / `Double`
+     * / `String` by convention — the façade converts to `Bundle` and `error()`s on
+     * unsupported types so a future variant can't slip through a leaky generic.
+     */
+    abstract val params: Map<String, Any>
+
+    // ── Task actions ─────────────────────────────────────────────────────────
+
+    /**
+     * FR-15: `task_created`. Params carry shape signals, not content.
+     * @param priority the enum ordinal (0 = none, 1 = low, 2 = med, 3 = high).
+     */
+    data class TaskCreated(val hasDueDate: Boolean, val hasTag: Boolean, val priority: Int, val isRecurring: Boolean) :
+        AnalyticsEvent() {
+        override val eventName: String = "task_created"
+        override val params: Map<String, Any> = mapOf(
+            PARAM_HAS_DUE_DATE to hasDueDate,
+            PARAM_HAS_TAG to hasTag,
+            PARAM_PRIORITY to priority,
+            PARAM_IS_RECURRING to isRecurring,
+        )
+    }
+
+    /** FR-15: `task_completed`. Zero params — the event itself is the signal. */
+    data object TaskCompleted : AnalyticsEvent() {
+        override val eventName: String = "task_completed"
+        override val params: Map<String, Any> = emptyMap()
+    }
+
+    /** FR-15: `task_archived`. */
+    data object TaskArchived : AnalyticsEvent() {
+        override val eventName: String = "task_archived"
+        override val params: Map<String, Any> = emptyMap()
+    }
+
+    /** FR-15: `task_restored`. */
+    data object TaskRestored : AnalyticsEvent() {
+        override val eventName: String = "task_restored"
+        override val params: Map<String, Any> = emptyMap()
+    }
+
+    // ── Calendar funnel ──────────────────────────────────────────────────────
+
+    /** FR-15: `calendar_tab_opened`. */
+    data object CalendarTabOpened : AnalyticsEvent() {
+        override val eventName: String = "calendar_tab_opened"
+        override val params: Map<String, Any> = emptyMap()
+    }
+
+    /**
+     * FR-15: `calendar_day_tapped`.
+     * @param hasDatedTasksThatDay whether the tapped day had any concrete or projected tasks.
+     */
+    data class CalendarDayTapped(val hasDatedTasksThatDay: Boolean) : AnalyticsEvent() {
+        override val eventName: String = "calendar_day_tapped"
+        override val params: Map<String, Any> = mapOf(
+            PARAM_HAS_DATED_TASKS_THAT_DAY to hasDatedTasksThatDay,
+        )
+    }
+
+    /** FR-15: `calendar_recurrence_materialized`. Marks projection → concrete. */
+    data object CalendarRecurrenceMaterialized : AnalyticsEvent() {
+        override val eventName: String = "calendar_recurrence_materialized"
+        override val params: Map<String, Any> = emptyMap()
+    }
+
+    // ── Depth ────────────────────────────────────────────────────────────────
+
+    /** FR-15: `subtask_added`. */
+    data object SubtaskAdded : AnalyticsEvent() {
+        override val eventName: String = "subtask_added"
+        override val params: Map<String, Any> = emptyMap()
+    }
+
+    /**
+     * FR-15: `bulk_operation_applied`.
+     * @param opType one of [BulkOpType] — enum-backed so a caller can't slip a user
+     *   string in.
+     * @param selectionSize the raw selection count; serialized as the shared
+     *   [bucketTaskCount] bucket ("1-9", "10-49", …) rather than the raw int to
+     *   protect extreme-value users.
+     */
+    data class BulkOperationApplied(val opType: BulkOpType, val selectionSize: Int) : AnalyticsEvent() {
+        override val eventName: String = "bulk_operation_applied"
+        override val params: Map<String, Any> = mapOf(
+            PARAM_OP_TYPE to opType.paramValue,
+            PARAM_SELECTION_SIZE to bucketTaskCount(selectionSize),
+        )
+    }
+
+    // ── Backup ───────────────────────────────────────────────────────────────
+
+    /**
+     * FR-15: `backup_exported`. [taskCount] is bucketed via [bucketTaskCount]; raw
+     * counts at the extremes (1 task, 10_000 tasks) correlate too tightly with a
+     * specific user.
+     */
+    data class BackupExported(val format: BackupEventFormat, val taskCount: Int) : AnalyticsEvent() {
+        override val eventName: String = "backup_exported"
+        override val params: Map<String, Any> = mapOf(
+            PARAM_FORMAT to format.paramValue,
+            PARAM_TASK_COUNT to bucketTaskCount(taskCount),
+        )
+    }
+
+    /**
+     * FR-15: `backup_imported`. Same count-bucketing rule as [BackupExported].
+     */
+    data class BackupImported(val format: BackupEventFormat, val recordCount: Int, val outcome: BackupOutcome) :
+        AnalyticsEvent() {
+        override val eventName: String = "backup_imported"
+        override val params: Map<String, Any> = mapOf(
+            PARAM_FORMAT to format.paramValue,
+            PARAM_RECORD_COUNT to bucketTaskCount(recordCount),
+            PARAM_OUTCOME to outcome.paramValue,
+        )
+    }
+
+    // ── Help ─────────────────────────────────────────────────────────────────
+
+    /**
+     * FR-15: `help_faq_expanded`.
+     * @param section an identifier for the FAQ section expanded. Must be a known
+     *   constant string from the help content, NOT translated text.
+     */
+    data class HelpFaqExpanded(val section: String) : AnalyticsEvent() {
+        override val eventName: String = "help_faq_expanded"
+        override val params: Map<String, Any> = mapOf(PARAM_SECTION to section)
+    }
+
+    companion object {
+        // Parameter name constants — kept consistent across related events where
+        // possible so Firebase funnel builders can reuse them.
+        const val PARAM_HAS_DUE_DATE = "has_due_date"
+        const val PARAM_HAS_TAG = "has_tag"
+        const val PARAM_PRIORITY = "priority"
+        const val PARAM_IS_RECURRING = "is_recurring"
+        const val PARAM_HAS_DATED_TASKS_THAT_DAY = "has_dated_tasks_that_day"
+        const val PARAM_OP_TYPE = "op_type"
+        const val PARAM_SELECTION_SIZE = "selection_size"
+        const val PARAM_FORMAT = "format"
+        const val PARAM_TASK_COUNT = "task_count"
+        const val PARAM_RECORD_COUNT = "record_count"
+        const val PARAM_OUTCOME = "outcome"
+        const val PARAM_SECTION = "section"
+    }
+}
+
+/**
+ * Closed set of bulk-operation kinds. Keeps [AnalyticsEvent.BulkOperationApplied.opType]
+ * from accepting an arbitrary string (which a call site might populate from user input).
+ */
+enum class BulkOpType(val paramValue: String) {
+    COMPLETE("complete"),
+    ARCHIVE("archive"),
+    DELETE("delete"),
+    RESTORE("restore"),
+    SET_PRIORITY("set_priority"),
+    SET_TAG("set_tag"),
+}
+
+/** Closed set of backup formats. Mirrors `domain.backup.model.BackupFormat` but lives
+ *  on the diagnostics side so Analytics doesn't depend on the backup module's enum. */
+enum class BackupEventFormat(val paramValue: String) {
+    JSON("json"),
+    CSV("csv"),
+}
+
+/** Closed set of backup-import outcomes. */
+enum class BackupOutcome(val paramValue: String) {
+    SUCCESS("success"),
+    PARTIAL("partial"),
+    ERROR("error"),
+}
