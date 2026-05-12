@@ -9,6 +9,7 @@ import dev.tuandoan.tasktracker.data.backup.BackupSerializer
 import dev.tuandoan.tasktracker.di.JsonSerializer
 import dev.tuandoan.tasktracker.diagnostics.BreadcrumbCategory
 import dev.tuandoan.tasktracker.diagnostics.BreadcrumbLogger
+import dev.tuandoan.tasktracker.diagnostics.bucketTaskCount
 import dev.tuandoan.tasktracker.domain.backup.model.ImportResult
 import dev.tuandoan.tasktracker.domain.repository.ITaskRepository
 import dev.tuandoan.tasktracker.domain.usecase.SubtaskUseCase
@@ -62,11 +63,11 @@ class ImportBackupUseCase @Inject constructor(
             )
 
             // FB-12: bucketed counts only.
+            val validCount = validationResult.validTasks.size
+            val skippedCount = validationResult.skippedCount
             breadcrumbLogger.log(
                 BreadcrumbCategory.BACKUP,
-                "import done count=${bucket(
-                    validationResult.validTasks.size,
-                )} skipped=${bucket(validationResult.skippedCount)}",
+                "import done count=${bucketTaskCount(validCount)} skipped=${bucketTaskCount(skippedCount)}",
             )
 
             ImportResult.Success(
@@ -81,13 +82,5 @@ class ImportBackupUseCase @Inject constructor(
                 cause = e,
             )
         }
-    }
-
-    private fun bucket(count: Int): String = when {
-        count <= 0 -> "0"
-        count < 10 -> "1-9"
-        count < 50 -> "10-49"
-        count < 200 -> "50-199"
-        else -> "200+"
     }
 }

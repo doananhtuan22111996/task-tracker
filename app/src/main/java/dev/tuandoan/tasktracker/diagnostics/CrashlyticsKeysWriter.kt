@@ -81,18 +81,12 @@ class CrashlyticsKeysWriter @Inject constructor(
     }
 
     /**
-     * Bucket the raw active-task count so the value we send is coarse enough to
-     * not identify individual users at the extremes (e.g. a single user with
-     * 10,000 tasks). Ranges chosen to match typical-usage distribution: most
-     * users stay in `1-9` or `10-49`, power users in `50-199`, outliers in `200+`.
+     * Bucket the raw active-task count. Thin alias over the package-level
+     * [dev.tuandoan.tasktracker.diagnostics.bucketTaskCount] — kept as a member so existing
+     * `CrashlyticsKeysWriterTest` cases that assert on `writer.bucketTaskCount(…)` keep working.
+     * FB-12 consolidated three copies of this rule into the shared helper.
      */
-    internal fun bucketTaskCount(count: Int): String = when {
-        count <= 0 -> "0"
-        count < 10 -> "1-9"
-        count < 50 -> "10-49"
-        count < 200 -> "50-199"
-        else -> "200+"
-    }
+    internal fun bucketTaskCount(count: Int): String = dev.tuandoan.tasktracker.diagnostics.bucketTaskCount(count)
 
     companion object {
         const val LOCALE = "locale"

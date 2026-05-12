@@ -53,6 +53,9 @@ class TaskReminderWorker @AssistedInject constructor(
             }
 
             // FB-12: see caveat above — id is opaque, title is not.
+            // Semantics: this breadcrumb marks the *attempt*, not the rendered notification.
+            // It fires before showNotification() so a subsequent NotificationManager failure
+            // still leaves a trail. Don't use it to verify delivery — use Android Vitals for that.
             breadcrumbLogger.log(BreadcrumbCategory.REMINDER, "fired id=$taskId")
 
             // Check notification permissions
