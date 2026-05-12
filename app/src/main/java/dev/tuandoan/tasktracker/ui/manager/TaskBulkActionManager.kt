@@ -147,12 +147,13 @@ class TaskBulkActionManager @Inject constructor(
      * @param onError Callback executed on error
      */
     fun bulkMarkActive(scope: CoroutineScope, onSuccess: (String) -> Unit = {}, onError: (String) -> Unit = {}) {
-        // FB-14: un-complete is the inverse of COMPLETE; bucketed into the same op for funnel
-        // parity with the single-task side (toggleTaskCompletion fires TaskCompleted only on
-        // the completing direction). The direction-signal is carried by the FB-12 breadcrumb.
+        // FB-14: un-complete is a correction path — matches `toggleTaskCompletion` which fires
+        // TaskCompleted only on the completing direction. Skipping the event here keeps Firebase
+        // funnel queries clean ("how many users bulk-completed?" won't be polluted by un-completes).
+        // The FB-12 breadcrumb still records the action for crash-report context.
         executeBulkOperation(
             scope = scope,
-            opType = BulkOpType.COMPLETE,
+            opType = null,
             operation = { taskIds ->
                 crudManager.bulkMarkActive(taskIds)
             },
@@ -557,7 +558,7 @@ class TaskBulkActionManager @Inject constructor(
      */
     private fun executeBulkOperation(
         scope: CoroutineScope,
-        opType: BulkOpType,
+        opType: BulkOpType?,
         operation: suspend (List<Long>) -> TaskOperationResult,
         successMessage: (Int) -> String,
         errorMessage: String,
@@ -612,13 +613,16 @@ class TaskBulkActionManager @Inject constructor(
 
                         // FB-14: one event per bulk operation, never per affected task. selection_size
                         // is bucketed inside AnalyticsEvent.BulkOperationApplied; op_type is enum-backed
-                        // so a user-provided tag/priority can't slip through.
-                        analyticsLogger.log(
-                            AnalyticsEvent.BulkOperationApplied(
-                                opType = opType,
-                                selectionSize = taskIds.size,
-                            ),
-                        )
+                        // so a user-provided tag/priority can't slip through. A `null` opType means
+                        // the caller deliberately skips the event (see bulkMarkActive for the rationale).
+                        if (opType != null) {
+                            analyticsLogger.log(
+                                AnalyticsEvent.BulkOperationApplied(
+                                    opType = opType,
+                                    selectionSize = taskIds.size,
+                                ),
+                            )
+                        }
                     }
                     is TaskOperationResult.CrudError -> {
                         onError(result.message)
