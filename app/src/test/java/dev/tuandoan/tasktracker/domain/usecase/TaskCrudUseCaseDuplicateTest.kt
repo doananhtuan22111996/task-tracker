@@ -7,6 +7,7 @@ import dev.tuandoan.tasktracker.testutil.FakeSubtaskRepository
 import dev.tuandoan.tasktracker.testutil.FakeTaskRepository
 import dev.tuandoan.tasktracker.testutil.FakeWidgetUpdater
 import dev.tuandoan.tasktracker.testutil.TestTaskFactory
+import dev.tuandoan.tasktracker.testutil.fakeBreadcrumbLogger
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
@@ -35,7 +36,8 @@ class TaskCrudUseCaseDuplicateTest {
         }
         repository = FakeTaskRepository()
         scheduler = FakeReminderScheduler()
-        taskManager = TaskManager(repository, FakeSubtaskRepository(), scheduler, FakeWidgetUpdater())
+        taskManager =
+            TaskManager(repository, FakeSubtaskRepository(), scheduler, FakeWidgetUpdater(), fakeBreadcrumbLogger())
         useCase = TaskCrudUseCase(taskManager, context)
     }
 

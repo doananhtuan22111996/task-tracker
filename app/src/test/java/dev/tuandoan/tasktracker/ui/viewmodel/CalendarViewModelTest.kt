@@ -12,6 +12,7 @@ import dev.tuandoan.tasktracker.testutil.FakeSubtaskRepository
 import dev.tuandoan.tasktracker.testutil.FakeTaskRepository
 import dev.tuandoan.tasktracker.testutil.FakeWidgetUpdater
 import dev.tuandoan.tasktracker.testutil.TestTaskFactory
+import dev.tuandoan.tasktracker.testutil.fakeBreadcrumbLogger
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -48,7 +49,8 @@ class CalendarViewModelTest {
         subtaskRepo = FakeSubtaskRepository()
         useCase = CalendarUseCase(repo)
         subtaskUseCase = SubtaskUseCase(subtaskRepo)
-        taskManager = TaskManager(repo, subtaskRepo, FakeReminderScheduler(), FakeWidgetUpdater())
+        taskManager =
+            TaskManager(repo, subtaskRepo, FakeReminderScheduler(), FakeWidgetUpdater(), fakeBreadcrumbLogger())
     }
 
     @After
@@ -57,7 +59,7 @@ class CalendarViewModelTest {
     }
 
     private fun createViewModel(savedState: SavedStateHandle = SavedStateHandle()): CalendarViewModel =
-        CalendarViewModel(useCase, savedState, taskManager, subtaskUseCase)
+        CalendarViewModel(useCase, savedState, taskManager, subtaskUseCase, fakeBreadcrumbLogger())
 
     private fun dateEpoch(date: LocalDate): Long = date.atStartOfDay(zone).toInstant().toEpochMilli()
 
@@ -559,6 +561,21 @@ class CalendarViewModelTest {
             assertTrue(afterInsert.hasAnyDatedTask)
 
             cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    // === FB-12: onDaySelect emits a NAV breadcrumb WITHOUT the date (leaks usage timing) ===
+
+    @Test
+    fun `onDaySelect logs NAV calendar_day_tap breadcrumb and omits the date`() = runTest {
+        val breadcrumbLogger = io.mockk.mockk<dev.tuandoan.tasktracker.diagnostics.BreadcrumbLogger>(relaxed = true)
+        val vm = CalendarViewModel(useCase, SavedStateHandle(), taskManager, subtaskUseCase, breadcrumbLogger)
+        vm.onDaySelect(LocalDate.of(2026, 5, 12))
+        io.mockk.verify {
+            breadcrumbLogger.log(
+                dev.tuandoan.tasktracker.diagnostics.BreadcrumbCategory.NAV,
+                "calendar_day_tap",
+            )
         }
     }
 }

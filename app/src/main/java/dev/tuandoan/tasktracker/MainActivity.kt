@@ -33,6 +33,8 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import dagger.hilt.android.AndroidEntryPoint
 import dev.tuandoan.tasktracker.data.preferences.SettingsRepository
+import dev.tuandoan.tasktracker.diagnostics.BreadcrumbCategory
+import dev.tuandoan.tasktracker.diagnostics.BreadcrumbLogger
 import dev.tuandoan.tasktracker.navigation.StatsFilter
 import dev.tuandoan.tasktracker.navigation.TaskTrackerRoutes
 import dev.tuandoan.tasktracker.ui.components.BottomNavBar
@@ -75,6 +77,9 @@ class MainActivity : AppCompatActivity() {
     @Inject
     lateinit var settingsRepository: SettingsRepository
 
+    @Inject
+    lateinit var breadcrumbLogger: BreadcrumbLogger
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -103,6 +108,7 @@ class MainActivity : AppCompatActivity() {
                         notificationPermissionManager = notificationPermissionManager,
                         isOnboardingCompleted = prefs.onboardingCompleted,
                         deepLinkRoute = deepLinkRoute,
+                        breadcrumbLogger = breadcrumbLogger,
                     )
                 }
             }
@@ -141,6 +147,7 @@ fun TaskTrackerApp(
     notificationPermissionManager: NotificationPermissionManager? = null,
     isOnboardingCompleted: Boolean = true,
     deepLinkRoute: String? = null,
+    breadcrumbLogger: BreadcrumbLogger? = null,
 ) {
     val navController = rememberNavController()
     val startDestination = if (isOnboardingCompleted) {
@@ -160,6 +167,16 @@ fun TaskTrackerApp(
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
     val showBottomBar = currentRoute != null && TAB_ROUTES.any { currentRoute.startsWith(it) }
+
+    // FB-12: log a NAV breadcrumb on every route change. Route strings are constants from
+    // `TaskTrackerRoutes` — not user input — so logging the raw value is safe. We intentionally
+    // do NOT include nav arguments (task ids, stats filters) because some routes carry a
+    // task id and that's an opaque id in isolation but could correlate with user content.
+    LaunchedEffect(currentRoute) {
+        val route = currentRoute ?: return@LaunchedEffect
+        val base = route.substringBefore('?').substringBefore('/')
+        breadcrumbLogger?.log(BreadcrumbCategory.NAV, "route=$base")
+    }
 
     Surface(
         modifier = Modifier.fillMaxSize(),

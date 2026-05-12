@@ -13,6 +13,8 @@ import dev.tuandoan.tasktracker.data.preferences.PrivacyRepository
 import dev.tuandoan.tasktracker.data.preferences.SettingsRepository
 import dev.tuandoan.tasktracker.data.preferences.ThemeMode
 import dev.tuandoan.tasktracker.data.preferences.UserPreferences
+import dev.tuandoan.tasktracker.diagnostics.BreadcrumbCategory
+import dev.tuandoan.tasktracker.diagnostics.BreadcrumbLogger
 import dev.tuandoan.tasktracker.diagnostics.PrivacyManager
 import dev.tuandoan.tasktracker.domain.backup.ExportBackupUseCase
 import dev.tuandoan.tasktracker.domain.backup.ImportBackupUseCase
@@ -43,6 +45,7 @@ class SettingsViewModel @Inject constructor(
     private val settingsRepository: SettingsRepository,
     private val privacyRepository: PrivacyRepository,
     private val privacyManager: PrivacyManager,
+    private val breadcrumbLogger: BreadcrumbLogger,
 ) : ViewModel() {
 
     // --- User Preferences ---
@@ -54,6 +57,8 @@ class SettingsViewModel @Inject constructor(
      * Updates the theme mode preference.
      */
     fun setThemeMode(mode: ThemeMode) {
+        // FB-12: enum constant name only — "LIGHT" / "DARK" / "SYSTEM".
+        breadcrumbLogger.log(BreadcrumbCategory.SETTINGS, "theme=${mode.name}")
         viewModelScope.launch { settingsRepository.setThemeMode(mode) }
     }
 
@@ -61,6 +66,8 @@ class SettingsViewModel @Inject constructor(
      * Updates the dynamic color preference.
      */
     fun setDynamicColor(enabled: Boolean) {
+        // FB-12: boolean, no user data.
+        breadcrumbLogger.log(BreadcrumbCategory.SETTINGS, "dynamic_color=$enabled")
         viewModelScope.launch { settingsRepository.setDynamicColor(enabled) }
     }
 
@@ -69,6 +76,8 @@ class SettingsViewModel @Inject constructor(
      * An empty tag means "follow system".
      */
     fun setLanguageTag(tag: String) {
+        // FB-12: language tag (e.g. "en", "vi") is not PII — same rule as CrashlyticsKeysWriter.LOCALE.
+        breadcrumbLogger.log(BreadcrumbCategory.SETTINGS, "locale=$tag")
         viewModelScope.launch {
             settingsRepository.setLanguageTag(tag)
             applyLocale(tag)
@@ -227,6 +236,9 @@ class SettingsViewModel @Inject constructor(
      * discard queued payloads (best-effort per the SDK contract).
      */
     fun setDiagnosticsOptIn(optIn: Boolean) {
+        // FB-12: boolean flip — not PII. Landing this breadcrumb while opted-in is fine;
+        // the SDK drops the next call once the disable fan-out lands.
+        breadcrumbLogger.log(BreadcrumbCategory.SETTINGS, "diagnostics=$optIn")
         viewModelScope.launch { privacyManager.setEnabled(optIn) }
     }
 }
