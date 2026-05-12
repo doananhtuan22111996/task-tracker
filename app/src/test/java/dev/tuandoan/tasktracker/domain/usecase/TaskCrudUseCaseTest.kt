@@ -7,6 +7,7 @@ import dev.tuandoan.tasktracker.testutil.FakeSubtaskRepository
 import dev.tuandoan.tasktracker.testutil.FakeTaskRepository
 import dev.tuandoan.tasktracker.testutil.FakeWidgetUpdater
 import dev.tuandoan.tasktracker.testutil.TestTaskFactory
+import dev.tuandoan.tasktracker.testutil.fakeAnalyticsLogger
 import dev.tuandoan.tasktracker.testutil.fakeBreadcrumbLogger
 import io.mockk.every
 import io.mockk.mockk
@@ -37,7 +38,14 @@ class TaskCrudUseCaseTest {
         repository = FakeTaskRepository()
         scheduler = FakeReminderScheduler()
         taskManager =
-            TaskManager(repository, FakeSubtaskRepository(), scheduler, FakeWidgetUpdater(), fakeBreadcrumbLogger())
+            TaskManager(
+                repository,
+                FakeSubtaskRepository(),
+                scheduler,
+                FakeWidgetUpdater(),
+                fakeBreadcrumbLogger(),
+                fakeAnalyticsLogger(),
+            )
         useCase = TaskCrudUseCase(taskManager, context)
     }
 

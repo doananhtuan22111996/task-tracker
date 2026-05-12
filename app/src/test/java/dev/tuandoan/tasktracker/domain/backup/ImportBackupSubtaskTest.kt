@@ -10,6 +10,7 @@ import dev.tuandoan.tasktracker.data.database.Subtask
 import dev.tuandoan.tasktracker.domain.backup.model.BackupMetadata
 import dev.tuandoan.tasktracker.domain.backup.model.ImportResult
 import dev.tuandoan.tasktracker.testutil.FakeTaskRepository
+import dev.tuandoan.tasktracker.testutil.fakeAnalyticsLogger
 import dev.tuandoan.tasktracker.testutil.fakeBreadcrumbLogger
 import io.mockk.coEvery
 import io.mockk.every
@@ -56,6 +57,7 @@ class ImportBackupSubtaskTest {
             validator,
             context,
             fakeBreadcrumbLogger(),
+            fakeAnalyticsLogger(),
         )
     }
 

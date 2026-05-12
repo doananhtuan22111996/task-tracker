@@ -48,7 +48,9 @@ class BackupBreadcrumbsTest {
         breadcrumbLogger = mockk(relaxed = true)
     }
 
-    private fun exportUseCase(): ExportBackupUseCase = ExportBackupUseCase(
+    private fun exportUseCase(
+        analyticsLogger: dev.tuandoan.tasktracker.diagnostics.AnalyticsLogger = io.mockk.mockk(relaxed = true),
+    ): ExportBackupUseCase = ExportBackupUseCase(
         repository = repository,
         subtaskRepository = subtaskRepository,
         jsonSerializer = serializer,
@@ -56,17 +58,21 @@ class BackupBreadcrumbsTest {
         fileProvider = fileProvider,
         context = context,
         breadcrumbLogger = breadcrumbLogger,
+        analyticsLogger = analyticsLogger,
     )
 
-    private fun importUseCase(validator: BackupValidator = TaskBackupValidator()): ImportBackupUseCase =
-        ImportBackupUseCase(
-            repository = repository,
-            jsonSerializer = serializer,
-            fileProvider = fileProvider,
-            validator = validator,
-            context = context,
-            breadcrumbLogger = breadcrumbLogger,
-        )
+    private fun importUseCase(
+        validator: BackupValidator = TaskBackupValidator(),
+        analyticsLogger: dev.tuandoan.tasktracker.diagnostics.AnalyticsLogger = io.mockk.mockk(relaxed = true),
+    ): ImportBackupUseCase = ImportBackupUseCase(
+        repository = repository,
+        jsonSerializer = serializer,
+        fileProvider = fileProvider,
+        validator = validator,
+        context = context,
+        breadcrumbLogger = breadcrumbLogger,
+        analyticsLogger = analyticsLogger,
+    )
 
     // ── Export ─────────────────────────────────────────────────────────────
 
@@ -101,6 +107,57 @@ class BackupBreadcrumbsTest {
         verify { breadcrumbLogger.log(BreadcrumbCategory.BACKUP, "import failed") }
         verify(exactly = 0) {
             breadcrumbLogger.log(BreadcrumbCategory.BACKUP, match { it.contains("alice") })
+        }
+    }
+
+    // ── FB-14: Analytics events ────────────────────────────────────────────
+
+    @Test
+    fun `export success emits BackupExported with enum format and bucketed count`() = runTest {
+        val analyticsLogger = io.mockk.mockk<dev.tuandoan.tasktracker.diagnostics.AnalyticsLogger>(relaxed = true)
+        repeat(3) { i -> repository.insertTask(TestTaskFactory.createTask(id = (i + 1).toLong())) }
+        exportUseCase(analyticsLogger).execute(uri, BackupFormat.JSON, "1.12.0")
+        io.mockk.verify {
+            analyticsLogger.log(
+                dev.tuandoan.tasktracker.diagnostics.AnalyticsEvent.BackupExported(
+                    format = dev.tuandoan.tasktracker.diagnostics.BackupEventFormat.JSON,
+                    taskCount = 3,
+                ),
+            )
+        }
+    }
+
+    @Test
+    fun `export failure does NOT emit BackupExported event`() = runTest {
+        val analyticsLogger = io.mockk.mockk<dev.tuandoan.tasktracker.diagnostics.AnalyticsLogger>(relaxed = true)
+        coEvery { fileProvider.writeToUri(any(), any()) } throws RuntimeException("/sensitive/path denied")
+        exportUseCase(analyticsLogger).execute(uri, BackupFormat.JSON, "1.12.0")
+        io.mockk.verify(exactly = 0) {
+            analyticsLogger.log(any<dev.tuandoan.tasktracker.diagnostics.AnalyticsEvent.BackupExported>())
+        }
+    }
+
+    @Test
+    fun `import failure emits BackupImported with outcome=ERROR and no path leak`() = runTest {
+        val analyticsLogger = io.mockk.mockk<dev.tuandoan.tasktracker.diagnostics.AnalyticsLogger>(relaxed = true)
+        coEvery { fileProvider.readFromUri(any()) } throws RuntimeException("/Users/alice/file.json")
+        importUseCase(analyticsLogger = analyticsLogger).execute(uri)
+        io.mockk.verify {
+            analyticsLogger.log(
+                dev.tuandoan.tasktracker.diagnostics.AnalyticsEvent.BackupImported(
+                    format = dev.tuandoan.tasktracker.diagnostics.BackupEventFormat.JSON,
+                    recordCount = 0,
+                    outcome = dev.tuandoan.tasktracker.diagnostics.BackupOutcome.ERROR,
+                ),
+            )
+        }
+        // Negative invariant: no event param contains the exception message.
+        io.mockk.verify(exactly = 0) {
+            analyticsLogger.log(
+                match<dev.tuandoan.tasktracker.diagnostics.AnalyticsEvent> { event ->
+                    event.params.values.any { it is String && it.contains("alice") }
+                },
+            )
         }
     }
 }

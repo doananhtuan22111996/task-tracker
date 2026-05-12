@@ -6,6 +6,8 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dev.tuandoan.tasktracker.data.database.SubtaskProgress
 import dev.tuandoan.tasktracker.data.database.Task
+import dev.tuandoan.tasktracker.diagnostics.AnalyticsEvent
+import dev.tuandoan.tasktracker.diagnostics.AnalyticsLogger
 import dev.tuandoan.tasktracker.diagnostics.BreadcrumbCategory
 import dev.tuandoan.tasktracker.diagnostics.BreadcrumbLogger
 import dev.tuandoan.tasktracker.domain.ITaskManager
@@ -52,6 +54,7 @@ class CalendarViewModel @Inject constructor(
     private val taskManager: ITaskManager,
     private val subtaskUseCase: SubtaskUseCase,
     private val breadcrumbLogger: BreadcrumbLogger,
+    private val analyticsLogger: AnalyticsLogger,
 ) : ViewModel() {
 
     private val zone: ZoneId = ZoneId.systemDefault()
@@ -193,6 +196,10 @@ class CalendarViewModel @Inject constructor(
         // FB-12: no date — date-of-tap leaks usage timing. Plain verb is enough for debugging
         // "user was on calendar day sheet when the crash happened".
         breadcrumbLogger.log(BreadcrumbCategory.NAV, "calendar_day_tap")
+        // FB-14: has_dated_tasks_that_day is the only param — boolean, not the date itself.
+        // Peek the current decorations cache; null = no tasks observed for that day.
+        val hasDated = uiState.value.decorations[date] != null
+        analyticsLogger.log(AnalyticsEvent.CalendarDayTapped(hasDatedTasksThatDay = hasDated))
     }
 
     fun onTodayClick() {

@@ -32,13 +32,15 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import dev.tuandoan.tasktracker.R
+import dev.tuandoan.tasktracker.diagnostics.HelpFaqSection
 
 private data class FaqItem(val questionRes: Int, val answerRes: Int)
-private data class FaqSection(val titleRes: Int, val items: List<FaqItem>)
+private data class FaqSection(val titleRes: Int, val section: HelpFaqSection, val items: List<FaqItem>)
 
 private val faqSections = listOf(
     FaqSection(
         R.string.help_section_getting_started,
+        HelpFaqSection.GETTING_STARTED,
         listOf(
             FaqItem(R.string.help_q_create_task, R.string.help_a_create_task),
             FaqItem(R.string.help_q_need_account, R.string.help_a_need_account),
@@ -46,6 +48,7 @@ private val faqSections = listOf(
     ),
     FaqSection(
         R.string.help_section_managing_tasks,
+        HelpFaqSection.MANAGING_TASKS,
         listOf(
             FaqItem(R.string.help_q_filter_by_tag, R.string.help_a_filter_by_tag),
             FaqItem(R.string.help_q_change_priority, R.string.help_a_change_priority),
@@ -54,6 +57,7 @@ private val faqSections = listOf(
     ),
     FaqSection(
         R.string.help_section_calendar,
+        HelpFaqSection.CALENDAR,
         listOf(
             FaqItem(R.string.help_q_calendar_where, R.string.help_a_calendar_where),
             FaqItem(R.string.help_q_calendar_dots, R.string.help_a_calendar_dots),
@@ -63,6 +67,7 @@ private val faqSections = listOf(
     ),
     FaqSection(
         R.string.help_section_subtasks,
+        HelpFaqSection.SUBTASKS,
         listOf(
             FaqItem(R.string.help_q_add_subtasks, R.string.help_a_add_subtasks),
             FaqItem(R.string.help_q_reorder_subtasks, R.string.help_a_reorder_subtasks),
@@ -72,6 +77,7 @@ private val faqSections = listOf(
     ),
     FaqSection(
         R.string.help_section_batch_ops,
+        HelpFaqSection.BATCH_OPS,
         listOf(
             FaqItem(R.string.help_q_bulk_actions, R.string.help_a_bulk_actions),
             FaqItem(R.string.help_q_bulk_tag_missing, R.string.help_a_bulk_tag_missing),
@@ -81,6 +87,7 @@ private val faqSections = listOf(
     ),
     FaqSection(
         R.string.help_section_reminders,
+        HelpFaqSection.REMINDERS,
         listOf(
             FaqItem(R.string.help_q_no_reminder, R.string.help_a_no_reminder),
             FaqItem(R.string.help_q_reminder_no_due, R.string.help_a_reminder_no_due),
@@ -88,6 +95,7 @@ private val faqSections = listOf(
     ),
     FaqSection(
         R.string.help_section_archive,
+        HelpFaqSection.ARCHIVE,
         listOf(
             FaqItem(R.string.help_q_archive_task, R.string.help_a_archive_task),
             FaqItem(R.string.help_q_restore_archived, R.string.help_a_restore_archived),
@@ -95,6 +103,7 @@ private val faqSections = listOf(
     ),
     FaqSection(
         R.string.help_section_stats,
+        HelpFaqSection.STATS,
         listOf(
             FaqItem(R.string.help_q_completion_rate, R.string.help_a_completion_rate),
             FaqItem(R.string.help_q_tap_stat_card, R.string.help_a_tap_stat_card),
@@ -102,6 +111,7 @@ private val faqSections = listOf(
     ),
     FaqSection(
         R.string.help_section_backup,
+        HelpFaqSection.BACKUP,
         listOf(
             FaqItem(R.string.help_q_backup_tasks, R.string.help_a_backup_tasks),
             FaqItem(R.string.help_q_export_csv, R.string.help_a_export_csv),
@@ -111,7 +121,7 @@ private val faqSections = listOf(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HelpScreen(onNavigateBack: () -> Unit) {
+fun HelpScreen(onNavigateBack: () -> Unit, onFaqExpanded: (HelpFaqSection) -> Unit = {}) {
     val expandedItems = remember { mutableStateMapOf<Int, Boolean>() }
 
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
@@ -196,7 +206,11 @@ fun HelpScreen(onNavigateBack: () -> Unit) {
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .clickable(role = Role.Button) {
-                                    expandedItems[faqItem.questionRes] = !isExpanded
+                                    val willExpand = !isExpanded
+                                    expandedItems[faqItem.questionRes] = willExpand
+                                    // FB-14: fire on the expand direction only — collapse is a
+                                    // correction, same pattern as TaskCompleted (no un-complete event).
+                                    if (willExpand) onFaqExpanded(section.section)
                                 },
                         )
                         AnimatedVisibility(visible = isExpanded) {

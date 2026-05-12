@@ -47,6 +47,7 @@ class TaskManagerRecurrenceTest {
             reminderScheduler,
             FakeWidgetUpdater(),
             breadcrumbLogger,
+            mockk(relaxed = true),
         )
     }
 
@@ -743,5 +744,77 @@ class TaskManagerRecurrenceTest {
             zone = zone,
         )
         verify { breadcrumbLogger.log(BreadcrumbCategory.TASK_ACTION, "materialize parent=1") }
+    }
+
+    // === FB-14: materialize also emits the CalendarRecurrenceMaterialized Analytics event ===
+
+    @Test
+    fun `materializeProjectedOccurrence emits CalendarRecurrenceMaterialized on success`() = runTest {
+        val analyticsLogger = io.mockk.mockk<dev.tuandoan.tasktracker.diagnostics.AnalyticsLogger>(relaxed = true)
+        taskManager = TaskManager(
+            repository,
+            subtaskRepository,
+            reminderScheduler,
+            FakeWidgetUpdater(),
+            breadcrumbLogger,
+            analyticsLogger,
+        )
+        val baseDate = LocalDate.of(2026, 5, 4)
+        repository.seed(
+            TestTaskFactory.createTask(
+                id = 1L,
+                title = "Daily",
+                dueAt = baseDate.atStartOfDay(zone).toInstant().toEpochMilli(),
+                recurrenceType = RecurrenceType.DAILY.value,
+            ),
+        )
+        taskManager.materializeProjectedOccurrence(
+            parentId = 1L,
+            date = LocalDate.of(2026, 5, 7),
+            zone = zone,
+        )
+        io.mockk.verify {
+            analyticsLogger.log(dev.tuandoan.tasktracker.diagnostics.AnalyticsEvent.CalendarRecurrenceMaterialized)
+        }
+    }
+
+    @Test
+    fun `materializeProjectedOccurrence does NOT emit event on idempotent no-op path`() = runTest {
+        // When a chain already has a concrete row on the target date, materialize returns
+        // the existing id without inserting — no new event should fire.
+        val analyticsLogger = io.mockk.mockk<dev.tuandoan.tasktracker.diagnostics.AnalyticsLogger>(relaxed = true)
+        taskManager = TaskManager(
+            repository,
+            subtaskRepository,
+            reminderScheduler,
+            FakeWidgetUpdater(),
+            breadcrumbLogger,
+            analyticsLogger,
+        )
+        val baseDate = LocalDate.of(2026, 5, 4)
+        repository.seed(
+            TestTaskFactory.createTask(
+                id = 1L,
+                title = "Daily",
+                dueAt = baseDate.atStartOfDay(zone).toInstant().toEpochMilli(),
+                recurrenceType = RecurrenceType.DAILY.value,
+            ),
+            // Already-concrete row on the target date:
+            TestTaskFactory.createTask(
+                id = 2L,
+                title = "Daily",
+                dueAt = baseDate.plusDays(3).atStartOfDay(zone).toInstant().toEpochMilli(),
+                recurrenceType = RecurrenceType.DAILY.value,
+                parentRecurringTaskId = 1L,
+            ),
+        )
+        taskManager.materializeProjectedOccurrence(
+            parentId = 1L,
+            date = baseDate.plusDays(3),
+            zone = zone,
+        )
+        io.mockk.verify(exactly = 0) {
+            analyticsLogger.log(dev.tuandoan.tasktracker.diagnostics.AnalyticsEvent.CalendarRecurrenceMaterialized)
+        }
     }
 }

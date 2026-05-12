@@ -19,6 +19,7 @@ import dev.tuandoan.tasktracker.testutil.FakeSubtaskRepository
 import dev.tuandoan.tasktracker.testutil.FakeTaskRepository
 import dev.tuandoan.tasktracker.testutil.FakeWidgetUpdater
 import dev.tuandoan.tasktracker.testutil.TestTaskFactory
+import dev.tuandoan.tasktracker.testutil.fakeAnalyticsLogger
 import dev.tuandoan.tasktracker.testutil.fakeBreadcrumbLogger
 import dev.tuandoan.tasktracker.ui.manager.TaskBulkActionManager
 import dev.tuandoan.tasktracker.ui.manager.TaskCrudManager
@@ -74,7 +75,14 @@ class TaskViewModelTest {
 
     private fun createViewModel(): TaskViewModel {
         val taskManager =
-            TaskManager(repository, FakeSubtaskRepository(), scheduler, FakeWidgetUpdater(), fakeBreadcrumbLogger())
+            TaskManager(
+                repository,
+                FakeSubtaskRepository(),
+                scheduler,
+                FakeWidgetUpdater(),
+                fakeBreadcrumbLogger(),
+                fakeAnalyticsLogger(),
+            )
         val crudUseCase = TaskCrudUseCase(taskManager, context)
         val searchUseCase = TaskSearchUseCase()
         val filterUseCase = TaskFilterUseCase()
@@ -83,7 +91,8 @@ class TaskViewModelTest {
         val formStateManager = TaskFormStateManager(formUseCase, context)
         val listStateManager = TaskListStateManager(crudUseCase, searchUseCase, filterUseCase, sortService)
         val crudManager = TaskCrudManager(crudUseCase, formStateManager, context)
-        val bulkActionManager = TaskBulkActionManager(context, crudManager, selectionStateManager)
+        val bulkActionManager =
+            TaskBulkActionManager(context, crudManager, selectionStateManager, fakeAnalyticsLogger())
 
         val settingsRepository = mockk<SettingsRepository>(relaxed = true) {
             every { userPreferences } returns flowOf(UserPreferences())
@@ -99,7 +108,7 @@ class TaskViewModelTest {
             settingsRepository,
             taskManager,
             StreakUseCase(repository),
-            SubtaskUseCase(FakeSubtaskRepository()),
+            SubtaskUseCase(FakeSubtaskRepository(), fakeAnalyticsLogger()),
             TagManagementUseCase(repository),
             TaskSortService(),
         )

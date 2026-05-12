@@ -10,6 +10,7 @@ import dev.tuandoan.tasktracker.testutil.FakeSubtaskRepository
 import dev.tuandoan.tasktracker.testutil.FakeTaskRepository
 import dev.tuandoan.tasktracker.testutil.FakeWidgetUpdater
 import dev.tuandoan.tasktracker.testutil.TestTaskFactory
+import dev.tuandoan.tasktracker.testutil.fakeAnalyticsLogger
 import dev.tuandoan.tasktracker.testutil.fakeBreadcrumbLogger
 import dev.tuandoan.tasktracker.ui.state.TaskFormStateManager
 import dev.tuandoan.tasktracker.ui.state.TaskSelectionStateManager
@@ -40,6 +41,7 @@ class TaskBulkActionManagerTest {
     private lateinit var scheduler: FakeReminderScheduler
     private lateinit var selectionManager: TaskSelectionStateManager
     private lateinit var crudManager: TaskCrudManager
+    private lateinit var analyticsLogger: dev.tuandoan.tasktracker.diagnostics.AnalyticsLogger
     private lateinit var bulkManager: TaskBulkActionManager
 
     @Before
@@ -79,13 +81,21 @@ class TaskBulkActionManagerTest {
         repository = FakeTaskRepository()
         scheduler = FakeReminderScheduler()
         val taskManager =
-            TaskManager(repository, FakeSubtaskRepository(), scheduler, FakeWidgetUpdater(), fakeBreadcrumbLogger())
+            TaskManager(
+                repository,
+                FakeSubtaskRepository(),
+                scheduler,
+                FakeWidgetUpdater(),
+                fakeBreadcrumbLogger(),
+                fakeAnalyticsLogger(),
+            )
         val crudUseCase = TaskCrudUseCase(taskManager, context)
         val formUseCase = TaskFormUseCase(context)
         val formStateManager = TaskFormStateManager(formUseCase, context)
         selectionManager = TaskSelectionStateManager()
         crudManager = TaskCrudManager(crudUseCase, formStateManager, context)
-        bulkManager = TaskBulkActionManager(context, crudManager, selectionManager)
+        analyticsLogger = mockk(relaxed = true)
+        bulkManager = TaskBulkActionManager(context, crudManager, selectionManager, analyticsLogger)
     }
 
     @After
@@ -432,4 +442,9 @@ class TaskBulkActionManagerTest {
 
         assertTrue(successMsg.contains("2 tasks"))
     }
+
+    // FB-14: BulkOperationApplied is tested at the AnalyticsEvent-shape level in
+    // AnalyticsLoggerTest (FB-13). The integration here (bulkMarkCompleted fires the right
+    // op_type through executeBulkOperation) is device-verified via Firebase Analytics debug
+    // view; the selection-state-flow initialization this test needs is heavy for a JVM unit.
 }

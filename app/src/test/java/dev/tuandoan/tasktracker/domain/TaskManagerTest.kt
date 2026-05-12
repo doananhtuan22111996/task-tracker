@@ -1,5 +1,8 @@
 package dev.tuandoan.tasktracker.domain
 
+import dev.tuandoan.tasktracker.diagnostics.AnalyticsEvent
+import dev.tuandoan.tasktracker.diagnostics.AnalyticsLogger
+import dev.tuandoan.tasktracker.diagnostics.AnalyticsPriority
 import dev.tuandoan.tasktracker.diagnostics.BreadcrumbCategory
 import dev.tuandoan.tasktracker.diagnostics.BreadcrumbLogger
 import dev.tuandoan.tasktracker.testutil.FakeReminderScheduler
@@ -26,6 +29,7 @@ class TaskManagerTest {
     private lateinit var scheduler: FakeReminderScheduler
     private lateinit var widgetUpdater: FakeWidgetUpdater
     private lateinit var breadcrumbLogger: BreadcrumbLogger
+    private lateinit var analyticsLogger: AnalyticsLogger
     private lateinit var manager: TaskManager
 
     @Before
@@ -35,7 +39,9 @@ class TaskManagerTest {
         scheduler = FakeReminderScheduler()
         widgetUpdater = FakeWidgetUpdater()
         breadcrumbLogger = mockk(relaxed = true)
-        manager = TaskManager(repository, subtaskRepository, scheduler, widgetUpdater, breadcrumbLogger)
+        analyticsLogger = mockk(relaxed = true)
+        manager =
+            TaskManager(repository, subtaskRepository, scheduler, widgetUpdater, breadcrumbLogger, analyticsLogger)
     }
 
     // === createTask ===
@@ -612,5 +618,74 @@ class TaskManagerTest {
         repository.seed(task)
         manager.archiveTask(7L)
         verify { breadcrumbLogger.log(BreadcrumbCategory.TASK_ACTION, "archive id=7") }
+    }
+
+    // === FB-14: AnalyticsEvent emissions with PII-safety contracts ===
+
+    @Test
+    fun `createTask emits TaskCreated event with flags and clamped priority only`() = runTest {
+        manager.createTask(
+            title = "Secret title should not leak",
+            description = "Sensitive notes",
+            dueAt = 1_700_000_000_000L,
+            dueAtHasTime = true,
+            reminderOffsetMinutes = 30,
+            tag = "work",
+            recurrenceType = 0,
+        )
+        verify {
+            analyticsLogger.log(
+                AnalyticsEvent.TaskCreated(
+                    hasDueDate = true,
+                    hasTag = true,
+                    priority = AnalyticsPriority.MEDIUM,
+                    isRecurring = false,
+                ),
+            )
+        }
+    }
+
+    @Test
+    fun `archiveTask emits TaskArchived event`() = runTest {
+        val task = TestTaskFactory.createTask(id = 7, title = "Private")
+        repository.seed(task)
+        manager.archiveTask(7L)
+        verify { analyticsLogger.log(AnalyticsEvent.TaskArchived) }
+    }
+
+    @Test
+    fun `toggleTaskCompletion emits TaskCompleted on complete direction only`() = runTest {
+        val task = TestTaskFactory.createTask(id = 1, title = "Confidential")
+        repository.seed(task)
+        manager.toggleTaskCompletion(task)
+        verify(exactly = 1) { analyticsLogger.log(AnalyticsEvent.TaskCompleted) }
+    }
+
+    @Test
+    fun `toggleTaskCompletion does NOT emit TaskCompleted on un-complete direction`() = runTest {
+        val completed = TestTaskFactory.completedTask(id = 1)
+        repository.seed(completed)
+        manager.toggleTaskCompletion(completed)
+        // Negative invariant: un-complete is a correction; no matching event in FR-15.
+        verify(exactly = 0) { analyticsLogger.log(AnalyticsEvent.TaskCompleted) }
+    }
+
+    @Test
+    fun `markTaskComplete emits TaskCompleted exactly once and is idempotent`() = runTest {
+        val task = TestTaskFactory.createTask(id = 1)
+        repository.seed(task)
+        manager.markTaskComplete(task)
+        // Second call on an already-completed task must NOT re-fire the event.
+        val completed = task.copy(isCompleted = true)
+        manager.markTaskComplete(completed)
+        verify(exactly = 1) { analyticsLogger.log(AnalyticsEvent.TaskCompleted) }
+    }
+
+    @Test
+    fun `unarchiveTask emits TaskRestored event`() = runTest {
+        val archived = TestTaskFactory.createTask(id = 11).copy(isArchived = true)
+        repository.seed(archived)
+        manager.unarchiveTask(11L)
+        verify { analyticsLogger.log(AnalyticsEvent.TaskRestored) }
     }
 }

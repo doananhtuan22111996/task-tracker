@@ -5,6 +5,7 @@ import dev.tuandoan.tasktracker.data.database.Subtask
 import dev.tuandoan.tasktracker.domain.repository.ISubtaskRepository
 import dev.tuandoan.tasktracker.testutil.FakeSubtaskRepository
 import dev.tuandoan.tasktracker.testutil.TestSubtaskFactory
+import dev.tuandoan.tasktracker.testutil.fakeAnalyticsLogger
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
@@ -25,7 +26,7 @@ class SubtaskUseCaseTest {
     @Before
     fun setup() {
         repository = FakeSubtaskRepository()
-        useCase = SubtaskUseCase(repository)
+        useCase = SubtaskUseCase(repository, fakeAnalyticsLogger())
     }
 
     // === addSubtask ===
@@ -348,7 +349,7 @@ class SubtaskUseCaseTest {
         val throwing = object : ISubtaskRepository by repository {
             override suspend fun updateSubtask(subtask: Subtask): Unit = throw CancellationException("cancel")
         }
-        val cancellingUseCase = SubtaskUseCase(throwing)
+        val cancellingUseCase = SubtaskUseCase(throwing, fakeAnalyticsLogger())
         repository.seed(TestSubtaskFactory.createSubtask(id = 1L, isCompleted = false))
 
         try {
@@ -356,6 +357,27 @@ class SubtaskUseCaseTest {
             fail("CancellationException should have propagated")
         } catch (expected: CancellationException) {
             assertEquals("cancel", expected.message)
+        }
+    }
+
+    // === FB-14: SubtaskAdded event fires on success only ===
+
+    @Test
+    fun `addSubtask emits SubtaskAdded event on success`() = runTest {
+        val analyticsLogger = io.mockk.mockk<dev.tuandoan.tasktracker.diagnostics.AnalyticsLogger>(relaxed = true)
+        val uc = SubtaskUseCase(repository, analyticsLogger)
+        uc.addSubtask(taskId = 1L, title = "Secret subtask")
+        io.mockk.verify { analyticsLogger.log(dev.tuandoan.tasktracker.diagnostics.AnalyticsEvent.SubtaskAdded) }
+    }
+
+    @Test
+    fun `addSubtask does NOT emit event when validation fails`() = runTest {
+        val analyticsLogger = io.mockk.mockk<dev.tuandoan.tasktracker.diagnostics.AnalyticsLogger>(relaxed = true)
+        val uc = SubtaskUseCase(repository, analyticsLogger)
+        // Blank title fails validation — event should NOT fire.
+        uc.addSubtask(taskId = 1L, title = "   ")
+        io.mockk.verify(exactly = 0) {
+            analyticsLogger.log(dev.tuandoan.tasktracker.diagnostics.AnalyticsEvent.SubtaskAdded)
         }
     }
 }

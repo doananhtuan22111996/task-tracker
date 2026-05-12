@@ -7,6 +7,10 @@ import dev.tuandoan.tasktracker.R
 import dev.tuandoan.tasktracker.data.backup.BackupFileProvider
 import dev.tuandoan.tasktracker.data.backup.BackupSerializer
 import dev.tuandoan.tasktracker.di.JsonSerializer
+import dev.tuandoan.tasktracker.diagnostics.AnalyticsEvent
+import dev.tuandoan.tasktracker.diagnostics.AnalyticsLogger
+import dev.tuandoan.tasktracker.diagnostics.BackupEventFormat
+import dev.tuandoan.tasktracker.diagnostics.BackupOutcome
 import dev.tuandoan.tasktracker.diagnostics.BreadcrumbCategory
 import dev.tuandoan.tasktracker.diagnostics.BreadcrumbLogger
 import dev.tuandoan.tasktracker.diagnostics.bucketTaskCount
@@ -26,6 +30,7 @@ class ImportBackupUseCase @Inject constructor(
     private val validator: BackupValidator,
     @ApplicationContext private val context: Context,
     private val breadcrumbLogger: BreadcrumbLogger,
+    private val analyticsLogger: AnalyticsLogger,
 ) {
 
     /**
@@ -69,6 +74,17 @@ class ImportBackupUseCase @Inject constructor(
                 BreadcrumbCategory.BACKUP,
                 "import done count=${bucketTaskCount(validCount)} skipped=${bucketTaskCount(skippedCount)}",
             )
+            // FB-14: `outcome` is partial when validation dropped rows, success otherwise.
+            // Failure path (below) maps to BackupOutcome.ERROR with the raw exception message
+            // deliberately omitted (same rule as the breadcrumb).
+            val outcome = if (skippedCount > 0) BackupOutcome.PARTIAL else BackupOutcome.SUCCESS
+            analyticsLogger.log(
+                AnalyticsEvent.BackupImported(
+                    format = BackupEventFormat.JSON,
+                    recordCount = validCount,
+                    outcome = outcome,
+                ),
+            )
 
             ImportResult.Success(
                 importedCount = validationResult.validTasks.size,
@@ -77,6 +93,16 @@ class ImportBackupUseCase @Inject constructor(
         } catch (e: Exception) {
             // FB-12: no exception message — may contain file paths.
             breadcrumbLogger.log(BreadcrumbCategory.BACKUP, "import failed")
+            // FB-14: outcome=ERROR captures the failure in the funnel without the exception
+            // message (which may contain file paths). record_count=0 matches the zero-rows-
+            // imported reality.
+            analyticsLogger.log(
+                AnalyticsEvent.BackupImported(
+                    format = BackupEventFormat.JSON,
+                    recordCount = 0,
+                    outcome = BackupOutcome.ERROR,
+                ),
+            )
             ImportResult.Error(
                 message = context.getString(R.string.error_import_backup, e.message ?: ""),
                 cause = e,

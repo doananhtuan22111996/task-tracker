@@ -16,6 +16,7 @@ import dev.tuandoan.tasktracker.testutil.FakeSubtaskRepository
 import dev.tuandoan.tasktracker.testutil.FakeTaskRepository
 import dev.tuandoan.tasktracker.testutil.FakeWidgetUpdater
 import dev.tuandoan.tasktracker.testutil.TestTaskFactory
+import dev.tuandoan.tasktracker.testutil.fakeAnalyticsLogger
 import dev.tuandoan.tasktracker.testutil.fakeBreadcrumbLogger
 import dev.tuandoan.tasktracker.ui.viewmodel.TaskFilter
 import io.mockk.every
@@ -60,6 +61,7 @@ class TaskListStateManagerTest {
                 FakeReminderScheduler(),
                 FakeWidgetUpdater(),
                 fakeBreadcrumbLogger(),
+                fakeAnalyticsLogger(),
             )
         val crudUseCase = TaskCrudUseCase(taskManager, context)
         searchUseCase = TaskSearchUseCase()

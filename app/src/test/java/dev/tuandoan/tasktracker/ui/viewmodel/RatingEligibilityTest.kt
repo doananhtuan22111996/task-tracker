@@ -63,6 +63,7 @@ class RatingEligibilityTest {
         streakUseCase = streakUseCase,
         subtaskUseCase = dev.tuandoan.tasktracker.domain.usecase.SubtaskUseCase(
             dev.tuandoan.tasktracker.testutil.FakeSubtaskRepository(),
+            dev.tuandoan.tasktracker.testutil.fakeAnalyticsLogger(),
         ),
         tagManagementUseCase = dev.tuandoan.tasktracker.domain.usecase.TagManagementUseCase(
             dev.tuandoan.tasktracker.testutil.FakeTaskRepository(),

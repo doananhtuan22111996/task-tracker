@@ -9,6 +9,7 @@ import dev.tuandoan.tasktracker.testutil.FakeSubtaskRepository
 import dev.tuandoan.tasktracker.testutil.FakeTaskRepository
 import dev.tuandoan.tasktracker.testutil.FakeWidgetUpdater
 import dev.tuandoan.tasktracker.testutil.TestTaskFactory
+import dev.tuandoan.tasktracker.testutil.fakeAnalyticsLogger
 import dev.tuandoan.tasktracker.testutil.fakeBreadcrumbLogger
 import dev.tuandoan.tasktracker.ui.state.TaskFormStateManager
 import io.mockk.every
@@ -39,7 +40,14 @@ class TaskCrudManagerValidationTest {
         repository = FakeTaskRepository()
         scheduler = FakeReminderScheduler()
         taskManager =
-            TaskManager(repository, FakeSubtaskRepository(), scheduler, FakeWidgetUpdater(), fakeBreadcrumbLogger())
+            TaskManager(
+                repository,
+                FakeSubtaskRepository(),
+                scheduler,
+                FakeWidgetUpdater(),
+                fakeBreadcrumbLogger(),
+                fakeAnalyticsLogger(),
+            )
         crudUseCase = TaskCrudUseCase(taskManager, context)
         formUseCase = TaskFormUseCase(context)
         formStateManager = TaskFormStateManager(formUseCase, context)

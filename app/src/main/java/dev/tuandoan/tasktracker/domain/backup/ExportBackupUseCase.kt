@@ -9,6 +9,9 @@ import dev.tuandoan.tasktracker.data.backup.BackupSerializer
 import dev.tuandoan.tasktracker.data.backup.dto.TaskBackupDto
 import dev.tuandoan.tasktracker.di.CsvSerializer
 import dev.tuandoan.tasktracker.di.JsonSerializer
+import dev.tuandoan.tasktracker.diagnostics.AnalyticsEvent
+import dev.tuandoan.tasktracker.diagnostics.AnalyticsLogger
+import dev.tuandoan.tasktracker.diagnostics.BackupEventFormat
 import dev.tuandoan.tasktracker.diagnostics.BreadcrumbCategory
 import dev.tuandoan.tasktracker.diagnostics.BreadcrumbLogger
 import dev.tuandoan.tasktracker.diagnostics.bucketTaskCount
@@ -30,6 +33,7 @@ class ExportBackupUseCase @Inject constructor(
     private val fileProvider: BackupFileProvider,
     @ApplicationContext private val context: Context,
     private val breadcrumbLogger: BreadcrumbLogger,
+    private val analyticsLogger: AnalyticsLogger,
 ) {
 
     /**
@@ -68,14 +72,28 @@ class ExportBackupUseCase @Inject constructor(
 
             // FB-12: bucketed count — same privacy rule as CrashlyticsKeysWriter.task_count_bucket.
             breadcrumbLogger.log(BreadcrumbCategory.BACKUP, "export done count=${bucketTaskCount(tasks.size)}")
+            // FB-14: fire only on success; the catch branch below is a separate funnel step.
+            analyticsLogger.log(
+                AnalyticsEvent.BackupExported(
+                    format = format.toAnalytics(),
+                    taskCount = tasks.size,
+                ),
+            )
             ExportResult.Success(taskCount = tasks.size)
         } catch (e: Exception) {
             // FB-12: no exception message — it can contain file paths or user-identifying strings.
             breadcrumbLogger.log(BreadcrumbCategory.BACKUP, "export failed")
+            // FB-14: no backup_exported event on failure; PRD has no "backup_export_failed"
+            // counterpart. The breadcrumb captures the attempt for crash-report context.
             ExportResult.Error(
                 message = context.getString(R.string.error_export_backup, e.message ?: ""),
                 cause = e,
             )
         }
+    }
+
+    private fun BackupFormat.toAnalytics(): BackupEventFormat = when (this) {
+        BackupFormat.JSON -> BackupEventFormat.JSON
+        BackupFormat.CSV -> BackupEventFormat.CSV
     }
 }
