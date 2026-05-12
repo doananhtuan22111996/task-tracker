@@ -28,19 +28,32 @@ class AnalyticsLoggerTest {
         val event = AnalyticsEvent.TaskCreated(
             hasDueDate = true,
             hasTag = false,
-            priority = 2,
+            priority = AnalyticsPriority.HIGH,
             isRecurring = true,
         )
         assertEquals("task_created", event.eventName)
         assertEquals(true, event.params[AnalyticsEvent.PARAM_HAS_DUE_DATE])
         assertEquals(false, event.params[AnalyticsEvent.PARAM_HAS_TAG])
-        assertEquals(2, event.params[AnalyticsEvent.PARAM_PRIORITY])
+        // priority serializes as a stable string, not the raw int — enum closes
+        // the range-violation leak path a raw Int would open.
+        assertEquals("high", event.params[AnalyticsEvent.PARAM_PRIORITY])
         assertEquals(true, event.params[AnalyticsEvent.PARAM_IS_RECURRING])
         // Negative invariant: no content-carrying keys ever.
         assertFalse(event.params.containsKey("title"))
         assertFalse(event.params.containsKey("tag"))
         assertFalse(event.params.containsKey("description"))
         assertFalse(event.params.containsKey("due_at"))
+    }
+
+    @Test
+    fun `AnalyticsPriority fromTaskPriority maps 0 1 2 correctly and clamps unknowns`() {
+        assertEquals(AnalyticsPriority.LOW, AnalyticsPriority.fromTaskPriority(0))
+        assertEquals(AnalyticsPriority.MEDIUM, AnalyticsPriority.fromTaskPriority(1))
+        assertEquals(AnalyticsPriority.HIGH, AnalyticsPriority.fromTaskPriority(2))
+        // Clamp path: a corrupt Int falls back to MEDIUM rather than throwing or
+        // shipping garbage to Firebase.
+        assertEquals(AnalyticsPriority.MEDIUM, AnalyticsPriority.fromTaskPriority(-1))
+        assertEquals(AnalyticsPriority.MEDIUM, AnalyticsPriority.fromTaskPriority(99))
     }
 
     @Test
@@ -154,9 +167,19 @@ class AnalyticsLoggerTest {
     // ── Help ──────────────────────────────────────────────────────────────────
 
     @Test
-    fun `HelpFaqExpanded forwards the section identifier`() {
-        val event = AnalyticsEvent.HelpFaqExpanded(section = "backup_restore")
+    fun `HelpFaqExpanded forwards the section paramValue not the enum name`() {
+        val event = AnalyticsEvent.HelpFaqExpanded(section = HelpFaqSection.BACKUP)
         assertEquals("help_faq_expanded", event.eventName)
-        assertEquals("backup_restore", event.params[AnalyticsEvent.PARAM_SECTION])
+        // Serializes as the stable lowercase paramValue, not "BACKUP" (the enum constant name).
+        assertEquals("backup", event.params[AnalyticsEvent.PARAM_SECTION])
+    }
+
+    @Test
+    fun `HelpFaqExpanded covers every HelpFaqSection exhaustively`() {
+        // Adding a section to the enum without a paramValue mapping fails loudly.
+        HelpFaqSection.values().forEach { section ->
+            val event = AnalyticsEvent.HelpFaqExpanded(section)
+            assertEquals(section.paramValue, event.params[AnalyticsEvent.PARAM_SECTION])
+        }
     }
 }

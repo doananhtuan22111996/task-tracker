@@ -91,16 +91,21 @@ sealed class AnalyticsEvent {
     // ── Task actions ─────────────────────────────────────────────────────────
 
     /**
-     * FR-15: `task_created`. Params carry shape signals, not content.
-     * @param priority the enum ordinal (0 = none, 1 = low, 2 = med, 3 = high).
+     * FR-15: `task_created`. Params carry shape signals, not content. `priority` is
+     * an [AnalyticsPriority] enum (not a raw int) so a call-site bug can't ship an
+     * out-of-range value to Firebase where it'd corrupt the analytics console.
      */
-    data class TaskCreated(val hasDueDate: Boolean, val hasTag: Boolean, val priority: Int, val isRecurring: Boolean) :
-        AnalyticsEvent() {
+    data class TaskCreated(
+        val hasDueDate: Boolean,
+        val hasTag: Boolean,
+        val priority: AnalyticsPriority,
+        val isRecurring: Boolean,
+    ) : AnalyticsEvent() {
         override val eventName: String = "task_created"
         override val params: Map<String, Any> = mapOf(
             PARAM_HAS_DUE_DATE to hasDueDate,
             PARAM_HAS_TAG to hasTag,
-            PARAM_PRIORITY to priority,
+            PARAM_PRIORITY to priority.paramValue,
             PARAM_IS_RECURRING to isRecurring,
         )
     }
@@ -204,12 +209,12 @@ sealed class AnalyticsEvent {
 
     /**
      * FR-15: `help_faq_expanded`.
-     * @param section an identifier for the FAQ section expanded. Must be a known
-     *   constant string from the help content, NOT translated text.
+     * @param section one of the 9 FAQ sections from `HelpScreen` (see [HelpFaqSection]).
+     *   Enum-backed so a call site can't pass a localized title or a user-typed string.
      */
-    data class HelpFaqExpanded(val section: String) : AnalyticsEvent() {
+    data class HelpFaqExpanded(val section: HelpFaqSection) : AnalyticsEvent() {
         override val eventName: String = "help_faq_expanded"
-        override val params: Map<String, Any> = mapOf(PARAM_SECTION to section)
+        override val params: Map<String, Any> = mapOf(PARAM_SECTION to section.paramValue)
     }
 
     companion object {
@@ -255,4 +260,48 @@ enum class BackupOutcome(val paramValue: String) {
     SUCCESS("success"),
     PARTIAL("partial"),
     ERROR("error"),
+}
+
+/**
+ * Closed set of task priorities for [AnalyticsEvent.TaskCreated]. Matches `Task.priority`'s
+ * stored int values (0/1/2) but keeps Analytics decoupled from the storage schema so a
+ * future priority renumber doesn't silently change what Firebase receives.
+ */
+enum class AnalyticsPriority(val paramValue: String) {
+    LOW("low"),
+    MEDIUM("medium"),
+    HIGH("high"),
+    ;
+
+    companion object {
+        /**
+         * Maps the raw `Task.priority` int (0=LOW, 1=MEDIUM, 2=HIGH) to the enum.
+         * Defaults to [MEDIUM] for any out-of-range value so a call site with a
+         * corrupt int doesn't skip the event or ship garbage.
+         */
+        fun fromTaskPriority(priority: Int): AnalyticsPriority = when (priority) {
+            0 -> LOW
+            1 -> MEDIUM
+            2 -> HIGH
+            else -> MEDIUM
+        }
+    }
+}
+
+/**
+ * Closed set of FAQ sections rendered on `HelpScreen`. Keeps
+ * [AnalyticsEvent.HelpFaqExpanded.section] from accepting a localized title or
+ * an arbitrary caller string — the 9 values mirror `help_section_*` string keys
+ * in `res/values/strings.xml`.
+ */
+enum class HelpFaqSection(val paramValue: String) {
+    GETTING_STARTED("getting_started"),
+    MANAGING_TASKS("managing_tasks"),
+    CALENDAR("calendar"),
+    SUBTASKS("subtasks"),
+    BATCH_OPS("batch_ops"),
+    REMINDERS("reminders"),
+    ARCHIVE("archive"),
+    STATS("stats"),
+    BACKUP("backup"),
 }
