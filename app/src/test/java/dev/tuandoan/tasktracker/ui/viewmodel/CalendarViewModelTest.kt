@@ -14,6 +14,7 @@ import dev.tuandoan.tasktracker.testutil.FakeWidgetUpdater
 import dev.tuandoan.tasktracker.testutil.TestTaskFactory
 import dev.tuandoan.tasktracker.testutil.fakeAnalyticsLogger
 import dev.tuandoan.tasktracker.testutil.fakeBreadcrumbLogger
+import dev.tuandoan.tasktracker.testutil.fakePerformanceLogger
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -74,6 +75,7 @@ class CalendarViewModelTest {
             subtaskUseCase,
             fakeBreadcrumbLogger(),
             fakeAnalyticsLogger(),
+            fakePerformanceLogger(),
         )
 
     private fun dateEpoch(date: LocalDate): Long = date.atStartOfDay(zone).toInstant().toEpochMilli()
@@ -592,6 +594,7 @@ class CalendarViewModelTest {
                 subtaskUseCase,
                 breadcrumbLogger,
                 io.mockk.mockk(relaxed = true),
+                fakePerformanceLogger(),
             )
         vm.onDaySelect(LocalDate.of(2026, 5, 12))
         io.mockk.verify {
@@ -615,6 +618,7 @@ class CalendarViewModelTest {
                 subtaskUseCase,
                 fakeBreadcrumbLogger(),
                 analyticsLogger,
+                fakePerformanceLogger(),
             )
         vm.onDaySelect(LocalDate.of(2026, 5, 12))
         io.mockk.verify {
@@ -624,6 +628,28 @@ class CalendarViewModelTest {
                         !event.params.containsKey("date")
                 },
             )
+        }
+    }
+
+    // === FB-16: startMonthRenderTrace delegates to PerformanceLogger ===
+
+    @Test
+    fun `startMonthRenderTrace delegates to PerformanceLogger with CalendarMonthRender`() = runTest {
+        val performanceLogger = io.mockk.mockk<dev.tuandoan.tasktracker.diagnostics.PerformanceLogger>(relaxed = true)
+        val vm = CalendarViewModel(
+            useCase,
+            SavedStateHandle(),
+            taskManager,
+            subtaskUseCase,
+            fakeBreadcrumbLogger(),
+            fakeAnalyticsLogger(),
+            performanceLogger,
+        )
+
+        vm.startMonthRenderTrace()
+
+        io.mockk.verify {
+            performanceLogger.start(dev.tuandoan.tasktracker.diagnostics.PerformanceTraceName.CalendarMonthRender)
         }
     }
 }
