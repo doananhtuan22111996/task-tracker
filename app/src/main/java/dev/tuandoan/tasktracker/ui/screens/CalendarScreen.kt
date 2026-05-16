@@ -16,11 +16,16 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
+import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.LiveRegionMode
@@ -31,11 +36,14 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dev.tuandoan.tasktracker.R
+import dev.tuandoan.tasktracker.diagnostics.PerformanceTrace
+import dev.tuandoan.tasktracker.domain.model.DayDecoration
 import dev.tuandoan.tasktracker.ui.components.CalendarEmptyStateCard
 import dev.tuandoan.tasktracker.ui.components.CalendarMonthView
 import dev.tuandoan.tasktracker.ui.components.DayAgendaSheet
 import dev.tuandoan.tasktracker.ui.theme.AppSpacing
 import dev.tuandoan.tasktracker.ui.viewmodel.CalendarViewModel
+import kotlinx.coroutines.flow.first
 import java.time.LocalDate
 import java.time.YearMonth
 import java.time.ZoneId
@@ -67,6 +75,17 @@ fun CalendarScreen(
     // system default on every invocation. Matches the `zone` cache in `CalendarViewModel`.
     val zone = remember { ZoneId.systemDefault() }
     val showEmptyStateHint = !uiState.hasAnyDatedTask
+
+    // FB-16: `calendar_month_render` Performance trace. Measures
+    // `visibleMonth` change → decorations Flow re-emits for the new month + one paint
+    // frame, which is a meaningful "data ready and rendered" signal for chevron, swipe,
+    // and today-click paths. See [rememberMonthRenderTrace] KDoc for why the readiness
+    // signal is decorations-identity rather than `Modifier.onGloballyPositioned`.
+    rememberMonthRenderTrace(
+        visibleMonth = uiState.visibleMonth,
+        decorations = uiState.decorations,
+        startTrace = viewModel::startMonthRenderTrace,
+    )
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -191,3 +210,93 @@ private fun CalendarTopBar(
 // Russian render nominative-case month names instead of the genitive form used by `MMMM` in
 // full-date contexts.
 private fun monthTitleFormatter(locale: Locale): DateTimeFormatter = DateTimeFormatter.ofPattern("LLLL yyyy", locale)
+
+/**
+ * Drives the `calendar_month_render` Firebase Performance trace (FB-16).
+ *
+ * **Why we don't use `Modifier.onGloballyPositioned` to stop the trace:**
+ * Kizitonwose's `HorizontalCalendar` keeps the same outer container coordinates across
+ * month changes (only inner cell content swaps), so a wrapper `onGloballyPositioned`
+ * doesn't fire for non-initial month changes. The decorations Flow is the more
+ * reliable readiness signal — `CalendarViewModel.decorationsFlow` is a `flatMapLatest`
+ * keyed on `_visibleMonth`, so a new emission is observable evidence that the new
+ * month's data is ready and the next composition tick will lay it out.
+ *
+ * **Why the initial composition does NOT start a trace:**
+ * On first open, the decorations for the initial `visibleMonth` are already loaded
+ * (or arrive concurrently with the LaunchedEffect's first run), so there is no
+ * "next" emission to settle on. Cold-start render is FR-17 territory (`_app_start`);
+ * FR-18's `calendar_month_render` is for *month changes after first composition*.
+ *
+ * **Lifecycle concerns wrapped here:**
+ *  1. **Skip first composition.** The initial run only seeds the holder for tracking;
+ *     no trace is started for the seeded `visibleMonth`.
+ *  2. **Start on each subsequent `visibleMonth` change.** A [LaunchedEffect] keyed on
+ *     `visibleMonth` starts a fresh trace whenever the visible month changes after
+ *     first composition (chevron tap, swipe, today-click, saved-state restore).
+ *  3. **Stop after data settles + one paint frame.** The effect waits for the
+ *     [decorations] reference to change (the Flow's next emission is a different
+ *     `Map` instance for the new month) via [snapshotFlow], then awaits one
+ *     [withFrameNanos] tick so layout/paint of the new content is included.
+ *  4. **Race-tolerance.** A second `visibleMonth` change before the first trace
+ *     stops cancels the prior [LaunchedEffect]; the new one starts by stopping any
+ *     leftover trace so we never have two running concurrently.
+ *  5. **Cleanup on dispose.** A [DisposableEffect] stops any pending trace if the
+ *     screen leaves composition before settle (e.g. user switches tabs mid-load),
+ *     preventing orphan traces in the SDK.
+ *
+ * All access to the trace slot is on the main thread (LaunchedEffect, onDispose).
+ */
+@Composable
+private fun rememberMonthRenderTrace(
+    visibleMonth: YearMonth,
+    decorations: Map<LocalDate, DayDecoration>,
+    startTrace: () -> PerformanceTrace,
+) {
+    val holder = remember { PendingTraceHolder() }
+    // Track the latest decorations reference in a Compose state slot so a snapshotFlow
+    // can observe changes from inside the LaunchedEffect. Writing inside SideEffect
+    // (not the composition body) keeps this side-effect-free at compose time.
+    val decorationsState = remember { mutableStateOf(decorations) }
+    SideEffect { decorationsState.value = decorations }
+
+    // Skip the initial composition: there is no "next" decorations emission to settle
+    // on for the seeded visibleMonth. See KDoc point (1).
+    val isInitialRun = remember { mutableStateOf(true) }
+
+    LaunchedEffect(visibleMonth) {
+        if (isInitialRun.value) {
+            isInitialRun.value = false
+            return@LaunchedEffect
+        }
+        // Cancel any leftover trace from a rapid prior month change.
+        holder.stopIfPending()
+        // Capture the baseline reference before starting; the next emission (different
+        // Map instance from the Flow's flatMapLatest re-fetch) is the readiness signal.
+        val baseline = decorationsState.value
+        holder.start(startTrace())
+        snapshotFlow { decorationsState.value }
+            .first { it !== baseline }
+        // One frame after data settles to include the new month's layout/paint.
+        withFrameNanos { }
+        holder.stopIfPending()
+    }
+    DisposableEffect(Unit) {
+        onDispose { holder.stopIfPending() }
+    }
+}
+
+private class PendingTraceHolder {
+    private var pending: PerformanceTrace? = null
+
+    fun start(trace: PerformanceTrace) {
+        pending = trace
+    }
+
+    fun stopIfPending() {
+        pending?.let {
+            it.stop()
+            pending = null
+        }
+    }
+}

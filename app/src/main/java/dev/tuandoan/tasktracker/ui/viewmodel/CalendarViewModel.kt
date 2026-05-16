@@ -10,6 +10,9 @@ import dev.tuandoan.tasktracker.diagnostics.AnalyticsEvent
 import dev.tuandoan.tasktracker.diagnostics.AnalyticsLogger
 import dev.tuandoan.tasktracker.diagnostics.BreadcrumbCategory
 import dev.tuandoan.tasktracker.diagnostics.BreadcrumbLogger
+import dev.tuandoan.tasktracker.diagnostics.PerformanceLogger
+import dev.tuandoan.tasktracker.diagnostics.PerformanceTrace
+import dev.tuandoan.tasktracker.diagnostics.PerformanceTraceName
 import dev.tuandoan.tasktracker.domain.ITaskManager
 import dev.tuandoan.tasktracker.domain.model.AgendaItem
 import dev.tuandoan.tasktracker.domain.model.DayDecoration
@@ -55,6 +58,7 @@ class CalendarViewModel @Inject constructor(
     private val subtaskUseCase: SubtaskUseCase,
     private val breadcrumbLogger: BreadcrumbLogger,
     private val analyticsLogger: AnalyticsLogger,
+    private val performanceLogger: PerformanceLogger,
 ) : ViewModel() {
 
     private val zone: ZoneId = ZoneId.systemDefault()
@@ -178,6 +182,14 @@ class CalendarViewModel @Inject constructor(
             newId?.let { taskManager.getTaskById(it) }
         }
     }
+
+    /**
+     * FB-16: start the `calendar_month_render` Performance trace. The screen calls this
+     * from a [LaunchedEffect] keyed on `visibleMonth` so the VM owns the [PerformanceLogger]
+     * dependency and the screen receives an opaque handle it can stop on layout. Keeps
+     * the diagnostics dependency `private` to mirror [breadcrumbLogger] / [analyticsLogger].
+     */
+    fun startMonthRenderTrace(): PerformanceTrace = performanceLogger.start(PerformanceTraceName.CalendarMonthRender)
 
     fun onMonthChange(delta: Int) {
         val next = _visibleMonth.value.plusMonths(delta.toLong())
