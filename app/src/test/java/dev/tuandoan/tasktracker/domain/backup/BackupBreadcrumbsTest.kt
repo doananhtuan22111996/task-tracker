@@ -64,6 +64,7 @@ class BackupBreadcrumbsTest {
     private fun importUseCase(
         validator: BackupValidator = TaskBackupValidator(),
         analyticsLogger: dev.tuandoan.tasktracker.diagnostics.AnalyticsLogger = io.mockk.mockk(relaxed = true),
+        performanceLogger: dev.tuandoan.tasktracker.diagnostics.PerformanceLogger = io.mockk.mockk(relaxed = true),
     ): ImportBackupUseCase = ImportBackupUseCase(
         repository = repository,
         jsonSerializer = serializer,
@@ -72,6 +73,7 @@ class BackupBreadcrumbsTest {
         context = context,
         breadcrumbLogger = breadcrumbLogger,
         analyticsLogger = analyticsLogger,
+        performanceLogger = performanceLogger,
     )
 
     // ── Export ─────────────────────────────────────────────────────────────
@@ -158,6 +160,70 @@ class BackupBreadcrumbsTest {
                     event.params.values.any { it is String && it.contains("alice") }
                 },
             )
+        }
+    }
+
+    // ── FB-17: backup_import Performance trace ─────────────────────────────
+
+    @Test
+    fun `import success starts and stops backup_import trace with bucketed record_count`() = runTest {
+        val performanceLogger = io.mockk.mockk<dev.tuandoan.tasktracker.diagnostics.PerformanceLogger>(relaxed = true)
+        val trace = io.mockk.mockk<dev.tuandoan.tasktracker.diagnostics.PerformanceTrace>(relaxed = true)
+        io.mockk.every {
+            performanceLogger.start(dev.tuandoan.tasktracker.diagnostics.PerformanceTraceName.BackupImport)
+        } returns trace
+
+        // 7 valid task DTOs in the JSON file → validator keeps them all → bucket "1-9".
+        val dtos = (1..7).map { i ->
+            dev.tuandoan.tasktracker.data.backup.dto.TaskBackupDto(
+                id = i.toLong(),
+                title = "task $i",
+                createdAt = 1_700_000_000_000L,
+            )
+        }
+        val json = serializer.serialize(
+            tasks = dtos,
+            schemaVersion = dev.tuandoan.tasktracker.domain.backup.model.BackupMetadata.CURRENT_SCHEMA_VERSION,
+            exportedAt = 0L,
+            appVersion = "test",
+        )
+        coEvery { fileProvider.readFromUri(uri) } returns json
+
+        importUseCase(performanceLogger = performanceLogger).execute(uri)
+
+        // Trace name pinned to BackupImport; attribute reflects the bucketed valid count.
+        // Use bucketTaskCount(7) directly so a future bucket-boundary shift fails this
+        // assertion at the right place rather than producing a quietly-stale literal.
+        io.mockk.verifyOrder {
+            performanceLogger.start(dev.tuandoan.tasktracker.diagnostics.PerformanceTraceName.BackupImport)
+            trace.putAttribute("record_count", dev.tuandoan.tasktracker.diagnostics.bucketTaskCount(7))
+            trace.stop()
+        }
+    }
+
+    @Test
+    fun `import failure stops backup_import trace with record_count=0`() = runTest {
+        val performanceLogger = io.mockk.mockk<dev.tuandoan.tasktracker.diagnostics.PerformanceLogger>(relaxed = true)
+        val trace = io.mockk.mockk<dev.tuandoan.tasktracker.diagnostics.PerformanceTrace>(relaxed = true)
+        io.mockk.every {
+            performanceLogger.start(dev.tuandoan.tasktracker.diagnostics.PerformanceTraceName.BackupImport)
+        } returns trace
+
+        coEvery { fileProvider.readFromUri(any()) } throws RuntimeException("/Users/alice/file.json")
+
+        importUseCase(performanceLogger = performanceLogger).execute(uri)
+
+        // Even on error, the finally block guarantees attribute set + stop. Use
+        // bucketTaskCount(0) directly so the test's coupling is to the bucketing rule, not
+        // to the literal output of the zero bucket.
+        io.mockk.verifyOrder {
+            performanceLogger.start(dev.tuandoan.tasktracker.diagnostics.PerformanceTraceName.BackupImport)
+            trace.putAttribute("record_count", dev.tuandoan.tasktracker.diagnostics.bucketTaskCount(0))
+            trace.stop()
+        }
+        // Negative invariant: no attribute key/value carries the file path.
+        io.mockk.verify(exactly = 0) {
+            trace.putAttribute(any(), match { it.contains("alice") })
         }
     }
 }
