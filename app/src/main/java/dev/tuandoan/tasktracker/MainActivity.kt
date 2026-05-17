@@ -45,6 +45,7 @@ import dev.tuandoan.tasktracker.ui.screens.ArchivedScreen
 import dev.tuandoan.tasktracker.ui.screens.CalendarScreen
 import dev.tuandoan.tasktracker.ui.screens.HelpScreen
 import dev.tuandoan.tasktracker.ui.screens.OnboardingScreen
+import dev.tuandoan.tasktracker.ui.screens.PrivacyPolicyScreen
 import dev.tuandoan.tasktracker.ui.screens.SettingsScreen
 import dev.tuandoan.tasktracker.ui.screens.StatsScreen
 import dev.tuandoan.tasktracker.ui.screens.TagManagementScreen
@@ -341,6 +342,9 @@ fun TaskTrackerApp(
                         onNavigateToTagManagement = {
                             navController.navigate(TaskTrackerRoutes.TAG_MANAGEMENT)
                         },
+                        onNavigateToPrivacyPolicy = {
+                            navController.navigate(TaskTrackerRoutes.PRIVACY_POLICY)
+                        },
                     )
                 }
 
@@ -363,6 +367,14 @@ fun TaskTrackerApp(
                         // stateless composable — keeps HelpScreen easy to preview/test.
                         onFaqExpanded = { section ->
                             analyticsLogger?.log(AnalyticsEvent.HelpFaqExpanded(section))
+                        },
+                    )
+                }
+
+                composable(TaskTrackerRoutes.PRIVACY_POLICY) {
+                    PrivacyPolicyScreen(
+                        onNavigateBack = {
+                            navController.popBackStack()
                         },
                     )
                 }

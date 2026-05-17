@@ -30,6 +30,7 @@ import androidx.compose.material.icons.outlined.Feedback
 import androidx.compose.material.icons.outlined.HelpOutline
 import androidx.compose.material.icons.outlined.Label
 import androidx.compose.material.icons.outlined.OpenInNew
+import androidx.compose.material.icons.outlined.PrivacyTip
 import androidx.compose.material.icons.outlined.Share
 import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material.icons.outlined.TableChart
@@ -101,6 +102,7 @@ fun SettingsScreen(
     onNavigateBack: () -> Unit,
     onNavigateToHelp: () -> Unit = {},
     onNavigateToTagManagement: () -> Unit = {},
+    onNavigateToPrivacyPolicy: () -> Unit = {},
 ) {
     val context = LocalContext.current
     val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
@@ -414,6 +416,46 @@ fun SettingsScreen(
                 ) {
                     Text(text = stringResource(R.string.settings_whats_collected))
                 }
+
+                // Privacy Policy (FB-18). Sits below the "What's collected?" sheet trigger
+                // because it covers the same subject in more legal/structural depth — users
+                // who want the short answer use the bottom sheet; users who want the full
+                // policy tap through here.
+                ListItem(
+                    headlineContent = {
+                        Text(
+                            text = stringResource(R.string.settings_privacy_policy),
+                            style = MaterialTheme.typography.bodyLarge,
+                        )
+                    },
+                    supportingContent = {
+                        Text(
+                            text = stringResource(R.string.settings_privacy_policy_desc),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    },
+                    leadingContent = {
+                        Icon(
+                            imageVector = Icons.Outlined.PrivacyTip,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary,
+                        )
+                    },
+                    trailingContent = {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    },
+                    colors = ListItemDefaults.colors(
+                        containerColor = MaterialTheme.colorScheme.surface,
+                    ),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable(role = Role.Button, onClick = onNavigateToPrivacyPolicy),
+                )
 
                 // =============================================
                 // Help & FAQ Section

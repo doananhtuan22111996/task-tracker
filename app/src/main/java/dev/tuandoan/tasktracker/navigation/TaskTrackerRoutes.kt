@@ -12,6 +12,7 @@ object TaskTrackerRoutes {
     const val SETTINGS = "settings"
     const val ONBOARDING = "onboarding"
     const val HELP = "help"
+    const val PRIVACY_POLICY = "privacy_policy"
     const val TAG_MANAGEMENT = "tag_management"
     const val TASK_EDITOR_CREATE = "task_editor"
 

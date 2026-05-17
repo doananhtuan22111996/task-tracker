@@ -201,6 +201,41 @@
     <string name="whats_collected_performance_2">Time spent on slow operations</string>
     <string name="whats_collected_performance_3">Never: the contents of your screens</string>
 
+    <!-- Privacy Policy entry on Settings (FB-18 — 2026-05-17; non-EN locales land in v1.13.0) -->
+    <string name="settings_privacy_policy">Privacy Policy</string>
+    <string name="settings_privacy_policy_desc">What we collect, how long it\'s kept, and how to opt out</string>
+
+    <!-- Privacy Policy screen (FB-18 — 2026-05-17; non-EN locales land in v1.13.0) -->
+    <string name="title_privacy_policy">Privacy Policy</string>
+    <string name="privacy_policy_intro">Task Tracker is a personal task manager designed to work offline. We don\'t require an account and we don\'t show ads. This page explains exactly what diagnostics data the app can collect, only when you opt in, and how you can turn it off at any time.</string>
+
+    <string name="privacy_policy_section_what_we_collect">What we collect</string>
+    <string name="privacy_policy_what_we_collect_intro">Diagnostics is OFF by default. If you turn it on in Settings → Privacy, the app sends three kinds of data to Firebase, a Google service:</string>
+    <string name="privacy_policy_what_we_collect_crashlytics">Crash reports (Firebase Crashlytics): the stack trace when the app crashes, your device model and Android version, and an install identifier specific to this app on this device. We don\'t collect or attach an account, email, or any identifier you\'ve given us elsewhere. Stack traces can sometimes contain values from local variables in the function that crashed; we never deliberately attach the contents of your tasks.</string>
+    <string name="privacy_policy_what_we_collect_analytics">Usage events (Firebase Analytics): which screens you open and which features you use (for example, that you opened the Calendar tab or imported a backup), plus the app version and your locale. We never send task titles, descriptions, tags, due dates, or reminder times. Counts are bucketed (for example, “10–49 tasks”) so they can\'t identify users at extreme values.</string>
+    <string name="privacy_policy_what_we_collect_performance">Performance (Firebase Performance Monitoring): how long the app takes to start, render the calendar, and import a backup. We never send the contents of your screens.</string>
+
+    <string name="privacy_policy_section_why">Why we collect it</string>
+    <string name="privacy_policy_why_body">Crash reports help us fix bugs we can\'t reproduce on our own devices. Usage events tell us which features are worth improving. Performance traces flag slow operations on real devices. We use this data only to make the app better — never for advertising, profiling, or selling.</string>
+
+    <string name="privacy_policy_section_retention">How long it\'s kept</string>
+    <string name="privacy_policy_retention_body">Firebase keeps Analytics events and Performance traces for up to 90 days, after which Google deletes them automatically. Crash reports are retained according to Google\'s current Crashlytics retention policy (refer to Firebase\'s data-retention documentation for the latest details). None of this data is exported, sold, or shared outside Google\'s Firebase product.</string>
+
+    <string name="privacy_policy_section_your_control">Your control</string>
+    <string name="privacy_policy_your_control_body">You can turn diagnostics on or off at any time from Settings → Privacy → Send diagnostics. The toggle is OFF by default on a fresh install. When you turn it off, we ask Crashlytics to delete any reports that were queued on your device but hadn\'t been sent yet — this is a best-effort cleanup that the SDK runs in the background.</string>
+
+    <string name="privacy_policy_section_third_party">Third parties</string>
+    <string name="privacy_policy_third_party_body">Firebase is a Google service. When diagnostics is on, your device sends the data above directly to Google\'s servers. Google acts as our data processor — they handle the data on our behalf and don\'t use it for their own purposes. We don\'t send your data to any other third party.</string>
+
+    <string name="privacy_policy_section_no_account">No account, no ads, works offline</string>
+    <string name="privacy_policy_no_account_body">Task Tracker stores all your tasks on your device. You don\'t create an account, and we don\'t have a server that holds your data. Backups are saved to files you choose, not to any cloud we control. The app works fully offline; the only network traffic is the optional diagnostics data described above.</string>
+
+    <string name="privacy_policy_section_changes">Changes to this policy</string>
+    <string name="privacy_policy_changes_body">If we change what we collect or how we use it, we\'ll update this page in a future app release and call out the change in the release notes. Continuing to use the app after such an update means accepting the updated policy.</string>
+
+    <string name="privacy_policy_section_effective">Effective date</string>
+    <string name="privacy_policy_effective_body">This policy applies to Task Tracker version 1.12.0 and later. Last updated 2026-05-17.</string>
+
     <!-- Settings Dialogs -->
     <string name="dialog_replace_tasks_title">Replace all tasks?</string>
     <string name="dialog_replace_tasks_message">Importing a backup will replace all existing tasks. This action cannot be undone. Are you sure you want to continue?</string>
