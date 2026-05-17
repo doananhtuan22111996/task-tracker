@@ -328,17 +328,19 @@ To add support for a new locale (e.g., Japanese `ja`):
    ```
 
 4. **Crashlytics mapping-file upload** (release builds only — FB-03)
-   Release builds upload the R8/ProGuard mapping file to Firebase Crashlytics so the
-   console can deobfuscate stack traces. The Crashlytics gradle plugin authenticates
-   via the **`GOOGLE_APPLICATION_CREDENTIALS` env var** (the plugin reads it from the
-   process environment; Gradle can't bridge env vars to non-Exec tasks).
+   Release builds optionally upload the R8/ProGuard mapping file to Firebase Crashlytics
+   so the console can deobfuscate stack traces. The build script enables the upload
+   task chain only when `GOOGLE_APPLICATION_CREDENTIALS` is set in the process
+   environment — when unset, the plugin's upload-related tasks are not registered, so
+   CI and dev builds without a service-account key are unaffected.
    ```bash
-   # Required: path to a Google service-account JSON key with Crashlytics upload scope.
+   # Optional: set the env var before bundleRelease to enable mapping upload.
+   # Path must point to a Google service-account JSON key with Crashlytics upload scope.
    export GOOGLE_APPLICATION_CREDENTIALS=/absolute/path/to/firebase-service-account.json
    ./gradlew :app:bundleRelease
    ```
-   If the env var is unset, `bundleRelease` fails fast with a clear message before the
-   upload task runs. CI builds are debug-only and never invoke the upload task.
+   Without the env var, `bundleRelease` succeeds normally without uploading the
+   mapping file (deobfuscation will be unavailable for that build's crashes).
 
 ## 📱 Usage
 
