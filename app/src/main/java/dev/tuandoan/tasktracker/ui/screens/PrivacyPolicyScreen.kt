@@ -105,8 +105,14 @@ fun PrivacyPolicyScreen(onNavigateBack: () -> Unit) {
             SectionHeader(R.string.privacy_policy_section_no_account)
             BodyText(R.string.privacy_policy_no_account_body)
 
+            SectionHeader(R.string.privacy_policy_section_children)
+            BodyText(R.string.privacy_policy_children_body)
+
             SectionHeader(R.string.privacy_policy_section_changes)
             BodyText(R.string.privacy_policy_changes_body)
+
+            SectionHeader(R.string.privacy_policy_section_contact)
+            BodyText(R.string.privacy_policy_contact_body)
 
             SectionHeader(R.string.privacy_policy_section_effective)
             BodyText(R.string.privacy_policy_effective_body)

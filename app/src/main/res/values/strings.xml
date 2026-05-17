@@ -233,6 +233,12 @@
     <string name="privacy_policy_section_changes">Changes to this policy</string>
     <string name="privacy_policy_changes_body">If we change what we collect or how we use it, we\'ll update this page in a future app release and call out the change in the release notes. Continuing to use the app after such an update means accepting the updated policy.</string>
 
+    <string name="privacy_policy_section_children">Children</string>
+    <string name="privacy_policy_children_body">Task Tracker is not directed at children under 13. We do not knowingly collect any data from children under 13. If you believe a child has used the app and you would like the data deleted, contact us using the address below.</string>
+
+    <string name="privacy_policy_section_contact">Contact</string>
+    <string name="privacy_policy_contact_body">This app is published by Tuan Doan as an indie project. For privacy questions, data-deletion requests, or to report a concern, contact tuandoan22111996@gmail.com.</string>
+
     <string name="privacy_policy_section_effective">Effective date</string>
     <string name="privacy_policy_effective_body">This policy applies to Task Tracker version 1.12.0 and later. Last updated 2026-05-17.</string>
 
