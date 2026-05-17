@@ -1,13 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  Cloud-backup excludes everything user-generated and identity-bearing. Task content stays
+  on-device by design, and the diagnostics opt-in (privacy.preferences_pb, FB-04) must NOT
+  travel via cloud backup so a new device starts at the "OFF by default" state the Privacy
+  Policy (FB-18) commits to.
+
+  Device-transfer keeps user content (so device-to-device migration works) but still
+  excludes privacy.preferences_pb so the new device's user re-affirms diagnostics opt-in
+  explicitly.
+-->
 <data-extraction-rules>
     <cloud-backup>
         <exclude domain="database" path="task_tracker.db" />
         <exclude domain="database" path="task_tracker.db-shm" />
         <exclude domain="database" path="task_tracker.db-wal" />
         <exclude domain="sharedpref" path="settings.preferences_pb" />
+        <exclude domain="sharedpref" path="privacy.preferences_pb" />
     </cloud-backup>
     <device-transfer>
         <include domain="database" path="task_tracker.db" />
         <include domain="sharedpref" path="settings.preferences_pb" />
+        <exclude domain="sharedpref" path="privacy.preferences_pb" />
     </device-transfer>
 </data-extraction-rules>
