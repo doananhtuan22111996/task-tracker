@@ -5,6 +5,11 @@ Format follows [Keep a Changelog](https://keepachangelog.com).
 
 ## [Unreleased]
 
+## [1.12.0] - 2026-05-17
+
+### Notes
+- **What's new (FB-20):** You can now opt in to help improve the app via Settings → Privacy.
+
 ### Added
 - Firebase BOM 33.10.0 + Crashlytics/Analytics/Performance Monitoring submodules on the app classpath, along with the `google-services`, `firebase-crashlytics`, and `firebase-perf` Gradle plugins (FB-01 catalog + FB-02 application). SDK collection is disabled by default via `AndroidManifest.xml` meta-data (`firebase_crashlytics_collection_enabled=false`, `firebase_analytics_collection_enabled=false`, `firebase_performance_collection_enabled=false`) — this is the structural opt-out guarantee from ADR-003 and keeps the interim window between FB-02 and FB-06 free of network traffic. FB-06's runtime `setXxxCollectionEnabled(true)` will override the manifest defaults when the user opts in. Release-APK size delta: +0.96 MB (9.85 MB → 10.81 MB), well inside the 15 MB budget (FB-02)
 - `PrivacyRepository` (FB-04) — Hilt-injected `@Singleton` persisting the `diagnosticsOptIn: Boolean` flag in its own `privacy.preferences_pb` DataStore file (separate from the existing `settings` file per ADR-003 Option E for audit clarity). Exposes `diagnosticsOptIn: Flow<Boolean>` with `distinctUntilChanged` + `suspend setDiagnosticsOptIn(Boolean)` + a static `readOptInOnce(context)` for the pre-Hilt synchronous read `TaskTrackerApplication.onCreate` needs in FB-06. Default value `false` for fresh installs. 7 new JVM tests covering default/write/toggle/Flow-emission/dedupe/persistence using `PreferenceDataStoreFactory` with a temp file (no Robolectric) (FB-04)
