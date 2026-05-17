@@ -12,6 +12,7 @@ import dev.tuandoan.tasktracker.domain.backup.model.ImportResult
 import dev.tuandoan.tasktracker.testutil.FakeTaskRepository
 import dev.tuandoan.tasktracker.testutil.fakeAnalyticsLogger
 import dev.tuandoan.tasktracker.testutil.fakeBreadcrumbLogger
+import dev.tuandoan.tasktracker.testutil.fakePerformanceLogger
 import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
@@ -58,6 +59,7 @@ class ImportBackupSubtaskTest {
             context,
             fakeBreadcrumbLogger(),
             fakeAnalyticsLogger(),
+            fakePerformanceLogger(),
         )
     }
 

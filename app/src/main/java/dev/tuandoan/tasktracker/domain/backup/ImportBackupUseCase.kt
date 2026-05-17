@@ -13,6 +13,8 @@ import dev.tuandoan.tasktracker.diagnostics.BackupEventFormat
 import dev.tuandoan.tasktracker.diagnostics.BackupOutcome
 import dev.tuandoan.tasktracker.diagnostics.BreadcrumbCategory
 import dev.tuandoan.tasktracker.diagnostics.BreadcrumbLogger
+import dev.tuandoan.tasktracker.diagnostics.PerformanceLogger
+import dev.tuandoan.tasktracker.diagnostics.PerformanceTraceName
 import dev.tuandoan.tasktracker.diagnostics.bucketTaskCount
 import dev.tuandoan.tasktracker.domain.backup.model.ImportResult
 import dev.tuandoan.tasktracker.domain.repository.ITaskRepository
@@ -31,6 +33,7 @@ class ImportBackupUseCase @Inject constructor(
     @ApplicationContext private val context: Context,
     private val breadcrumbLogger: BreadcrumbLogger,
     private val analyticsLogger: AnalyticsLogger,
+    private val performanceLogger: PerformanceLogger,
 ) {
 
     /**
@@ -40,9 +43,17 @@ class ImportBackupUseCase @Inject constructor(
      * @return An [ImportResult] indicating success or failure.
      */
     suspend fun execute(uri: Uri): ImportResult {
+        // FB-17: `backup_import` Performance trace — measures end-to-end import duration
+        // (start before any other work → finally after DB replace). `record_count`
+        // attribute carries the bucketed valid-count so the Firebase Performance console
+        // can slice latency by import size without leaking exact counts. Set in `finally`
+        // so the attribute reflects the final value on both success and error paths.
+        // Started BEFORE the breadcrumb so the trace literally measures the whole call.
+        val trace = performanceLogger.start(PerformanceTraceName.BackupImport)
+        var recordCountForTrace = 0
         // FB-12: no uri, no file content — just a "we started" marker.
         breadcrumbLogger.log(BreadcrumbCategory.BACKUP, "import start")
-        return try {
+        try {
             val rawContent = fileProvider.readFromUri(uri)
             val dtos = jsonSerializer.deserialize(rawContent)
             val tasks = dtos.map { it.toTask() }
@@ -70,6 +81,7 @@ class ImportBackupUseCase @Inject constructor(
             // FB-12: bucketed counts only.
             val validCount = validationResult.validTasks.size
             val skippedCount = validationResult.skippedCount
+            recordCountForTrace = validCount
             breadcrumbLogger.log(
                 BreadcrumbCategory.BACKUP,
                 "import done count=${bucketTaskCount(validCount)} skipped=${bucketTaskCount(skippedCount)}",
@@ -86,7 +98,7 @@ class ImportBackupUseCase @Inject constructor(
                 ),
             )
 
-            ImportResult.Success(
+            return ImportResult.Success(
                 importedCount = validationResult.validTasks.size,
                 skippedCount = validationResult.skippedCount,
             )
@@ -103,10 +115,21 @@ class ImportBackupUseCase @Inject constructor(
                     outcome = BackupOutcome.ERROR,
                 ),
             )
-            ImportResult.Error(
+            return ImportResult.Error(
                 message = context.getString(R.string.error_import_backup, e.message ?: ""),
                 cause = e,
             )
+        } finally {
+            // FB-17: `record_count` is bucketed to mirror the FB-14 Analytics event taxonomy
+            // (avoids raw-count re-identification at the extremes). On error path, value is
+            // `0` which matches the zero-rows-imported reality.
+            trace.putAttribute(ATTR_RECORD_COUNT, bucketTaskCount(recordCountForTrace))
+            trace.stop()
         }
+    }
+
+    private companion object {
+        // Firebase Performance attribute keys are limited to 40 chars; this is well within.
+        const val ATTR_RECORD_COUNT = "record_count"
     }
 }
