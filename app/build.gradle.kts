@@ -1,3 +1,4 @@
+import com.google.firebase.crashlytics.buildtools.gradle.CrashlyticsExtension
 import java.io.FileInputStream
 import java.time.Instant
 import java.util.Properties
@@ -74,6 +75,16 @@ android {
                 "proguard-rules.pro",
             )
             signingConfig = signingConfigs.getByName("release")
+
+            // FB-03: enable R8/ProGuard mapping-file upload to Crashlytics so the console
+            // can deobfuscate release stack traces. The plugin's default behaviour shifts
+            // across versions; setting it explicitly pins the contract regardless of the
+            // BOM/plugin version. The mapping-file upload requires service-account
+            // credentials — see the `uploadCrashlyticsMappingFile*` task-config block
+            // outside `android { }` for the credential pre-check.
+            configure<CrashlyticsExtension> {
+                mappingFileUploadEnabled = true
+            }
         }
     }
     compileOptions {
@@ -93,6 +104,25 @@ android {
 
 ksp {
     arg("room.schemaLocation", "$projectDir/schemas")
+}
+
+// FB-03: fail-fast pre-check on the Crashlytics mapping-file upload task. The plugin's
+// upload task (`uploadCrashlyticsMappingFile<Variant>`) authenticates via the Firebase
+// Tools SDK, which reads `GOOGLE_APPLICATION_CREDENTIALS` from the process env — Gradle
+// can't set env vars on non-Exec tasks, so the developer must export it from their
+// shell before invoking the upload. Surfacing a clear message at task start beats a
+// cryptic SDK error mid-upload. CI builds debug-only and never invoke this task.
+tasks.matching { it.name.startsWith("uploadCrashlyticsMappingFile") }.configureEach {
+    doFirst {
+        val envCreds = System.getenv("GOOGLE_APPLICATION_CREDENTIALS")
+        if (envCreds.isNullOrBlank()) {
+            throw GradleException(
+                "FB-03: Crashlytics mapping upload requires GOOGLE_APPLICATION_CREDENTIALS=/path/to/key.json " +
+                    "in your shell environment before running ./gradlew bundleRelease. See README → " +
+                    "Crashlytics mapping-file upload.",
+            )
+        }
+    }
 }
 
 // Guardrail: fail the build if any file outside the allowlist writes

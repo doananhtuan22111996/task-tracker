@@ -327,6 +327,19 @@ To add support for a new locale (e.g., Japanese `ja`):
    ./gradlew assembleRelease
    ```
 
+4. **Crashlytics mapping-file upload** (release builds only — FB-03)
+   Release builds upload the R8/ProGuard mapping file to Firebase Crashlytics so the
+   console can deobfuscate stack traces. The Crashlytics gradle plugin authenticates
+   via the **`GOOGLE_APPLICATION_CREDENTIALS` env var** (the plugin reads it from the
+   process environment; Gradle can't bridge env vars to non-Exec tasks).
+   ```bash
+   # Required: path to a Google service-account JSON key with Crashlytics upload scope.
+   export GOOGLE_APPLICATION_CREDENTIALS=/absolute/path/to/firebase-service-account.json
+   ./gradlew :app:bundleRelease
+   ```
+   If the env var is unset, `bundleRelease` fails fast with a clear message before the
+   upload task runs. CI builds are debug-only and never invoke the upload task.
+
 ## 📱 Usage
 
 ### Basic Operations
