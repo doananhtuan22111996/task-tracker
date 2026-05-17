@@ -1,3 +1,4 @@
+import com.google.firebase.crashlytics.buildtools.gradle.CrashlyticsExtension
 import java.io.FileInputStream
 import java.time.Instant
 import java.util.Properties
@@ -74,6 +75,24 @@ android {
                 "proguard-rules.pro",
             )
             signingConfig = signingConfigs.getByName("release")
+
+            // FB-03: enable R8/ProGuard mapping-file upload to Crashlytics so the console
+            // can deobfuscate release stack traces — but only when service-account
+            // credentials are present in the environment. When `GOOGLE_APPLICATION_CREDENTIALS`
+            // is unset (CI, dev builds without a key), the plugin doesn't register the
+            // upload task chain at all, so the R8 trace analysis it triggers also doesn't
+            // run. That keeps CI/JVM pipelines green and matches the plugin's pre-FB-03
+            // skip-when-unconfigured behaviour. Developers opt in by exporting
+            // GOOGLE_APPLICATION_CREDENTIALS=/path/to/key.json before `bundleRelease`.
+            //
+            // Reads the env var via `providers.environmentVariable` (configuration-cache
+            // friendly) rather than `System.getenv` (which marks the cache invalid).
+            configure<CrashlyticsExtension> {
+                mappingFileUploadEnabled =
+                    providers
+                        .environmentVariable("GOOGLE_APPLICATION_CREDENTIALS")
+                        .isPresent
+            }
         }
     }
     compileOptions {
