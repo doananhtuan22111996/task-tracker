@@ -2,8 +2,11 @@ package dev.tuandoan.tasktracker.widget
 
 import android.content.Context
 import android.util.Log
+import androidx.compose.ui.unit.DpSize
+import androidx.compose.ui.unit.dp
 import androidx.glance.GlanceId
 import androidx.glance.appwidget.GlanceAppWidget
+import androidx.glance.appwidget.SizeMode
 import androidx.glance.appwidget.provideContent
 import dev.tuandoan.tasktracker.data.preferences.ThemeMode
 import dev.tuandoan.tasktracker.widget.model.WidgetTask
@@ -11,6 +14,8 @@ import dev.tuandoan.tasktracker.widget.ui.WidgetContent
 import kotlinx.coroutines.flow.first
 
 class TaskTrackerWidget : GlanceAppWidget() {
+
+    override val sizeMode: SizeMode = SizeMode.Responsive(setOf(SMALL, MEDIUM, LARGE))
 
     override suspend fun provideGlance(context: Context, id: GlanceId) {
         var tasks: List<WidgetTask> = emptyList()
@@ -36,5 +41,9 @@ class TaskTrackerWidget : GlanceAppWidget() {
 
     companion object {
         private const val TAG = "TaskTrackerWidget"
+
+        val SMALL: DpSize = DpSize(110.dp, 110.dp)
+        val MEDIUM: DpSize = DpSize(250.dp, 110.dp)
+        val LARGE: DpSize = DpSize(250.dp, 250.dp)
     }
 }
