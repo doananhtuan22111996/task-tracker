@@ -43,7 +43,7 @@ class TaskTrackerWidget : GlanceAppWidget() {
         private const val TAG = "TaskTrackerWidget"
 
         val SMALL: DpSize = DpSize(110.dp, 110.dp)
-        val MEDIUM: DpSize = DpSize(250.dp, 110.dp)
-        val LARGE: DpSize = DpSize(250.dp, 250.dp)
+        val MEDIUM: DpSize = DpSize(260.dp, 110.dp)
+        val LARGE: DpSize = DpSize(260.dp, 260.dp)
     }
 }
