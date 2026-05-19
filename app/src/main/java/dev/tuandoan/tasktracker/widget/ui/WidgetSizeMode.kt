@@ -30,6 +30,15 @@ object WidgetSizeResolver {
     const val LIST_ROW_COUNT = 5
     const val LARGE_ROW_COUNT = 10
 
+    /**
+     * Upper bound on tasks fetched for the widget. Equals [LARGE_ROW_COUNT] so
+     * the 4x4 layout has enough rows; smaller layouts slice client-side.
+     * The 2x2 count badge displays "${LARGE_ROW_COUNT}+" when the fetched list
+     * hits this cap, since we don't have an exact total without a separate
+     * count query (V13-03 will revisit).
+     */
+    const val FETCH_LIMIT = LARGE_ROW_COUNT
+
     fun resolve(size: DpSize): WidgetLayoutSpec = when {
         size.width < WIDTH_THRESHOLD ->
             WidgetLayoutSpec(WidgetLayoutMode.COMPACT_BADGE, COMPACT_ROW_COUNT)

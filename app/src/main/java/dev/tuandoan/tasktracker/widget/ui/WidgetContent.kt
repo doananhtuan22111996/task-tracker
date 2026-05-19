@@ -81,19 +81,25 @@ private fun WidgetListContent(tasks: List<WidgetTask>) {
 
 @Composable
 private fun WidgetCompactContent(tasks: List<WidgetTask>, topTask: WidgetTask?) {
+    val countText = if (tasks.size >= WidgetSizeResolver.FETCH_LIMIT) {
+        "${WidgetSizeResolver.FETCH_LIMIT}+"
+    } else {
+        tasks.size.toString()
+    }
+    val tapAction = if (topTask != null) createTaskAction(topTask.id) else createNewTaskAction()
     Column(
         modifier = GlanceModifier
             .fillMaxSize()
             .background(GlanceTheme.colors.surface)
             .padding(8.dp)
-            .clickable(createNewTaskAction()),
+            .clickable(tapAction),
     ) {
         Row(
             modifier = GlanceModifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
-                text = tasks.size.toString(),
+                text = countText,
                 style = TextStyle(
                     color = GlanceTheme.colors.onSurface,
                     fontWeight = FontWeight.Bold,
@@ -118,7 +124,6 @@ private fun WidgetCompactContent(tasks: List<WidgetTask>, topTask: WidgetTask?) 
                     fontSize = 12.sp,
                 ),
                 maxLines = 2,
-                modifier = GlanceModifier.clickable(createTaskAction(topTask.id)),
             )
         } else {
             Text(
@@ -134,6 +139,7 @@ private fun WidgetCompactContent(tasks: List<WidgetTask>, topTask: WidgetTask?) 
 
 @Composable
 private fun WidgetListWithOverdueContent(tasks: List<WidgetTask>) {
+    // V13-12: replace with full overdue partition
     val now = System.currentTimeMillis()
     val overdueCount = tasks.count { it.dueAt != null && it.dueAt < now }
 
