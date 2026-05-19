@@ -11,6 +11,7 @@ import androidx.glance.appwidget.provideContent
 import dev.tuandoan.tasktracker.data.preferences.ThemeMode
 import dev.tuandoan.tasktracker.widget.model.WidgetTask
 import dev.tuandoan.tasktracker.widget.ui.WidgetContent
+import dev.tuandoan.tasktracker.widget.ui.WidgetSizeResolver
 import kotlinx.coroutines.flow.first
 
 class TaskTrackerWidget : GlanceAppWidget() {
@@ -24,7 +25,8 @@ class TaskTrackerWidget : GlanceAppWidget() {
 
         try {
             val entryPoint = WidgetEntryPoint.get(context)
-            tasks = WidgetDataProvider(entryPoint.taskDao()).getWidgetTasks()
+            tasks = WidgetDataProvider(entryPoint.taskDao())
+                .getWidgetTasks(limit = WidgetSizeResolver.FETCH_LIMIT)
             val prefs = entryPoint.settingsRepository().userPreferences.first()
             themeMode = prefs.themeMode
             dynamicColor = prefs.dynamicColor
