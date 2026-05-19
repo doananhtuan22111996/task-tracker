@@ -7,6 +7,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.glance.GlanceModifier
 import androidx.glance.GlanceTheme
+import androidx.glance.LocalSize
 import androidx.glance.action.Action
 import androidx.glance.action.clickable
 import androidx.glance.appwidget.action.actionStartActivity
@@ -48,6 +49,21 @@ private fun createNewTaskAction(): Action {
 
 @Composable
 fun WidgetContent(tasks: List<WidgetTask>) {
+    val spec = WidgetSizeResolver.resolve(LocalSize.current)
+    val visibleTasks = tasks.take(spec.rowCount)
+
+    when (spec.mode) {
+        WidgetLayoutMode.COMPACT_BADGE -> WidgetCompactContent(
+            tasks = tasks,
+            topTask = visibleTasks.firstOrNull(),
+        )
+        WidgetLayoutMode.LIST -> WidgetListContent(tasks = visibleTasks)
+        WidgetLayoutMode.LIST_WITH_OVERDUE -> WidgetListWithOverdueContent(tasks = visibleTasks)
+    }
+}
+
+@Composable
+private fun WidgetListContent(tasks: List<WidgetTask>) {
     Column(
         modifier = GlanceModifier
             .fillMaxSize()
@@ -58,6 +74,90 @@ fun WidgetContent(tasks: List<WidgetTask>) {
         if (tasks.isEmpty()) {
             WidgetEmptyState()
         } else {
+            WidgetTaskList(tasks = tasks)
+        }
+    }
+}
+
+@Composable
+private fun WidgetCompactContent(tasks: List<WidgetTask>, topTask: WidgetTask?) {
+    Column(
+        modifier = GlanceModifier
+            .fillMaxSize()
+            .background(GlanceTheme.colors.surface)
+            .padding(8.dp)
+            .clickable(createNewTaskAction()),
+    ) {
+        Row(
+            modifier = GlanceModifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(
+                text = tasks.size.toString(),
+                style = TextStyle(
+                    color = GlanceTheme.colors.onSurface,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 22.sp,
+                ),
+            )
+            Spacer(modifier = GlanceModifier.width(6.dp))
+            Text(
+                text = "tasks",
+                style = TextStyle(
+                    color = GlanceTheme.colors.onSurfaceVariant,
+                    fontSize = 12.sp,
+                ),
+            )
+        }
+        Spacer(modifier = GlanceModifier.height(4.dp))
+        if (topTask != null) {
+            Text(
+                text = topTask.title,
+                style = TextStyle(
+                    color = GlanceTheme.colors.onSurface,
+                    fontSize = 12.sp,
+                ),
+                maxLines = 2,
+                modifier = GlanceModifier.clickable(createTaskAction(topTask.id)),
+            )
+        } else {
+            Text(
+                text = "No tasks",
+                style = TextStyle(
+                    color = GlanceTheme.colors.onSurfaceVariant,
+                    fontSize = 12.sp,
+                ),
+            )
+        }
+    }
+}
+
+@Composable
+private fun WidgetListWithOverdueContent(tasks: List<WidgetTask>) {
+    val now = System.currentTimeMillis()
+    val overdueCount = tasks.count { it.dueAt != null && it.dueAt < now }
+
+    Column(
+        modifier = GlanceModifier
+            .fillMaxSize()
+            .background(GlanceTheme.colors.surface)
+            .padding(8.dp),
+    ) {
+        WidgetHeader()
+        if (tasks.isEmpty()) {
+            WidgetEmptyState()
+        } else {
+            if (overdueCount > 0) {
+                Text(
+                    text = "Overdue ($overdueCount)",
+                    style = TextStyle(
+                        color = GlanceTheme.colors.error,
+                        fontWeight = FontWeight.Medium,
+                        fontSize = 12.sp,
+                    ),
+                    modifier = GlanceModifier.padding(vertical = 2.dp),
+                )
+            }
             WidgetTaskList(tasks = tasks)
         }
     }

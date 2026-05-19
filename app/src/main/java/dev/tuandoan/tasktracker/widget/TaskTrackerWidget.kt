@@ -24,7 +24,7 @@ class TaskTrackerWidget : GlanceAppWidget() {
 
         try {
             val entryPoint = WidgetEntryPoint.get(context)
-            tasks = WidgetDataProvider(entryPoint.taskDao()).getWidgetTasks()
+            tasks = WidgetDataProvider(entryPoint.taskDao()).getWidgetTasks(limit = LARGE_LIMIT)
             val prefs = entryPoint.settingsRepository().userPreferences.first()
             themeMode = prefs.themeMode
             dynamicColor = prefs.dynamicColor
@@ -41,6 +41,9 @@ class TaskTrackerWidget : GlanceAppWidget() {
 
     companion object {
         private const val TAG = "TaskTrackerWidget"
+
+        // Fetch enough tasks to populate the 4x4 layout; smaller layouts slice client-side.
+        private const val LARGE_LIMIT = 10
 
         val SMALL: DpSize = DpSize(110.dp, 110.dp)
         val MEDIUM: DpSize = DpSize(260.dp, 110.dp)
