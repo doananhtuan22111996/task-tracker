@@ -166,13 +166,45 @@ interface TaskDao {
     )
     suspend fun findChainTaskOnDate(rootId: Long, startMillis: Long, endMillis: Long): Task?
 
-    // Widget query
+    // Widget queries (V13-03 — one per WidgetSource variant)
+
+    // Today / default — all active, ordered by pinned then due-date (nulls last).
+    // Same semantics as the v1.12.0 widget query; renaming would touch every
+    // consumer with no behavior change, so it's kept under the original name.
     @Query(
         "SELECT * FROM tasks WHERE isCompleted = 0 AND isArchived = 0 " +
             "ORDER BY isPinned DESC, CASE WHEN dueAt IS NULL THEN 1 ELSE 0 END, dueAt ASC " +
             "LIMIT :limit",
     )
     suspend fun getWidgetTasks(limit: Int): List<Task>
+
+    // Upcoming 7 days — active tasks with a due date inside [nowMillis, untilMillis).
+    // Pinned float to the top so the user's hand-picked items stay first.
+    @Query(
+        "SELECT * FROM tasks WHERE isCompleted = 0 AND isArchived = 0 " +
+            "AND dueAt IS NOT NULL AND dueAt >= :nowMillis AND dueAt < :untilMillis " +
+            "ORDER BY isPinned DESC, dueAt ASC " +
+            "LIMIT :limit",
+    )
+    suspend fun getWidgetTasksUpcoming(nowMillis: Long, untilMillis: Long, limit: Int): List<Task>
+
+    // Pinned — only pinned active tasks; due-date sort with nulls last so
+    // pinned undated items still appear (just at the bottom of the pinned set).
+    @Query(
+        "SELECT * FROM tasks WHERE isCompleted = 0 AND isArchived = 0 AND isPinned = 1 " +
+            "ORDER BY CASE WHEN dueAt IS NULL THEN 1 ELSE 0 END, dueAt ASC " +
+            "LIMIT :limit",
+    )
+    suspend fun getWidgetTasksPinned(limit: Int): List<Task>
+
+    // Tag-filtered — active tasks whose tag column equals the given (already-
+    // normalized) value. Pinned float to top inside the tag set.
+    @Query(
+        "SELECT * FROM tasks WHERE isCompleted = 0 AND isArchived = 0 AND tag = :tag " +
+            "ORDER BY isPinned DESC, CASE WHEN dueAt IS NULL THEN 1 ELSE 0 END, dueAt ASC " +
+            "LIMIT :limit",
+    )
+    suspend fun getWidgetTasksByTag(tag: String, limit: Int): List<Task>
 
     // Tag management operations
     @Query(
