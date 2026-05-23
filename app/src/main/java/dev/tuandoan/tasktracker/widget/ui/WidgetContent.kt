@@ -11,6 +11,7 @@ import androidx.glance.LocalSize
 import androidx.glance.action.Action
 import androidx.glance.action.actionParametersOf
 import androidx.glance.action.clickable
+import androidx.glance.appwidget.CheckBox
 import androidx.glance.appwidget.action.actionRunCallback
 import androidx.glance.appwidget.action.actionStartActivity
 import androidx.glance.appwidget.cornerRadius
@@ -260,27 +261,19 @@ private fun WidgetTaskRow(task: WidgetTask) {
             .padding(vertical = 6.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        // Leading complete-from-widget checkbox. Has its own click target so it
-        // doesn't double-fire with the row click that opens the editor (V13-04
-        // FR-11 / FR-12). Sized 28dp to give a comfortable hit target on dense
-        // launchers while staying within the 4-row 4x4 height budget.
-        Box(
-            modifier = GlanceModifier
-                .size(28.dp)
-                .padding(end = 6.dp)
-                .clickable(completeTaskAction(task.id)),
-            contentAlignment = Alignment.Center,
-        ) {
-            // Empty checkbox glyph; flips to \u2611 briefly on completion via the
-            // next provideGlance pass (no animation here \u2014 V13-05).
-            Text(
-                text = "\u2610", // \u2610
-                style = TextStyle(
-                    color = GlanceTheme.colors.onSurface,
-                    fontSize = 18.sp,
-                ),
-            )
-        }
+        // Leading complete-from-widget checkbox. Real Glance CheckBox renders
+        // via RemoteViews so the launcher draws the platform native checkbox
+        // with proper accent color + ripple. checked is always false because
+        // completed tasks are filtered out of the widget data set; the row
+        // disappears on the next provideGlance pass after WidgetCompleteAction
+        // runs. No timed strikethrough/fade \u2014 Glance composables compile to a
+        // static RemoteViews snapshot and can't host Compose animations
+        // (OQ-01 fallback acknowledged in V13-05 decision doc).
+        CheckBox(
+            checked = false,
+            onCheckedChange = completeTaskAction(task.id),
+            modifier = GlanceModifier.padding(end = 4.dp),
+        )
 
         // Tap target for the rest of the row \u2192 editor.
         Row(
