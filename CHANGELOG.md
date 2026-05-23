@@ -12,6 +12,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com).
 - widget supports responsive 2x2 / 4x2 / 4x4 placements (default 4x2), scaffold for v1.13.0 widget v2 (V13-01)
 - widget renders size-aware layouts: 2x2 count badge + top task, 4x2 top 5 (unchanged), 4x4 top 10 with overdue header (V13-02)
 - widget task row split into two click targets: leading checkbox completes the task, rest of the row opens the editor (V13-04)
+- widget row now uses the platform Glance `CheckBox` (native accent color + ripple) instead of a text glyph; OQ-01 strikethrough/fade animation dropped — Glance composables compile to a static RemoteViews snapshot and can't host Compose animations (V13-05)
 
 ## [1.12.0] - 2026-05-17
 
