@@ -7,6 +7,7 @@ import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.components.SingletonComponent
 import dev.tuandoan.tasktracker.data.database.TaskDao
 import dev.tuandoan.tasktracker.data.preferences.SettingsRepository
+import dev.tuandoan.tasktracker.data.preferences.WidgetConfigurationRepository
 import dev.tuandoan.tasktracker.domain.ITaskManager
 
 @EntryPoint
@@ -18,6 +19,8 @@ interface WidgetEntryPoint {
     fun settingsRepository(): SettingsRepository
 
     fun taskManager(): ITaskManager
+
+    fun widgetConfigurationRepository(): WidgetConfigurationRepository
 
     companion object {
         fun get(context: Context): WidgetEntryPoint =
