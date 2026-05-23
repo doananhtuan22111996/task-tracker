@@ -21,9 +21,16 @@ class WidgetDataProviderTest {
         dataProvider = WidgetDataProvider(fakeDao, now = { TestTaskFactory.BASE_TIMESTAMP })
     }
 
+    private companion object {
+        // Matches WidgetSizeResolver.FETCH_LIMIT — production callers always pass
+        // that. Tests use it as the implicit-default replacement after V13-03
+        // dropped the misleading MAX_WIDGET_TASKS=5 default.
+        const val DEFAULT_LIMIT = 10
+    }
+
     @Test
     fun `empty database returns empty list`() = runTest {
-        val result = dataProvider.getWidgetTasks(WidgetSource.Today)
+        val result = dataProvider.getWidgetTasks(WidgetSource.Today, limit = DEFAULT_LIMIT)
         assertTrue(result.isEmpty())
     }
 
@@ -34,7 +41,7 @@ class WidgetDataProviderTest {
             TestTaskFactory.completedTask(id = 2, title = "Completed"),
         )
 
-        val result = dataProvider.getWidgetTasks(WidgetSource.Today)
+        val result = dataProvider.getWidgetTasks(WidgetSource.Today, limit = DEFAULT_LIMIT)
 
         assertEquals(1, result.size)
         assertEquals("Active", result[0].title)
@@ -47,21 +54,22 @@ class WidgetDataProviderTest {
             TestTaskFactory.archivedTask(id = 2, title = "Archived"),
         )
 
-        val result = dataProvider.getWidgetTasks(WidgetSource.Today)
+        val result = dataProvider.getWidgetTasks(WidgetSource.Today, limit = DEFAULT_LIMIT)
 
         assertEquals(1, result.size)
         assertEquals("Active", result[0].title)
     }
 
     @Test
-    fun `returns max 5 tasks`() = runTest {
-        fakeDao.tasks = (1..10).map { i ->
+    fun `respects the passed limit when more tasks exist`() = runTest {
+        // Seed 20 (twice DEFAULT_LIMIT) to verify capping kicks in.
+        fakeDao.tasks = (1..20).map { i ->
             TestTaskFactory.createTask(id = i.toLong(), title = "Task $i")
         }
 
-        val result = dataProvider.getWidgetTasks(WidgetSource.Today)
+        val result = dataProvider.getWidgetTasks(WidgetSource.Today, limit = DEFAULT_LIMIT)
 
-        assertEquals(5, result.size)
+        assertEquals(DEFAULT_LIMIT, result.size)
     }
 
     @Test
@@ -80,7 +88,7 @@ class WidgetDataProviderTest {
             ),
         )
 
-        val result = dataProvider.getWidgetTasks(WidgetSource.Today)
+        val result = dataProvider.getWidgetTasks(WidgetSource.Today, limit = DEFAULT_LIMIT)
 
         assertEquals("Pinned", result[0].title)
         assertTrue(result[0].isPinned)
@@ -101,7 +109,7 @@ class WidgetDataProviderTest {
             ),
         )
 
-        val result = dataProvider.getWidgetTasks(WidgetSource.Today)
+        val result = dataProvider.getWidgetTasks(WidgetSource.Today, limit = DEFAULT_LIMIT)
 
         assertEquals("Sooner", result[0].title)
         assertEquals("Later", result[1].title)
@@ -118,7 +126,7 @@ class WidgetDataProviderTest {
             ),
         )
 
-        val result = dataProvider.getWidgetTasks(WidgetSource.Today)
+        val result = dataProvider.getWidgetTasks(WidgetSource.Today, limit = DEFAULT_LIMIT)
 
         assertEquals("Has date", result[0].title)
         assertEquals("No date", result[1].title)
@@ -137,7 +145,7 @@ class WidgetDataProviderTest {
             ),
         )
 
-        val result = dataProvider.getWidgetTasks(WidgetSource.Today)
+        val result = dataProvider.getWidgetTasks(WidgetSource.Today, limit = DEFAULT_LIMIT)
 
         assertEquals(1, result.size)
         val task = result[0]

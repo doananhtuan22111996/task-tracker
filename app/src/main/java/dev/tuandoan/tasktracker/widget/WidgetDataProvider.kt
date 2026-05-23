@@ -15,7 +15,7 @@ import dev.tuandoan.tasktracker.widget.model.WidgetTask
  */
 class WidgetDataProvider(private val taskDao: TaskDao, private val now: () -> Long = { System.currentTimeMillis() }) {
 
-    suspend fun getWidgetTasks(source: WidgetSource, limit: Int = MAX_WIDGET_TASKS): List<WidgetTask> {
+    suspend fun getWidgetTasks(source: WidgetSource, limit: Int): List<WidgetTask> {
         val tasks = when (source) {
             is WidgetSource.Today ->
                 taskDao.getWidgetTasks(limit)
@@ -48,7 +48,6 @@ class WidgetDataProvider(private val taskDao: TaskDao, private val now: () -> Lo
     }
 
     companion object {
-        const val MAX_WIDGET_TASKS = 5
         private const val WEEK_MILLIS = 7L * 24 * 60 * 60 * 1000
     }
 }
