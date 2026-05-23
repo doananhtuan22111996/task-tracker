@@ -13,6 +13,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com).
 - widget renders size-aware layouts: 2x2 count badge + top task, 4x2 top 5 (unchanged), 4x4 top 10 with overdue header (V13-02)
 - widget task row split into two click targets: leading checkbox completes the task, rest of the row opens the editor (V13-04)
 - widget row now uses the platform Glance `CheckBox` (native accent color + ripple) instead of a text glyph; OQ-01 strikethrough/fade animation dropped — Glance composables compile to a static RemoteViews snapshot and can't host Compose animations (V13-05)
+- widget data provider now dispatches via a sealed `WidgetSource` (Today / Upcoming7d / Pinned / Tag); only Today is wired into the widget surface until V13-09 reads per-widget config (V13-03)
 
 ## [1.12.0] - 2026-05-17
 

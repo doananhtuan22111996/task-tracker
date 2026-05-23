@@ -3,6 +3,7 @@ package dev.tuandoan.tasktracker.widget
 import dev.tuandoan.tasktracker.data.database.Task
 import dev.tuandoan.tasktracker.testutil.TestTaskFactory
 import dev.tuandoan.tasktracker.testutil.TestTaskFactory.ONE_DAY_MS
+import dev.tuandoan.tasktracker.widget.model.WidgetSource
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -17,12 +18,12 @@ class WidgetDataProviderTest {
     @Before
     fun setup() {
         fakeDao = FakeWidgetTaskDao()
-        dataProvider = WidgetDataProvider(fakeDao)
+        dataProvider = WidgetDataProvider(fakeDao, now = { TestTaskFactory.BASE_TIMESTAMP })
     }
 
     @Test
     fun `empty database returns empty list`() = runTest {
-        val result = dataProvider.getWidgetTasks()
+        val result = dataProvider.getWidgetTasks(WidgetSource.Today)
         assertTrue(result.isEmpty())
     }
 
@@ -33,7 +34,7 @@ class WidgetDataProviderTest {
             TestTaskFactory.completedTask(id = 2, title = "Completed"),
         )
 
-        val result = dataProvider.getWidgetTasks()
+        val result = dataProvider.getWidgetTasks(WidgetSource.Today)
 
         assertEquals(1, result.size)
         assertEquals("Active", result[0].title)
@@ -46,7 +47,7 @@ class WidgetDataProviderTest {
             TestTaskFactory.archivedTask(id = 2, title = "Archived"),
         )
 
-        val result = dataProvider.getWidgetTasks()
+        val result = dataProvider.getWidgetTasks(WidgetSource.Today)
 
         assertEquals(1, result.size)
         assertEquals("Active", result[0].title)
@@ -58,7 +59,7 @@ class WidgetDataProviderTest {
             TestTaskFactory.createTask(id = i.toLong(), title = "Task $i")
         }
 
-        val result = dataProvider.getWidgetTasks()
+        val result = dataProvider.getWidgetTasks(WidgetSource.Today)
 
         assertEquals(5, result.size)
     }
@@ -79,7 +80,7 @@ class WidgetDataProviderTest {
             ),
         )
 
-        val result = dataProvider.getWidgetTasks()
+        val result = dataProvider.getWidgetTasks(WidgetSource.Today)
 
         assertEquals("Pinned", result[0].title)
         assertTrue(result[0].isPinned)
@@ -100,7 +101,7 @@ class WidgetDataProviderTest {
             ),
         )
 
-        val result = dataProvider.getWidgetTasks()
+        val result = dataProvider.getWidgetTasks(WidgetSource.Today)
 
         assertEquals("Sooner", result[0].title)
         assertEquals("Later", result[1].title)
@@ -117,7 +118,7 @@ class WidgetDataProviderTest {
             ),
         )
 
-        val result = dataProvider.getWidgetTasks()
+        val result = dataProvider.getWidgetTasks(WidgetSource.Today)
 
         assertEquals("Has date", result[0].title)
         assertEquals("No date", result[1].title)
@@ -136,7 +137,7 @@ class WidgetDataProviderTest {
             ),
         )
 
-        val result = dataProvider.getWidgetTasks()
+        val result = dataProvider.getWidgetTasks(WidgetSource.Today)
 
         assertEquals(1, result.size)
         val task = result[0]
@@ -154,9 +155,46 @@ class WidgetDataProviderTest {
             TestTaskFactory.createTask(id = i.toLong(), title = "Task $i")
         }
 
-        val result = dataProvider.getWidgetTasks(limit = 3)
+        val result = dataProvider.getWidgetTasks(WidgetSource.Today, limit = 3)
 
         assertEquals(3, result.size)
+    }
+
+    // ── V13-03: WidgetSource dispatch smoke tests ────────────────────────────
+    // V13-13 owns the deeper query-semantic coverage for each source. These
+    // tests just pin that the provider routes each WidgetSource variant to the
+    // matching DAO method (no fall-through, no crossed wires).
+
+    @Test
+    fun `Upcoming7d source routes to getWidgetTasksUpcoming with now and now+week window`() = runTest {
+        dataProvider.getWidgetTasks(WidgetSource.Upcoming7d, limit = 4)
+
+        val call = fakeDao.upcomingCalls.single()
+        assertEquals(TestTaskFactory.BASE_TIMESTAMP, call.now)
+        assertEquals(TestTaskFactory.BASE_TIMESTAMP + 7L * 24 * 60 * 60 * 1000, call.until)
+        assertEquals(4, call.limit)
+    }
+
+    @Test
+    fun `Pinned source routes to getWidgetTasksPinned`() = runTest {
+        dataProvider.getWidgetTasks(WidgetSource.Pinned, limit = 7)
+
+        assertEquals(listOf(7), fakeDao.pinnedLimits)
+    }
+
+    @Test
+    fun `Tag source routes to getWidgetTasksByTag with the normalized name`() = runTest {
+        dataProvider.getWidgetTasks(WidgetSource.Tag("WORK"), limit = 5)
+
+        assertEquals(listOf("WORK" to 5), fakeDao.tagCalls)
+    }
+
+    @Test
+    fun `Tag source with blank name returns empty without touching dao`() = runTest {
+        val result = dataProvider.getWidgetTasks(WidgetSource.Tag(""), limit = 5)
+
+        assertTrue(result.isEmpty())
+        assertTrue(fakeDao.tagCalls.isEmpty())
     }
 }
 
@@ -169,6 +207,12 @@ private class FakeWidgetTaskDao : dev.tuandoan.tasktracker.data.database.TaskDao
 
     var tasks: List<Task> = emptyList()
 
+    /** V13-03 dispatch tracking — V13-13 will replace these with real query simulation. */
+    data class UpcomingCall(val now: Long, val until: Long, val limit: Int)
+    val upcomingCalls = mutableListOf<UpcomingCall>()
+    val pinnedLimits = mutableListOf<Int>()
+    val tagCalls = mutableListOf<Pair<String, Int>>()
+
     override suspend fun getWidgetTasks(limit: Int): List<Task> = tasks
         .filter { !it.isCompleted && !it.isArchived }
         .sortedWith(
@@ -176,6 +220,21 @@ private class FakeWidgetTaskDao : dev.tuandoan.tasktracker.data.database.TaskDao
                 .thenBy(nullsLast()) { it.dueAt },
         )
         .take(limit)
+
+    override suspend fun getWidgetTasksUpcoming(nowMillis: Long, untilMillis: Long, limit: Int): List<Task> {
+        upcomingCalls.add(UpcomingCall(nowMillis, untilMillis, limit))
+        return emptyList()
+    }
+
+    override suspend fun getWidgetTasksPinned(limit: Int): List<Task> {
+        pinnedLimits.add(limit)
+        return emptyList()
+    }
+
+    override suspend fun getWidgetTasksByTag(tag: String, limit: Int): List<Task> {
+        tagCalls.add(tag to limit)
+        return emptyList()
+    }
 
     // Unused stubs — only getWidgetTasks matters for this test
     override fun getAllTasks() = throw UnsupportedOperationException()
