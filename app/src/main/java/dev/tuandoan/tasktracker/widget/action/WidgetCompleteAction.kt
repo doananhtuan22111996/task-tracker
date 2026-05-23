@@ -11,23 +11,26 @@ import dev.tuandoan.tasktracker.widget.WidgetEntryPoint
 /**
  * Glance [ActionCallback] for the per-row complete checkbox.
  *
- * Resolves [ITaskManager] via [WidgetEntryPoint] and delegates to
- * [WidgetCompleteHandler]. The callback itself stays a thin handler — all logic
- * (lookup, idempotency, ordering) is in the handler so it's JVM-unit-testable
- * without the Glance runtime.
+ * Resolves the task manager via [WidgetEntryPoint] and delegates to
+ * [WidgetCompleteHandler]. The callback stays thin — all logic (lookup,
+ * idempotency, ordering) is in the handler so it's JVM-unit-testable without
+ * the Glance runtime.
  *
- * After completion, every placed widget is refreshed via [TaskTrackerWidget.updateAll]
- * to remove the just-completed row from views fed by other instances. The handler
- * already calls the injected `WidgetUpdater`, so this `updateAll` is the same path
- * — duplicates collapse on the GlanceManager side.
+ * Only calls [TaskTrackerWidget.updateAll] when a completion was actually
+ * applied. The handler's no-op paths (missing, already-completed, rapid
+ * double-tap absorbed by the DB-state guard) skip the second render — the
+ * `WidgetUpdater` injected into `TaskManager` already covers the apply path,
+ * so this is a belt-and-braces refresh that picks up other widget instances.
  */
 class WidgetCompleteAction : ActionCallback {
 
     override suspend fun onAction(context: Context, glanceId: GlanceId, parameters: ActionParameters) {
         val taskId = parameters[TASK_ID_KEY] ?: return
         val entryPoint = WidgetEntryPoint.get(context)
-        WidgetCompleteHandler(entryPoint.taskManager()).complete(taskId)
-        TaskTrackerWidget().updateAll(context)
+        val applied = WidgetCompleteHandler(entryPoint.taskManager()).complete(taskId)
+        if (applied) {
+            TaskTrackerWidget().updateAll(context)
+        }
     }
 
     companion object {
