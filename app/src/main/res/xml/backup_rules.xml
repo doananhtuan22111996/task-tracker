@@ -12,4 +12,5 @@
     <exclude domain="database" path="task_tracker.db-wal" />
     <exclude domain="sharedpref" path="settings.preferences_pb" />
     <exclude domain="sharedpref" path="privacy.preferences_pb" />
+    <exclude domain="sharedpref" path="widget.preferences_pb" />
 </full-backup-content>
