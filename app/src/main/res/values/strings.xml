@@ -643,4 +643,5 @@
     <string name="widget_priority_medium">medium</string>
     <string name="widget_priority_low">low</string>
     <string name="widget_due_overdue">Overdue</string>
+    <string name="widget_action_mark_complete">Mark %1$s complete</string>
 </resources>

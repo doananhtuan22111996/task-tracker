@@ -9,7 +9,9 @@ import androidx.glance.GlanceModifier
 import androidx.glance.GlanceTheme
 import androidx.glance.LocalSize
 import androidx.glance.action.Action
+import androidx.glance.action.actionParametersOf
 import androidx.glance.action.clickable
+import androidx.glance.appwidget.action.actionRunCallback
 import androidx.glance.appwidget.action.actionStartActivity
 import androidx.glance.appwidget.cornerRadius
 import androidx.glance.appwidget.lazy.LazyColumn
@@ -30,6 +32,7 @@ import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
 import dev.tuandoan.tasktracker.MainActivity
+import dev.tuandoan.tasktracker.widget.action.WidgetCompleteAction
 import dev.tuandoan.tasktracker.widget.formatDueDate
 import dev.tuandoan.tasktracker.widget.model.WidgetTask
 
@@ -46,6 +49,10 @@ private fun createNewTaskAction(): Action {
     intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
     return actionStartActivity(intent)
 }
+
+private fun completeTaskAction(taskId: Long): Action = actionRunCallback<WidgetCompleteAction>(
+    parameters = actionParametersOf(WidgetCompleteAction.TASK_ID_KEY to taskId),
+)
 
 @Composable
 fun WidgetContent(tasks: List<WidgetTask>) {
@@ -250,60 +257,89 @@ private fun WidgetTaskRow(task: WidgetTask) {
     Row(
         modifier = GlanceModifier
             .fillMaxWidth()
-            .padding(vertical = 6.dp)
-            .clickable(createTaskAction(task.id)),
+            .padding(vertical = 6.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        // Priority dot
-        Text(
-            text = when (task.priority) {
-                2 -> "\uD83D\uDD34" // red circle
-                0 -> "\uD83D\uDFE3" // purple circle
-                else -> "\uD83D\uDD35" // blue circle
-            },
-            style = TextStyle(fontSize = 8.sp),
-        )
-        Spacer(modifier = GlanceModifier.width(6.dp))
-
-        // Pin icon
-        if (task.isPinned) {
+        // Leading complete-from-widget checkbox. Has its own click target so it
+        // doesn't double-fire with the row click that opens the editor (V13-04
+        // FR-11 / FR-12). Sized 28dp to give a comfortable hit target on dense
+        // launchers while staying within the 4-row 4x4 height budget.
+        Box(
+            modifier = GlanceModifier
+                .size(28.dp)
+                .padding(end = 6.dp)
+                .clickable(completeTaskAction(task.id)),
+            contentAlignment = Alignment.Center,
+        ) {
+            // Empty checkbox glyph; flips to \u2611 briefly on completion via the
+            // next provideGlance pass (no animation here \u2014 V13-05).
             Text(
-                text = "\u2605",
+                text = "\u2610", // \u2610
                 style = TextStyle(
-                    color = GlanceTheme.colors.primary,
-                    fontSize = 12.sp,
+                    color = GlanceTheme.colors.onSurface,
+                    fontSize = 18.sp,
                 ),
             )
-            Spacer(modifier = GlanceModifier.width(4.dp))
         }
 
-        // Title
-        Text(
-            text = task.title,
-            style = TextStyle(
-                color = GlanceTheme.colors.onSurface,
-                fontSize = 14.sp,
-            ),
-            maxLines = 1,
-            modifier = GlanceModifier.defaultWeight(),
-        )
-
-        // Due date
-        val dueDateText = formatDueDate(task.dueAt)
-        if (dueDateText != null) {
-            val isOverdue = task.dueAt != null && task.dueAt < System.currentTimeMillis()
+        // Tap target for the rest of the row \u2192 editor.
+        Row(
+            modifier = GlanceModifier
+                .defaultWeight()
+                .clickable(createTaskAction(task.id)),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            // Priority dot
             Text(
-                text = dueDateText,
-                style = TextStyle(
-                    color = if (isOverdue) {
-                        GlanceTheme.colors.error
-                    } else {
-                        GlanceTheme.colors.onSurfaceVariant
-                    },
-                    fontWeight = if (isOverdue) FontWeight.Medium else FontWeight.Normal,
-                    fontSize = 11.sp,
-                ),
+                text = when (task.priority) {
+                    2 -> "\uD83D\uDD34" // red circle
+                    0 -> "\uD83D\uDFE3" // purple circle
+                    else -> "\uD83D\uDD35" // blue circle
+                },
+                style = TextStyle(fontSize = 8.sp),
             )
+            Spacer(modifier = GlanceModifier.width(6.dp))
+
+            // Pin icon
+            if (task.isPinned) {
+                Text(
+                    text = "\u2605",
+                    style = TextStyle(
+                        color = GlanceTheme.colors.primary,
+                        fontSize = 12.sp,
+                    ),
+                )
+                Spacer(modifier = GlanceModifier.width(4.dp))
+            }
+
+            // Title
+            Text(
+                text = task.title,
+                style = TextStyle(
+                    color = GlanceTheme.colors.onSurface,
+                    fontSize = 14.sp,
+                ),
+                maxLines = 1,
+                modifier = GlanceModifier.defaultWeight(),
+            )
+
+            // Due date
+            val dueDateText = formatDueDate(task.dueAt)
+            if (dueDateText != null) {
+                val isOverdue = task.dueAt != null && task.dueAt < System.currentTimeMillis()
+                Text(
+                    text = dueDateText,
+                    style = TextStyle(
+                        color = if (isOverdue) {
+                            GlanceTheme.colors.error
+                        } else {
+                            GlanceTheme.colors.onSurfaceVariant
+                        },
+                        fontWeight = if (isOverdue) FontWeight.Medium else FontWeight.Normal,
+                        fontSize = 11.sp,
+                    ),
+                )
+            }
         }
     }
 }
