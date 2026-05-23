@@ -6,6 +6,7 @@ import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.glance.GlanceId
 import androidx.glance.appwidget.GlanceAppWidget
+import androidx.glance.appwidget.GlanceAppWidgetManager
 import androidx.glance.appwidget.SizeMode
 import androidx.glance.appwidget.provideContent
 import dev.tuandoan.tasktracker.data.preferences.ThemeMode
@@ -26,10 +27,16 @@ class TaskTrackerWidget : GlanceAppWidget() {
 
         try {
             val entryPoint = WidgetEntryPoint.get(context)
-            // Today is the only source wired until V13-09 reads per-appWidgetId
-            // configuration (V13-07 / V13-08).
+            // V13-09: resolve the per-appWidgetId source from `widget.preferences_pb`.
+            // null = unconfigured (first placement before the user opens the configure
+            // activity, OR a transient repository read failure that the repo's IOException
+            // recovery already mapped to null) → fall back to the v1.12.0 Today shape so
+            // existing placements don't change behavior on upgrade.
+            val appWidgetId = GlanceAppWidgetManager(context).getAppWidgetId(id)
+            val source = entryPoint.widgetConfigurationRepository()
+                .getSourceOnce(appWidgetId) ?: WidgetSource.Today
             tasks = WidgetDataProvider(entryPoint.taskDao())
-                .getWidgetTasks(source = WidgetSource.Today, limit = WidgetSizeResolver.FETCH_LIMIT)
+                .getWidgetTasks(source = source, limit = WidgetSizeResolver.FETCH_LIMIT)
             val prefs = entryPoint.settingsRepository().userPreferences.first()
             themeMode = prefs.themeMode
             dynamicColor = prefs.dynamicColor
