@@ -643,4 +643,15 @@
     <string name="widget_priority_medium">medium</string>
     <string name="widget_priority_low">low</string>
     <string name="widget_due_overdue">Overdue</string>
+
+    <!-- Widget configure activity (V13-08) -->
+    <string name="widget_configure_title">Choose widget content</string>
+    <string name="widget_configure_confirm">Confirm</string>
+    <string name="widget_source_today">Today</string>
+    <string name="widget_source_upcoming">Upcoming (7 days)</string>
+    <string name="widget_source_pinned">Pinned</string>
+    <string name="widget_source_tag">By tag</string>
+    <string name="widget_configure_tag_picker_hint">Select a tag</string>
+    <string name="widget_configure_no_tags">No tags yet. Create tasks with tags first.</string>
+    <string name="cd_widget_source_option">%1$s source option</string>
 </resources>

@@ -10,6 +10,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com).
 - per-`appWidgetId` widget configuration repository backed by a dedicated `widget.preferences_pb` DataStore file; persists the user's source choice (Today / Upcoming 7d / Pinned / Tag) per placement and is excluded from cloud-backup so each device starts fresh (V13-07)
 - removing a widget from the home screen now drops its stored configuration via `TaskTrackerWidgetReceiver.onDeleted`, so a fresh widget placed at the same `appWidgetId` starts from defaults instead of inheriting the previous source (V13-10)
 - `provideGlance` resolves the per-`appWidgetId` source from `WidgetConfigurationRepository` and falls back to Today when unconfigured; V13-08's configure activity will write the source the user picks (V13-09)
+- full-screen `WidgetConfigureActivity` launched on widget placement; lets the user pick Today / Upcoming 7d / Pinned / By tag as the content source, writes to `WidgetConfigurationRepository`, and returns `RESULT_OK`; back or cancel returns `RESULT_CANCELED` so the OS removes the placement (V13-08)
 
 ### Changed
 - widget supports responsive 2x2 / 4x2 / 4x4 placements (default 4x2), scaffold for v1.13.0 widget v2 (V13-01)
