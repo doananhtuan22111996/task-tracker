@@ -69,6 +69,11 @@
             android:name=".work.TaskSnoozeReceiver"
             android:exported="false" />
 
+        <activity
+            android:name=".widget.ui.WidgetConfigureActivity"
+            android:exported="false"
+            android:theme="@style/Theme.TaskTracker" />
+
         <receiver
             android:name=".widget.TaskTrackerWidgetReceiver"
             android:exported="false">
