@@ -39,21 +39,26 @@ class WidgetConfigureViewModel @Inject constructor(
      * Persists the selected source for [appWidgetId] and signals completion via [onDone].
      * [onDone] is called on the main thread inside `viewModelScope`; the caller sets
      * `RESULT_OK` and finishes the activity.
+     *
+     * `isSaving` is always cleared in `finally` so an `IOException` from DataStore never
+     * leaves the Confirm button permanently disabled.
      */
     fun confirm(appWidgetId: Int, onDone: () -> Unit) {
         viewModelScope.launch {
             _uiState.update { it.copy(isSaving = true) }
-            val source = _uiState.value.selection
-            // Normalize tag name defensively; blank tags are rejected by the repository too.
-            val finalSource = if (source is WidgetSource.Tag) {
-                val normalized = TagNormalizer.normalize(source.name)
-                if (normalized != null) WidgetSource.Tag(normalized) else WidgetSource.Today
-            } else {
-                source
+            try {
+                val source = _uiState.value.selection
+                val finalSource = if (source is WidgetSource.Tag) {
+                    val normalized = TagNormalizer.normalize(source.name)
+                    if (normalized != null) WidgetSource.Tag(normalized) else WidgetSource.Today
+                } else {
+                    source
+                }
+                configRepository.setSource(appWidgetId, finalSource)
+                onDone()
+            } finally {
+                _uiState.update { it.copy(isSaving = false) }
             }
-            configRepository.setSource(appWidgetId, finalSource)
-            _uiState.update { it.copy(isSaving = false) }
-            onDone()
         }
     }
 }

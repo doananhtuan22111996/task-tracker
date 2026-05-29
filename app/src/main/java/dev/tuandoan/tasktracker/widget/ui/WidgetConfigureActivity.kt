@@ -3,6 +3,7 @@ package dev.tuandoan.tasktracker.widget.ui
 import android.appwidget.AppWidgetManager
 import android.content.Intent
 import android.os.Bundle
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -44,6 +45,18 @@ class WidgetConfigureActivity : AppCompatActivity() {
             return
         }
 
+        // RESULT_CANCELED is already the default; this callback makes back gesture explicit
+        // and avoids the deprecated onBackPressed() override.
+        onBackPressedDispatcher.addCallback(
+            this,
+            object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    setResult(RESULT_CANCELED)
+                    finish()
+                }
+            },
+        )
+
         enableEdgeToEdge()
 
         setContent {
@@ -58,11 +71,15 @@ class WidgetConfigureActivity : AppCompatActivity() {
                     onSelectionChange = { source -> viewModel.setSelection(source) },
                     onConfirm = {
                         viewModel.confirm(appWidgetId) {
-                            val resultIntent = Intent().apply {
-                                putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
+                            // Guard against a back press arriving while the DataStore write
+                            // was in flight — last setResult wins, so don't override CANCELED.
+                            if (!isFinishing) {
+                                val resultIntent = Intent().apply {
+                                    putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
+                                }
+                                setResult(RESULT_OK, resultIntent)
+                                finish()
                             }
-                            setResult(RESULT_OK, resultIntent)
-                            finish()
                         }
                     },
                     onCancel = {
@@ -72,11 +89,5 @@ class WidgetConfigureActivity : AppCompatActivity() {
                 )
             }
         }
-    }
-
-    override fun onBackPressed() {
-        setResult(RESULT_CANCELED)
-        @Suppress("DEPRECATION")
-        super.onBackPressed()
     }
 }
