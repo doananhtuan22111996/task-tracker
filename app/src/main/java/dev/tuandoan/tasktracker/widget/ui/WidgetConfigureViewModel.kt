@@ -8,9 +8,12 @@ import dev.tuandoan.tasktracker.domain.model.TagItem
 import dev.tuandoan.tasktracker.domain.service.TagNormalizer
 import dev.tuandoan.tasktracker.domain.usecase.TagManagementUseCase
 import dev.tuandoan.tasktracker.widget.model.WidgetSource
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -28,6 +31,9 @@ class WidgetConfigureViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(WidgetConfigureUiState())
     val uiState: StateFlow<WidgetConfigureUiState> = _uiState.asStateFlow()
 
+    private val _navigateDone = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
+    val navigateDone: SharedFlow<Unit> = _navigateDone.asSharedFlow()
+
     val tags: StateFlow<List<TagItem>> = tagManagementUseCase.observeTags()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
@@ -36,18 +42,18 @@ class WidgetConfigureViewModel @Inject constructor(
     }
 
     /**
-     * Persists the selected source for [appWidgetId] and signals completion via [onDone].
-     * [onDone] is called on the main thread inside `viewModelScope`; the caller sets
-     * `RESULT_OK` and finishes the activity.
+     * Persists the selected source for [appWidgetId] and emits on [navigateDone].
      *
-     * `isSaving` is always cleared in `finally` so an `IOException` from DataStore never
+     * Selection is captured before the coroutine starts to avoid a TOCTOU where
+     * the user taps a different radio button between `isSaving=true` and the read.
+     * `isSaving` is always cleared in `finally` so a DataStore `IOException` never
      * leaves the Confirm button permanently disabled.
      */
-    fun confirm(appWidgetId: Int, onDone: () -> Unit) {
+    fun confirm(appWidgetId: Int) {
+        val source = _uiState.value.selection
         viewModelScope.launch {
             _uiState.update { it.copy(isSaving = true) }
             try {
-                val source = _uiState.value.selection
                 val finalSource = if (source is WidgetSource.Tag) {
                     val normalized = TagNormalizer.normalize(source.name)
                     if (normalized != null) WidgetSource.Tag(normalized) else WidgetSource.Today
@@ -55,7 +61,7 @@ class WidgetConfigureViewModel @Inject constructor(
                     source
                 }
                 configRepository.setSource(appWidgetId, finalSource)
-                onDone()
+                _navigateDone.tryEmit(Unit)
             } finally {
                 _uiState.update { it.copy(isSaving = false) }
             }

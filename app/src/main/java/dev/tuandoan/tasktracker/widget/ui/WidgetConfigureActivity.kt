@@ -6,12 +6,16 @@ import android.os.Bundle
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.getValue
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import dagger.hilt.android.AndroidEntryPoint
 import dev.tuandoan.tasktracker.ui.theme.TaskTrackerTheme
+import kotlinx.coroutines.launch
 
 /**
  * Full-screen configuration activity launched by the launcher when the user places the widget
@@ -28,6 +32,7 @@ import dev.tuandoan.tasktracker.ui.theme.TaskTrackerTheme
 @AndroidEntryPoint
 class WidgetConfigureActivity : AppCompatActivity() {
 
+    private val viewModel: WidgetConfigureViewModel by viewModels()
     private var appWidgetId: Int = AppWidgetManager.INVALID_APPWIDGET_ID
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -57,11 +62,24 @@ class WidgetConfigureActivity : AppCompatActivity() {
             },
         )
 
+        // Collect navigateDone as a one-shot navigation event so no Activity reference
+        // is held inside viewModelScope across configuration changes.
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.navigateDone.collect {
+                    val resultIntent = Intent().apply {
+                        putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
+                    }
+                    setResult(RESULT_OK, resultIntent)
+                    finish()
+                }
+            }
+        }
+
         enableEdgeToEdge()
 
         setContent {
             TaskTrackerTheme {
-                val viewModel: WidgetConfigureViewModel = hiltViewModel()
                 val uiState by viewModel.uiState.collectAsStateWithLifecycle()
                 val tags by viewModel.tags.collectAsStateWithLifecycle()
 
@@ -69,19 +87,7 @@ class WidgetConfigureActivity : AppCompatActivity() {
                     uiState = uiState,
                     tags = tags,
                     onSelectionChange = { source -> viewModel.setSelection(source) },
-                    onConfirm = {
-                        viewModel.confirm(appWidgetId) {
-                            // Guard against a back press arriving while the DataStore write
-                            // was in flight — last setResult wins, so don't override CANCELED.
-                            if (!isFinishing) {
-                                val resultIntent = Intent().apply {
-                                    putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
-                                }
-                                setResult(RESULT_OK, resultIntent)
-                                finish()
-                            }
-                        }
-                    },
+                    onConfirm = { viewModel.confirm(appWidgetId) },
                     onCancel = {
                         setResult(RESULT_CANCELED)
                         finish()
