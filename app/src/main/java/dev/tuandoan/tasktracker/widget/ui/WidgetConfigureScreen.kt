@@ -194,6 +194,7 @@ private fun TagPickerRow(tag: TagItem, selected: Boolean, onClick: () -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
+            .semantics { role = Role.RadioButton }
             .clickable(onClick = onClick)
             .padding(horizontal = 32.dp, vertical = 12.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
