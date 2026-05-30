@@ -7,6 +7,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com).
 
 ### Added
 - complete-from-widget: per-row checkbox marks the task done in one tap, reusing `TaskManager.toggleTaskCompletion` so reminder cancellation, recurrence generation and analytics all stay on a single code path (V13-04)
+- JVM tests for `WidgetCompleteHandler`: ordering invariant (cancel reminder → persist → widget update), timed double-tap absorbed as no-op, and no-reschedule guarantee post-completion (V13-06)
 - per-`appWidgetId` widget configuration repository backed by a dedicated `widget.preferences_pb` DataStore file; persists the user's source choice (Today / Upcoming 7d / Pinned / Tag) per placement and is excluded from cloud-backup so each device starts fresh (V13-07)
 - removing a widget from the home screen now drops its stored configuration via `TaskTrackerWidgetReceiver.onDeleted`, so a fresh widget placed at the same `appWidgetId` starts from defaults instead of inheriting the previous source (V13-10)
 - `provideGlance` resolves the per-`appWidgetId` source from `WidgetConfigurationRepository` and falls back to Today when unconfigured; V13-08's configure activity will write the source the user picks (V13-09)

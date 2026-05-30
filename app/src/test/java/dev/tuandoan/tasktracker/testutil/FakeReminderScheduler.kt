@@ -6,7 +6,7 @@ import dev.tuandoan.tasktracker.domain.scheduler.TaskReminderScheduler
  * Fake implementation of [TaskReminderScheduler] for unit tests.
  * Tracks scheduled and cancelled reminders for assertion without touching OS APIs.
  */
-class FakeReminderScheduler : TaskReminderScheduler {
+open class FakeReminderScheduler : TaskReminderScheduler {
 
     data class ScheduledReminder(val taskId: Long, val title: String, val dueAt: Long, val offsetMinutes: Int)
 
