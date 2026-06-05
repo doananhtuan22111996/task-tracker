@@ -26,6 +26,7 @@ class WidgetDataProviderTest {
         // that. Tests use it as the implicit-default replacement after V13-03
         // dropped the misleading MAX_WIDGET_TASKS=5 default.
         const val DEFAULT_LIMIT = 10
+        val ONE_DAY_MS = TestTaskFactory.ONE_DAY_MS
     }
 
     @Test
@@ -204,44 +205,285 @@ class WidgetDataProviderTest {
         assertTrue(result.isEmpty())
         assertTrue(fakeDao.tagCalls.isEmpty())
     }
+
+    // ── V13-13: WidgetSource query-semantic tests ─────────────────────────────
+    // These replace the empty-stub dispatches with real query simulation and
+    // pin the semantic edges documented in the PRD + V13-03 notes.
+
+    // ── Upcoming7d ────────────────────────────────────────────────────────────
+
+    @Test
+    fun `Upcoming7d returns only tasks with dueAt inside the 7-day window`() = runTest {
+        val now = TestTaskFactory.BASE_TIMESTAMP
+        val week = 7L * ONE_DAY_MS
+        fakeDao.tasks = listOf(
+            TestTaskFactory.createTask(id = 1, title = "In window", dueAt = now + ONE_DAY_MS),
+            TestTaskFactory.createTask(id = 2, title = "Exactly now", dueAt = now),
+            TestTaskFactory.createTask(id = 3, title = "Just before end", dueAt = now + week - 1),
+            TestTaskFactory.createTask(id = 4, title = "At end (exclusive)", dueAt = now + week),
+            TestTaskFactory.createTask(id = 5, title = "Past window", dueAt = now + week + ONE_DAY_MS),
+            TestTaskFactory.createTask(id = 6, title = "No due date"),
+        )
+
+        val result = dataProvider.getWidgetTasks(WidgetSource.Upcoming7d, limit = DEFAULT_LIMIT)
+
+        val titles = result.map { it.title }
+        assertTrue("In window" in titles)
+        assertTrue("Exactly now" in titles)
+        assertTrue("Just before end" in titles)
+        assertTrue("At end (exclusive)" !in titles)
+        assertTrue("Past window" !in titles)
+        assertTrue("No due date" !in titles)
+    }
+
+    @Test
+    fun `Upcoming7d excludes completed tasks`() = runTest {
+        val now = TestTaskFactory.BASE_TIMESTAMP
+        fakeDao.tasks = listOf(
+            TestTaskFactory.createTask(id = 1, title = "Active", dueAt = now + ONE_DAY_MS),
+            TestTaskFactory.completedTask(id = 2, title = "Completed").copy(dueAt = now + ONE_DAY_MS),
+        )
+
+        val result = dataProvider.getWidgetTasks(WidgetSource.Upcoming7d, limit = DEFAULT_LIMIT)
+
+        assertEquals(1, result.size)
+        assertEquals("Active", result[0].title)
+    }
+
+    @Test
+    fun `Upcoming7d excludes archived tasks`() = runTest {
+        val now = TestTaskFactory.BASE_TIMESTAMP
+        fakeDao.tasks = listOf(
+            TestTaskFactory.createTask(id = 1, title = "Active", dueAt = now + ONE_DAY_MS),
+            TestTaskFactory.archivedTask(id = 2, title = "Archived").copy(dueAt = now + ONE_DAY_MS),
+        )
+
+        val result = dataProvider.getWidgetTasks(WidgetSource.Upcoming7d, limit = DEFAULT_LIMIT)
+
+        assertEquals(1, result.size)
+        assertEquals("Active", result[0].title)
+    }
+
+    @Test
+    fun `Upcoming7d pinned tasks float to top within window`() = runTest {
+        val now = TestTaskFactory.BASE_TIMESTAMP
+        fakeDao.tasks = listOf(
+            TestTaskFactory.createTask(id = 1, title = "Normal", dueAt = now + ONE_DAY_MS),
+            TestTaskFactory.createTask(id = 2, title = "Pinned later", dueAt = now + 2 * ONE_DAY_MS, isPinned = true),
+        )
+
+        val result = dataProvider.getWidgetTasks(WidgetSource.Upcoming7d, limit = DEFAULT_LIMIT)
+
+        assertEquals("Pinned later", result[0].title)
+        assertEquals("Normal", result[1].title)
+    }
+
+    @Test
+    fun `Upcoming7d respects limit`() = runTest {
+        val now = TestTaskFactory.BASE_TIMESTAMP
+        fakeDao.tasks = (1..10).map { i ->
+            TestTaskFactory.createTask(id = i.toLong(), title = "Task $i", dueAt = now + i * ONE_DAY_MS)
+        }
+
+        val result = dataProvider.getWidgetTasks(WidgetSource.Upcoming7d, limit = 3)
+
+        assertEquals(3, result.size)
+    }
+
+    // ── Pinned ────────────────────────────────────────────────────────────────
+
+    @Test
+    fun `Pinned returns only pinned active tasks`() = runTest {
+        fakeDao.tasks = listOf(
+            TestTaskFactory.createTask(id = 1, title = "Pinned", isPinned = true),
+            TestTaskFactory.createTask(id = 2, title = "Not pinned", isPinned = false),
+        )
+
+        val result = dataProvider.getWidgetTasks(WidgetSource.Pinned, limit = DEFAULT_LIMIT)
+
+        assertEquals(1, result.size)
+        assertEquals("Pinned", result[0].title)
+    }
+
+    @Test
+    fun `Pinned excludes completed tasks`() = runTest {
+        fakeDao.tasks = listOf(
+            TestTaskFactory.createTask(id = 1, title = "Active pinned", isPinned = true),
+            TestTaskFactory.completedTask(id = 2, title = "Completed pinned").copy(isPinned = true),
+        )
+
+        val result = dataProvider.getWidgetTasks(WidgetSource.Pinned, limit = DEFAULT_LIMIT)
+
+        assertEquals(1, result.size)
+        assertEquals("Active pinned", result[0].title)
+    }
+
+    @Test
+    fun `Pinned pinned undated tasks appear after pinned dated tasks`() = runTest {
+        fakeDao.tasks = listOf(
+            TestTaskFactory.createTask(id = 1, title = "Pinned undated", isPinned = true),
+            TestTaskFactory.createTask(
+                id = 2,
+                title = "Pinned dated",
+                isPinned = true,
+                dueAt = TestTaskFactory.BASE_TIMESTAMP + ONE_DAY_MS,
+            ),
+        )
+
+        val result = dataProvider.getWidgetTasks(WidgetSource.Pinned, limit = DEFAULT_LIMIT)
+
+        assertEquals("Pinned dated", result[0].title)
+        assertEquals("Pinned undated", result[1].title)
+    }
+
+    @Test
+    fun `Pinned respects limit`() = runTest {
+        fakeDao.tasks = (1..10).map { i ->
+            TestTaskFactory.createTask(id = i.toLong(), title = "Pinned $i", isPinned = true)
+        }
+
+        val result = dataProvider.getWidgetTasks(WidgetSource.Pinned, limit = 4)
+
+        assertEquals(4, result.size)
+    }
+
+    // ── Tag ───────────────────────────────────────────────────────────────────
+
+    @Test
+    fun `Tag returns only tasks matching the exact tag name`() = runTest {
+        fakeDao.tasks = listOf(
+            TestTaskFactory.createTask(id = 1, title = "Work task", tag = "work"),
+            TestTaskFactory.createTask(id = 2, title = "Personal task", tag = "personal"),
+            TestTaskFactory.createTask(id = 3, title = "No tag"),
+        )
+
+        val result = dataProvider.getWidgetTasks(WidgetSource.Tag("work"), limit = DEFAULT_LIMIT)
+
+        assertEquals(1, result.size)
+        assertEquals("Work task", result[0].title)
+    }
+
+    @Test
+    fun `Tag excludes completed and archived tasks`() = runTest {
+        fakeDao.tasks = listOf(
+            TestTaskFactory.createTask(id = 1, title = "Active", tag = "work"),
+            TestTaskFactory.completedTask(id = 2, title = "Completed").copy(tag = "work"),
+            TestTaskFactory.archivedTask(id = 3, title = "Archived").copy(tag = "work"),
+        )
+
+        val result = dataProvider.getWidgetTasks(WidgetSource.Tag("work"), limit = DEFAULT_LIMIT)
+
+        assertEquals(1, result.size)
+        assertEquals("Active", result[0].title)
+    }
+
+    @Test
+    fun `Tag pinned tasks float to top within tag`() = runTest {
+        fakeDao.tasks = listOf(
+            TestTaskFactory.createTask(id = 1, title = "Normal work", tag = "work"),
+            TestTaskFactory.createTask(id = 2, title = "Pinned work", tag = "work", isPinned = true),
+        )
+
+        val result = dataProvider.getWidgetTasks(WidgetSource.Tag("work"), limit = DEFAULT_LIMIT)
+
+        assertEquals("Pinned work", result[0].title)
+        assertEquals("Normal work", result[1].title)
+    }
+
+    @Test
+    fun `Tag undated tasks appear last within tag`() = runTest {
+        fakeDao.tasks = listOf(
+            TestTaskFactory.createTask(id = 1, title = "Tag no date", tag = "work"),
+            TestTaskFactory.createTask(
+                id = 2,
+                title = "Tag with date",
+                tag = "work",
+                dueAt = TestTaskFactory.BASE_TIMESTAMP + ONE_DAY_MS,
+            ),
+        )
+
+        val result = dataProvider.getWidgetTasks(WidgetSource.Tag("work"), limit = DEFAULT_LIMIT)
+
+        assertEquals("Tag with date", result[0].title)
+        assertEquals("Tag no date", result[1].title)
+    }
+
+    @Test
+    fun `Tag tag comparison is exact — different case does not match`() = runTest {
+        fakeDao.tasks = listOf(
+            TestTaskFactory.createTask(id = 1, title = "Lowercase", tag = "work"),
+            TestTaskFactory.createTask(id = 2, title = "Uppercase", tag = "WORK"),
+        )
+
+        val result = dataProvider.getWidgetTasks(WidgetSource.Tag("work"), limit = DEFAULT_LIMIT)
+
+        assertEquals(1, result.size)
+        assertEquals("Lowercase", result[0].title)
+    }
+
+    @Test
+    fun `Tag respects limit`() = runTest {
+        fakeDao.tasks = (1..10).map { i ->
+            TestTaskFactory.createTask(id = i.toLong(), title = "Work $i", tag = "work")
+        }
+
+        val result = dataProvider.getWidgetTasks(WidgetSource.Tag("work"), limit = 5)
+
+        assertEquals(5, result.size)
+    }
 }
 
 /**
- * Fake TaskDao that simulates the widget query behavior:
- * filters active (non-completed, non-archived), sorts by isPinned DESC then dueAt ASC (nulls last),
- * and limits results.
+ * Fake TaskDao that simulates all four widget query semantics (V13-13).
+ * Each method mirrors the SQL logic in TaskDao exactly so test failures
+ * reflect real behavioral regressions, not stub gaps.
  */
 private class FakeWidgetTaskDao : dev.tuandoan.tasktracker.data.database.TaskDao {
 
     var tasks: List<Task> = emptyList()
 
-    /** V13-03 dispatch tracking — V13-13 will replace these with real query simulation. */
+    // Dispatch call-tracking kept for V13-03 smoke tests above.
     data class UpcomingCall(val now: Long, val until: Long, val limit: Int)
     val upcomingCalls = mutableListOf<UpcomingCall>()
     val pinnedLimits = mutableListOf<Int>()
     val tagCalls = mutableListOf<Pair<String, Int>>()
 
+    private fun List<Task>.activeOnly() = filter { !it.isCompleted && !it.isArchived }
+
+    private val pinnedThenDueAscNullsLast: Comparator<Task> =
+        compareByDescending<Task> { it.isPinned }
+            .thenBy(nullsLast()) { it.dueAt }
+
     override suspend fun getWidgetTasks(limit: Int): List<Task> = tasks
-        .filter { !it.isCompleted && !it.isArchived }
-        .sortedWith(
-            compareByDescending<Task> { it.isPinned }
-                .thenBy(nullsLast()) { it.dueAt },
-        )
+        .activeOnly()
+        .sortedWith(pinnedThenDueAscNullsLast)
         .take(limit)
 
     override suspend fun getWidgetTasksUpcoming(nowMillis: Long, untilMillis: Long, limit: Int): List<Task> {
         upcomingCalls.add(UpcomingCall(nowMillis, untilMillis, limit))
-        return emptyList()
+        return tasks
+            .activeOnly()
+            .filter { it.dueAt != null && it.dueAt >= nowMillis && it.dueAt < untilMillis }
+            .sortedWith(compareByDescending<Task> { it.isPinned }.thenBy { it.dueAt })
+            .take(limit)
     }
 
     override suspend fun getWidgetTasksPinned(limit: Int): List<Task> {
         pinnedLimits.add(limit)
-        return emptyList()
+        return tasks
+            .activeOnly()
+            .filter { it.isPinned }
+            .sortedWith(compareBy(nullsLast()) { it.dueAt })
+            .take(limit)
     }
 
     override suspend fun getWidgetTasksByTag(tag: String, limit: Int): List<Task> {
         tagCalls.add(tag to limit)
-        return emptyList()
+        return tasks
+            .activeOnly()
+            .filter { it.tag == tag }
+            .sortedWith(pinnedThenDueAscNullsLast)
+            .take(limit)
     }
 
     // Unused stubs — only getWidgetTasks matters for this test
