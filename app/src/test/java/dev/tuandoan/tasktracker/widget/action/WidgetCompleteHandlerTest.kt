@@ -1,5 +1,6 @@
 package dev.tuandoan.tasktracker.widget.action
 
+import dev.tuandoan.tasktracker.data.database.Task
 import dev.tuandoan.tasktracker.domain.TaskManager
 import dev.tuandoan.tasktracker.testutil.FakeReminderScheduler
 import dev.tuandoan.tasktracker.testutil.FakeSubtaskRepository
@@ -8,6 +9,7 @@ import dev.tuandoan.tasktracker.testutil.FakeWidgetUpdater
 import dev.tuandoan.tasktracker.testutil.TestTaskFactory
 import dev.tuandoan.tasktracker.testutil.fakeAnalyticsLogger
 import dev.tuandoan.tasktracker.testutil.fakeBreadcrumbLogger
+import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -17,9 +19,12 @@ import org.junit.Before
 import org.junit.Test
 
 /**
- * V13-04: covers FR-11 (cancel reminder → mark complete → widget update ordering),
+ * V13-04/V13-06: covers FR-11 (cancel reminder → mark complete → widget update ordering),
  * FR-12 (idempotency under double-tap), and NFR-08 (no leftover-cancelled reminder
  * when completion no-ops). Uses fakes only — no Glance runtime, no mocks.
+ *
+ * V13-06 additions: timed double-tap scenarios, explicit ordering assertion via call log,
+ * and no-reschedule guarantee post-completion.
  */
 class WidgetCompleteHandlerTest {
 
@@ -136,5 +141,76 @@ class WidgetCompleteHandlerTest {
         assertEquals(1, scheduler.cancelledTaskIds.count { it == 1L })
         assertEquals(1, widgetUpdater.updateCount)
         assertTrue(repository.getTaskById(1L)!!.isCompleted)
+    }
+
+    // ── V13-06 additions ──────────────────────────────────────────────────────
+
+    @Test
+    fun `cancel reminder precedes persistence and widget update (ordering invariant)`() = runTest {
+        val callLog = mutableListOf<String>()
+        val trackingScheduler = object : FakeReminderScheduler() {
+            override suspend fun cancel(taskId: Long) {
+                callLog.add("cancel")
+                super.cancel(taskId)
+            }
+        }
+        val trackingUpdater = object : FakeWidgetUpdater() {
+            override suspend fun requestUpdate() {
+                callLog.add("update")
+                super.requestUpdate()
+            }
+        }
+        val trackingRepository = object : FakeTaskRepository() {
+            override suspend fun updateTask(task: Task) {
+                callLog.add("persist")
+                super.updateTask(task)
+            }
+        }
+        val task = TestTaskFactory.createTask(id = 1, title = "Ordered", reminderOffsetMinutes = 15)
+        trackingRepository.seed(task)
+        val trackingManager = TaskManager(
+            trackingRepository,
+            FakeSubtaskRepository(),
+            trackingScheduler,
+            trackingUpdater,
+            fakeBreadcrumbLogger(),
+            fakeAnalyticsLogger(),
+        )
+        val trackingHandler = WidgetCompleteHandler(trackingManager)
+
+        trackingHandler.complete(1L)
+
+        assertEquals(listOf("cancel", "persist", "update"), callLog)
+    }
+
+    @Test
+    fun `timed double-tap with delay still results in exactly one completion`() = runTest {
+        val task = TestTaskFactory.createTask(id = 1, title = "Timed tap")
+        repository.seed(task)
+
+        val first = handler.complete(1L)
+        advanceTimeBy(500)
+        val second = handler.complete(1L)
+
+        assertTrue(first)
+        assertFalse(second)
+        assertEquals(1, widgetUpdater.updateCount)
+        assertTrue(repository.getTaskById(1L)!!.isCompleted)
+    }
+
+    @Test
+    fun `no reminder is rescheduled after successful completion (NFR-08)`() = runTest {
+        val task = TestTaskFactory.createTask(
+            id = 1,
+            title = "No reschedule",
+            dueAt = System.currentTimeMillis() + 3_600_000L,
+            reminderOffsetMinutes = 15,
+        )
+        repository.seed(task)
+
+        handler.complete(1L)
+
+        assertTrue(scheduler.scheduledReminders.isEmpty())
+        assertTrue(scheduler.cancelledTaskIds.contains(1L))
     }
 }

@@ -16,7 +16,7 @@ import java.time.format.DateTimeFormatter
  * In-memory fake implementation of [ITaskRepository] for JVM unit tests.
  * Maintains internal state via a [MutableStateFlow] for reactive observation.
  */
-class FakeTaskRepository : ITaskRepository {
+open class FakeTaskRepository : ITaskRepository {
 
     private val tasks = MutableStateFlow<List<Task>>(emptyList())
     private var nextId = 1L
