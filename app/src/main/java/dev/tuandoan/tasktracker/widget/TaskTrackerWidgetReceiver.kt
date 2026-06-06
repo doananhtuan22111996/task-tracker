@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.Log
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.GlanceAppWidgetReceiver
+import dev.tuandoan.tasktracker.diagnostics.AnalyticsEvent
 import dev.tuandoan.tasktracker.widget.action.WidgetCleanupHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -34,9 +35,11 @@ class TaskTrackerWidgetReceiver : GlanceAppWidgetReceiver() {
         val handler = WidgetCleanupHandler(
             WidgetEntryPoint.get(context).widgetConfigurationRepository(),
         )
+        val analyticsLogger = WidgetEntryPoint.get(context).analyticsLogger()
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 handler.cleanup(appWidgetIds)
+                repeat(appWidgetIds.size) { analyticsLogger.log(AnalyticsEvent.WidgetRemoved) }
             } catch (e: Exception) {
                 Log.e(TAG, "Widget config cleanup failed for ids=${appWidgetIds.joinToString()}", e)
             } finally {

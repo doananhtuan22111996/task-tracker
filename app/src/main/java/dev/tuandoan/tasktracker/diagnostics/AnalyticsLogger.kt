@@ -217,6 +217,55 @@ sealed class AnalyticsEvent {
         override val params: Map<String, Any> = mapOf(PARAM_SECTION to section.paramValue)
     }
 
+    // ── Widget lifecycle (FR-19 / V13-14) ────────────────────────────────────
+
+    /**
+     * FR-19: `widget_added`. Fired on explicit config-success (user taps Confirm in
+     * [WidgetConfigureActivity]). The source param is the one the user chose, so
+     * `widget_added` and `widget_configured` are always emitted together on first
+     * placement via the configure flow (OQ-04).
+     */
+    data object WidgetAdded : AnalyticsEvent() {
+        override val eventName: String = "widget_added"
+        override val params: Map<String, Any> = emptyMap()
+    }
+
+    /** FR-19: `widget_removed`. Fired per-id in [onDeleted]. */
+    data object WidgetRemoved : AnalyticsEvent() {
+        override val eventName: String = "widget_removed"
+        override val params: Map<String, Any> = emptyMap()
+    }
+
+    /**
+     * FR-19: `widget_configured`. Fired when the user confirms a source selection.
+     * @param source the chosen [WidgetAnalyticsSource] — enum-backed so a call site
+     *   can't pass a tag name or other user-supplied string.
+     */
+    data class WidgetConfigured(val source: WidgetAnalyticsSource) : AnalyticsEvent() {
+        override val eventName: String = "widget_configured"
+        override val params: Map<String, Any> = mapOf(PARAM_WIDGET_SOURCE to source.paramValue)
+    }
+
+    /** FR-19: `widget_task_completed`. Fired when a task is completed via the widget row. */
+    data object WidgetTaskCompleted : AnalyticsEvent() {
+        override val eventName: String = "widget_task_completed"
+        override val params: Map<String, Any> = emptyMap()
+    }
+
+    /**
+     * FR-19: `widget_resized`. Fired when the rendered layout size changes between
+     * consecutive [provideGlance] calls for the same widget id.
+     * @param fromSize the previous [WidgetAnalyticsSize] key.
+     * @param toSize the new [WidgetAnalyticsSize] key.
+     */
+    data class WidgetResized(val fromSize: WidgetAnalyticsSize, val toSize: WidgetAnalyticsSize) : AnalyticsEvent() {
+        override val eventName: String = "widget_resized"
+        override val params: Map<String, Any> = mapOf(
+            PARAM_FROM_SIZE to fromSize.paramValue,
+            PARAM_TO_SIZE to toSize.paramValue,
+        )
+    }
+
     companion object {
         // Parameter name constants — kept consistent across related events where
         // possible so Firebase funnel builders can reuse them.
@@ -232,6 +281,9 @@ sealed class AnalyticsEvent {
         const val PARAM_RECORD_COUNT = "record_count"
         const val PARAM_OUTCOME = "outcome"
         const val PARAM_SECTION = "section"
+        const val PARAM_WIDGET_SOURCE = "source"
+        const val PARAM_FROM_SIZE = "from_size"
+        const val PARAM_TO_SIZE = "to_size"
     }
 }
 
@@ -304,4 +356,28 @@ enum class HelpFaqSection(val paramValue: String) {
     ARCHIVE("archive"),
     STATS("stats"),
     BACKUP("backup"),
+}
+
+/**
+ * Closed set of widget source labels for [AnalyticsEvent.WidgetConfigured].
+ * Mirrors [dev.tuandoan.tasktracker.widget.model.WidgetSource] variants but lives on
+ * the diagnostics side so Analytics doesn't depend on the widget module's sealed
+ * interface, and tag names (user-supplied) are collapsed to a single "tag" bucket.
+ */
+enum class WidgetAnalyticsSource(val paramValue: String) {
+    TODAY("today"),
+    UPCOMING_7D("upcoming_7d"),
+    PINNED("pinned"),
+    TAG("tag"),
+}
+
+/**
+ * Closed set of widget layout sizes for [AnalyticsEvent.WidgetResized].
+ * Maps to the three [dev.tuandoan.tasktracker.widget.ui.WidgetLayoutMode] variants
+ * so the Firebase funnel can distinguish resize paths without raw dp values.
+ */
+enum class WidgetAnalyticsSize(val paramValue: String) {
+    SMALL("small"),
+    MEDIUM("medium"),
+    LARGE("large"),
 }
