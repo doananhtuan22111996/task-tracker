@@ -32,10 +32,9 @@ class TaskTrackerWidgetReceiver : GlanceAppWidgetReceiver() {
         super.onDeleted(context, appWidgetIds)
         if (appWidgetIds.isEmpty()) return
         val pendingResult = goAsync()
-        val handler = WidgetCleanupHandler(
-            WidgetEntryPoint.get(context).widgetConfigurationRepository(),
-        )
-        val analyticsLogger = WidgetEntryPoint.get(context).analyticsLogger()
+        val entryPoint = WidgetEntryPoint.get(context)
+        val handler = WidgetCleanupHandler(entryPoint.widgetConfigurationRepository())
+        val analyticsLogger = entryPoint.analyticsLogger()
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 handler.cleanup(appWidgetIds)

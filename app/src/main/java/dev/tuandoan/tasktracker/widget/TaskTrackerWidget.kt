@@ -84,7 +84,7 @@ class TaskTrackerWidget : GlanceAppWidget() {
         // session, not across reboots.
         internal val lastKnownSize = ConcurrentHashMap<GlanceId, WidgetAnalyticsSize>()
 
-        internal fun WidgetLayoutMode.toAnalyticsSize(): WidgetAnalyticsSize = when (this) {
+        private fun WidgetLayoutMode.toAnalyticsSize(): WidgetAnalyticsSize = when (this) {
             WidgetLayoutMode.COMPACT_BADGE -> WidgetAnalyticsSize.SMALL
             WidgetLayoutMode.LIST -> WidgetAnalyticsSize.MEDIUM
             WidgetLayoutMode.LIST_WITH_OVERDUE -> WidgetAnalyticsSize.LARGE
