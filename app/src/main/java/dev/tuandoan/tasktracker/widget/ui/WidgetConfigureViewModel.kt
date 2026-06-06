@@ -4,6 +4,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dev.tuandoan.tasktracker.data.preferences.WidgetConfigurationRepository
+import dev.tuandoan.tasktracker.diagnostics.AnalyticsEvent
+import dev.tuandoan.tasktracker.diagnostics.AnalyticsLogger
+import dev.tuandoan.tasktracker.diagnostics.WidgetAnalyticsSource
 import dev.tuandoan.tasktracker.domain.model.TagItem
 import dev.tuandoan.tasktracker.domain.service.TagNormalizer
 import dev.tuandoan.tasktracker.domain.usecase.TagManagementUseCase
@@ -22,9 +25,17 @@ import javax.inject.Inject
 
 data class WidgetConfigureUiState(val selection: WidgetSource = WidgetSource.Today, val isSaving: Boolean = false)
 
+private fun WidgetSource.toAnalyticsSource(): WidgetAnalyticsSource = when (this) {
+    is WidgetSource.Today -> WidgetAnalyticsSource.TODAY
+    is WidgetSource.Upcoming7d -> WidgetAnalyticsSource.UPCOMING_7D
+    is WidgetSource.Pinned -> WidgetAnalyticsSource.PINNED
+    is WidgetSource.Tag -> WidgetAnalyticsSource.TAG
+}
+
 @HiltViewModel
 class WidgetConfigureViewModel @Inject constructor(
     private val configRepository: WidgetConfigurationRepository,
+    private val analyticsLogger: AnalyticsLogger,
     tagManagementUseCase: TagManagementUseCase,
 ) : ViewModel() {
 
@@ -61,6 +72,9 @@ class WidgetConfigureViewModel @Inject constructor(
                     source
                 }
                 configRepository.setSource(appWidgetId, finalSource)
+                val analyticsSource = finalSource.toAnalyticsSource()
+                analyticsLogger.log(AnalyticsEvent.WidgetAdded)
+                analyticsLogger.log(AnalyticsEvent.WidgetConfigured(analyticsSource))
                 _navigateDone.tryEmit(Unit)
             } finally {
                 _uiState.update { it.copy(isSaving = false) }

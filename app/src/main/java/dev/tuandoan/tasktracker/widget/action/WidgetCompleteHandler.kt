@@ -1,6 +1,8 @@
 package dev.tuandoan.tasktracker.widget.action
 
 import android.util.Log
+import dev.tuandoan.tasktracker.diagnostics.AnalyticsEvent
+import dev.tuandoan.tasktracker.diagnostics.AnalyticsLogger
 import dev.tuandoan.tasktracker.domain.ITaskManager
 
 /**
@@ -14,7 +16,10 @@ import dev.tuandoan.tasktracker.domain.ITaskManager
  * This handler keeps the widget surface free of business logic and reuses the same
  * code path as the in-app and notification "Mark Complete" flows.
  */
-class WidgetCompleteHandler(private val taskManager: ITaskManager) {
+class WidgetCompleteHandler(
+    private val taskManager: ITaskManager,
+    private val analyticsLogger: AnalyticsLogger? = null,
+) {
 
     /**
      * Look up [taskId] and complete it if it is active. No-op on missing or
@@ -29,6 +34,7 @@ class WidgetCompleteHandler(private val taskManager: ITaskManager) {
             val task = taskManager.getTaskById(taskId) ?: return false
             if (task.isCompleted) return false
             taskManager.toggleTaskCompletion(task)
+            analyticsLogger?.log(AnalyticsEvent.WidgetTaskCompleted)
             true
         } catch (e: Exception) {
             Log.e(TAG, "Failed to complete task $taskId from widget", e)

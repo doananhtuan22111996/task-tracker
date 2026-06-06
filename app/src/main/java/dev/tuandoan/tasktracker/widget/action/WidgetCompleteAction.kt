@@ -27,7 +27,10 @@ class WidgetCompleteAction : ActionCallback {
     override suspend fun onAction(context: Context, glanceId: GlanceId, parameters: ActionParameters) {
         val taskId = parameters[TASK_ID_KEY] ?: return
         val entryPoint = WidgetEntryPoint.get(context)
-        val applied = WidgetCompleteHandler(entryPoint.taskManager()).complete(taskId)
+        val applied = WidgetCompleteHandler(
+            taskManager = entryPoint.taskManager(),
+            analyticsLogger = entryPoint.analyticsLogger(),
+        ).complete(taskId)
         if (applied) {
             TaskTrackerWidget().updateAll(context)
         }

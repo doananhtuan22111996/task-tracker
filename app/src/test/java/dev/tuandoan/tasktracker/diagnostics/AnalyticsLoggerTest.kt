@@ -182,4 +182,62 @@ class AnalyticsLoggerTest {
             assertEquals(section.paramValue, event.params[AnalyticsEvent.PARAM_SECTION])
         }
     }
+
+    // ── Widget lifecycle (FR-19 / V13-14) ─────────────────────────────────────
+
+    @Test
+    fun `WidgetAdded has the correct name and empty params`() {
+        assertEquals("widget_added", AnalyticsEvent.WidgetAdded.eventName)
+        assertTrue(AnalyticsEvent.WidgetAdded.params.isEmpty())
+    }
+
+    @Test
+    fun `WidgetRemoved has the correct name and empty params`() {
+        assertEquals("widget_removed", AnalyticsEvent.WidgetRemoved.eventName)
+        assertTrue(AnalyticsEvent.WidgetRemoved.params.isEmpty())
+    }
+
+    @Test
+    fun `WidgetConfigured serializes source as paramValue not enum name`() {
+        val event = AnalyticsEvent.WidgetConfigured(WidgetAnalyticsSource.UPCOMING_7D)
+        assertEquals("widget_configured", event.eventName)
+        assertEquals("upcoming_7d", event.params[AnalyticsEvent.PARAM_WIDGET_SOURCE])
+        // Negative invariant: no tag name or raw source class name.
+        assertFalse(event.params.containsKey("tag"))
+        assertFalse(event.params.containsKey("name"))
+    }
+
+    @Test
+    fun `WidgetConfigured covers every WidgetAnalyticsSource exhaustively`() {
+        WidgetAnalyticsSource.values().forEach { source ->
+            val event = AnalyticsEvent.WidgetConfigured(source)
+            assertEquals(source.paramValue, event.params[AnalyticsEvent.PARAM_WIDGET_SOURCE])
+        }
+    }
+
+    @Test
+    fun `WidgetTaskCompleted has the correct name and empty params`() {
+        assertEquals("widget_task_completed", AnalyticsEvent.WidgetTaskCompleted.eventName)
+        assertTrue(AnalyticsEvent.WidgetTaskCompleted.params.isEmpty())
+    }
+
+    @Test
+    fun `WidgetResized serializes from_size and to_size as paramValues`() {
+        val event = AnalyticsEvent.WidgetResized(
+            fromSize = WidgetAnalyticsSize.MEDIUM,
+            toSize = WidgetAnalyticsSize.LARGE,
+        )
+        assertEquals("widget_resized", event.eventName)
+        assertEquals("medium", event.params[AnalyticsEvent.PARAM_FROM_SIZE])
+        assertEquals("large", event.params[AnalyticsEvent.PARAM_TO_SIZE])
+    }
+
+    @Test
+    fun `WidgetResized covers every WidgetAnalyticsSize exhaustively`() {
+        WidgetAnalyticsSize.values().forEach { size ->
+            val event = AnalyticsEvent.WidgetResized(fromSize = size, toSize = size)
+            assertEquals(size.paramValue, event.params[AnalyticsEvent.PARAM_FROM_SIZE])
+            assertEquals(size.paramValue, event.params[AnalyticsEvent.PARAM_TO_SIZE])
+        }
+    }
 }

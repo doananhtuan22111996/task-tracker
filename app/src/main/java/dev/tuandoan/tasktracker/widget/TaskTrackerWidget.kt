@@ -10,11 +10,15 @@ import androidx.glance.appwidget.GlanceAppWidgetManager
 import androidx.glance.appwidget.SizeMode
 import androidx.glance.appwidget.provideContent
 import dev.tuandoan.tasktracker.data.preferences.ThemeMode
+import dev.tuandoan.tasktracker.diagnostics.AnalyticsEvent
+import dev.tuandoan.tasktracker.diagnostics.WidgetAnalyticsSize
 import dev.tuandoan.tasktracker.widget.model.WidgetSource
 import dev.tuandoan.tasktracker.widget.model.WidgetTask
 import dev.tuandoan.tasktracker.widget.ui.WidgetContent
+import dev.tuandoan.tasktracker.widget.ui.WidgetLayoutMode
 import dev.tuandoan.tasktracker.widget.ui.WidgetSizeResolver
 import kotlinx.coroutines.flow.first
+import java.util.concurrent.ConcurrentHashMap
 
 class TaskTrackerWidget : GlanceAppWidget() {
 
@@ -27,12 +31,13 @@ class TaskTrackerWidget : GlanceAppWidget() {
 
         try {
             val entryPoint = WidgetEntryPoint.get(context)
+            val widgetManager = GlanceAppWidgetManager(context)
             // V13-09: resolve the per-appWidgetId source from `widget.preferences_pb`.
             // null = unconfigured (first placement before the user opens the configure
             // activity, OR a transient repository read failure that the repo's IOException
             // recovery already mapped to null) → fall back to the v1.12.0 Today shape so
             // existing placements don't change behavior on upgrade.
-            val appWidgetId = GlanceAppWidgetManager(context).getAppWidgetId(id)
+            val appWidgetId = widgetManager.getAppWidgetId(id)
             val source = entryPoint.widgetConfigurationRepository()
                 .getSourceOnce(appWidgetId) ?: WidgetSource.Today
             tasks = WidgetDataProvider(entryPoint.taskDao())
@@ -40,6 +45,20 @@ class TaskTrackerWidget : GlanceAppWidget() {
             val prefs = entryPoint.settingsRepository().userPreferences.first()
             themeMode = prefs.themeMode
             dynamicColor = prefs.dynamicColor
+
+            // V13-14: detect resize by comparing the representative layout size
+            // (largest current size) to the last-known size for this glanceId.
+            val sizes = widgetManager.getAppWidgetSizes(id)
+            if (sizes.isNotEmpty()) {
+                val representativeSize = sizes.maxByOrNull { it.width.value + it.height.value } ?: sizes.first()
+                val currentAnalyticsSize = WidgetSizeResolver.resolve(representativeSize).mode.toAnalyticsSize()
+                val previousSize = lastKnownSize.put(id, currentAnalyticsSize)
+                if (previousSize != null && previousSize != currentAnalyticsSize) {
+                    entryPoint.analyticsLogger().log(
+                        AnalyticsEvent.WidgetResized(fromSize = previousSize, toSize = currentAnalyticsSize),
+                    )
+                }
+            }
         } catch (e: Exception) {
             Log.e(TAG, "Failed to load widget data", e)
         }
@@ -57,5 +76,18 @@ class TaskTrackerWidget : GlanceAppWidget() {
         val SMALL: DpSize = DpSize(110.dp, 110.dp)
         val MEDIUM: DpSize = DpSize(260.dp, 110.dp)
         val LARGE: DpSize = DpSize(260.dp, 260.dp)
+
+        // In-memory size cache: glanceId → last known WidgetAnalyticsSize.
+        // ConcurrentHashMap guards against concurrent provideGlance calls for
+        // different widget ids. Entries are process-lifetime; an app restart resets
+        // them naturally, which is fine — we only want to detect resizes within a
+        // session, not across reboots.
+        private val lastKnownSize = ConcurrentHashMap<GlanceId, WidgetAnalyticsSize>()
+
+        private fun WidgetLayoutMode.toAnalyticsSize(): WidgetAnalyticsSize = when (this) {
+            WidgetLayoutMode.COMPACT_BADGE -> WidgetAnalyticsSize.SMALL
+            WidgetLayoutMode.LIST -> WidgetAnalyticsSize.MEDIUM
+            WidgetLayoutMode.LIST_WITH_OVERDUE -> WidgetAnalyticsSize.LARGE
+        }
     }
 }
