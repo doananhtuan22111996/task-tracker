@@ -82,7 +82,7 @@ class TaskTrackerWidget : GlanceAppWidget() {
         // different widget ids. Entries are process-lifetime; an app restart resets
         // them naturally, which is fine — we only want to detect resizes within a
         // session, not across reboots.
-        internal val lastKnownSize = ConcurrentHashMap<GlanceId, WidgetAnalyticsSize>()
+        private val lastKnownSize = ConcurrentHashMap<GlanceId, WidgetAnalyticsSize>()
 
         private fun WidgetLayoutMode.toAnalyticsSize(): WidgetAnalyticsSize = when (this) {
             WidgetLayoutMode.COMPACT_BADGE -> WidgetAnalyticsSize.SMALL
