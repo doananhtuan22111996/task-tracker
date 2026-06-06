@@ -15,8 +15,15 @@ import dev.tuandoan.tasktracker.widget.action.WidgetCompleteHandler
 import dev.tuandoan.tasktracker.widget.model.WidgetSource
 import io.mockk.mockk
 import io.mockk.verify
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.setMain
+import org.junit.After
 import org.junit.Assert.assertFalse
+import org.junit.Before
 import org.junit.Test
 
 /**
@@ -96,7 +103,20 @@ class WidgetAnalyticsEmissionTest {
  * Call-site emission tests for [dev.tuandoan.tasktracker.widget.ui.WidgetConfigureViewModel]
  * analytics events (V13-15).
  */
+@OptIn(ExperimentalCoroutinesApi::class)
 class WidgetConfigureViewModelAnalyticsTest {
+
+    private val testDispatcher = UnconfinedTestDispatcher()
+
+    @Before
+    fun setUp() {
+        Dispatchers.setMain(testDispatcher)
+    }
+
+    @After
+    fun tearDown() {
+        Dispatchers.resetMain()
+    }
 
     private val analyticsLogger: AnalyticsLogger = mockk(relaxed = true)
 
