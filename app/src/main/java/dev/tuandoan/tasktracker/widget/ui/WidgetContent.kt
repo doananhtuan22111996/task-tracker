@@ -147,9 +147,8 @@ private fun WidgetCompactContent(tasks: List<WidgetTask>, topTask: WidgetTask?) 
 
 @Composable
 private fun WidgetListWithOverdueContent(tasks: List<WidgetTask>) {
-    // V13-12: replace with full overdue partition
     val now = System.currentTimeMillis()
-    val overdueCount = tasks.count { it.dueAt != null && it.dueAt < now }
+    val (overdueTasks, regularTasks) = tasks.partition { it.dueAt != null && it.dueAt < now }
 
     Column(
         modifier = GlanceModifier
@@ -161,18 +160,27 @@ private fun WidgetListWithOverdueContent(tasks: List<WidgetTask>) {
         if (tasks.isEmpty()) {
             WidgetEmptyState()
         } else {
-            if (overdueCount > 0) {
-                Text(
-                    text = "Overdue ($overdueCount)",
-                    style = TextStyle(
-                        color = GlanceTheme.colors.error,
-                        fontWeight = FontWeight.Medium,
-                        fontSize = 12.sp,
-                    ),
-                    modifier = GlanceModifier.padding(vertical = 2.dp),
-                )
+            LazyColumn(modifier = GlanceModifier.fillMaxSize()) {
+                if (overdueTasks.isNotEmpty()) {
+                    item {
+                        Text(
+                            text = "Overdue (${overdueTasks.size})",
+                            style = TextStyle(
+                                color = GlanceTheme.colors.error,
+                                fontWeight = FontWeight.Medium,
+                                fontSize = 12.sp,
+                            ),
+                            modifier = GlanceModifier.padding(vertical = 2.dp),
+                        )
+                    }
+                    items(overdueTasks, itemId = { it.id }) { task ->
+                        WidgetTaskRow(task = task)
+                    }
+                }
+                items(regularTasks, itemId = { it.id }) { task ->
+                    WidgetTaskRow(task = task)
+                }
             }
-            WidgetTaskList(tasks = tasks)
         }
     }
 }
