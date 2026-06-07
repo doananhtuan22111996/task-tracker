@@ -162,6 +162,7 @@ class WidgetConfigPersistenceTest {
         repo.setSource(1, WidgetSource.Tag("INBOX"))
 
         WidgetCleanupHandler(repo).cleanup(intArrayOf(1))
+        assertNull(repo.getSourceOnce(1))
 
         // A fresh placement at the same id must not inherit the stale tag.
         repo.setSource(1, WidgetSource.Today)
