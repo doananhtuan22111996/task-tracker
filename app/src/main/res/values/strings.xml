@@ -15,6 +15,7 @@
     <string name="calendar_empty_state_cta">Add a task</string>
     <string name="cd_agenda_add_task">Add task for this day</string>
     <string name="agenda_upcoming_badge">Upcoming</string>
+    <string name="agenda_multi_select_count">%1$d selected</string>
     <string name="a11y_day_cell_today_prefix">Today</string>
     <string name="a11y_day_cell_selected_suffix">selected</string>
     <plurals name="a11y_day_cell_tasks">
@@ -470,6 +471,7 @@
     <string name="snackbar_task_archived">Task archived</string>
     <string name="snackbar_task_skipped">Occurrence skipped</string>
     <string name="error_skip_occurrence">Failed to skip occurrence</string>
+    <string name="snackbar_task_completed">Task completed</string>
     <string name="snackbar_tasks_marked_completed">%d tasks marked as completed</string>
     <string name="snackbar_tasks_marked_active">%d tasks marked as active</string>
     <string name="snackbar_tasks_priority_updated">Priority updated for %d tasks</string>
@@ -643,6 +645,11 @@
     <string name="widget_priority_medium">medium</string>
     <string name="widget_priority_low">low</string>
     <string name="widget_due_overdue">Overdue</string>
+    <string name="widget_due_today">Today</string>
+    <string name="widget_due_tomorrow">Tomorrow</string>
+    <string name="widget_overdue_header">Overdue (%1$d)</string>
+    <string name="widget_compact_tasks_label">tasks</string>
+    <string name="widget_compact_no_tasks">No tasks</string>
 
     <!-- Widget configure activity (V13-08) -->
     <string name="widget_configure_title">Choose widget content</string>

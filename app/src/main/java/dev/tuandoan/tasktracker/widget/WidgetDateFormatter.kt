@@ -5,7 +5,13 @@ import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
-internal fun formatDueDate(dueAt: Long?, nowProvider: () -> Long = { System.currentTimeMillis() }): String? {
+internal fun formatDueDate(
+    dueAt: Long?,
+    overdueLabel: String = "Overdue",
+    todayLabel: String = "Today",
+    tomorrowLabel: String = "Tomorrow",
+    nowProvider: () -> Long = { System.currentTimeMillis() },
+): String? {
     if (dueAt == null) return null
 
     val now = nowProvider()
@@ -20,9 +26,9 @@ internal fun formatDueDate(dueAt: Long?, nowProvider: () -> Long = { System.curr
     val dayAfterTomorrow = (today.clone() as Calendar).apply { add(Calendar.DAY_OF_YEAR, 2) }
 
     return when {
-        dueAt < now -> "Overdue"
-        dueAt >= today.timeInMillis && dueAt < tomorrow.timeInMillis -> "Today"
-        dueAt >= tomorrow.timeInMillis && dueAt < dayAfterTomorrow.timeInMillis -> "Tomorrow"
+        dueAt < now -> overdueLabel
+        dueAt >= today.timeInMillis && dueAt < tomorrow.timeInMillis -> todayLabel
+        dueAt >= tomorrow.timeInMillis && dueAt < dayAfterTomorrow.timeInMillis -> tomorrowLabel
         else -> SimpleDateFormat("MMM dd", Locale.getDefault()).format(Date(dueAt))
     }
 }
