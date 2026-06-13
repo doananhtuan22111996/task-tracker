@@ -1,11 +1,71 @@
 <?xml version="1.0" encoding="utf-8"?>
-<shape xmlns:android="http://schemas.android.com/apk/res/android"
-    android:shape="rectangle">
-    <corners android:radius="16dp" />
-    <solid android:color="#F0F0F0" />
-    <padding
-        android:bottom="8dp"
-        android:left="8dp"
-        android:right="8dp"
-        android:top="8dp" />
-</shape>
+<!--
+  Static fallback preview for API 26–30.
+  Geometry anchored to H=110dp (widget minimum height).
+  top/bottom are insets from each edge; height = H - top - bottom.
+  Header  : top=0,  bottom=74  →  0..36dp  (h=36)
+  Row 1   : top=48, bottom=52  →  48..58dp (h=10)
+  Row 2   : top=62, bottom=38  →  62..72dp (h=10)
+  Row 3   : top=76, bottom=24  →  76..86dp (h=10)
+-->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Widget background card -->
+    <item>
+        <shape android:shape="rectangle">
+            <corners android:radius="16dp" />
+            <solid android:color="#FFF3F3F3" />
+        </shape>
+    </item>
+
+    <!-- Header bar (primary color strip, h=36dp at H=110) -->
+    <item
+        android:bottom="74dp"
+        android:left="0dp"
+        android:right="0dp"
+        android:top="0dp">
+        <shape android:shape="rectangle">
+            <corners
+                android:topLeftRadius="16dp"
+                android:topRightRadius="16dp" />
+            <solid android:color="#1976D2" />
+        </shape>
+    </item>
+
+    <!-- Task row placeholder 1 (full width, h=10dp at H=110) -->
+    <item
+        android:bottom="52dp"
+        android:left="12dp"
+        android:right="40dp"
+        android:top="48dp">
+        <shape android:shape="rectangle">
+            <corners android:radius="4dp" />
+            <solid android:color="#1F000000" />
+        </shape>
+    </item>
+
+    <!-- Task row placeholder 2 (75% width, h=10dp at H=110) -->
+    <item
+        android:bottom="38dp"
+        android:left="12dp"
+        android:right="60dp"
+        android:top="62dp">
+        <shape android:shape="rectangle">
+            <corners android:radius="4dp" />
+            <solid android:color="#1F000000" />
+        </shape>
+    </item>
+
+    <!-- Task row placeholder 3 (60% width, h=10dp at H=110) -->
+    <item
+        android:bottom="24dp"
+        android:left="12dp"
+        android:right="76dp"
+        android:top="76dp">
+        <shape android:shape="rectangle">
+            <corners android:radius="4dp" />
+            <solid android:color="#1F000000" />
+        </shape>
+    </item>
+
+</layer-list>
