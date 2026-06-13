@@ -590,7 +590,7 @@
     <string name="widget_source_pinned">Angeheftet</string>
     <string name="widget_source_tag">Nach Tag</string>
     <string name="widget_configure_tag_picker_hint">Tag auswählen</string>
-    <string name="widget_configure_no_tags">Noch keine Tags. Erstellen Sie zuerst Aufgaben mit Tags.</string>
+    <string name="widget_configure_no_tags">Noch keine Tags. Erstell zuerst Aufgaben mit Tags.</string>
     <string name="cd_widget_source_option">%1$s Quell-Option</string>
 
     <!-- New Accessibility & Sort -->
