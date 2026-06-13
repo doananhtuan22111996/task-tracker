@@ -23,6 +23,7 @@
     <string name="a11y_day_cell_has_high_priority">mit hoher Priorität</string>
     <string name="cd_agenda_add_task">Aufgabe für diesen Tag hinzufügen</string>
     <string name="agenda_upcoming_badge">Demnächst</string>
+    <string name="agenda_multi_select_count">%1$d ausgewählt</string>
 
     <!-- Navigation -->
     <string name="nav_all">Alle</string>
@@ -561,6 +562,7 @@
     <string name="day_sun_full">Sonntag</string>
     <string name="snackbar_task_skipped">Vorkommen übersprungen</string>
     <string name="error_skip_occurrence">Vorkommen konnte nicht übersprungen werden</string>
+    <string name="snackbar_task_completed">Aufgabe erledigt</string>
 
     <!-- Widget -->
     <string name="widget_name">Task Tracker</string>
@@ -574,6 +576,22 @@
     <string name="widget_priority_medium">mittel</string>
     <string name="widget_priority_low">niedrig</string>
     <string name="widget_due_overdue">Überfällig</string>
+    <string name="widget_due_today">Heute</string>
+    <string name="widget_due_tomorrow">Morgen</string>
+    <string name="widget_overdue_header">Überfällig (%1$d)</string>
+    <string name="widget_compact_tasks_label">Aufgaben</string>
+    <string name="widget_compact_no_tasks">Keine Aufgaben</string>
+
+    <!-- Widget configure activity (V13-08) -->
+    <string name="widget_configure_title">Widget-Inhalt auswählen</string>
+    <string name="widget_configure_confirm">Bestätigen</string>
+    <string name="widget_source_today">Heute</string>
+    <string name="widget_source_upcoming">Demnächst (7 Tage)</string>
+    <string name="widget_source_pinned">Angeheftet</string>
+    <string name="widget_source_tag">Nach Tag</string>
+    <string name="widget_configure_tag_picker_hint">Tag auswählen</string>
+    <string name="widget_configure_no_tags">Noch keine Tags. Erstellen Sie zuerst Aufgaben mit Tags.</string>
+    <string name="cd_widget_source_option">%1$s Quell-Option</string>
 
     <!-- New Accessibility & Sort -->
     <string name="cd_completion_rate">Abschlussquote: %1$d%%</string>

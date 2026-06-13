@@ -23,6 +23,7 @@
     <string name="a11y_day_cell_has_high_priority">có ưu tiên cao</string>
     <string name="cd_agenda_add_task">Thêm việc cho ngày này</string>
     <string name="agenda_upcoming_badge">Sắp tới</string>
+    <string name="agenda_multi_select_count">%1$d đã chọn</string>
 
     <!-- Navigation -->
     <string name="nav_all">Tất cả</string>
@@ -561,6 +562,7 @@
     <string name="day_sun_full">Chủ Nhật</string>
     <string name="snackbar_task_skipped">Đã bỏ qua lần lặp</string>
     <string name="error_skip_occurrence">Không thể bỏ qua lần lặp</string>
+    <string name="snackbar_task_completed">Nhiệm vụ hoàn thành</string>
 
     <!-- Widget -->
     <string name="widget_name">Task Tracker</string>
@@ -574,6 +576,22 @@
     <string name="widget_priority_medium">trung bình</string>
     <string name="widget_priority_low">thấp</string>
     <string name="widget_due_overdue">Quá hạn</string>
+    <string name="widget_due_today">Hôm nay</string>
+    <string name="widget_due_tomorrow">Ngày mai</string>
+    <string name="widget_overdue_header">Quá hạn (%1$d)</string>
+    <string name="widget_compact_tasks_label">nhiệm vụ</string>
+    <string name="widget_compact_no_tasks">Không có nhiệm vụ</string>
+
+    <!-- Widget configure activity (V13-08) -->
+    <string name="widget_configure_title">Chọn nội dung widget</string>
+    <string name="widget_configure_confirm">Xác nhận</string>
+    <string name="widget_source_today">Hôm nay</string>
+    <string name="widget_source_upcoming">Sắp tới (7 ngày)</string>
+    <string name="widget_source_pinned">Đã ghim</string>
+    <string name="widget_source_tag">Theo thẻ</string>
+    <string name="widget_configure_tag_picker_hint">Chọn một thẻ</string>
+    <string name="widget_configure_no_tags">Chưa có thẻ nào. Hãy tạo nhiệm vụ với thẻ trước.</string>
+    <string name="cd_widget_source_option">tùy chọn nguồn %1$s</string>
 
     <!-- New Accessibility & Sort -->
     <string name="cd_completion_rate">Tỷ lệ hoàn thành: %1$d%%</string>

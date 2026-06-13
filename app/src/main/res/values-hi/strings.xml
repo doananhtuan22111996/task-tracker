@@ -23,6 +23,7 @@
     <string name="a11y_day_cell_has_high_priority">उच्च प्राथमिकता के साथ</string>
     <string name="cd_agenda_add_task">इस दिन के लिए कार्य जोड़ें</string>
     <string name="agenda_upcoming_badge">आगामी</string>
+    <string name="agenda_multi_select_count">%1$d चुने गए</string>
 
     <!-- Navigation -->
     <string name="nav_all">सभी</string>
@@ -561,6 +562,7 @@
     <string name="day_sun_full">रविवार</string>
     <string name="snackbar_task_skipped">आवृत्ति छोड़ी गई</string>
     <string name="error_skip_occurrence">आवृत्ति छोड़ने में विफल</string>
+    <string name="snackbar_task_completed">कार्य पूर्ण हुआ</string>
 
     <!-- Widget -->
     <string name="widget_name">Task Tracker</string>
@@ -574,6 +576,22 @@
     <string name="widget_priority_medium">मध्यम</string>
     <string name="widget_priority_low">निम्न</string>
     <string name="widget_due_overdue">अतिदेय</string>
+    <string name="widget_due_today">आज</string>
+    <string name="widget_due_tomorrow">कल</string>
+    <string name="widget_overdue_header">अतिदेय (%1$d)</string>
+    <string name="widget_compact_tasks_label">कार्य</string>
+    <string name="widget_compact_no_tasks">कोई कार्य नहीं</string>
+
+    <!-- Widget configure activity (V13-08) -->
+    <string name="widget_configure_title">विजेट सामग्री चुनें</string>
+    <string name="widget_configure_confirm">पुष्टि करें</string>
+    <string name="widget_source_today">आज</string>
+    <string name="widget_source_upcoming">आगामी (7 दिन)</string>
+    <string name="widget_source_pinned">पिन किए गए</string>
+    <string name="widget_source_tag">टैग द्वारा</string>
+    <string name="widget_configure_tag_picker_hint">एक टैग चुनें</string>
+    <string name="widget_configure_no_tags">अभी तक कोई टैग नहीं। पहले टैग के साथ कार्य बनाएं।</string>
+    <string name="cd_widget_source_option">%1$s स्रोत विकल्प</string>
 
     <!-- New Accessibility & Sort -->
     <string name="cd_completion_rate">पूर्णता दर: %1$d%%</string>
