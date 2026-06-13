@@ -7,6 +7,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.glance.GlanceModifier
 import androidx.glance.GlanceTheme
+import androidx.glance.LocalContext
 import androidx.glance.LocalSize
 import androidx.glance.action.Action
 import androidx.glance.action.actionParametersOf
@@ -33,6 +34,7 @@ import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
 import dev.tuandoan.tasktracker.MainActivity
+import dev.tuandoan.tasktracker.R
 import dev.tuandoan.tasktracker.widget.action.WidgetCompleteAction
 import dev.tuandoan.tasktracker.widget.formatDueDate
 import dev.tuandoan.tasktracker.widget.model.WidgetTask
@@ -89,6 +91,7 @@ private fun WidgetListContent(tasks: List<WidgetTask>) {
 
 @Composable
 private fun WidgetCompactContent(tasks: List<WidgetTask>, topTask: WidgetTask?) {
+    val context = LocalContext.current
     val countText = if (tasks.size >= WidgetSizeResolver.FETCH_LIMIT) {
         "${WidgetSizeResolver.FETCH_LIMIT}+"
     } else {
@@ -116,7 +119,7 @@ private fun WidgetCompactContent(tasks: List<WidgetTask>, topTask: WidgetTask?) 
             )
             Spacer(modifier = GlanceModifier.width(6.dp))
             Text(
-                text = "tasks",
+                text = context.getString(R.string.widget_compact_tasks_label),
                 style = TextStyle(
                     color = GlanceTheme.colors.onSurfaceVariant,
                     fontSize = 12.sp,
@@ -135,7 +138,7 @@ private fun WidgetCompactContent(tasks: List<WidgetTask>, topTask: WidgetTask?) 
             )
         } else {
             Text(
-                text = "No tasks",
+                text = context.getString(R.string.widget_compact_no_tasks),
                 style = TextStyle(
                     color = GlanceTheme.colors.onSurfaceVariant,
                     fontSize = 12.sp,
@@ -147,6 +150,7 @@ private fun WidgetCompactContent(tasks: List<WidgetTask>, topTask: WidgetTask?) 
 
 @Composable
 private fun WidgetListWithOverdueContent(tasks: List<WidgetTask>) {
+    val context = LocalContext.current
     val now = System.currentTimeMillis()
     val (overdueTasks, regularTasks) = tasks.partition { it.dueAt != null && it.dueAt < now }
 
@@ -164,7 +168,7 @@ private fun WidgetListWithOverdueContent(tasks: List<WidgetTask>) {
                 if (overdueTasks.isNotEmpty()) {
                     item {
                         Text(
-                            text = "Overdue (${overdueTasks.size})",
+                            text = context.getString(R.string.widget_overdue_header, overdueTasks.size),
                             style = TextStyle(
                                 color = GlanceTheme.colors.error,
                                 fontWeight = FontWeight.Medium,
@@ -187,6 +191,7 @@ private fun WidgetListWithOverdueContent(tasks: List<WidgetTask>) {
 
 @Composable
 private fun WidgetHeader() {
+    val context = LocalContext.current
     Row(
         modifier = GlanceModifier
             .fillMaxWidth()
@@ -194,7 +199,7 @@ private fun WidgetHeader() {
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
-            text = "Task Tracker",
+            text = context.getString(R.string.widget_name),
             style = TextStyle(
                 color = GlanceTheme.colors.onSurface,
                 fontWeight = FontWeight.Medium,
@@ -224,6 +229,7 @@ private fun WidgetHeader() {
 
 @Composable
 private fun WidgetEmptyState() {
+    val context = LocalContext.current
     Box(
         modifier = GlanceModifier.fillMaxSize(),
         contentAlignment = Alignment.Center,
@@ -235,14 +241,14 @@ private fun WidgetEmptyState() {
             )
             Spacer(modifier = GlanceModifier.height(4.dp))
             Text(
-                text = "No tasks yet",
+                text = context.getString(R.string.widget_empty_title),
                 style = TextStyle(
                     color = GlanceTheme.colors.onSurfaceVariant,
                     fontSize = 14.sp,
                 ),
             )
             Text(
-                text = "Tap + to create one",
+                text = context.getString(R.string.widget_empty_subtitle),
                 style = TextStyle(
                     color = GlanceTheme.colors.onSurfaceVariant,
                     fontSize = 12.sp,
@@ -263,6 +269,7 @@ private fun WidgetTaskList(tasks: List<WidgetTask>) {
 
 @Composable
 private fun WidgetTaskRow(task: WidgetTask) {
+    val context = LocalContext.current
     Row(
         modifier = GlanceModifier
             .fillMaxWidth()
@@ -325,7 +332,12 @@ private fun WidgetTaskRow(task: WidgetTask) {
             )
 
             // Due date
-            val dueDateText = formatDueDate(task.dueAt)
+            val dueDateText = formatDueDate(
+                dueAt = task.dueAt,
+                overdueLabel = context.getString(R.string.widget_due_overdue),
+                todayLabel = context.getString(R.string.widget_due_today),
+                tomorrowLabel = context.getString(R.string.widget_due_tomorrow),
+            )
             if (dueDateText != null) {
                 val isOverdue = task.dueAt != null && task.dueAt < System.currentTimeMillis()
                 Text(
