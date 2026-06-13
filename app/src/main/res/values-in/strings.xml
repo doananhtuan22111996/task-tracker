@@ -23,6 +23,7 @@
     <string name="a11y_day_cell_has_high_priority">dengan prioritas tinggi</string>
     <string name="cd_agenda_add_task">Tambah tugas untuk hari ini</string>
     <string name="agenda_upcoming_badge">Akan Datang</string>
+    <string name="agenda_multi_select_count">%1$d dipilih</string>
 
     <!-- Navigation -->
     <string name="nav_all">Semua</string>
@@ -561,6 +562,7 @@
     <string name="day_sun_full">Minggu</string>
     <string name="snackbar_task_skipped">Kejadian dilewati</string>
     <string name="error_skip_occurrence">Gagal melewati kejadian</string>
+    <string name="snackbar_task_completed">Tugas selesai</string>
 
     <!-- Widget -->
     <string name="widget_name">Task Tracker</string>
@@ -574,6 +576,22 @@
     <string name="widget_priority_medium">sedang</string>
     <string name="widget_priority_low">rendah</string>
     <string name="widget_due_overdue">Terlambat</string>
+    <string name="widget_due_today">Hari ini</string>
+    <string name="widget_due_tomorrow">Besok</string>
+    <string name="widget_overdue_header">Terlambat (%1$d)</string>
+    <string name="widget_compact_tasks_label">tugas</string>
+    <string name="widget_compact_no_tasks">Tidak ada tugas</string>
+
+    <!-- Widget configure activity (V13-08) -->
+    <string name="widget_configure_title">Pilih konten widget</string>
+    <string name="widget_configure_confirm">Konfirmasi</string>
+    <string name="widget_source_today">Hari ini</string>
+    <string name="widget_source_upcoming">Mendatang (7 hari)</string>
+    <string name="widget_source_pinned">Disematkan</string>
+    <string name="widget_source_tag">Berdasarkan tag</string>
+    <string name="widget_configure_tag_picker_hint">Pilih tag</string>
+    <string name="widget_configure_no_tags">Belum ada tag. Buat tugas dengan tag terlebih dahulu.</string>
+    <string name="cd_widget_source_option">opsi sumber %1$s</string>
 
     <!-- New Accessibility & Sort -->
     <string name="cd_completion_rate">Tingkat penyelesaian: %1$d%%</string>

@@ -23,6 +23,7 @@
     <string name="a11y_day_cell_has_high_priority">avec priorité élevée</string>
     <string name="cd_agenda_add_task">Ajouter une tâche pour ce jour</string>
     <string name="agenda_upcoming_badge">À venir</string>
+    <string name="agenda_multi_select_count">%1$d sélectionné(s)</string>
 
     <!-- Navigation -->
     <string name="nav_all">Tous</string>
@@ -561,6 +562,7 @@
     <string name="day_sun_full">Dimanche</string>
     <string name="snackbar_task_skipped">Occurrence ignorée</string>
     <string name="error_skip_occurrence">Impossible d\'ignorer l\'occurrence</string>
+    <string name="snackbar_task_completed">Tâche terminée</string>
 
     <!-- Widget -->
     <string name="widget_name">Task Tracker</string>
@@ -574,6 +576,22 @@
     <string name="widget_priority_medium">moyenne</string>
     <string name="widget_priority_low">basse</string>
     <string name="widget_due_overdue">En retard</string>
+    <string name="widget_due_today">Aujourd\'hui</string>
+    <string name="widget_due_tomorrow">Demain</string>
+    <string name="widget_overdue_header">En retard (%1$d)</string>
+    <string name="widget_compact_tasks_label">tâches</string>
+    <string name="widget_compact_no_tasks">Aucune tâche</string>
+
+    <!-- Widget configure activity (V13-08) -->
+    <string name="widget_configure_title">Choisir le contenu du widget</string>
+    <string name="widget_configure_confirm">Confirmer</string>
+    <string name="widget_source_today">Aujourd\'hui</string>
+    <string name="widget_source_upcoming">À venir (7 jours)</string>
+    <string name="widget_source_pinned">Épinglées</string>
+    <string name="widget_source_tag">Par étiquette</string>
+    <string name="widget_configure_tag_picker_hint">Sélectionner une étiquette</string>
+    <string name="widget_configure_no_tags">Pas encore d\'étiquettes. Créez d\'abord des tâches avec des étiquettes.</string>
+    <string name="cd_widget_source_option">option de source %1$s</string>
 
     <!-- New Accessibility & Sort -->
     <string name="cd_completion_rate">Taux d\'achèvement : %1$d%%</string>
