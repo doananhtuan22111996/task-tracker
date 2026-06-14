@@ -652,7 +652,7 @@
     <string name="widget_compact_no_tasks">No tasks</string>
     <string name="cd_widget_complete_task">Mark %1$s as complete</string>
     <string name="cd_widget_open_task">Open task: %1$s</string>
-    <string name="cd_widget_compact_summary">%1$d tasks, top task: %2$s</string>
+    <string name="cd_widget_compact_summary">%1$s tasks, top task: %2$s</string>
 
     <!-- Widget configure activity (V13-08) -->
     <string name="widget_configure_title">Choose widget content</string>

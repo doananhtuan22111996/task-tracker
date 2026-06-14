@@ -101,7 +101,7 @@ private fun WidgetCompactContent(tasks: List<WidgetTask>, topTask: WidgetTask?) 
     }
     val tapAction = if (topTask != null) createTaskAction(topTask.id) else createNewTaskAction()
     val compactCd = if (topTask != null) {
-        context.getString(R.string.cd_widget_compact_summary, tasks.size, topTask.title)
+        context.getString(R.string.cd_widget_compact_summary, countText, topTask.title)
     } else {
         context.getString(R.string.widget_compact_no_tasks)
     }
