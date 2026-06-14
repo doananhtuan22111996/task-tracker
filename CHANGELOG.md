@@ -16,7 +16,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com).
 - widget strings translated to de/es/fr/hi/in/pt/vi; covers new widget display keys and configure-activity strings that shipped without locale coverage (V13-16, V13-17)
 - JVM lifecycle tests for widget config persistence: reboot survival across all 4 `WidgetSource` variants, rebind stability, per-`appWidgetId` isolation, `onDeleted` cleanup (V13-11)
 - 16 `WidgetSource` query-semantic JVM tests (window bounds, ordering invariants, tag exact-match/case, limit) and 13 analytics call-site emission tests (V13-13, V13-15)
-- GlanceTheme color contrast audit complete: all `onSurface`, `onSurfaceVariant`, `error`, `primary`, and `onPrimary` token pairs used in widget layouts pass WCAG AA (4.5:1) in both light and dark modes for the static color scheme; dynamic-color path verified on API 31+ device (V13-19)
+- GlanceTheme color contrast audit complete: all `onSurface`, `onSurfaceVariant`, `error`, `primary`, and `onPrimary` token pairs used in widget layouts pass WCAG AA (4.5:1) in both light and dark modes for the static color scheme (V13-19)
 
 ### Changed
 - widget supports responsive 2x2 / 4x2 / 4x4 placements (default 4x2), scaffold for v1.13.0 widget v2 (V13-01)
