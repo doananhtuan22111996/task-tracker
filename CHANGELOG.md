@@ -12,6 +12,11 @@ Format follows [Keep a Changelog](https://keepachangelog.com).
 - removing a widget from the home screen now drops its stored configuration via `TaskTrackerWidgetReceiver.onDeleted`, so a fresh widget placed at the same `appWidgetId` starts from defaults instead of inheriting the previous source (V13-10)
 - `provideGlance` resolves the per-`appWidgetId` source from `WidgetConfigurationRepository` and falls back to Today when unconfigured; V13-08's configure activity will write the source the user picks (V13-09)
 - full-screen `WidgetConfigureActivity` launched on widget placement; lets the user pick Today / Upcoming 7d / Pinned / By tag as the content source, writes to `WidgetConfigurationRepository`, and returns `RESULT_OK`; back or cancel returns `RESULT_CANCELED` so the OS removes the placement (V13-08)
+- 5 new analytics events for widget interactions: `widget_added`, `widget_removed`, `widget_configured`, `widget_task_completed`, `widget_resized`; emission verified at 13 call sites (V13-14, V13-15)
+- widget strings translated to de/es/fr/hi/in/pt/vi; covers new widget display keys and configure-activity strings that shipped without locale coverage (V13-16, V13-17)
+- JVM lifecycle tests for widget config persistence: reboot survival across all 4 `WidgetSource` variants, rebind stability, per-`appWidgetId` isolation, `onDeleted` cleanup (V13-11)
+- 16 `WidgetSource` query-semantic JVM tests (window bounds, ordering invariants, tag exact-match/case, limit) and 13 analytics call-site emission tests (V13-13, V13-15)
+- GlanceTheme color contrast audit complete: all `onSurface`, `onSurfaceVariant`, `error`, `primary`, and `onPrimary` token pairs used in widget layouts pass WCAG AA (4.5:1) in both light and dark modes for the static color scheme; dynamic-color path verified on API 31+ device (V13-19)
 
 ### Changed
 - widget supports responsive 2x2 / 4x2 / 4x4 placements (default 4x2), scaffold for v1.13.0 widget v2 (V13-01)
@@ -19,6 +24,8 @@ Format follows [Keep a Changelog](https://keepachangelog.com).
 - widget task row split into two click targets: leading checkbox completes the task, rest of the row opens the editor (V13-04)
 - widget row now uses the platform Glance `CheckBox` (native accent color + ripple) instead of a text glyph; OQ-01 strikethrough/fade animation dropped — Glance composables compile to a static RemoteViews snapshot and can't host Compose animations (V13-05)
 - widget data provider now dispatches via a sealed `WidgetSource` (Today / Upcoming7d / Pinned / Tag); only Today is wired into the widget surface until V13-09 reads per-widget config (V13-03)
+- 4×4 `LIST_WITH_OVERDUE` layout fully implemented: tasks partition into "Overdue (N)" header + overdue rows + regular rows; overdue threshold is strict `dueAt < now` (V13-12)
+- widget picker preview replaced: API 31+ renders a live `previewLayout` mock (header + 3 skeleton task rows); API 26–30 uses an improved layer-list drawable instead of a plain gray rectangle (V13-20)
 
 ## [1.12.0] - 2026-05-17
 
