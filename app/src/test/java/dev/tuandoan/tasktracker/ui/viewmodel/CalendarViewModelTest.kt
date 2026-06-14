@@ -15,6 +15,8 @@ import dev.tuandoan.tasktracker.testutil.TestTaskFactory
 import dev.tuandoan.tasktracker.testutil.fakeAnalyticsLogger
 import dev.tuandoan.tasktracker.testutil.fakeBreadcrumbLogger
 import dev.tuandoan.tasktracker.testutil.fakePerformanceLogger
+import dev.tuandoan.tasktracker.ui.state.TaskSelectionStateManager
+import io.mockk.mockk
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -76,6 +78,8 @@ class CalendarViewModelTest {
             fakeBreadcrumbLogger(),
             fakeAnalyticsLogger(),
             fakePerformanceLogger(),
+            TaskSelectionStateManager(),
+            mockk(relaxed = true),
         )
 
     private fun dateEpoch(date: LocalDate): Long = date.atStartOfDay(zone).toInstant().toEpochMilli()
@@ -595,6 +599,8 @@ class CalendarViewModelTest {
                 breadcrumbLogger,
                 io.mockk.mockk(relaxed = true),
                 fakePerformanceLogger(),
+                TaskSelectionStateManager(),
+                mockk(relaxed = true),
             )
         vm.onDaySelect(LocalDate.of(2026, 5, 12))
         io.mockk.verify {
@@ -619,6 +625,8 @@ class CalendarViewModelTest {
                 fakeBreadcrumbLogger(),
                 analyticsLogger,
                 fakePerformanceLogger(),
+                TaskSelectionStateManager(),
+                mockk(relaxed = true),
             )
         vm.onDaySelect(LocalDate.of(2026, 5, 12))
         io.mockk.verify {
@@ -644,6 +652,8 @@ class CalendarViewModelTest {
             fakeBreadcrumbLogger(),
             fakeAnalyticsLogger(),
             performanceLogger,
+            TaskSelectionStateManager(),
+            mockk(relaxed = true),
         )
 
         vm.startMonthRenderTrace()

@@ -1,16 +1,20 @@
 package dev.tuandoan.tasktracker.ui.screens
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
@@ -41,6 +45,7 @@ import dev.tuandoan.tasktracker.domain.model.DayDecoration
 import dev.tuandoan.tasktracker.ui.components.CalendarEmptyStateCard
 import dev.tuandoan.tasktracker.ui.components.CalendarMonthView
 import dev.tuandoan.tasktracker.ui.components.DayAgendaSheet
+import dev.tuandoan.tasktracker.ui.events.UiEvent
 import dev.tuandoan.tasktracker.ui.theme.AppSpacing
 import dev.tuandoan.tasktracker.ui.viewmodel.CalendarViewModel
 import kotlinx.coroutines.flow.first
@@ -70,11 +75,31 @@ fun CalendarScreen(
     modifier: Modifier = Modifier,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val isSelectionMode by viewModel.isSelectionMode.collectAsStateWithLifecycle()
+    val selectedIds by viewModel.selectedIds.collectAsStateWithLifecycle()
+    val selectedCount by viewModel.selectedCount.collectAsStateWithLifecycle()
+    val pendingBulkArchiveTasks by viewModel.pendingBulkArchiveTasks.collectAsStateWithLifecycle()
+    val pendingBulkDeleteTasks by viewModel.pendingBulkDeleteTasks.collectAsStateWithLifecycle()
     var isAgendaOpen by rememberSaveable { mutableStateOf(false) }
+    val snackbarHostState = remember { SnackbarHostState() }
     // Cache the zone so today's-epoch lookups inside click handlers don't re-read the
     // system default on every invocation. Matches the `zone` cache in `CalendarViewModel`.
     val zone = remember { ZoneId.systemDefault() }
     val showEmptyStateHint = !uiState.hasAnyDatedTask
+
+    LaunchedEffect(viewModel) {
+        viewModel.bulkUiEvent.collect { event ->
+            when (event) {
+                is UiEvent.ShowSnackbar -> snackbarHostState.showSnackbar(event.message)
+                is UiEvent.ShowUndoDelete -> event.message?.let { snackbarHostState.showSnackbar(it) }
+                else -> Unit
+            }
+        }
+    }
+
+    BackHandler(enabled = isSelectionMode && isAgendaOpen) {
+        viewModel.clearAgendaSelection()
+    }
 
     // FB-16: `calendar_month_render` Performance trace. Measures
     // `visibleMonth` change → decorations Flow re-emits for the new month + one paint
@@ -87,6 +112,44 @@ fun CalendarScreen(
         startTrace = viewModel::startMonthRenderTrace,
     )
 
+    // Bulk archive confirmation dialog
+    if (pendingBulkArchiveTasks.isNotEmpty()) {
+        AlertDialog(
+            onDismissRequest = viewModel::cancelAgendaBulkArchive,
+            title = { Text(stringResource(R.string.dialog_archive_tasks_title)) },
+            text = { Text(stringResource(R.string.dialog_archive_tasks_message, pendingBulkArchiveTasks.size)) },
+            confirmButton = {
+                TextButton(onClick = viewModel::confirmAgendaBulkArchive) {
+                    Text(stringResource(R.string.action_archive))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = viewModel::cancelAgendaBulkArchive) {
+                    Text(stringResource(R.string.action_cancel))
+                }
+            },
+        )
+    }
+
+    // Bulk delete confirmation dialog
+    if (pendingBulkDeleteTasks.isNotEmpty()) {
+        AlertDialog(
+            onDismissRequest = viewModel::cancelAgendaBulkDelete,
+            title = { Text(stringResource(R.string.dialog_delete_tasks_title)) },
+            text = { Text(stringResource(R.string.dialog_delete_tasks_message, pendingBulkDeleteTasks.size)) },
+            confirmButton = {
+                TextButton(onClick = viewModel::confirmAgendaBulkDelete) {
+                    Text(stringResource(R.string.action_delete), color = MaterialTheme.colorScheme.error)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = viewModel::cancelAgendaBulkDelete) {
+                    Text(stringResource(R.string.action_cancel))
+                }
+            },
+        )
+    }
+
     Scaffold(
         modifier = modifier.fillMaxSize(),
         topBar = {
@@ -97,6 +160,7 @@ fun CalendarScreen(
                 onTodayClick = viewModel::onTodayClick,
             )
         },
+        snackbarHost = { SnackbarHost(snackbarHostState) },
     ) { paddingValues ->
         Column(
             modifier = Modifier
@@ -138,8 +202,10 @@ fun CalendarScreen(
                 items = uiState.agendaItems,
                 subtaskProgress = uiState.subtaskProgress,
                 onItemClick = { item ->
-                    isAgendaOpen = false
-                    viewModel.onAgendaItemClick(item, onNavigateToEditor)
+                    if (!isSelectionMode) {
+                        isAgendaOpen = false
+                        viewModel.onAgendaItemClick(item, onNavigateToEditor)
+                    }
                 },
                 onToggleComplete = viewModel::onAgendaItemToggleComplete,
                 onArchive = viewModel::onAgendaItemArchive,
@@ -152,7 +218,18 @@ fun CalendarScreen(
                         .toEpochMilli()
                     onNavigateToCreateForDay(epoch)
                 },
-                onDismiss = { isAgendaOpen = false },
+                onDismiss = {
+                    viewModel.clearAgendaSelection()
+                    isAgendaOpen = false
+                },
+                isSelectionMode = isSelectionMode,
+                selectedIds = selectedIds,
+                selectedCount = selectedCount,
+                onLongPressTask = viewModel::onAgendaLongPress,
+                onToggleSelection = viewModel::onAgendaToggleSelection,
+                onBulkComplete = viewModel::agendaBulkComplete,
+                onBulkArchive = viewModel::agendaBulkArchive,
+                onBulkDelete = viewModel::agendaBulkDelete,
             )
         }
     }

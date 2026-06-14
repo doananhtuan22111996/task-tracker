@@ -18,9 +18,13 @@ import dev.tuandoan.tasktracker.domain.model.AgendaItem
 import dev.tuandoan.tasktracker.domain.model.DayDecoration
 import dev.tuandoan.tasktracker.domain.usecase.CalendarUseCase
 import dev.tuandoan.tasktracker.domain.usecase.SubtaskUseCase
+import dev.tuandoan.tasktracker.ui.events.UiEvent
+import dev.tuandoan.tasktracker.ui.manager.TaskBulkActionManager
+import dev.tuandoan.tasktracker.ui.state.TaskSelectionStateManager
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
@@ -59,9 +63,58 @@ class CalendarViewModel @Inject constructor(
     private val breadcrumbLogger: BreadcrumbLogger,
     private val analyticsLogger: AnalyticsLogger,
     private val performanceLogger: PerformanceLogger,
+    private val selectionStateManager: TaskSelectionStateManager,
+    private val bulkActionManager: TaskBulkActionManager,
 ) : ViewModel() {
 
     private val zone: ZoneId = ZoneId.systemDefault()
+
+    // ── Multi-select (CAL-20) ─────────────────────────────────────────────────────────────
+    // TaskSelectionStateManager is a @Singleton shared with TaskViewModel. Clear on init
+    // and onCleared so the calendar never inherits task-list selection and never leaks its
+    // own selection back to the task list when the user switches tabs.
+    init {
+        selectionStateManager.clearSelection()
+    }
+
+    private val selectionState = selectionStateManager.initializeStateFlows(viewModelScope)
+    val isSelectionMode: StateFlow<Boolean> = selectionState.isSelectionMode
+    val selectedIds: StateFlow<Set<Long>> = selectionState.selectedIds
+    val selectedCount: StateFlow<Int> = selectionState.selectedCount
+    val bulkUiEvent: SharedFlow<UiEvent> = bulkActionManager.uiEvent
+    val pendingBulkArchiveTasks = bulkActionManager.pendingBulkArchiveTasks
+    val pendingBulkDeleteTasks = bulkActionManager.pendingBulkDeleteTasks
+
+    fun onAgendaLongPress(taskId: Long) = selectionStateManager.enterSelection(taskId)
+    fun onAgendaToggleSelection(taskId: Long) = selectionStateManager.toggleSelection(taskId)
+    fun clearAgendaSelection() = selectionStateManager.clearSelection()
+
+    fun agendaBulkComplete() = bulkActionManager.bulkMarkCompleted(viewModelScope)
+
+    fun agendaBulkArchive() {
+        val tasks = concreteTasks()
+        if (tasks.isEmpty()) return
+        bulkActionManager.requestBulkArchive(tasks)
+    }
+
+    fun confirmAgendaBulkArchive() = bulkActionManager.confirmBulkArchive(viewModelScope)
+    fun cancelAgendaBulkArchive() = bulkActionManager.cancelBulkArchive()
+
+    fun agendaBulkDelete() {
+        val tasks = concreteTasks()
+        if (tasks.isEmpty()) return
+        bulkActionManager.requestBulkDelete(tasks)
+    }
+
+    fun confirmAgendaBulkDelete() = bulkActionManager.confirmBulkDelete(viewModelScope)
+    fun cancelAgendaBulkDelete() = bulkActionManager.cancelBulkDelete()
+
+    // Snapshot of concrete tasks at call time. May be stale if the agenda live-updates
+    // between long-press and the confirm tap, but that window is narrow and matches the
+    // same risk present on the task list (TaskViewModel.allTasks is also a snapshot).
+    private fun concreteTasks(): List<Task> = uiState.value.agendaItems
+        .filterIsInstance<AgendaItem.Concrete>()
+        .map { it.task }
 
     private val _visibleMonth: MutableStateFlow<YearMonth> = MutableStateFlow(
         parseOrNull(savedStateHandle.get<String>(KEY_VISIBLE_MONTH), YearMonth::parse)
@@ -203,6 +256,7 @@ class CalendarViewModel @Inject constructor(
     }
 
     fun onDaySelect(date: LocalDate) {
+        selectionStateManager.clearSelection()
         _selectedDay.value = date
         savedStateHandle[KEY_SELECTED_DAY] = date.toString()
         // FB-12: no date — date-of-tap leaks usage timing. Plain verb is enough for debugging
@@ -221,6 +275,11 @@ class CalendarViewModel @Inject constructor(
         _selectedDay.value = today
         savedStateHandle[KEY_VISIBLE_MONTH] = thisMonth.toString()
         savedStateHandle[KEY_SELECTED_DAY] = today.toString()
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        selectionStateManager.clearSelection()
     }
 
     companion object {
