@@ -17,6 +17,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com).
 - JVM lifecycle tests for widget config persistence: reboot survival across all 4 `WidgetSource` variants, rebind stability, per-`appWidgetId` isolation, `onDeleted` cleanup (V13-11)
 - 16 `WidgetSource` query-semantic JVM tests (window bounds, ordering invariants, tag exact-match/case, limit) and 13 analytics call-site emission tests (V13-13, V13-15)
 - GlanceTheme color contrast audit complete: all `onSurface`, `onSurfaceVariant`, `error`, `primary`, and `onPrimary` token pairs used in widget layouts pass WCAG AA (4.5:1) in both light and dark modes for the static color scheme (V13-19)
+- TalkBack content descriptions added to all interactive widget elements: `+` button announces "Create new task", per-task checkbox announces "Mark [title] as complete", task row tap target announces "Open task: [title]", compact widget announces task count + top task title (V13-18)
 
 ### Changed
 - widget supports responsive 2x2 / 4x2 / 4x4 placements (default 4x2), scaffold for v1.13.0 widget v2 (V13-01)

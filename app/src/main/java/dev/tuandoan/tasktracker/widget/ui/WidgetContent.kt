@@ -30,6 +30,8 @@ import androidx.glance.layout.height
 import androidx.glance.layout.padding
 import androidx.glance.layout.size
 import androidx.glance.layout.width
+import androidx.glance.semantics.contentDescription
+import androidx.glance.semantics.semantics
 import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
@@ -98,11 +100,17 @@ private fun WidgetCompactContent(tasks: List<WidgetTask>, topTask: WidgetTask?) 
         tasks.size.toString()
     }
     val tapAction = if (topTask != null) createTaskAction(topTask.id) else createNewTaskAction()
+    val compactCd = if (topTask != null) {
+        context.getString(R.string.cd_widget_compact_summary, countText, topTask.title)
+    } else {
+        context.getString(R.string.widget_compact_no_tasks)
+    }
     Column(
         modifier = GlanceModifier
             .fillMaxSize()
             .background(GlanceTheme.colors.surface)
             .padding(8.dp)
+            .semantics { contentDescription = compactCd }
             .clickable(tapAction),
     ) {
         Row(
@@ -212,6 +220,7 @@ private fun WidgetHeader() {
                 .size(36.dp)
                 .cornerRadius(18.dp)
                 .background(GlanceTheme.colors.primary)
+                .semantics { contentDescription = context.getString(R.string.widget_add_task) }
                 .clickable(createNewTaskAction()),
             contentAlignment = Alignment.Center,
         ) {
@@ -287,13 +296,18 @@ private fun WidgetTaskRow(task: WidgetTask) {
         CheckBox(
             checked = false,
             onCheckedChange = completeTaskAction(task.id),
-            modifier = GlanceModifier.padding(end = 4.dp),
+            modifier = GlanceModifier
+                .padding(end = 4.dp)
+                .semantics {
+                    contentDescription = context.getString(R.string.cd_widget_complete_task, task.title)
+                },
         )
 
         // Tap target for the rest of the row \u2192 editor.
         Row(
             modifier = GlanceModifier
                 .defaultWeight()
+                .semantics { contentDescription = context.getString(R.string.cd_widget_open_task, task.title) }
                 .clickable(createTaskAction(task.id)),
             verticalAlignment = Alignment.CenterVertically,
         ) {
