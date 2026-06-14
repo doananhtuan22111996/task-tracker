@@ -70,6 +70,13 @@ class CalendarViewModel @Inject constructor(
     private val zone: ZoneId = ZoneId.systemDefault()
 
     // ── Multi-select (CAL-20) ─────────────────────────────────────────────────────────────
+    // TaskSelectionStateManager is a @Singleton shared with TaskViewModel. Clear on init
+    // and onCleared so the calendar never inherits task-list selection and never leaks its
+    // own selection back to the task list when the user switches tabs.
+    init {
+        selectionStateManager.clearSelection()
+    }
+
     private val selectionState = selectionStateManager.initializeStateFlows(viewModelScope)
     val isSelectionMode: StateFlow<Boolean> = selectionState.isSelectionMode
     val selectedIds: StateFlow<Set<Long>> = selectionState.selectedIds
@@ -102,6 +109,9 @@ class CalendarViewModel @Inject constructor(
     fun confirmAgendaBulkDelete() = bulkActionManager.confirmBulkDelete(viewModelScope)
     fun cancelAgendaBulkDelete() = bulkActionManager.cancelBulkDelete()
 
+    // Snapshot of concrete tasks at call time. May be stale if the agenda live-updates
+    // between long-press and the confirm tap, but that window is narrow and matches the
+    // same risk present on the task list (TaskViewModel.allTasks is also a snapshot).
     private fun concreteTasks(): List<Task> = uiState.value.agendaItems
         .filterIsInstance<AgendaItem.Concrete>()
         .map { it.task }
@@ -265,6 +275,11 @@ class CalendarViewModel @Inject constructor(
         _selectedDay.value = today
         savedStateHandle[KEY_VISIBLE_MONTH] = thisMonth.toString()
         savedStateHandle[KEY_SELECTED_DAY] = today.toString()
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        selectionStateManager.clearSelection()
     }
 
     companion object {
