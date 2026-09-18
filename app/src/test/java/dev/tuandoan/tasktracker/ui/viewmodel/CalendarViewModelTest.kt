@@ -853,4 +853,89 @@ class CalendarViewModelTest {
         assertEquals(emptySet<Long>(), vm.selectedIds.value)
         assertEquals(emptySet<Long>(), selectionManager.selectedIds.value)
     }
+
+    @Test
+    fun `onTodayClick clears active selection`() = runTest {
+        val selectionManager = TaskSelectionStateManager()
+        val vm = createViewModel(selectionStateManager = selectionManager)
+
+        vm.isSelectionMode.test {
+            assertEquals(false, awaitItem())
+            vm.onAgendaLongPress(42L)
+            assertEquals(true, awaitItem())
+
+            vm.onTodayClick()
+            assertEquals(false, awaitItem())
+            assertEquals(emptySet<Long>(), vm.selectedIds.value)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `agendaBulkArchive catches exception and clears selection`() = runTest {
+        val target = LocalDate.of(2026, 5, 10)
+        val savedState = SavedStateHandle(
+            mapOf(
+                CalendarViewModel.KEY_VISIBLE_MONTH to "2026-05",
+                CalendarViewModel.KEY_SELECTED_DAY to target.toString(),
+            ),
+        )
+        val task = TestTaskFactory.createTask(id = 101L, title = "Task 101", dueAt = dateEpoch(target))
+        repo.seed(task)
+
+        val selectionManager = TaskSelectionStateManager()
+        val bulkManager = mockk<TaskBulkActionManager>(relaxed = true) {
+            io.mockk.every { requestBulkArchive(any()) } throws IllegalStateException("Simulated mismatch")
+        }
+        val vm = createViewModel(
+            savedState = savedState,
+            selectionStateManager = selectionManager,
+            bulkActionManager = bulkManager,
+        )
+
+        vm.isSelectionMode.test {
+            assertEquals(false, awaitItem())
+            vm.onAgendaLongPress(101L)
+            assertEquals(true, awaitItem())
+
+            vm.agendaBulkArchive()
+            assertEquals(false, awaitItem())
+            assertEquals(emptySet<Long>(), vm.selectedIds.value)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `agendaBulkDelete catches exception and clears selection`() = runTest {
+        val target = LocalDate.of(2026, 5, 10)
+        val savedState = SavedStateHandle(
+            mapOf(
+                CalendarViewModel.KEY_VISIBLE_MONTH to "2026-05",
+                CalendarViewModel.KEY_SELECTED_DAY to target.toString(),
+            ),
+        )
+        val task = TestTaskFactory.createTask(id = 202L, title = "Task 202", dueAt = dateEpoch(target))
+        repo.seed(task)
+
+        val selectionManager = TaskSelectionStateManager()
+        val bulkManager = mockk<TaskBulkActionManager>(relaxed = true) {
+            io.mockk.every { requestBulkDelete(any()) } throws IllegalStateException("Simulated mismatch")
+        }
+        val vm = createViewModel(
+            savedState = savedState,
+            selectionStateManager = selectionManager,
+            bulkActionManager = bulkManager,
+        )
+
+        vm.isSelectionMode.test {
+            assertEquals(false, awaitItem())
+            vm.onAgendaLongPress(202L)
+            assertEquals(true, awaitItem())
+
+            vm.agendaBulkDelete()
+            assertEquals(false, awaitItem())
+            assertEquals(emptySet<Long>(), vm.selectedIds.value)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
 }

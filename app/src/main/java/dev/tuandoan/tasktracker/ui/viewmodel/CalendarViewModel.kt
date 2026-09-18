@@ -93,20 +93,40 @@ class CalendarViewModel @Inject constructor(
 
     fun agendaBulkArchive() {
         val tasks = concreteTasks()
-        if (tasks.isEmpty()) return
-        bulkActionManager.requestBulkArchive(tasks)
+        if (tasks.isEmpty()) {
+            clearAgendaSelection()
+            return
+        }
+        runCatching {
+            bulkActionManager.requestBulkArchive(tasks)
+        }.onFailure {
+            clearAgendaSelection()
+        }
     }
 
-    fun confirmAgendaBulkArchive() = bulkActionManager.confirmBulkArchive(viewModelScope)
+    fun confirmAgendaBulkArchive() {
+        runCatching { bulkActionManager.confirmBulkArchive(viewModelScope) }
+    }
+
     fun cancelAgendaBulkArchive() = bulkActionManager.cancelBulkArchive()
 
     fun agendaBulkDelete() {
         val tasks = concreteTasks()
-        if (tasks.isEmpty()) return
-        bulkActionManager.requestBulkDelete(tasks)
+        if (tasks.isEmpty()) {
+            clearAgendaSelection()
+            return
+        }
+        runCatching {
+            bulkActionManager.requestBulkDelete(tasks)
+        }.onFailure {
+            clearAgendaSelection()
+        }
     }
 
-    fun confirmAgendaBulkDelete() = bulkActionManager.confirmBulkDelete(viewModelScope)
+    fun confirmAgendaBulkDelete() {
+        runCatching { bulkActionManager.confirmBulkDelete(viewModelScope) }
+    }
+
     fun cancelAgendaBulkDelete() = bulkActionManager.cancelBulkDelete()
 
     // Snapshot of concrete tasks at call time. May be stale if the agenda live-updates
@@ -269,6 +289,7 @@ class CalendarViewModel @Inject constructor(
     }
 
     fun onTodayClick() {
+        selectionStateManager.clearSelection()
         val today = LocalDate.now(zone)
         val thisMonth = YearMonth.from(today)
         _visibleMonth.value = thisMonth
