@@ -13,8 +13,10 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
@@ -31,6 +33,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.heading
@@ -86,12 +89,45 @@ fun CalendarScreen(
     // system default on every invocation. Matches the `zone` cache in `CalendarViewModel`.
     val zone = remember { ZoneId.systemDefault() }
     val showEmptyStateHint = !uiState.hasAnyDatedTask
+    val context = LocalContext.current
 
     LaunchedEffect(viewModel) {
         viewModel.bulkUiEvent.collect { event ->
             when (event) {
-                is UiEvent.ShowSnackbar -> snackbarHostState.showSnackbar(event.message)
-                is UiEvent.ShowUndoDelete -> event.message?.let { snackbarHostState.showSnackbar(it) }
+                is UiEvent.ShowSnackbar -> {
+                    if (event.actionLabel != null) {
+                        val result = snackbarHostState.showSnackbar(
+                            message = event.message,
+                            actionLabel = event.actionLabel,
+                            duration = SnackbarDuration.Short,
+                        )
+                        if (result == SnackbarResult.ActionPerformed) {
+                            event.onActionClick()
+                        }
+                    } else {
+                        snackbarHostState.showSnackbar(
+                            message = event.message,
+                            duration = SnackbarDuration.Short,
+                        )
+                    }
+                }
+                is UiEvent.ShowUndoDelete -> {
+                    val taskCount = event.tasks.size
+                    val message = event.message ?: if (taskCount == 1) {
+                        context.getString(R.string.snackbar_task_deleted)
+                    } else {
+                        context.getString(R.string.snackbar_tasks_deleted, taskCount)
+                    }
+
+                    val result = snackbarHostState.showSnackbar(
+                        message = message,
+                        actionLabel = context.getString(R.string.action_undo),
+                        duration = SnackbarDuration.Short,
+                    )
+                    if (result == SnackbarResult.ActionPerformed) {
+                        event.onUndo()
+                    }
+                }
                 else -> Unit
             }
         }
