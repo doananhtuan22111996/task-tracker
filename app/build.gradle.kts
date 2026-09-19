@@ -1,6 +1,5 @@
 import com.google.firebase.crashlytics.buildtools.gradle.CrashlyticsExtension
 import java.io.FileInputStream
-import java.time.Instant
 import java.util.Properties
 
 plugins {
@@ -19,12 +18,19 @@ android {
     namespace = "dev.tuandoan.tasktracker"
     compileSdk = 36
 
+    val versionMajor = 1
+    val versionMinor = 13
+    val versionPatch = 0
+
     defaultConfig {
         applicationId = "dev.tuandoan.tasktracker"
         minSdk = 26
         targetSdk = 36
-        versionCode = Instant.now().epochSecond.toInt() // Epoch seconds: safe until 2038, always increasing
-        versionName = "1.13.0"
+        // Base starting point above highest uploaded epoch seconds (1,789,793,749).
+        // Sustainable SemVer formula: leaves 310M+ version codes until Google Play's 2.1B cap.
+        // v1.13.0 -> 1,789,800,000 + (1 * 10,000 + 13 * 100 + 0) = 1,789,811,300
+        versionCode = 1_789_800_000 + (versionMajor * 10_000 + versionMinor * 100 + versionPatch)
+        versionName = "$versionMajor.$versionMinor.$versionPatch"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
