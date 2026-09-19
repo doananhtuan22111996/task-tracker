@@ -5,6 +5,13 @@ Format follows [Keep a Changelog](https://keepachangelog.com).
 
 ## [Unreleased]
 
+## [1.13.0] - 2026-09-19
+
+### Notes
+- **What's new (V13-25):**
+  - **Home Screen Widget v2:** Redesigned responsive widgets supporting 2x2, 4x2, and 4x4 sizes. Mark tasks completed directly from the home screen in one tap, configure content sources per widget (Today, Upcoming 7 days, Pinned, or custom Tag), and view overdue tasks highlighted in a dedicated section on 4x4 widgets.
+  - **Calendar Day Agenda Multi-Select:** Long-press any task row in the day agenda bottom sheet to enter multi-select mode and complete, archive, or delete tasks in bulk with full undo support.
+
 ### Added
 - complete-from-widget: per-row checkbox marks the task done in one tap, reusing `TaskManager.toggleTaskCompletion` so reminder cancellation, recurrence generation and analytics all stay on a single code path (V13-04)
 - JVM tests for `WidgetCompleteHandler`: ordering invariant (cancel reminder → persist → widget update), timed double-tap absorbed as no-op, and no-reschedule guarantee post-completion (V13-06)
