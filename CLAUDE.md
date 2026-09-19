@@ -23,7 +23,7 @@ Task Tracker is an offline-first Android task management app. Single-module Kotl
 
 - **Package:** `dev.tuandoan.tasktracker`
 - **Min SDK:** 26 · **Compile/Target SDK:** 36
-- **Version:** defined in `app/build.gradle.kts` (`versionName`)
+- **Version:** defined in `app/build.gradle.kts` (`versionMajor`, `versionMinor`, `versionPatch`)
 - **Version catalog:** `gradle/libs.versions.toml`
 - **Stage:** Closed Beta (Android)
 
