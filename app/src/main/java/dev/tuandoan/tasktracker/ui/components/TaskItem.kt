@@ -186,7 +186,7 @@ fun TaskItem(
                 modifier = Modifier
                     .combinedClickable(
                         onClick = {
-                            if (!isSelectionMode) onToggleComplete()
+                            if (isSelectionMode) onToggleSelection() else onToggleComplete()
                         },
                     )
                     .semantics {

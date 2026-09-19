@@ -3,6 +3,7 @@ package dev.tuandoan.tasktracker.ui.components
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -12,11 +13,15 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Archive
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.EventBusy
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
@@ -61,6 +66,14 @@ fun DayAgendaSheet(
     onTogglePin: (AgendaItem) -> Unit,
     onAddTaskClick: () -> Unit,
     onDismiss: () -> Unit,
+    isSelectionMode: Boolean = false,
+    selectedIds: Set<Long> = emptySet(),
+    selectedCount: Int = 0,
+    onLongPressTask: (Long) -> Unit = {},
+    onToggleSelection: (Long) -> Unit = {},
+    onBulkComplete: () -> Unit = {},
+    onBulkArchive: () -> Unit = {},
+    onBulkDelete: () -> Unit = {},
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = false)
     val dateFormatter = dayTitleFormatter(Locale.getDefault())
@@ -75,12 +88,22 @@ fun DayAgendaSheet(
                 .fillMaxWidth()
                 .padding(horizontal = AppSpacing.screenPadding),
         ) {
-            Text(
-                text = dateTitle,
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.SemiBold,
-                modifier = Modifier.padding(bottom = AppSpacing.small),
-            )
+            if (isSelectionMode) {
+                AgendaSelectionBar(
+                    selectedCount = selectedCount,
+                    onComplete = onBulkComplete,
+                    onArchive = onBulkArchive,
+                    onDelete = onBulkDelete,
+                    modifier = Modifier.padding(bottom = AppSpacing.small),
+                )
+            } else {
+                Text(
+                    text = dateTitle,
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.SemiBold,
+                    modifier = Modifier.padding(bottom = AppSpacing.small),
+                )
+            }
 
             if (items.isEmpty()) {
                 // CAL-22: polished empty-day state. Icon + date-inlined message. FAB below
@@ -118,10 +141,14 @@ fun DayAgendaSheet(
                                 onEditClick = { onItemClick(item) },
                                 onArchiveClick = { onArchive(item) },
                                 onPinClick = { onTogglePin(item) },
+                                isSelectionMode = isSelectionMode,
+                                isSelected = item.task.id in selectedIds,
+                                onLongPress = { onLongPressTask(item.task.id) },
+                                onToggleSelection = { onToggleSelection(item.task.id) },
                             )
                             is AgendaItem.Projected -> ProjectedAgendaRow(
                                 projected = item,
-                                onClick = { onItemClick(item) },
+                                onClick = { if (!isSelectionMode) onItemClick(item) },
                             )
                         }
                     }
@@ -130,30 +157,71 @@ fun DayAgendaSheet(
 
             Spacer(Modifier.height(AppSpacing.medium))
 
-            // FAB (CAL-19): opens task editor with dueDate prefilled to selectedDay.
-            // Right-aligned inside the sheet so it behaves like the floating action it is,
-            // without colliding with the sheet's own drag-to-dismiss gestures.
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = AppSpacing.medium),
-                contentAlignment = Alignment.CenterEnd,
-            ) {
-                FloatingActionButton(
-                    onClick = onAddTaskClick,
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    contentColor = MaterialTheme.colorScheme.onPrimary,
-                    elevation = FloatingActionButtonDefaults.elevation(
-                        defaultElevation = 6.dp,
-                        pressedElevation = 8.dp,
-                    ),
+            // FAB (CAL-19): hidden in selection mode to avoid conflicting with bulk actions.
+            if (!isSelectionMode) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = AppSpacing.medium),
+                    contentAlignment = Alignment.CenterEnd,
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.Add,
-                        contentDescription = stringResource(R.string.cd_agenda_add_task),
-                    )
+                    FloatingActionButton(
+                        onClick = onAddTaskClick,
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.onPrimary,
+                        elevation = FloatingActionButtonDefaults.elevation(
+                            defaultElevation = 6.dp,
+                            pressedElevation = 8.dp,
+                        ),
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Add,
+                            contentDescription = stringResource(R.string.cd_agenda_add_task),
+                        )
+                    }
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun AgendaSelectionBar(
+    selectedCount: Int,
+    onComplete: () -> Unit,
+    onArchive: () -> Unit,
+    onDelete: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Row(
+        modifier = modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(
+            text = stringResource(R.string.agenda_multi_select_count, selectedCount),
+            style = MaterialTheme.typography.titleMedium,
+            modifier = Modifier.weight(1f),
+        )
+        IconButton(onClick = onComplete) {
+            Icon(
+                imageVector = Icons.Default.CheckCircle,
+                contentDescription = stringResource(R.string.cd_mark_completed),
+                tint = MaterialTheme.colorScheme.primary,
+            )
+        }
+        IconButton(onClick = onArchive) {
+            Icon(
+                imageVector = Icons.Default.Archive,
+                contentDescription = stringResource(R.string.action_archive),
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+        IconButton(onClick = onDelete) {
+            Icon(
+                imageVector = Icons.Default.Delete,
+                contentDescription = stringResource(R.string.action_delete),
+                tint = MaterialTheme.colorScheme.error,
+            )
         }
     }
 }

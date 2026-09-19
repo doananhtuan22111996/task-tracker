@@ -15,6 +15,10 @@ import dev.tuandoan.tasktracker.testutil.TestTaskFactory
 import dev.tuandoan.tasktracker.testutil.fakeAnalyticsLogger
 import dev.tuandoan.tasktracker.testutil.fakeBreadcrumbLogger
 import dev.tuandoan.tasktracker.testutil.fakePerformanceLogger
+import dev.tuandoan.tasktracker.ui.manager.TaskBulkActionManager
+import dev.tuandoan.tasktracker.ui.state.TaskSelectionStateManager
+import io.mockk.mockk
+import io.mockk.verify
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -67,16 +71,21 @@ class CalendarViewModelTest {
         Dispatchers.resetMain()
     }
 
-    private fun createViewModel(savedState: SavedStateHandle = SavedStateHandle()): CalendarViewModel =
-        CalendarViewModel(
-            useCase,
-            savedState,
-            taskManager,
-            subtaskUseCase,
-            fakeBreadcrumbLogger(),
-            fakeAnalyticsLogger(),
-            fakePerformanceLogger(),
-        )
+    private fun createViewModel(
+        savedState: SavedStateHandle = SavedStateHandle(),
+        selectionStateManager: TaskSelectionStateManager = TaskSelectionStateManager(),
+        bulkActionManager: TaskBulkActionManager = mockk(relaxed = true),
+    ): CalendarViewModel = CalendarViewModel(
+        useCase,
+        savedState,
+        taskManager,
+        subtaskUseCase,
+        fakeBreadcrumbLogger(),
+        fakeAnalyticsLogger(),
+        fakePerformanceLogger(),
+        selectionStateManager,
+        bulkActionManager,
+    )
 
     private fun dateEpoch(date: LocalDate): Long = date.atStartOfDay(zone).toInstant().toEpochMilli()
 
@@ -595,6 +604,8 @@ class CalendarViewModelTest {
                 breadcrumbLogger,
                 io.mockk.mockk(relaxed = true),
                 fakePerformanceLogger(),
+                TaskSelectionStateManager(),
+                mockk(relaxed = true),
             )
         vm.onDaySelect(LocalDate.of(2026, 5, 12))
         io.mockk.verify {
@@ -619,6 +630,8 @@ class CalendarViewModelTest {
                 fakeBreadcrumbLogger(),
                 analyticsLogger,
                 fakePerformanceLogger(),
+                TaskSelectionStateManager(),
+                mockk(relaxed = true),
             )
         vm.onDaySelect(LocalDate.of(2026, 5, 12))
         io.mockk.verify {
@@ -644,12 +657,285 @@ class CalendarViewModelTest {
             fakeBreadcrumbLogger(),
             fakeAnalyticsLogger(),
             performanceLogger,
+            TaskSelectionStateManager(),
+            mockk(relaxed = true),
         )
 
         vm.startMonthRenderTrace()
 
         io.mockk.verify {
             performanceLogger.start(dev.tuandoan.tasktracker.diagnostics.PerformanceTraceName.CalendarMonthRender)
+        }
+    }
+
+    // ── Multi-select (CAL-20) ──
+
+    @Test
+    fun `onAgendaLongPress enters selection mode and selects task`() = runTest {
+        val selectionManager = TaskSelectionStateManager()
+        val vm = createViewModel(selectionStateManager = selectionManager)
+
+        vm.isSelectionMode.test {
+            assertEquals(false, awaitItem())
+            vm.onAgendaLongPress(42L)
+            assertEquals(true, awaitItem())
+            assertEquals(setOf(42L), vm.selectedIds.value)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `onAgendaToggleSelection toggles task selection`() = runTest {
+        val selectionManager = TaskSelectionStateManager()
+        val vm = createViewModel(selectionStateManager = selectionManager)
+
+        vm.isSelectionMode.test {
+            assertEquals(false, awaitItem())
+            vm.onAgendaLongPress(42L)
+            assertEquals(true, awaitItem())
+
+            vm.onAgendaToggleSelection(43L)
+            assertEquals(setOf(42L, 43L), vm.selectedIds.value)
+
+            vm.onAgendaToggleSelection(42L)
+            assertEquals(setOf(43L), vm.selectedIds.value)
+
+            vm.onAgendaToggleSelection(43L)
+            assertEquals(false, awaitItem())
+            assertEquals(emptySet<Long>(), vm.selectedIds.value)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `clearAgendaSelection exits selection mode and clears ids`() = runTest {
+        val selectionManager = TaskSelectionStateManager()
+        val vm = createViewModel(selectionStateManager = selectionManager)
+
+        vm.isSelectionMode.test {
+            assertEquals(false, awaitItem())
+            vm.onAgendaLongPress(42L)
+            assertEquals(true, awaitItem())
+
+            vm.clearAgendaSelection()
+            assertEquals(false, awaitItem())
+            assertEquals(emptySet<Long>(), vm.selectedIds.value)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `onDaySelect clears active selection`() = runTest {
+        val selectionManager = TaskSelectionStateManager()
+        val vm = createViewModel(selectionStateManager = selectionManager)
+
+        vm.isSelectionMode.test {
+            assertEquals(false, awaitItem())
+            vm.onAgendaLongPress(42L)
+            assertEquals(true, awaitItem())
+
+            vm.onDaySelect(LocalDate.of(2026, 5, 20))
+            assertEquals(false, awaitItem())
+            assertEquals(emptySet<Long>(), vm.selectedIds.value)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `agendaBulkComplete delegates to bulkActionManager bulkMarkCompleted`() = runTest {
+        val bulkManager = mockk<TaskBulkActionManager>(relaxed = true)
+        val vm = createViewModel(bulkActionManager = bulkManager)
+
+        vm.agendaBulkComplete()
+
+        verify { bulkManager.bulkMarkCompleted(any()) }
+    }
+
+    @Test
+    fun `agendaBulkArchive extracts concrete tasks and calls requestBulkArchive`() = runTest {
+        val target = LocalDate.of(2026, 5, 10)
+        val savedState = SavedStateHandle(
+            mapOf(
+                CalendarViewModel.KEY_VISIBLE_MONTH to "2026-05",
+                CalendarViewModel.KEY_SELECTED_DAY to target.toString(),
+            ),
+        )
+        val task = TestTaskFactory.createTask(id = 101L, title = "Task 101", dueAt = dateEpoch(target))
+        repo.seed(task)
+
+        val bulkManager = mockk<TaskBulkActionManager>(relaxed = true)
+        val vm = createViewModel(savedState = savedState, bulkActionManager = bulkManager)
+
+        vm.uiState.test {
+            awaitItem()
+            vm.agendaBulkArchive()
+            verify { bulkManager.requestBulkArchive(match { tasks -> tasks.any { it.id == 101L } }) }
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `agendaBulkArchive does nothing when concrete tasks are empty`() = runTest {
+        val bulkManager = mockk<TaskBulkActionManager>(relaxed = true)
+        val vm = createViewModel(bulkActionManager = bulkManager)
+
+        vm.agendaBulkArchive()
+
+        verify(exactly = 0) { bulkManager.requestBulkArchive(any()) }
+    }
+
+    @Test
+    fun `confirmAgendaBulkArchive and cancelAgendaBulkArchive delegate to bulkActionManager`() = runTest {
+        val bulkManager = mockk<TaskBulkActionManager>(relaxed = true)
+        val vm = createViewModel(bulkActionManager = bulkManager)
+
+        vm.confirmAgendaBulkArchive()
+        verify { bulkManager.confirmBulkArchive(any()) }
+
+        vm.cancelAgendaBulkArchive()
+        verify { bulkManager.cancelBulkArchive() }
+    }
+
+    @Test
+    fun `agendaBulkDelete extracts concrete tasks and calls requestBulkDelete`() = runTest {
+        val target = LocalDate.of(2026, 5, 10)
+        val savedState = SavedStateHandle(
+            mapOf(
+                CalendarViewModel.KEY_VISIBLE_MONTH to "2026-05",
+                CalendarViewModel.KEY_SELECTED_DAY to target.toString(),
+            ),
+        )
+        val task = TestTaskFactory.createTask(id = 202L, title = "Task 202", dueAt = dateEpoch(target))
+        repo.seed(task)
+
+        val bulkManager = mockk<TaskBulkActionManager>(relaxed = true)
+        val vm = createViewModel(savedState = savedState, bulkActionManager = bulkManager)
+
+        vm.uiState.test {
+            awaitItem()
+            vm.agendaBulkDelete()
+            verify { bulkManager.requestBulkDelete(match { tasks -> tasks.any { it.id == 202L } }) }
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `agendaBulkDelete does nothing when concrete tasks are empty`() = runTest {
+        val bulkManager = mockk<TaskBulkActionManager>(relaxed = true)
+        val vm = createViewModel(bulkActionManager = bulkManager)
+
+        vm.agendaBulkDelete()
+
+        verify(exactly = 0) { bulkManager.requestBulkDelete(any()) }
+    }
+
+    @Test
+    fun `confirmAgendaBulkDelete and cancelAgendaBulkDelete delegate to bulkActionManager`() = runTest {
+        val bulkManager = mockk<TaskBulkActionManager>(relaxed = true)
+        val vm = createViewModel(bulkActionManager = bulkManager)
+
+        vm.confirmAgendaBulkDelete()
+        verify { bulkManager.confirmBulkDelete(any()) }
+
+        vm.cancelAgendaBulkDelete()
+        verify { bulkManager.cancelBulkDelete() }
+    }
+
+    @Test
+    fun `init clears existing selection in selectionStateManager`() = runTest {
+        val selectionManager = TaskSelectionStateManager()
+        selectionManager.enterSelection(99L)
+        assertEquals(setOf(99L), selectionManager.selectedIds.value)
+
+        val vm = createViewModel(selectionStateManager = selectionManager)
+
+        assertEquals(false, vm.isSelectionMode.value)
+        assertEquals(emptySet<Long>(), vm.selectedIds.value)
+        assertEquals(emptySet<Long>(), selectionManager.selectedIds.value)
+    }
+
+    @Test
+    fun `onTodayClick clears active selection`() = runTest {
+        val selectionManager = TaskSelectionStateManager()
+        val vm = createViewModel(selectionStateManager = selectionManager)
+
+        vm.isSelectionMode.test {
+            assertEquals(false, awaitItem())
+            vm.onAgendaLongPress(42L)
+            assertEquals(true, awaitItem())
+
+            vm.onTodayClick()
+            assertEquals(false, awaitItem())
+            assertEquals(emptySet<Long>(), vm.selectedIds.value)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `agendaBulkArchive catches exception and clears selection`() = runTest {
+        val target = LocalDate.of(2026, 5, 10)
+        val savedState = SavedStateHandle(
+            mapOf(
+                CalendarViewModel.KEY_VISIBLE_MONTH to "2026-05",
+                CalendarViewModel.KEY_SELECTED_DAY to target.toString(),
+            ),
+        )
+        val task = TestTaskFactory.createTask(id = 101L, title = "Task 101", dueAt = dateEpoch(target))
+        repo.seed(task)
+
+        val selectionManager = TaskSelectionStateManager()
+        val bulkManager = mockk<TaskBulkActionManager>(relaxed = true) {
+            io.mockk.every { requestBulkArchive(any()) } throws IllegalStateException("Simulated mismatch")
+        }
+        val vm = createViewModel(
+            savedState = savedState,
+            selectionStateManager = selectionManager,
+            bulkActionManager = bulkManager,
+        )
+
+        vm.isSelectionMode.test {
+            assertEquals(false, awaitItem())
+            vm.onAgendaLongPress(101L)
+            assertEquals(true, awaitItem())
+
+            vm.agendaBulkArchive()
+            assertEquals(false, awaitItem())
+            assertEquals(emptySet<Long>(), vm.selectedIds.value)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `agendaBulkDelete catches exception and clears selection`() = runTest {
+        val target = LocalDate.of(2026, 5, 10)
+        val savedState = SavedStateHandle(
+            mapOf(
+                CalendarViewModel.KEY_VISIBLE_MONTH to "2026-05",
+                CalendarViewModel.KEY_SELECTED_DAY to target.toString(),
+            ),
+        )
+        val task = TestTaskFactory.createTask(id = 202L, title = "Task 202", dueAt = dateEpoch(target))
+        repo.seed(task)
+
+        val selectionManager = TaskSelectionStateManager()
+        val bulkManager = mockk<TaskBulkActionManager>(relaxed = true) {
+            io.mockk.every { requestBulkDelete(any()) } throws IllegalStateException("Simulated mismatch")
+        }
+        val vm = createViewModel(
+            savedState = savedState,
+            selectionStateManager = selectionManager,
+            bulkActionManager = bulkManager,
+        )
+
+        vm.isSelectionMode.test {
+            assertEquals(false, awaitItem())
+            vm.onAgendaLongPress(202L)
+            assertEquals(true, awaitItem())
+
+            vm.agendaBulkDelete()
+            assertEquals(false, awaitItem())
+            assertEquals(emptySet<Long>(), vm.selectedIds.value)
+            cancelAndIgnoreRemainingEvents()
         }
     }
 }
