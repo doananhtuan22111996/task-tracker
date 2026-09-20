@@ -1,58 +1,26 @@
 package dev.tuandoan.tasktracker.ui.components
 
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Archive
-import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.EventBusy
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.FloatingActionButtonDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.Text
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
-import dev.tuandoan.tasktracker.R
 import dev.tuandoan.tasktracker.data.database.SubtaskProgress
 import dev.tuandoan.tasktracker.domain.model.AgendaItem
 import dev.tuandoan.tasktracker.ui.theme.AppSpacing
 import java.time.LocalDate
-import java.time.format.DateTimeFormatter
-import java.time.format.FormatStyle
-import java.util.Locale
 
 /**
- * Day agenda bottom sheet (CAL-17 + CAL-18 + CAL-19 + CAL-24). Renders a mixed list of
- * [AgendaItem.Concrete] (full [TaskItem]) and [AgendaItem.Projected] (read-only
- * [ProjectedAgendaRow]). All interaction handlers take the [AgendaItem] so the VM can
- * materialize projections before dispatching to the concrete handler (ADR-002 option c).
- *
- * Scope for the calendar agenda context:
- * - `onClick` / `onToggleComplete` / `onArchive` / `onTogglePin` wired through the VM.
- * - `onDuplicateClick` / `onSkipOccurrence` left at `TaskItem`'s `{}` defaults — users
- *   duplicate/skip from the task list.
- * - Multi-select and swipe-to-archive land in CAL-20 / CAL-21.
- * - Empty-day state gets its dedicated polish in CAL-22.
+ * Day agenda bottom sheet (CAL-17 + CAL-18 + CAL-19 + CAL-24 + CAL-25.2).
+ * Thin wrapper around [DayAgendaContent] inside [ModalBottomSheet].
+ * Supports hosting an optional [SnackbarHostState] (CAL-21.2) so undo snackbars
+ * appear visibly on top of the bottom sheet without being obscured by the scrim.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -66,6 +34,8 @@ fun DayAgendaSheet(
     onTogglePin: (AgendaItem) -> Unit,
     onAddTaskClick: () -> Unit,
     onDismiss: () -> Unit,
+    modifier: Modifier = Modifier,
+    snackbarHostState: SnackbarHostState? = null,
     isSelectionMode: Boolean = false,
     selectedIds: Set<Long> = emptySet(),
     selectedCount: Int = 0,
@@ -76,164 +46,41 @@ fun DayAgendaSheet(
     onBulkDelete: () -> Unit = {},
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = false)
-    val dateFormatter = dayTitleFormatter(Locale.getDefault())
-    val dateTitle = selectedDay.format(dateFormatter)
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
         sheetState = sheetState,
+        modifier = modifier,
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = AppSpacing.screenPadding),
-        ) {
-            if (isSelectionMode) {
-                AgendaSelectionBar(
-                    selectedCount = selectedCount,
-                    onComplete = onBulkComplete,
-                    onArchive = onBulkArchive,
-                    onDelete = onBulkDelete,
-                    modifier = Modifier.padding(bottom = AppSpacing.small),
-                )
-            } else {
-                Text(
-                    text = dateTitle,
-                    style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.SemiBold,
-                    modifier = Modifier.padding(bottom = AppSpacing.small),
-                )
-            }
+        Box(modifier = Modifier.fillMaxWidth()) {
+            DayAgendaContent(
+                selectedDay = selectedDay,
+                items = items,
+                subtaskProgress = subtaskProgress,
+                onItemClick = onItemClick,
+                onToggleComplete = onToggleComplete,
+                onArchive = onArchive,
+                onTogglePin = onTogglePin,
+                onAddTaskClick = onAddTaskClick,
+                isTwoPane = false,
+                isSelectionMode = isSelectionMode,
+                selectedIds = selectedIds,
+                selectedCount = selectedCount,
+                onLongPressTask = onLongPressTask,
+                onToggleSelection = onToggleSelection,
+                onBulkComplete = onBulkComplete,
+                onBulkArchive = onBulkArchive,
+                onBulkDelete = onBulkDelete,
+            )
 
-            if (items.isEmpty()) {
-                // CAL-22: polished empty-day state. Icon + date-inlined message. FAB below
-                // stays in place (CAL-19) so the user can still create a task for this day.
-                Column(
+            if (snackbarHostState != null) {
+                SnackbarHost(
+                    hostState = snackbarHostState,
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = AppSpacing.large),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.EventBusy,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
-                        modifier = Modifier.size(40.dp),
-                    )
-                    Spacer(Modifier.height(AppSpacing.small))
-                    Text(
-                        text = stringResource(R.string.calendar_agenda_empty_on_date, dateTitle),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                }
-            } else {
-                LazyColumn(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalArrangement = Arrangement.spacedBy(AppSpacing.small),
-                ) {
-                    items(items = items, key = { agendaItemKey(it) }) { item ->
-                        when (item) {
-                            is AgendaItem.Concrete -> TaskItem(
-                                task = item.task,
-                                subtaskProgress = subtaskProgress[item.task.id],
-                                onToggleComplete = { onToggleComplete(item) },
-                                onEditClick = { onItemClick(item) },
-                                onArchiveClick = { onArchive(item) },
-                                onPinClick = { onTogglePin(item) },
-                                isSelectionMode = isSelectionMode,
-                                isSelected = item.task.id in selectedIds,
-                                onLongPress = { onLongPressTask(item.task.id) },
-                                onToggleSelection = { onToggleSelection(item.task.id) },
-                            )
-                            is AgendaItem.Projected -> ProjectedAgendaRow(
-                                projected = item,
-                                onClick = { if (!isSelectionMode) onItemClick(item) },
-                            )
-                        }
-                    }
-                }
-            }
-
-            Spacer(Modifier.height(AppSpacing.medium))
-
-            // FAB (CAL-19): hidden in selection mode to avoid conflicting with bulk actions.
-            if (!isSelectionMode) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = AppSpacing.medium),
-                    contentAlignment = Alignment.CenterEnd,
-                ) {
-                    FloatingActionButton(
-                        onClick = onAddTaskClick,
-                        containerColor = MaterialTheme.colorScheme.primary,
-                        contentColor = MaterialTheme.colorScheme.onPrimary,
-                        elevation = FloatingActionButtonDefaults.elevation(
-                            defaultElevation = 6.dp,
-                            pressedElevation = 8.dp,
-                        ),
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Add,
-                            contentDescription = stringResource(R.string.cd_agenda_add_task),
-                        )
-                    }
-                }
+                        .align(Alignment.BottomCenter)
+                        .padding(bottom = AppSpacing.large),
+                )
             }
         }
     }
 }
-
-@Composable
-private fun AgendaSelectionBar(
-    selectedCount: Int,
-    onComplete: () -> Unit,
-    onArchive: () -> Unit,
-    onDelete: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    Row(
-        modifier = modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Text(
-            text = stringResource(R.string.agenda_multi_select_count, selectedCount),
-            style = MaterialTheme.typography.titleMedium,
-            modifier = Modifier.weight(1f),
-        )
-        IconButton(onClick = onComplete) {
-            Icon(
-                imageVector = Icons.Default.CheckCircle,
-                contentDescription = stringResource(R.string.cd_mark_completed),
-                tint = MaterialTheme.colorScheme.primary,
-            )
-        }
-        IconButton(onClick = onArchive) {
-            Icon(
-                imageVector = Icons.Default.Archive,
-                contentDescription = stringResource(R.string.action_archive),
-                tint = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-        }
-        IconButton(onClick = onDelete) {
-            Icon(
-                imageVector = Icons.Default.Delete,
-                contentDescription = stringResource(R.string.action_delete),
-                tint = MaterialTheme.colorScheme.error,
-            )
-        }
-    }
-}
-
-// Stable LazyColumn key. Concrete and Projected must never collide even if their underlying
-// id and parentTaskId happen to match (they can — Projected.parentTaskId is the chain root
-// which may also be a Concrete elsewhere in the same list). Namespace with a prefix.
-private fun agendaItemKey(item: AgendaItem): String = when (item) {
-    is AgendaItem.Concrete -> "concrete-${item.task.id}"
-    is AgendaItem.Projected -> "projected-${item.parentTaskId}-${item.date}"
-}
-
-// Locale-aware "full day of week, full date" formatter — e.g. "Tuesday, May 12, 2026".
-private fun dayTitleFormatter(locale: Locale): DateTimeFormatter =
-    DateTimeFormatter.ofLocalizedDate(FormatStyle.FULL).withLocale(locale)

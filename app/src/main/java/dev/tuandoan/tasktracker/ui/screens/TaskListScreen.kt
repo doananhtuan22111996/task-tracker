@@ -155,6 +155,23 @@ fun TaskListScreen(
                         event.onUndo()
                     }
                 }
+                is UiEvent.ShowUndoArchive -> {
+                    val taskCount = event.tasks.size
+                    val message = event.message ?: if (taskCount == 1) {
+                        context.getString(R.string.snackbar_task_archived)
+                    } else {
+                        context.getString(R.string.snackbar_tasks_archived, taskCount)
+                    }
+
+                    val result = snackbarHostState.showSnackbar(
+                        message = message,
+                        actionLabel = context.getString(R.string.action_undo),
+                        duration = SnackbarDuration.Short,
+                    )
+                    if (result == SnackbarResult.ActionPerformed) {
+                        event.onUndo()
+                    }
+                }
                 is UiEvent.ShowRatingPrompt -> {
                     if (BuildConfig.DEBUG) {
                         showDebugRatingDialog = true

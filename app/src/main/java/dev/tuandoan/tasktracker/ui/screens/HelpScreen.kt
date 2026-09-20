@@ -63,6 +63,7 @@ private val faqSections = listOf(
             FaqItem(R.string.help_q_calendar_dots, R.string.help_a_calendar_dots),
             FaqItem(R.string.help_q_calendar_projection, R.string.help_a_calendar_projection),
             FaqItem(R.string.help_q_calendar_add_for_day, R.string.help_a_calendar_add_for_day),
+            FaqItem(R.string.help_q_agenda_multi_select, R.string.help_a_agenda_multi_select),
         ),
     ),
     FaqSection(
@@ -115,6 +116,15 @@ private val faqSections = listOf(
         listOf(
             FaqItem(R.string.help_q_backup_tasks, R.string.help_a_backup_tasks),
             FaqItem(R.string.help_q_export_csv, R.string.help_a_export_csv),
+        ),
+    ),
+    FaqSection(
+        R.string.help_section_widgets,
+        HelpFaqSection.WIDGETS,
+        listOf(
+            FaqItem(R.string.help_q_widget_sizes, R.string.help_a_widget_sizes),
+            FaqItem(R.string.help_q_widget_configure, R.string.help_a_widget_configure),
+            FaqItem(R.string.help_q_widget_complete, R.string.help_a_widget_complete),
         ),
     ),
 )

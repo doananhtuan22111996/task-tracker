@@ -24,6 +24,9 @@
     <string name="cd_agenda_add_task">Ajouter une tâche pour ce jour</string>
     <string name="agenda_upcoming_badge">À venir</string>
     <string name="agenda_multi_select_count">%1$d sélectionné(s)</string>
+    <string name="calendar_select_day_prompt">Sélectionnez un jour pour voir l\'agenda</string>
+    <string name="cd_calendar_month_pane">Grille mensuelle du calendrier</string>
+    <string name="cd_calendar_agenda_pane">Agenda du jour</string>
 
     <!-- Navigation -->
     <string name="nav_all">Tous</string>
@@ -480,6 +483,8 @@
     <string name="help_a_calendar_projection">Les tâches récurrentes sont projetées sur leurs prochaines dates d\'échéance pour vous permettre de planifier à l\'avance. Touchez une occurrence projetée pour la transformer en véritable tâche à cette date — vous pouvez ensuite la modifier, la terminer ou l\'archiver comme n\'importe quelle autre.</string>
     <string name="help_q_calendar_add_for_day">Puis-je ajouter une tâche pour un jour précis ?</string>
     <string name="help_a_calendar_add_for_day">Oui. Touchez le jour pour ouvrir la feuille du jour, puis touchez le bouton + ; la nouvelle tâche est préremplie avec cette date. Si le calendrier est vide, une carte \"Ajouter une tâche\" apparaît également au-dessus de la grille et démarre avec la date d\'aujourd\'hui.</string>
+    <string name="help_q_agenda_multi_select">Comment sélectionner plusieurs tâches dans l\'agenda du jour ?</string>
+    <string name="help_a_agenda_multi_select">Appuyez longuement sur une ligne de tâche dans l\'agenda du jour pour activer la sélection, puis touchez d\'autres tâches. Utilisez la barre en haut pour terminer, archiver ou supprimer toutes les tâches sélectionnées d\'un coup.</string>
     <string name="help_section_subtasks">Sous-tâches</string>
     <string name="help_q_add_subtasks">Comment ajouter des sous-tâches à une tâche ?</string>
     <string name="help_a_add_subtasks">Ouvrez une tâche et faites défiler jusqu\'à la section Sous-tâches. Saisissez dans la ligne « Ajouter une sous-tâche » et appuyez sur OK pour en ajouter une autre.</string>
@@ -518,6 +523,13 @@
     <string name="help_a_backup_tasks">Allez dans Paramètres → Sauvegarde &amp; Restauration → Exporter la sauvegarde. Un fichier JSON est enregistré à l\'emplacement choisi.</string>
     <string name="help_q_export_csv">Puis-je exporter vers un tableur ?</string>
     <string name="help_a_export_csv">Oui. Paramètres → Exporter en CSV produit un fichier compatible avec Excel et Google Sheets.</string>
+    <string name="help_section_widgets">Widgets</string>
+    <string name="help_q_widget_sizes">Quelles tailles de widgets sont prises en charge ?</string>
+    <string name="help_a_widget_sizes">Task Tracker prend en charge les widgets d\'écran d\'accueil 2x2 (compteur compact et ajout rapide), 4x2 (liste déroulante) et 4x4 (liste étendue haute densité).</string>
+    <string name="help_q_widget_configure">Comment configurer les sources de tâches du widget ?</string>
+    <string name="help_a_widget_configure">Lors de l\'ajout d\'un widget ou en touchant son icône de paramètres, vous pouvez choisir parmi quatre sources : Aujourd\'hui, 7 prochains jours, Tâches épinglées ou une étiquette spécifique.</string>
+    <string name="help_q_widget_complete">Puis-je terminer des tâches directement depuis le widget ?</string>
+    <string name="help_a_widget_complete">Oui. Cochez la case à côté d\'une tâche directement sur le widget 4x2 ou 4x4 pour la marquer comme terminée sans ouvrir l\'application.</string>
 
     <!-- Recurrence -->
     <string name="recurrence_none">Ne se répète pas</string>

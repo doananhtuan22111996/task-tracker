@@ -8,6 +8,8 @@ secret.properties
 
 # Log/OS Files
 *.log
+.DS_Store
+.vscode/
 
 # Android Studio generated files and folders
 captures/

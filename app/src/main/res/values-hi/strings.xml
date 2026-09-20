@@ -24,6 +24,9 @@
     <string name="cd_agenda_add_task">इस दिन के लिए कार्य जोड़ें</string>
     <string name="agenda_upcoming_badge">आगामी</string>
     <string name="agenda_multi_select_count">%1$d चुने गए</string>
+    <string name="calendar_select_day_prompt">कार्यसूची देखने के लिए कोई दिन चुनें</string>
+    <string name="cd_calendar_month_pane">कैलेंडर माह ग्रिड</string>
+    <string name="cd_calendar_agenda_pane">दिन की कार्यसूची</string>
 
     <!-- Navigation -->
     <string name="nav_all">सभी</string>
@@ -480,6 +483,8 @@
     <string name="help_a_calendar_projection">आवर्ती कार्य उनकी आगामी नियत तिथियों पर अनुमानित किए जाते हैं ताकि आप पहले से योजना बना सकें। किसी अनुमानित घटना पर टैप करके उसे उस दिन एक वास्तविक कार्य में बदलें — उसके बाद आप उसे किसी भी अन्य कार्य की तरह संपादित, पूर्ण या संग्रहित कर सकते हैं।</string>
     <string name="help_q_calendar_add_for_day">क्या मैं किसी विशेष दिन के लिए कार्य जोड़ सकता हूँ?</string>
     <string name="help_a_calendar_add_for_day">हाँ। उस दिन पर टैप करके दिन की शीट खोलें, फिर + बटन पर टैप करें — नया कार्य उस तिथि के साथ पहले से भरा होता है। खाली कैलेंडर पर ग्रिड के ऊपर एक \"कार्य जोड़ें\" कार्ड भी दिखाई देता है, जो आज की तिथि से शुरू होता है।</string>
+    <string name="help_q_agenda_multi_select">दिन की कार्यसूची में कई कार्यों का चयन कैसे करें?</string>
+    <string name="help_a_agenda_multi_select">चयन मोड में प्रवेश करने के लिए कार्यसूची में किसी भी कार्य पंक्ति को देर तक दबाएं, फिर शामिल करने के लिए अन्य कार्यों पर टैप करें। एक साथ सभी चयनित कार्यों को पूरा करने, संग्रहीत करने या हटाने के लिए शीर्ष बार का उपयोग करें।</string>
     <string name="help_section_subtasks">उप-कार्य</string>
     <string name="help_q_add_subtasks">मैं किसी कार्य में उप-कार्य कैसे जोड़ूँ?</string>
     <string name="help_a_add_subtasks">कोई कार्य खोलें और उप-कार्य अनुभाग तक स्क्रॉल करें। "उप-कार्य जोड़ें" पंक्ति में टाइप करें और अधिक जोड़ने के लिए Done दबाएँ।</string>
@@ -518,6 +523,13 @@
     <string name="help_a_backup_tasks">सेटिंग्स → बैकअप और पुनर्स्थापना → बैकअप निर्यात करें पर जाएँ। एक JSON फ़ाइल आपके चुने गए स्थान पर सहेजी जाएगी।</string>
     <string name="help_q_export_csv">क्या मैं स्प्रेडशीट में निर्यात कर सकता हूँ?</string>
     <string name="help_a_export_csv">हाँ। सेटिंग्स → CSV के रूप में निर्यात करें Excel और Google Sheets के साथ संगत फ़ाइल बनाता है।</string>
+    <string name="help_section_widgets">विजेट्स</string>
+    <string name="help_q_widget_sizes">कौन से विजेट आकार समर्थित हैं?</string>
+    <string name="help_a_widget_sizes">Task Tracker 2x2 (संक्षिप्त संख्या और त्वरित जोड़), 4x2 (स्क्रॉल करने योग्य सूची) और 4x4 (विस्तारित सूची) होम स्क्रीन विजेट का समर्थन करता है।</string>
+    <string name="help_q_widget_configure">विजेट कार्य स्रोतों को कैसे कॉन्फ़िगर करें?</string>
+    <string name="help_a_widget_configure">विजेट रखते समय या उसकी सेटिंग्स आइकन पर टैप करते समय, आप चार स्रोतों में से चुन सकते हैं: आज, आगामी 7 दिन, पिन किए गए कार्य, या कोई विशिष्ट टैग।</string>
+    <string name="help_q_widget_complete">क्या मैं सीधे होम स्क्रीन विजेट से कार्य पूर्ण कर सकता हूँ?</string>
+    <string name="help_a_widget_complete">हाँ। ऐप खोले बिना कार्य को पूर्ण चिह्नित करने के लिए 4x2 या 4x4 विजेट पर किसी भी कार्य के बगल में स्थित चेकबॉक्स पर टैप करें।</string>
 
     <!-- Recurrence -->
     <string name="recurrence_none">दोहराता नहीं है</string>

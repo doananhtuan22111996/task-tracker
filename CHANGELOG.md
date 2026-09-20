@@ -5,6 +5,30 @@ Format follows [Keep a Changelog](https://keepachangelog.com).
 
 ## [Unreleased]
 
+## [1.14.0] - 2026-09-20
+
+### Notes
+- **What's new:**
+  - **Tablet Split-Pane Calendar (CAL-25):** On tablet landscape viewports and expanded window widths, the Calendar screen now renders a two-pane layout with 50% month grid on the left and 50% day agenda on the right. Tapping dates instantly loads their agenda inline without modal bottom sheets. Portrait orientation preserves the full-height single-pane view.
+  - **Single-Task Archive Undo (CAL-21):** Archiving a task directly from the day agenda now displays an instant Undo snackbar inside the sheet or split-pane view, allowing immediate restoration in one tap.
+  - **Help & FAQ Updates (V13-26):** Added dedicated FAQ section for Widget v2 (sizes 2x2, 4x2, 4x4, data sources, home screen completion) and calendar agenda multi-select, fully translated across all 8 supported languages.
+
+### Added
+- adaptive two-pane layout for `CalendarScreen`: detects `WindowWidthSizeClass` (Expanded or Medium in landscape) and distributes 50% width to `CalendarMonthView` and 50% to inline `DayAgendaContent` (CAL-25.1, CAL-25.3)
+- extracted `DayAgendaContent` composable from `DayAgendaSheet` for seamless reuse across modal bottom sheet and two-pane tablet layout (CAL-25.2)
+- TalkBack accessibility landmarks (`paneTitle`) for Calendar month grid and Day agenda split-panes (CAL-25.4)
+- out-of-range prompt in tablet split-pane agenda when navigating months away from the selected day (CAL-25.3)
+- single-task archive undo affordance in `CalendarViewModel` and `DayAgendaSheet`, emitting `UiEvent.ShowUndoArchive` with a 5-second snackbar and restoring task on undo (CAL-21.1, CAL-21.2)
+- JVM unit tests in `CalendarViewModelTest` verifying `onAgendaItemArchive` emits `ShowUndoArchive` and undo restores the task (CAL-21.3)
+- `HelpFaqSection.WIDGETS` added to `AnalyticsLogger` and new Widgets FAQ section in `HelpScreen` covering widget sizes, configuration sources, and home screen completion (V13-26.1, V13-26.2)
+- Day agenda multi-select FAQ question in `HelpScreen` explaining long-press selection and batch actions (V13-26.1, V13-26.2)
+- full localization of all new FAQ strings and calendar prompts across 7 non-English locales: German, Spanish, French, Hindi, Indonesian, Portuguese, Vietnamese (V13-26.3)
+
+### Changed
+- `DayAgendaSheet` refactored into a thin wrapper around `DayAgendaContent` hosting an internal `SnackbarHostState` to ensure undo snackbars render visibly above the bottom sheet (CAL-21.2, CAL-25.2)
+- `CalendarScreen` and `TaskListScreen` now handle `UiEvent.ShowUndoArchive` identically to delete undo (CAL-21.1)
+- bumped `versionMinor` to 14 (`v1.14.0`, `versionCode 1,789,811,400`) (REL-14.1)
+
 ## [1.13.0] - 2026-09-19
 
 ### Notes

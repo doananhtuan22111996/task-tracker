@@ -23,12 +23,13 @@ import dev.tuandoan.tasktracker.ui.manager.TaskBulkActionManager
 import dev.tuandoan.tasktracker.ui.state.TaskSelectionStateManager
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.time.LocalDate
@@ -81,7 +82,9 @@ class CalendarViewModel @Inject constructor(
     val isSelectionMode: StateFlow<Boolean> = selectionState.isSelectionMode
     val selectedIds: StateFlow<Set<Long>> = selectionState.selectedIds
     val selectedCount: StateFlow<Int> = selectionState.selectedCount
-    val bulkUiEvent: SharedFlow<UiEvent> = bulkActionManager.uiEvent
+    private val _agendaUiEvent = MutableSharedFlow<UiEvent>()
+    val agendaUiEvent: Flow<UiEvent> = merge(bulkActionManager.uiEvent, _agendaUiEvent)
+    val bulkUiEvent: Flow<UiEvent> get() = agendaUiEvent
     val pendingBulkArchiveTasks = bulkActionManager.pendingBulkArchiveTasks
     val pendingBulkDeleteTasks = bulkActionManager.pendingBulkDeleteTasks
 
@@ -231,6 +234,16 @@ class CalendarViewModel @Inject constructor(
         viewModelScope.launch {
             val task = resolveConcreteTask(item) ?: return@launch
             taskManager.archiveTask(task.id)
+            _agendaUiEvent.emit(
+                UiEvent.ShowUndoArchive(
+                    tasks = listOf(task),
+                    onUndo = {
+                        viewModelScope.launch {
+                            taskManager.unarchiveTask(task.id)
+                        }
+                    },
+                ),
+            )
         }
     }
 

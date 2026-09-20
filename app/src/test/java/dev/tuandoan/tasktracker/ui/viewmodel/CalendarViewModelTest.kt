@@ -511,6 +511,28 @@ class CalendarViewModelTest {
     }
 
     @Test
+    fun `onAgendaItemArchive emits ShowUndoArchive and undo restores task`() = runTest {
+        val task = TestTaskFactory.createTask(id = 1L, dueAt = dateEpoch(LocalDate.of(2026, 5, 10)))
+        repo.seed(task)
+        val vm = createViewModel()
+
+        vm.agendaUiEvent.test {
+            vm.onAgendaItemArchive(concreteItem(task))
+
+            val event = awaitItem()
+            assertTrue(event is dev.tuandoan.tasktracker.ui.events.UiEvent.ShowUndoArchive)
+            val undoEvent = event as dev.tuandoan.tasktracker.ui.events.UiEvent.ShowUndoArchive
+            assertEquals(listOf(task), undoEvent.tasks)
+            assertTrue(repo.getAllTasksSnapshot().single { it.id == 1L }.isArchived)
+
+            // Trigger undo callback
+            undoEvent.onUndo()
+            assertFalse(repo.getAllTasksSnapshot().single { it.id == 1L }.isArchived)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
     fun `onAgendaItemArchive Projected materializes then archives the new row`() = runTest {
         val parentDate = LocalDate.of(2026, 5, 4)
         repo.seed(
