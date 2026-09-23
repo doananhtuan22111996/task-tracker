@@ -24,6 +24,9 @@
     <string name="cd_agenda_add_task">Tambah tugas untuk hari ini</string>
     <string name="agenda_upcoming_badge">Akan Datang</string>
     <string name="agenda_multi_select_count">%1$d dipilih</string>
+    <string name="calendar_select_day_prompt">Pilih hari untuk melihat agenda</string>
+    <string name="cd_calendar_month_pane">Kisi bulan kalender</string>
+    <string name="cd_calendar_agenda_pane">Agenda harian</string>
 
     <!-- Navigation -->
     <string name="nav_all">Semua</string>
@@ -480,6 +483,8 @@
     <string name="help_a_calendar_projection">Tugas berulang diproyeksikan ke tanggal jatuh tempo berikutnya sehingga Anda dapat merencanakan ke depan. Ketuk kejadian yang diproyeksikan untuk mengubahnya menjadi tugas nyata pada tanggal tersebut — Anda kemudian dapat mengeditnya, menyelesaikannya, atau mengarsipkannya seperti tugas lainnya.</string>
     <string name="help_q_calendar_add_for_day">Bisakah saya menambahkan tugas untuk hari tertentu?</string>
     <string name="help_a_calendar_add_for_day">Ya. Ketuk hari tersebut untuk membuka lembar harian, lalu ketuk tombol + — tugas baru sudah terisi dengan tanggal itu. Kalender yang kosong juga menampilkan kartu \"Tambah tugas\" di atas grid, yang dimulai dengan tanggal hari ini.</string>
+    <string name="help_q_agenda_multi_select">Bagaimana cara memilih beberapa tugas di agenda harian?</string>
+    <string name="help_a_agenda_multi_select">Tekan lama baris tugas di agenda harian untuk masuk ke mode pemilihan, lalu ketuk tugas lain untuk menyertakannya. Gunakan bilah aksi di atas untuk menyelesaikan, mengarsipkan, atau menghapus semua tugas yang dipilih sekaligus.</string>
     <string name="help_section_subtasks">Subtugas</string>
     <string name="help_q_add_subtasks">Bagaimana menambahkan subtugas ke sebuah tugas?</string>
     <string name="help_a_add_subtasks">Buka tugas dan gulir ke bagian Subtugas. Ketik di baris "Tambah subtugas" dan tekan Selesai untuk menambah lagi.</string>
@@ -518,6 +523,13 @@
     <string name="help_a_backup_tasks">Buka Pengaturan → Cadangan &amp; Pemulihan → Ekspor cadangan. File JSON akan disimpan di lokasi yang Anda pilih.</string>
     <string name="help_q_export_csv">Bisakah saya mengekspor ke spreadsheet?</string>
     <string name="help_a_export_csv">Ya. Pengaturan → Ekspor sebagai CSV menghasilkan file yang kompatibel dengan Excel dan Google Sheets.</string>
+    <string name="help_section_widgets">Widget</string>
+    <string name="help_q_widget_sizes">Ukuran widget apa saja yang didukung?</string>
+    <string name="help_a_widget_sizes">Task Tracker mendukung widget layar utama 2x2 (jumlah ringkas &amp; tambah cepat), 4x2 (daftar yang dapat digulir), dan 4x4 (daftar diperluas dengan kerapatan tinggi).</string>
+    <string name="help_q_widget_configure">Bagaimana cara mengonfigurasi sumber tugas widget?</string>
+    <string name="help_a_widget_configure">Saat menempatkan widget atau mengetuk ikon pengaturannya, Anda dapat memilih dari empat sumber: Hari ini, 7 hari mendatang, Tugas disematkan, atau Tag tertentu.</string>
+    <string name="help_q_widget_complete">Bisakah saya menyelesaikan tugas langsung dari widget layar utama?</string>
+    <string name="help_a_widget_complete">Ya. Ketuk kotak centang di samping tugas apa pun di widget 4x2 atau 4x4 untuk menandainya selesai tanpa membuka aplikasi.</string>
 
     <!-- Recurrence -->
     <string name="recurrence_none">Tidak berulang</string>

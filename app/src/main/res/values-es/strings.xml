@@ -24,6 +24,9 @@
     <string name="cd_agenda_add_task">Añadir tarea para este día</string>
     <string name="agenda_upcoming_badge">Próxima</string>
     <string name="agenda_multi_select_count">%1$d seleccionado(s)</string>
+    <string name="calendar_select_day_prompt">Selecciona un día para ver la agenda</string>
+    <string name="cd_calendar_month_pane">Cuadrícula mensual del calendario</string>
+    <string name="cd_calendar_agenda_pane">Agenda del día</string>
 
     <!-- Navigation -->
     <string name="nav_all">Todas</string>
@@ -480,6 +483,8 @@
     <string name="help_a_calendar_projection">Las tareas recurrentes se proyectan sobre sus próximas fechas de vencimiento para que puedas planificar con antelación. Toca una instancia proyectada para convertirla en una tarea real en esa fecha — luego puedes editarla, completarla o archivarla como cualquier otra.</string>
     <string name="help_q_calendar_add_for_day">¿Puedo añadir una tarea para un día concreto?</string>
     <string name="help_a_calendar_add_for_day">Sí. Toca el día para abrir la hoja diaria y luego toca el botón +; la nueva tarea se crea con esa fecha prellenada. Si el calendario está vacío, aparece también una tarjeta \"Añadir una tarea\" sobre la cuadrícula, que empieza con la fecha de hoy.</string>
+    <string name="help_q_agenda_multi_select">¿Cómo selecciono varias tareas en la agenda del día?</string>
+    <string name="help_a_agenda_multi_select">Mantén pulsada una tarea en la agenda del día para activar el modo de selección y luego toca otras tareas para agregarlas. Usa la barra superior para completar, archivar o eliminar todas las tareas seleccionadas a la vez.</string>
     <string name="help_section_subtasks">Subtareas</string>
     <string name="help_q_add_subtasks">¿Cómo añado subtareas a una tarea?</string>
     <string name="help_a_add_subtasks">Abre una tarea y desplázate hasta la sección Subtareas. Escribe en la fila «Añadir subtarea» y pulsa Listo para añadir otra.</string>
@@ -518,6 +523,13 @@
     <string name="help_a_backup_tasks">Ve a Ajustes → Copia de seguridad &amp; Restauración → Exportar copia de seguridad. Un archivo JSON se guardará en la ubicación que elijas.</string>
     <string name="help_q_export_csv">¿Puedo exportar a una hoja de cálculo?</string>
     <string name="help_a_export_csv">Sí. Ajustes → Exportar como CSV genera un archivo compatible con Excel y Google Sheets.</string>
+    <string name="help_section_widgets">Widgets</string>
+    <string name="help_q_widget_sizes">¿Qué tamaños de widgets son compatibles?</string>
+    <string name="help_a_widget_sizes">Task Tracker admite widgets de pantalla de inicio de 2x2 (recuento compacto y añadido rápido), 4x2 (lista desplazable) y 4x4 (lista expandida con alta densidad de tareas).</string>
+    <string name="help_q_widget_configure">¿Cómo configuro las fuentes de tareas de los widgets?</string>
+    <string name="help_a_widget_configure">Al colocar un widget o tocar su icono de configuración, puedes elegir entre cuatro fuentes: Hoy, Próximos 7 días, Tareas fijadas o una etiqueta específica.</string>
+    <string name="help_q_widget_complete">¿Puedo completar tareas directamente desde el widget de inicio?</string>
+    <string name="help_a_widget_complete">Sí. Toca la casilla junto a cualquier tarea en el widget 4x2 o 4x4 para marcarla como completada sin abrir la aplicación.</string>
 
     <!-- Recurrence -->
     <string name="recurrence_none">No se repite</string>

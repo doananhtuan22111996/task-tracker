@@ -23,6 +23,9 @@
         <item quantity="other">%1$d tasks</item>
     </plurals>
     <string name="a11y_day_cell_has_high_priority">with high priority</string>
+    <string name="calendar_select_day_prompt">Select a day to view agenda</string>
+    <string name="cd_calendar_month_pane">Calendar month grid</string>
+    <string name="cd_calendar_agenda_pane">Day agenda</string>
 
     <!-- Task Filter Chips -->
     <string name="nav_all">All</string>
@@ -548,6 +551,8 @@
     <string name="help_a_calendar_projection">Repeating tasks are projected onto their upcoming due dates so you can plan ahead. Tap a projected occurrence to turn it into a real task on that date — you can then edit, complete, or archive it like any other task.</string>
     <string name="help_q_calendar_add_for_day">Can I add a task for a specific day?</string>
     <string name="help_a_calendar_add_for_day">Yes. Tap the day to open the day sheet, then tap the + button — the new task is pre-filled with that date. An empty calendar also shows an "Add a task" card above the grid that starts with today\'s date.</string>
+    <string name="help_q_agenda_multi_select">How do I select multiple tasks in the day agenda?</string>
+    <string name="help_a_agenda_multi_select">Long-press any task row in the day agenda to enter selection mode, then tap other tasks to include them. Use the action bar at the top to complete, archive, or delete all selected tasks at once.</string>
     <string name="help_section_subtasks">Subtasks</string>
     <string name="help_q_add_subtasks">How do I add subtasks to a task?</string>
     <string name="help_a_add_subtasks">Open a task and scroll to the Subtasks section. Type in the "Add subtask" row and press Done to add another.</string>
@@ -586,6 +591,13 @@
     <string name="help_a_backup_tasks">Go to Settings → Backup &amp; Restore → Export Backup. A JSON file is saved to your chosen location.</string>
     <string name="help_q_export_csv">Can I export to a spreadsheet?</string>
     <string name="help_a_export_csv">Yes. Settings → Export as CSV produces a file compatible with Excel and Google Sheets.</string>
+    <string name="help_section_widgets">Widgets</string>
+    <string name="help_q_widget_sizes">What widget sizes are supported?</string>
+    <string name="help_a_widget_sizes">Task Tracker supports 2x2 (compact count and quick add), 4x2 (scrollable list), and 4x4 (expanded list with high-density tasks) home screen widgets.</string>
+    <string name="help_q_widget_configure">How do I configure widget task sources?</string>
+    <string name="help_a_widget_configure">When placing a widget or tapping its settings icon, you can choose from four task sources: Today, Upcoming 7 days, Pinned tasks, or a specific Tag.</string>
+    <string name="help_q_widget_complete">Can I complete tasks directly from the home screen widget?</string>
+    <string name="help_a_widget_complete">Yes. Tap the checkbox next to any task directly on the 4x2 or 4x4 widget to mark it completed without opening the app.</string>
 
     <!-- Feedback -->
     <string name="settings_section_feedback">Feedback</string>

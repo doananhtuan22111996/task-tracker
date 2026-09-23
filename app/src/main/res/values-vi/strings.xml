@@ -24,6 +24,9 @@
     <string name="cd_agenda_add_task">Thêm việc cho ngày này</string>
     <string name="agenda_upcoming_badge">Sắp tới</string>
     <string name="agenda_multi_select_count">%1$d đã chọn</string>
+    <string name="calendar_select_day_prompt">Chọn một ngày để xem lịch trình</string>
+    <string name="cd_calendar_month_pane">Lưới tháng lịch</string>
+    <string name="cd_calendar_agenda_pane">Lịch trình trong ngày</string>
 
     <!-- Navigation -->
     <string name="nav_all">Tất cả</string>
@@ -480,6 +483,8 @@
     <string name="help_a_calendar_projection">Các công việc lặp lại được dự đoán tới những ngày đáo hạn sắp tới để bạn có thể lên kế hoạch trước. Nhấn vào một lần xuất hiện được dự đoán để biến nó thành công việc thật vào ngày đó — sau đó bạn có thể chỉnh sửa, hoàn thành hoặc lưu trữ như bất kỳ công việc nào khác.</string>
     <string name="help_q_calendar_add_for_day">Tôi có thể thêm công việc cho một ngày cụ thể không?</string>
     <string name="help_a_calendar_add_for_day">Có. Nhấn vào ngày đó để mở bảng ngày, rồi nhấn nút + — công việc mới sẽ được điền sẵn với ngày đó. Khi lịch trống, phía trên lưới còn hiện một thẻ \"Thêm việc mới\" bắt đầu bằng ngày hôm nay.</string>
+    <string name="help_q_agenda_multi_select">Làm thế nào để chọn nhiều việc trong lịch trình ngày?</string>
+    <string name="help_a_agenda_multi_select">Nhấn giữ bất kỳ việc nào trong lịch trình ngày để vào chế độ chọn, sau đó chạm vào các việc khác để chọn thêm. Sử dụng thanh tác vụ ở trên cùng để hoàn thành, lưu trữ hoặc xóa tất cả các việc đã chọn cùng lúc.</string>
     <string name="help_section_subtasks">Công việc phụ</string>
     <string name="help_q_add_subtasks">Làm thế nào để thêm công việc phụ vào một công việc?</string>
     <string name="help_a_add_subtasks">Mở một công việc và kéo xuống phần Công việc phụ. Gõ vào ô "Thêm công việc phụ" rồi nhấn Xong để thêm mục tiếp theo.</string>
@@ -518,6 +523,13 @@
     <string name="help_a_backup_tasks">Vào Cài đặt → Sao lưu &amp; Khôi phục → Xuất bản sao lưu. Một tệp JSON sẽ được lưu tại vị trí bạn chọn.</string>
     <string name="help_q_export_csv">Tôi có thể xuất sang bảng tính không?</string>
     <string name="help_a_export_csv">Có. Cài đặt → Xuất dạng CSV tạo ra tệp tương thích với Excel và Google Sheets.</string>
+    <string name="help_section_widgets">Tiện ích (Widgets)</string>
+    <string name="help_q_widget_sizes">Những kích thước tiện ích nào được hỗ trợ?</string>
+    <string name="help_a_widget_sizes">Task Tracker hỗ trợ các tiện ích màn hình chính 2x2 (số lượng nhỏ gọn và thêm nhanh), 4x2 (danh sách cuộn được) và 4x4 (danh sách mở rộng mật độ cao).</string>
+    <string name="help_q_widget_configure">Làm thế nào để định cấu hình nguồn việc cho tiện ích?</string>
+    <string name="help_a_widget_configure">Khi đặt tiện ích hoặc nhấn vào biểu tượng cài đặt của tiện ích, bạn có thể chọn từ bốn nguồn việc: Hôm nay, 7 ngày tới, Việc đã ghim hoặc Thẻ cụ thể.</string>
+    <string name="help_q_widget_complete">Tôi có thể hoàn thành việc trực tiếp từ tiện ích màn hình chính không?</string>
+    <string name="help_a_widget_complete">Có. Chạm vào ô kiểm bên cạnh bất kỳ việc nào trực tiếp trên tiện ích 4x2 hoặc 4x4 để đánh dấu hoàn thành mà không cần mở ứng dụng.</string>
 
     <!-- Recurrence -->
     <string name="recurrence_none">Không lặp lại</string>

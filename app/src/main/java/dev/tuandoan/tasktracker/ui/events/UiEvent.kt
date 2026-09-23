@@ -22,5 +22,10 @@ sealed class UiEvent {
         val message: String? = null, // Custom message, if null will generate default
     ) : UiEvent()
 
+    /**
+     * Event to show undo action for archived tasks
+     */
+    data class ShowUndoArchive(val tasks: List<Task>, val onUndo: () -> Unit, val message: String? = null) : UiEvent()
+
     data object ShowRatingPrompt : UiEvent()
 }

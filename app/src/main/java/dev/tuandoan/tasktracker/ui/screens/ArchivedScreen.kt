@@ -101,6 +101,7 @@ fun ArchivedScreen(viewModel: TaskViewModel, modifier: Modifier = Modifier, bott
                     }
                 }
                 is UiEvent.ShowRatingPrompt -> { /* Not applicable on archive screen */ }
+                is UiEvent.ShowUndoArchive -> { /* Not applicable on archive screen */ }
             }
         }
     }

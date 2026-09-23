@@ -24,6 +24,9 @@
     <string name="cd_agenda_add_task">Aufgabe für diesen Tag hinzufügen</string>
     <string name="agenda_upcoming_badge">Demnächst</string>
     <string name="agenda_multi_select_count">%1$d ausgewählt</string>
+    <string name="calendar_select_day_prompt">Wählen Sie einen Tag aus, um die Agenda anzuzeigen</string>
+    <string name="cd_calendar_month_pane">Kalender-Monatsraster</string>
+    <string name="cd_calendar_agenda_pane">Tagesagenda</string>
 
     <!-- Navigation -->
     <string name="nav_all">Alle</string>
@@ -480,6 +483,8 @@
     <string name="help_a_calendar_projection">Wiederkehrende Aufgaben werden auf ihre nächsten Fälligkeitstermine projiziert, damit Sie voraus planen können. Tippen Sie auf eine projizierte Instanz, um sie an diesem Tag in eine echte Aufgabe umzuwandeln — danach können Sie sie wie jede andere bearbeiten, abschließen oder archivieren.</string>
     <string name="help_q_calendar_add_for_day">Kann ich eine Aufgabe für einen bestimmten Tag hinzufügen?</string>
     <string name="help_a_calendar_add_for_day">Ja. Tippen Sie auf den Tag, um das Tagesblatt zu öffnen, und tippen Sie dann auf +. Die neue Aufgabe ist mit diesem Datum vorausgefüllt. Bei leerem Kalender erscheint außerdem eine Karte \"Aufgabe hinzufügen\" über dem Raster, die mit dem heutigen Datum startet.</string>
+    <string name="help_q_agenda_multi_select">Wie wähle ich mehrere Aufgaben in der Tagesagenda aus?</string>
+    <string name="help_a_agenda_multi_select">Halte eine Aufgabenzeile in der Tagesagenda gedrückt, um den Auswahlmodus zu aktivieren, und tippe dann auf weitere Aufgaben. Verwende die Leiste oben, um alle ausgewählten Aufgaben gleichzeitig abzuschließen, zu archivieren oder zu löschen.</string>
     <string name="help_section_subtasks">Unteraufgaben</string>
     <string name="help_q_add_subtasks">Wie füge ich Unteraufgaben zu einer Aufgabe hinzu?</string>
     <string name="help_a_add_subtasks">Öffnen Sie eine Aufgabe und scrollen Sie zum Bereich Unteraufgaben. Tippen Sie in die Zeile „Unteraufgabe hinzufügen" und drücken Sie Fertig, um weitere hinzuzufügen.</string>
@@ -518,6 +523,13 @@
     <string name="help_a_backup_tasks">Gehen Sie zu Einstellungen → Backup &amp; Wiederherstellung → Backup exportieren. Eine JSON-Datei wird an Ihrem gewählten Speicherort gespeichert.</string>
     <string name="help_q_export_csv">Kann ich in eine Tabelle exportieren?</string>
     <string name="help_a_export_csv">Ja. Einstellungen → Als CSV exportieren erzeugt eine Datei, die mit Excel und Google Tabellen kompatibel ist.</string>
+    <string name="help_section_widgets">Widgets</string>
+    <string name="help_q_widget_sizes">Welche Widget-Größen werden unterstützt?</string>
+    <string name="help_a_widget_sizes">Task Tracker unterstützt 2x2- (Kompaktanzahl und Schnellerfassung), 4x2- (scrollbare Liste) und 4x4-Startbildschirm-Widgets (erweiterte Liste mit hoher Informationsdichte).</string>
+    <string name="help_q_widget_configure">Wie konfiguriere ich Widget-Aufgabenquellen?</string>
+    <string name="help_a_widget_configure">Beim Platzieren eines Widgets oder Tippen auf dessen Einstellungssymbol kannst du aus vier Aufgabenquellen wählen: Heute, Demnächst 7 Tage, Angeheftete Aufgaben oder ein bestimmter Tag.</string>
+    <string name="help_q_widget_complete">Kann ich Aufgaben direkt über das Startbildschirm-Widget abschließen?</string>
+    <string name="help_a_widget_complete">Ja. Tippe direkt auf dem 4x2- oder 4x4-Widget auf das Kontrollkästchen neben einer Aufgabe, um sie als erledigt zu markieren, ohne die App zu öffnen.</string>
 
     <!-- Recurrence -->
     <string name="recurrence_none">Wiederholt sich nicht</string>
