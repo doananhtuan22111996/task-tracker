@@ -27,6 +27,12 @@ class SubtaskUseCase @Inject constructor(
     fun observeSubtasks(taskId: Long): Flow<List<Subtask>> = repository.observeSubtasks(taskId)
 
     /**
+     * Live map of all subtasks grouped by `taskId`. Tasks with no subtasks are absent.
+     * Suitable for O(1) per-row lookup when task items are expanded inline.
+     */
+    fun observeSubtasksByTaskId(): Flow<Map<Long, List<Subtask>>> = repository.observeSubtasksByTaskId()
+
+    /**
      * Live map of [SubtaskProgress] keyed by `taskId`. Tasks with no subtasks are absent — the
      * UI treats a missing entry as "no indicator". Suitable for O(1) per-row lookup on the list.
      */

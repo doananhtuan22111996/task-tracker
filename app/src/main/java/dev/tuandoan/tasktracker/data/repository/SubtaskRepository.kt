@@ -7,6 +7,7 @@ import dev.tuandoan.tasktracker.data.database.SubtaskProgress
 import dev.tuandoan.tasktracker.data.database.TaskDatabase
 import dev.tuandoan.tasktracker.domain.repository.ISubtaskRepository
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 /**
@@ -19,6 +20,9 @@ class SubtaskRepository @Inject constructor(
 ) : ISubtaskRepository {
 
     override fun observeSubtasks(taskId: Long): Flow<List<Subtask>> = subtaskDao.observeSubtasks(taskId)
+
+    override fun observeSubtasksByTaskId(): Flow<Map<Long, List<Subtask>>> =
+        subtaskDao.observeAllSubtasks().map { list -> list.groupBy { it.taskId } }
 
     override fun observeSubtaskProgress(): Flow<List<SubtaskProgress>> = subtaskDao.observeSubtaskProgress()
 

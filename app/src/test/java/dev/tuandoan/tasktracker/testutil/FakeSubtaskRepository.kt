@@ -29,6 +29,10 @@ class FakeSubtaskRepository : ISubtaskRepository {
         list.filter { it.taskId == taskId }.sortedWith(compareBy({ it.sortOrder }, { it.id }))
     }
 
+    override fun observeSubtasksByTaskId(): Flow<Map<Long, List<Subtask>>> = subtasks.map { list ->
+        list.sortedWith(compareBy({ it.sortOrder }, { it.id })).groupBy { it.taskId }
+    }
+
     override fun observeSubtaskProgress(): Flow<List<SubtaskProgress>> = subtasks.map { list ->
         list.groupBy { it.taskId }
             .map { (taskId, items) ->

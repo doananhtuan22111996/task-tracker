@@ -380,4 +380,55 @@ class SubtaskUseCaseTest {
             analyticsLogger.log(dev.tuandoan.tasktracker.diagnostics.AnalyticsEvent.SubtaskAdded)
         }
     }
+
+    // === observeSubtasksByTaskId ===
+
+    @Test
+    fun `observeSubtasksByTaskId emits empty map when repository has no subtasks`() = runTest {
+        useCase.observeSubtasksByTaskId().test {
+            assertEquals(emptyMap<Long, List<Subtask>>(), awaitItem())
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `observeSubtasksByTaskId groups by taskId and preserves sort order`() = runTest {
+        repository.seed(
+            TestSubtaskFactory.createSubtask(id = 1L, taskId = 10L, sortOrder = 1, title = "Second"),
+            TestSubtaskFactory.createSubtask(id = 2L, taskId = 10L, sortOrder = 0, title = "First"),
+            TestSubtaskFactory.createSubtask(id = 3L, taskId = 20L, sortOrder = 0, title = "Other task"),
+        )
+
+        useCase.observeSubtasksByTaskId().test {
+            val map = awaitItem()
+            assertEquals(2, map.size)
+
+            val task10List = map[10L]
+            assertNotNull(task10List)
+            assertEquals(2, task10List!!.size)
+            assertEquals("First", task10List[0].title)
+            assertEquals("Second", task10List[1].title)
+
+            val task20List = map[20L]
+            assertNotNull(task20List)
+            assertEquals(1, task20List!!.size)
+            assertEquals("Other task", task20List[0].title)
+
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `observeSubtasksByTaskId updates reactively when subtasks change`() = runTest {
+        useCase.observeSubtasksByTaskId().test {
+            assertEquals(emptyMap<Long, List<Subtask>>(), awaitItem())
+
+            useCase.addSubtask(taskId = 5L, title = "New subtask")
+            val updatedMap = awaitItem()
+            assertEquals(1, updatedMap.size)
+            assertEquals("New subtask", updatedMap[5L]?.first()?.title)
+
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
 }
