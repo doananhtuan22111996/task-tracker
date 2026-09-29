@@ -1,9 +1,12 @@
 package dev.tuandoan.tasktracker.ui.components
 
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -50,6 +53,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
@@ -62,6 +66,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import dev.tuandoan.tasktracker.R
+import dev.tuandoan.tasktracker.data.database.Subtask
 import dev.tuandoan.tasktracker.data.database.SubtaskProgress
 import dev.tuandoan.tasktracker.data.database.Task
 import dev.tuandoan.tasktracker.domain.model.Priority
@@ -77,6 +82,11 @@ fun TaskItem(
     subtaskProgress: SubtaskProgress? = null,
     isSelected: Boolean = false,
     isSelectionMode: Boolean = false,
+    isExpanded: Boolean = false,
+    subtasks: List<Subtask> = emptyList(),
+    onToggleExpand: () -> Unit = {},
+    onToggleSubtask: (subtaskId: Long, completed: Boolean) -> Unit = { _, _ -> },
+    onAddSubtask: (title: String) -> Unit = {},
     onToggleComplete: () -> Unit,
     onEditClick: () -> Unit,
     onArchiveClick: () -> Unit,
@@ -153,6 +163,7 @@ fun TaskItem(
     Card(
         modifier = modifier
             .fillMaxWidth()
+            .animateContentSize()
             .combinedClickable(
                 onClick = {
                     if (isSelectionMode) onToggleSelection() else onEditClick()
@@ -290,28 +301,66 @@ fun TaskItem(
                     }
                 }
 
-                // Subtask progress indicator — only rendered when the task has >=1 subtask.
+                // Subtask progress indicator & expand affordance — only rendered when the task has >=1 subtask.
                 if (subtaskProgress != null && subtaskProgress.total > 0) {
+                    val progressText = stringResource(
+                        R.string.label_subtask_progress,
+                        subtaskProgress.completed,
+                        subtaskProgress.total,
+                    )
                     val progressDescription = stringResource(
                         R.string.cd_subtask_progress,
                         subtaskProgress.completed,
                         subtaskProgress.total,
                     )
+                    val expandCollapseDescription = stringResource(
+                        if (isExpanded) R.string.cd_collapse_subtasks else R.string.cd_expand_subtasks,
+                    )
+                    val chevronRotation by animateFloatAsState(
+                        targetValue = if (isExpanded) 180f else 0f,
+                        label = "subtaskChevronRotation",
+                    )
+
                     Column(
                         modifier = Modifier
-                            .padding(top = 4.dp)
-                            .semantics { contentDescription = progressDescription },
-                        verticalArrangement = Arrangement.spacedBy(2.dp),
+                            .fillMaxWidth()
+                            .padding(top = 4.dp),
+                        verticalArrangement = Arrangement.spacedBy(4.dp),
                     ) {
-                        Text(
-                            text = stringResource(
-                                R.string.label_subtask_progress,
-                                subtaskProgress.completed,
-                                subtaskProgress.total,
-                            ),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clip(RoundedCornerShape(4.dp))
+                                .clickable(
+                                    enabled = !isSelectionMode,
+                                    onClick = onToggleExpand,
+                                )
+                                .semantics {
+                                    contentDescription = buildSubtaskExpandA11yDescription(
+                                        progressDescription = progressDescription,
+                                        expandCollapseDescription = expandCollapseDescription,
+                                    )
+                                    role = Role.Button
+                                }
+                                .padding(vertical = 2.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                        ) {
+                            Text(
+                                text = progressText,
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                            Icon(
+                                imageVector = Icons.Default.KeyboardArrowDown,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier
+                                    .size(18.dp)
+                                    .rotate(chevronRotation),
+                            )
+                        }
+
                         LinearProgressIndicator(
                             progress = {
                                 if (subtaskProgress.total == 0) {
@@ -325,6 +374,15 @@ fun TaskItem(
                                 .height(4.dp)
                                 .clip(RoundedCornerShape(2.dp)),
                         )
+
+                        if (isExpanded) {
+                            InlineSubtaskList(
+                                subtasks = subtasks,
+                                onToggleSubtask = onToggleSubtask,
+                                onAddSubtask = onAddSubtask,
+                                modifier = Modifier.padding(top = 4.dp),
+                            )
+                        }
                     }
                 }
 
@@ -529,3 +587,8 @@ private enum class ChipType {
     Tag,
     Priority,
 }
+
+internal fun buildSubtaskExpandA11yDescription(
+    progressDescription: String,
+    expandCollapseDescription: String,
+): String = "$progressDescription, $expandCollapseDescription"
