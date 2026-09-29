@@ -9,6 +9,12 @@ interface ISubtaskRepository {
     fun observeSubtasks(taskId: Long): Flow<List<Subtask>>
 
     /**
+     * Live map of all subtasks grouped by `taskId`, ordered by sortOrder then id.
+     * Tasks with no subtasks are absent from the map keys.
+     */
+    fun observeSubtasksByTaskId(): Flow<Map<Long, List<Subtask>>>
+
+    /**
      * Live aggregated progress per task. Emits one row per task that has at least one subtask;
      * tasks with no subtasks are absent from the list.
      */

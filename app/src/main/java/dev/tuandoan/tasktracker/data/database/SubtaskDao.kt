@@ -47,6 +47,9 @@ interface SubtaskDao {
     @Query("SELECT * FROM subtasks ORDER BY taskId ASC, sortOrder ASC, id ASC")
     suspend fun getAllSubtasks(): List<Subtask>
 
+    @Query("SELECT * FROM subtasks ORDER BY taskId ASC, sortOrder ASC, id ASC")
+    fun observeAllSubtasks(): Flow<List<Subtask>>
+
     /**
      * Aggregated progress across every task that has at least one subtask. SQLite stores
      * Boolean as INTEGER 0/1 so SUM(isCompleted) gives the completed count directly.
