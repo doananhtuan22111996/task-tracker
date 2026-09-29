@@ -52,6 +52,7 @@ class TaskViewModelTest {
 
     private lateinit var context: Context
     private lateinit var repository: FakeTaskRepository
+    private lateinit var subtaskRepository: FakeSubtaskRepository
     private lateinit var scheduler: FakeReminderScheduler
     private lateinit var selectionStateManager: TaskSelectionStateManager
     private lateinit var viewModel: TaskViewModel
@@ -64,6 +65,7 @@ class TaskViewModelTest {
             every { getString(any(), *anyVararg()) } returns "test string"
         }
         repository = FakeTaskRepository()
+        subtaskRepository = FakeSubtaskRepository()
         scheduler = FakeReminderScheduler()
         selectionStateManager = TaskSelectionStateManager()
     }
@@ -77,7 +79,7 @@ class TaskViewModelTest {
         val taskManager =
             TaskManager(
                 repository,
-                FakeSubtaskRepository(),
+                subtaskRepository,
                 scheduler,
                 FakeWidgetUpdater(),
                 fakeBreadcrumbLogger(),
@@ -108,7 +110,7 @@ class TaskViewModelTest {
             settingsRepository,
             taskManager,
             StreakUseCase(repository),
-            SubtaskUseCase(FakeSubtaskRepository(), fakeAnalyticsLogger()),
+            SubtaskUseCase(subtaskRepository, fakeAnalyticsLogger()),
             TagManagementUseCase(repository),
             TaskSortService(),
         )
@@ -372,5 +374,81 @@ class TaskViewModelTest {
         viewModel = createViewModel()
         viewModel.clearError() // should not throw
         assertNull(viewModel.errorMessage.value)
+    }
+
+    // === Subtask & Expansion Tests ===
+
+    @Test
+    fun `toggleTaskExpanded updates expandedTaskIds`() {
+        viewModel = createViewModel()
+        viewModel.toggleTaskExpanded(42L)
+
+        assertEquals(setOf(42L), viewModel.expandedTaskIds.value)
+
+        viewModel.toggleTaskExpanded(42L)
+        assertTrue(viewModel.expandedTaskIds.value.isEmpty())
+    }
+
+    @Test
+    fun `toggleTaskCompletion collapses task when becoming completed`() = runTest {
+        viewModel = createViewModel()
+        val task = TestTaskFactory.createTask(id = 10L, isCompleted = false)
+        repository.seed(task)
+
+        viewModel.toggleTaskExpanded(10L)
+        assertEquals(setOf(10L), viewModel.expandedTaskIds.value)
+
+        viewModel.toggleTaskCompletion(task)
+        advanceUntilIdle()
+
+        assertTrue(viewModel.expandedTaskIds.value.isEmpty())
+    }
+
+    @Test
+    fun `confirmArchiveTask collapses task`() = runTest {
+        viewModel = createViewModel()
+        val task = TestTaskFactory.createTask(id = 10L)
+        repository.seed(task)
+
+        viewModel.toggleTaskExpanded(10L)
+        assertEquals(setOf(10L), viewModel.expandedTaskIds.value)
+
+        viewModel.archiveTask(task)
+        viewModel.confirmArchiveTask()
+        advanceUntilIdle()
+
+        assertTrue(viewModel.expandedTaskIds.value.isEmpty())
+    }
+
+    @Test
+    fun `addInlineSubtask delegates to SubtaskUseCase and updates subtasksByTaskId`() = runTest {
+        viewModel = createViewModel()
+        viewModel.subtasksByTaskId.test {
+            assertEquals(emptyMap<Long, List<Any>>(), awaitItem())
+
+            viewModel.addInlineSubtask(10L, "New subtask")
+            advanceUntilIdle()
+
+            val map = awaitItem()
+            assertTrue(map.containsKey(10L))
+            assertEquals(1, map[10L]?.size)
+            assertEquals("New subtask", map[10L]?.first()?.title)
+        }
+    }
+
+    @Test
+    fun `toggleSubtaskCompletion updates completion state in subtasksByTaskId`() = runTest {
+        viewModel = createViewModel()
+        viewModel.addInlineSubtask(10L, "Subtask 1")
+        advanceUntilIdle()
+
+        val subtask = subtaskRepository.getSubtasks(10L).first()
+        assertFalse(subtask.isCompleted)
+
+        viewModel.toggleSubtaskCompletion(subtask.id, true)
+        advanceUntilIdle()
+
+        val updated = subtaskRepository.getSubtaskById(subtask.id)
+        assertTrue(updated?.isCompleted == true)
     }
 }

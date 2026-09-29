@@ -287,6 +287,7 @@
     <string name="cd_collapse_subtasks">Collapse subtasks</string>
     <string name="subtask_add_hint">Add subtask…</string>
     <string name="cd_add_subtask">Add subtask</string>
+    <string name="error_add_subtask">Failed to add subtask</string>
 
     <!-- Priority -->
     <string name="priority_low">Low</string>
