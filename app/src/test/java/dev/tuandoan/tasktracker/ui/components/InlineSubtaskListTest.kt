@@ -1,5 +1,6 @@
 package dev.tuandoan.tasktracker.ui.components
 
+import dev.tuandoan.tasktracker.domain.usecase.SubtaskUseCase
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
@@ -27,5 +28,13 @@ class InlineSubtaskListTest {
     fun `sanitizeSubtaskTitle preserves internal spacing`() {
         val input = "Write  unit  tests"
         assertEquals("Write  unit  tests", sanitizeSubtaskTitle(input))
+    }
+
+    @Test
+    fun `sanitizeSubtaskTitle clamps title exceeding MAX_TITLE_LENGTH`() {
+        val longInput = "A".repeat(600)
+        val result = sanitizeSubtaskTitle(longInput)
+        assertEquals(SubtaskUseCase.MAX_TITLE_LENGTH, result?.length)
+        assertEquals("A".repeat(500), result)
     }
 }
