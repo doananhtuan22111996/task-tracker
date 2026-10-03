@@ -224,6 +224,11 @@
     <string name="error_subtask_save">Einige Unteraufgaben konnten nicht gespeichert werden: %1$s</string>
     <string name="label_subtask_progress">%1$d / %2$d</string>
     <string name="cd_subtask_progress">%1$d von %2$d Unteraufgaben erledigt</string>
+    <string name="cd_expand_subtasks">Unteraufgaben ausklappen</string>
+    <string name="cd_collapse_subtasks">Unteraufgaben einklappen</string>
+    <string name="subtask_add_hint">Unteraufgabe hinzufügen…</string>
+    <string name="cd_add_subtask">Unteraufgabe hinzufügen</string>
+    <string name="error_add_subtask">Unteraufgabe konnte nicht hinzugefügt werden</string>
 
     <!-- Priority -->
     <string name="priority_low">Niedrig</string>
@@ -474,6 +479,8 @@
     <string name="help_a_change_priority">Öffnen Sie den Aufgaben-Editor (tippen Sie auf eine Aufgabe) und wählen Sie Niedrig, Mittel oder Hoch.</string>
     <string name="help_q_multi_select">Kann ich mehrere Aufgaben gleichzeitig auswählen?</string>
     <string name="help_a_multi_select">Ja. Halten Sie eine Aufgabe lange gedrückt, um den Mehrfachauswahlmodus zu aktivieren, und tippen Sie dann auf weitere Aufgaben.</string>
+    <string name="help_q_share_target">Wie erstelle ich Aufgaben aus anderen Apps?</string>
+    <string name="help_a_share_target">Tippen Sie in einer beliebigen App (wie Chrome oder Notizen) auf Teilen und wählen Sie Task Tracker. Links werden automatisch in die Beschreibung eingefügt und Titel vorab ausgefüllt.</string>
     <string name="help_section_calendar">Kalender</string>
     <string name="help_q_calendar_where">Wo finde ich die Kalenderansicht?</string>
     <string name="help_a_calendar_where">Tippen Sie in der unteren Navigation auf den Tab \"Kalender\", um Ihre Aufgaben im Monatsraster zu sehen. Tippen Sie auf einen Tag, um die Tagesagenda zu öffnen.</string>
@@ -488,6 +495,8 @@
     <string name="help_section_subtasks">Unteraufgaben</string>
     <string name="help_q_add_subtasks">Wie füge ich Unteraufgaben zu einer Aufgabe hinzu?</string>
     <string name="help_a_add_subtasks">Öffnen Sie eine Aufgabe und scrollen Sie zum Bereich Unteraufgaben. Tippen Sie in die Zeile „Unteraufgabe hinzufügen" und drücken Sie Fertig, um weitere hinzuzufügen.</string>
+    <string name="help_q_inline_subtasks">Kann ich Unteraufgaben ansehen und erledigen, ohne den Editor zu öffnen?</string>
+    <string name="help_a_inline_subtasks">Ja. Tippen Sie auf das Ausklapp-Symbol auf einer Aufgabenkarte in der Aufgabenliste oder im Kalender, um Unteraufgaben direkt anzuzeigen, abzuhaken oder hinzuzufügen.</string>
     <string name="help_q_reorder_subtasks">Kann ich Unteraufgaben umsortieren?</string>
     <string name="help_a_reorder_subtasks">Ja. Halten Sie den Ziehpunkt rechts neben der Unteraufgabe lange gedrückt und ziehen Sie. Mit TalkBack nutzen Sie die Aktionen „Nach oben verschieben" / „Nach unten verschieben".</string>
     <string name="help_q_subtasks_recurrence">Was passiert mit Unteraufgaben, wenn eine wiederkehrende Aufgabe neu erstellt wird?</string>

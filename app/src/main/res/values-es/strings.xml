@@ -224,6 +224,11 @@
     <string name="error_subtask_save">Algunas subtareas no se pudieron guardar: %1$s</string>
     <string name="label_subtask_progress">%1$d / %2$d</string>
     <string name="cd_subtask_progress">%1$d de %2$d subtareas completadas</string>
+    <string name="cd_expand_subtasks">Expandir subtareas</string>
+    <string name="cd_collapse_subtasks">Contraer subtareas</string>
+    <string name="subtask_add_hint">Añadir subtarea…</string>
+    <string name="cd_add_subtask">Añadir subtarea</string>
+    <string name="error_add_subtask">Error al añadir la subtarea</string>
 
     <!-- Priority -->
     <string name="priority_low">Baja</string>
@@ -474,6 +479,8 @@
     <string name="help_a_change_priority">Abre el editor de tareas (toca una tarea) y selecciona Baja, Media o Alta.</string>
     <string name="help_q_multi_select">¿Puedo seleccionar varias tareas a la vez?</string>
     <string name="help_a_multi_select">Sí. Mantén presionada cualquier tarea para entrar en modo de selección múltiple y luego toca las tareas que desees seleccionar.</string>
+    <string name="help_q_share_target">¿Cómo creo tareas desde otras aplicaciones?</string>
+    <string name="help_a_share_target">Toca Compartir en cualquier aplicación (como Chrome o Notas) y selecciona Task Tracker. Los enlaces se colocan automáticamente en la descripción y los títulos se completan previamente.</string>
     <string name="help_section_calendar">Calendario</string>
     <string name="help_q_calendar_where">¿Dónde está la vista de calendario?</string>
     <string name="help_a_calendar_where">Toca la pestaña Calendario en la barra de navegación inferior para ver tus tareas en una cuadrícula mensual. Toca cualquier día para abrir su agenda.</string>
@@ -488,6 +495,8 @@
     <string name="help_section_subtasks">Subtareas</string>
     <string name="help_q_add_subtasks">¿Cómo añado subtareas a una tarea?</string>
     <string name="help_a_add_subtasks">Abre una tarea y desplázate hasta la sección Subtareas. Escribe en la fila «Añadir subtarea» y pulsa Listo para añadir otra.</string>
+    <string name="help_q_inline_subtasks">¿Puedo ver y completar subtareas sin abrir el editor?</string>
+    <string name="help_a_inline_subtasks">Sí. Toca el icono de expansión en cualquier tarjeta de tarea de la lista o la agenda del calendario para ver, marcar o añadir subtareas directamente.</string>
     <string name="help_q_reorder_subtasks">¿Puedo reordenar las subtareas?</string>
     <string name="help_a_reorder_subtasks">Sí. Mantén presionado el indicador de arrastre a la derecha de cualquier subtarea y arrástralo. Con TalkBack, usa las acciones «Mover arriba» / «Mover abajo».</string>
     <string name="help_q_subtasks_recurrence">¿Qué ocurre con las subtareas cuando una tarea recurrente se regenera?</string>

@@ -547,6 +547,8 @@
     <string name="help_a_change_priority">Open the task editor (tap a task) and select Low, Medium, or High.</string>
     <string name="help_q_multi_select">Can I select multiple tasks at once?</string>
     <string name="help_a_multi_select">Yes. Long-press any task to enter multi-select mode, then tap tasks to select them.</string>
+    <string name="help_q_share_target">How do I create tasks from other apps?</string>
+    <string name="help_a_share_target">Tap Share in any app (such as Chrome or Notes) and select Task Tracker. Links are automatically placed in the description and titles are prefilled.</string>
     <string name="help_section_calendar">Calendar</string>
     <string name="help_q_calendar_where">Where is the calendar view?</string>
     <string name="help_a_calendar_where">Tap the Calendar tab in the bottom nav to see your tasks on a month grid. Tap any day to view that day\'s agenda.</string>
@@ -561,6 +563,8 @@
     <string name="help_section_subtasks">Subtasks</string>
     <string name="help_q_add_subtasks">How do I add subtasks to a task?</string>
     <string name="help_a_add_subtasks">Open a task and scroll to the Subtasks section. Type in the "Add subtask" row and press Done to add another.</string>
+    <string name="help_q_inline_subtasks">Can I view and complete subtasks without opening the editor?</string>
+    <string name="help_a_inline_subtasks">Yes. Tap the expand chevron on any task card on the task list or calendar agenda to view, check off, or add subtasks inline.</string>
     <string name="help_q_reorder_subtasks">Can I reorder subtasks?</string>
     <string name="help_a_reorder_subtasks">Yes. Long-press the drag handle on the right of any subtask and drag. With TalkBack, use the "Move up" / "Move down" custom actions.</string>
     <string name="help_q_subtasks_recurrence">What happens to subtasks when a recurring task regenerates?</string>
