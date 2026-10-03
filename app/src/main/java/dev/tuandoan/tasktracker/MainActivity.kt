@@ -23,6 +23,8 @@ import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -60,6 +62,7 @@ import dev.tuandoan.tasktracker.ui.viewmodel.SettingsViewModel
 import dev.tuandoan.tasktracker.ui.viewmodel.StatsViewModel
 import dev.tuandoan.tasktracker.ui.viewmodel.TagManagementViewModel
 import dev.tuandoan.tasktracker.ui.viewmodel.TaskViewModel
+import dev.tuandoan.tasktracker.utils.ShareIntentParser
 import javax.inject.Inject
 
 /**
@@ -89,6 +92,8 @@ class MainActivity : AppCompatActivity() {
     @Inject
     lateinit var analyticsLogger: AnalyticsLogger
 
+    private var pendingRoute by mutableStateOf<String?>(null)
+
     @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -101,8 +106,10 @@ class MainActivity : AppCompatActivity() {
 
         enableEdgeToEdge()
 
-        // Check if launched from app shortcut deep-link
-        val deepLinkRoute = resolveDeepLinkRoute(intent)
+        // Check if launched from app shortcut deep-link or share target (CAP-01)
+        if (savedInstanceState == null) {
+            pendingRoute = resolveDeepLinkRoute(intent)
+        }
 
         setContent {
             val windowSizeClass = calculateWindowSizeClass(this)
@@ -118,7 +125,8 @@ class MainActivity : AppCompatActivity() {
                     TaskTrackerApp(
                         notificationPermissionManager = notificationPermissionManager,
                         isOnboardingCompleted = prefs.onboardingCompleted,
-                        deepLinkRoute = deepLinkRoute,
+                        deepLinkRoute = pendingRoute,
+                        onDeepLinkHandled = { pendingRoute = null },
                         windowWidthSizeClass = windowSizeClass.widthSizeClass,
                         breadcrumbLogger = breadcrumbLogger,
                         analyticsLogger = analyticsLogger,
@@ -128,12 +136,32 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        pendingRoute = resolveDeepLinkRoute(intent)
+    }
+
     private fun resolveDeepLinkRoute(intent: Intent?): String? {
-        val data = intent?.data ?: return null
-        if (data.scheme == "tasktracker" && data.host == "task_editor") {
+        val data = intent?.data
+        if (data != null && data.scheme == "tasktracker" && data.host == "task_editor") {
             val taskId = data.pathSegments?.firstOrNull()?.toLongOrNull()
             return if (taskId != null) {
                 TaskTrackerRoutes.taskEditorEdit(taskId)
+            } else {
+                TaskTrackerRoutes.TASK_EDITOR_CREATE
+            }
+        }
+        if (intent?.action == Intent.ACTION_SEND && intent.type?.startsWith("text/") == true) {
+            val subject = intent.getStringExtra(Intent.EXTRA_SUBJECT)
+            val text = intent.getStringExtra(Intent.EXTRA_TEXT)
+            breadcrumbLogger.log(BreadcrumbCategory.NAV, "action_send_received")
+            val payload = ShareIntentParser.parse(subject = subject, text = text)
+            return if (payload != null) {
+                TaskTrackerRoutes.taskEditorCreate(
+                    initialTitle = payload.title,
+                    initialDescription = payload.description,
+                )
             } else {
                 TaskTrackerRoutes.TASK_EDITOR_CREATE
             }
@@ -160,6 +188,7 @@ fun TaskTrackerApp(
     notificationPermissionManager: NotificationPermissionManager? = null,
     isOnboardingCompleted: Boolean = true,
     deepLinkRoute: String? = null,
+    onDeepLinkHandled: () -> Unit = {},
     windowWidthSizeClass: WindowWidthSizeClass = WindowWidthSizeClass.Compact,
     breadcrumbLogger: BreadcrumbLogger? = null,
     analyticsLogger: AnalyticsLogger? = null,
@@ -171,10 +200,11 @@ fun TaskTrackerApp(
         TaskTrackerRoutes.ONBOARDING
     }
 
-    // Handle deep-link navigation (e.g., from app shortcut)
+    // Handle deep-link navigation (e.g., from app shortcut or share target)
     LaunchedEffect(deepLinkRoute) {
         if (deepLinkRoute != null && isOnboardingCompleted) {
             navController.navigate(deepLinkRoute)
+            onDeepLinkHandled()
         }
     }
 
@@ -393,6 +423,16 @@ fun TaskTrackerApp(
                         navArgument("initialDueAt") {
                             type = NavType.LongType
                             defaultValue = -1L // sentinel for "not provided"; VM treats negative as null
+                        },
+                        navArgument("initialTitle") {
+                            type = NavType.StringType
+                            nullable = true
+                            defaultValue = null
+                        },
+                        navArgument("initialDescription") {
+                            type = NavType.StringType
+                            nullable = true
+                            defaultValue = null
                         },
                     ),
                 ) {

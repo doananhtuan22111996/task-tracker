@@ -44,6 +44,7 @@
         <activity
             android:name=".MainActivity"
             android:exported="true"
+            android:launchMode="singleTop"
             android:theme="@style/Theme.TaskTracker">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -54,6 +55,11 @@
                 <action android:name="android.intent.action.VIEW" />
                 <data android:scheme="tasktracker" android:host="task_editor" />
                 <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="text/plain" />
             </intent-filter>
 
             <meta-data

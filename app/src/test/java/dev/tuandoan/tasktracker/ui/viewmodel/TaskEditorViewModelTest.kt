@@ -67,13 +67,24 @@ class TaskEditorViewModelTest {
         Dispatchers.resetMain()
     }
 
-    private fun createViewModel(taskId: Long? = null, initialDueAt: Long? = null): TaskEditorViewModel {
+    private fun createViewModel(
+        taskId: Long? = null,
+        initialDueAt: Long? = null,
+        initialTitle: String? = null,
+        initialDescription: String? = null,
+    ): TaskEditorViewModel {
         val savedStateHandle = SavedStateHandle().apply {
             if (taskId != null) {
                 set("taskId", taskId)
             }
             if (initialDueAt != null) {
                 set("initialDueAt", initialDueAt)
+            }
+            if (initialTitle != null) {
+                set("initialTitle", initialTitle)
+            }
+            if (initialDescription != null) {
+                set("initialDescription", initialDescription)
             }
         }
         return TaskEditorViewModel(
@@ -138,6 +149,63 @@ class TaskEditorViewModelTest {
         testDispatcher.scheduler.advanceUntilIdle()
 
         assertEquals(taskDueAt, viewModel.dueAt.value)
+    }
+
+    // ── Create mode with prefilled title & description from Share Target (CAP-01) ──
+
+    @Test
+    fun `create mode - initialTitle and initialDescription prefill form fields and mark changes`() {
+        val title = "Check out this documentation"
+        val desc = "https://developer.android.com/reference"
+
+        val viewModel = createViewModel(initialTitle = title, initialDescription = desc)
+
+        assertEquals(title, viewModel.taskTitle.value)
+        assertEquals(desc, viewModel.taskDescription.value)
+        assertTrue(viewModel.hasChanges.value)
+    }
+
+    @Test
+    fun `create mode - blank initialTitle and initialDescription are ignored`() {
+        val viewModel = createViewModel(initialTitle = "   ", initialDescription = "")
+
+        assertEquals("", viewModel.taskTitle.value)
+        assertEquals("", viewModel.taskDescription.value)
+        assertFalse(viewModel.hasChanges.value)
+    }
+
+    @Test
+    fun `create mode - initialTitle is clamped to MAX_TITLE_LENGTH`() {
+        val longTitle = "A".repeat(150)
+        val viewModel = createViewModel(initialTitle = longTitle)
+
+        assertEquals(TaskFormUseCase.MAX_TITLE_LENGTH, viewModel.taskTitle.value.length)
+        assertEquals("A".repeat(TaskFormUseCase.MAX_TITLE_LENGTH), viewModel.taskTitle.value)
+    }
+
+    @Test
+    fun `create mode - initialDescription is clamped to MAX_DESCRIPTION_LENGTH`() {
+        val longDesc = "B".repeat(600)
+        val viewModel = createViewModel(initialDescription = longDesc)
+
+        assertEquals(TaskFormUseCase.MAX_DESCRIPTION_LENGTH, viewModel.taskDescription.value.length)
+        assertEquals("B".repeat(TaskFormUseCase.MAX_DESCRIPTION_LENGTH), viewModel.taskDescription.value)
+    }
+
+    @Test
+    fun `edit mode - taskId wins over initialTitle and initialDescription`() = runTest {
+        val task = TestTaskFactory.createTask(id = 1, title = "Original Title", description = "Original Desc")
+        fakeTaskManager.taskToReturn = task
+
+        val viewModel = createViewModel(
+            taskId = 1L,
+            initialTitle = "Shared Title",
+            initialDescription = "Shared Desc",
+        )
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        assertEquals("Original Title", viewModel.taskTitle.value)
+        assertEquals("Original Desc", viewModel.taskDescription.value)
     }
 
     @Test
