@@ -1,7 +1,9 @@
 package dev.tuandoan.tasktracker.ui.viewmodel
 
+import android.content.Context
 import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
+import dev.tuandoan.tasktracker.R
 import dev.tuandoan.tasktracker.data.database.Subtask
 import dev.tuandoan.tasktracker.domain.TaskManager
 import dev.tuandoan.tasktracker.domain.model.AgendaItem
@@ -19,6 +21,7 @@ import dev.tuandoan.tasktracker.testutil.fakePerformanceLogger
 import dev.tuandoan.tasktracker.ui.events.UiEvent
 import dev.tuandoan.tasktracker.ui.manager.TaskBulkActionManager
 import dev.tuandoan.tasktracker.ui.state.TaskSelectionStateManager
+import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import kotlinx.coroutines.Dispatchers
@@ -49,10 +52,14 @@ class CalendarViewModelTest {
     private lateinit var useCase: CalendarUseCase
     private lateinit var subtaskUseCase: SubtaskUseCase
     private lateinit var taskManager: TaskManager
+    private lateinit var context: Context
 
     @Before
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
+        context = mockk(relaxed = true) {
+            every { getString(R.string.error_add_subtask) } returns "Failed to add subtask"
+        }
         repo = FakeTaskRepository()
         subtaskRepo = FakeSubtaskRepository()
         useCase = CalendarUseCase(repo)
@@ -78,6 +85,7 @@ class CalendarViewModelTest {
         selectionStateManager: TaskSelectionStateManager = TaskSelectionStateManager(),
         bulkActionManager: TaskBulkActionManager = mockk(relaxed = true),
     ): CalendarViewModel = CalendarViewModel(
+        context,
         useCase,
         savedState,
         taskManager,
@@ -621,6 +629,7 @@ class CalendarViewModelTest {
         val breadcrumbLogger = io.mockk.mockk<dev.tuandoan.tasktracker.diagnostics.BreadcrumbLogger>(relaxed = true)
         val vm =
             CalendarViewModel(
+                context,
                 useCase,
                 SavedStateHandle(),
                 taskManager,
@@ -647,6 +656,7 @@ class CalendarViewModelTest {
         val analyticsLogger = io.mockk.mockk<dev.tuandoan.tasktracker.diagnostics.AnalyticsLogger>(relaxed = true)
         val vm =
             CalendarViewModel(
+                context,
                 useCase,
                 SavedStateHandle(),
                 taskManager,
@@ -674,6 +684,7 @@ class CalendarViewModelTest {
     fun `startMonthRenderTrace delegates to PerformanceLogger with CalendarMonthRender`() = runTest {
         val performanceLogger = io.mockk.mockk<dev.tuandoan.tasktracker.diagnostics.PerformanceLogger>(relaxed = true)
         val vm = CalendarViewModel(
+            context,
             useCase,
             SavedStateHandle(),
             taskManager,
