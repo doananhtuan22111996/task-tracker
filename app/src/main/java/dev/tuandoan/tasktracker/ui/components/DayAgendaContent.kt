@@ -31,6 +31,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import dev.tuandoan.tasktracker.R
+import dev.tuandoan.tasktracker.data.database.Subtask
 import dev.tuandoan.tasktracker.data.database.SubtaskProgress
 import dev.tuandoan.tasktracker.domain.model.AgendaItem
 import dev.tuandoan.tasktracker.ui.theme.AppSpacing
@@ -60,8 +61,13 @@ fun DayAgendaContent(
     isSelectionMode: Boolean = false,
     selectedIds: Set<Long> = emptySet(),
     selectedCount: Int = 0,
+    expandedTaskIds: Set<Long> = emptySet(),
+    subtasksByTaskId: Map<Long, List<Subtask>> = emptyMap(),
     onLongPressTask: (Long) -> Unit = {},
     onToggleSelection: (Long) -> Unit = {},
+    onToggleExpandTask: (Long) -> Unit = {},
+    onToggleSubtask: (subtaskId: Long, completed: Boolean) -> Unit = { _, _ -> },
+    onAddSubtask: (taskId: Long, title: String) -> Unit = { _, _ -> },
     onBulkComplete: () -> Unit = {},
     onBulkArchive: () -> Unit = {},
     onBulkDelete: () -> Unit = {},
@@ -152,6 +158,11 @@ fun DayAgendaContent(
                         is AgendaItem.Concrete -> TaskItem(
                             task = item.task,
                             subtaskProgress = subtaskProgress[item.task.id],
+                            isExpanded = expandedTaskIds.contains(item.task.id),
+                            subtasks = subtasksByTaskId[item.task.id] ?: emptyList(),
+                            onToggleExpand = { onToggleExpandTask(item.task.id) },
+                            onToggleSubtask = onToggleSubtask,
+                            onAddSubtask = { title -> onAddSubtask(item.task.id, title) },
                             onToggleComplete = { onToggleComplete(item) },
                             onEditClick = { onItemClick(item) },
                             onArchiveClick = { onArchive(item) },

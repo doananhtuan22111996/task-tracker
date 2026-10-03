@@ -11,6 +11,7 @@ import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import dev.tuandoan.tasktracker.data.database.Subtask
 import dev.tuandoan.tasktracker.data.database.SubtaskProgress
 import dev.tuandoan.tasktracker.domain.model.AgendaItem
 import dev.tuandoan.tasktracker.ui.theme.AppSpacing
@@ -39,8 +40,13 @@ fun DayAgendaSheet(
     isSelectionMode: Boolean = false,
     selectedIds: Set<Long> = emptySet(),
     selectedCount: Int = 0,
+    expandedTaskIds: Set<Long> = emptySet(),
+    subtasksByTaskId: Map<Long, List<Subtask>> = emptyMap(),
     onLongPressTask: (Long) -> Unit = {},
     onToggleSelection: (Long) -> Unit = {},
+    onToggleExpandTask: (Long) -> Unit = {},
+    onToggleSubtask: (subtaskId: Long, completed: Boolean) -> Unit = { _, _ -> },
+    onAddSubtask: (taskId: Long, title: String) -> Unit = { _, _ -> },
     onBulkComplete: () -> Unit = {},
     onBulkArchive: () -> Unit = {},
     onBulkDelete: () -> Unit = {},
@@ -66,8 +72,13 @@ fun DayAgendaSheet(
                 isSelectionMode = isSelectionMode,
                 selectedIds = selectedIds,
                 selectedCount = selectedCount,
+                expandedTaskIds = expandedTaskIds,
+                subtasksByTaskId = subtasksByTaskId,
                 onLongPressTask = onLongPressTask,
                 onToggleSelection = onToggleSelection,
+                onToggleExpandTask = onToggleExpandTask,
+                onToggleSubtask = onToggleSubtask,
+                onAddSubtask = onAddSubtask,
                 onBulkComplete = onBulkComplete,
                 onBulkArchive = onBulkArchive,
                 onBulkDelete = onBulkDelete,

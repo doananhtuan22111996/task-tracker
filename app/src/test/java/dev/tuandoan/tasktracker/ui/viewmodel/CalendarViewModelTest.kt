@@ -2,6 +2,7 @@ package dev.tuandoan.tasktracker.ui.viewmodel
 
 import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
+import dev.tuandoan.tasktracker.data.database.Subtask
 import dev.tuandoan.tasktracker.domain.TaskManager
 import dev.tuandoan.tasktracker.domain.model.AgendaItem
 import dev.tuandoan.tasktracker.domain.model.RecurrenceType
@@ -15,6 +16,7 @@ import dev.tuandoan.tasktracker.testutil.TestTaskFactory
 import dev.tuandoan.tasktracker.testutil.fakeAnalyticsLogger
 import dev.tuandoan.tasktracker.testutil.fakeBreadcrumbLogger
 import dev.tuandoan.tasktracker.testutil.fakePerformanceLogger
+import dev.tuandoan.tasktracker.ui.events.UiEvent
 import dev.tuandoan.tasktracker.ui.manager.TaskBulkActionManager
 import dev.tuandoan.tasktracker.ui.state.TaskSelectionStateManager
 import io.mockk.mockk
@@ -959,5 +961,164 @@ class CalendarViewModelTest {
             assertEquals(emptySet<Long>(), vm.selectedIds.value)
             cancelAndIgnoreRemainingEvents()
         }
+    }
+
+    // ── Inline Subtasks (CAL-ST-34) ──
+
+    @Test
+    fun `toggleTaskExpanded updates expandedTaskIds`() {
+        val vm = createViewModel()
+        vm.toggleTaskExpanded(42L)
+
+        assertEquals(setOf(42L), vm.expandedTaskIds.value)
+
+        vm.toggleTaskExpanded(42L)
+        assertTrue(vm.expandedTaskIds.value.isEmpty())
+    }
+
+    @Test
+    fun `collapseTask and collapseTasks remove task from expandedTaskIds`() {
+        val vm = createViewModel()
+        vm.toggleTaskExpanded(1L)
+        vm.toggleTaskExpanded(2L)
+        assertEquals(setOf(1L, 2L), vm.expandedTaskIds.value)
+
+        vm.collapseTask(1L)
+        assertEquals(setOf(2L), vm.expandedTaskIds.value)
+
+        vm.collapseTasks(listOf(2L))
+        assertTrue(vm.expandedTaskIds.value.isEmpty())
+    }
+
+    @Test
+    fun `clearExpandedTasks empties expandedTaskIds`() {
+        val vm = createViewModel()
+        vm.toggleTaskExpanded(1L)
+        vm.toggleTaskExpanded(2L)
+        assertEquals(setOf(1L, 2L), vm.expandedTaskIds.value)
+
+        vm.clearExpandedTasks()
+        assertTrue(vm.expandedTaskIds.value.isEmpty())
+    }
+
+    @Test
+    fun `onAgendaItemToggleComplete collapses task when becoming completed`() = runTest {
+        val target = LocalDate.of(2026, 5, 10)
+        val task = TestTaskFactory.createTask(id = 10L, isCompleted = false, dueAt = dateEpoch(target))
+        repo.seed(task)
+
+        val vm = createViewModel()
+        vm.toggleTaskExpanded(10L)
+        assertEquals(setOf(10L), vm.expandedTaskIds.value)
+
+        vm.onAgendaItemToggleComplete(AgendaItem.Concrete(task, target))
+
+        assertTrue(vm.expandedTaskIds.value.isEmpty())
+    }
+
+    @Test
+    fun `onAgendaItemArchive collapses task`() = runTest {
+        val target = LocalDate.of(2026, 5, 10)
+        val task = TestTaskFactory.createTask(id = 10L, dueAt = dateEpoch(target))
+        repo.seed(task)
+
+        val vm = createViewModel()
+        vm.toggleTaskExpanded(10L)
+        assertEquals(setOf(10L), vm.expandedTaskIds.value)
+
+        vm.onAgendaItemArchive(AgendaItem.Concrete(task, target))
+
+        assertTrue(vm.expandedTaskIds.value.isEmpty())
+    }
+
+    @Test
+    fun `addInlineSubtask delegates to SubtaskUseCase and updates subtasksByTaskId`() = runTest {
+        val vm = createViewModel()
+        vm.subtasksByTaskId.test {
+            assertEquals(emptyMap<Long, List<Subtask>>(), awaitItem())
+
+            vm.addInlineSubtask(10L, "New subtask")
+
+            val map = awaitItem()
+            assertTrue(map.containsKey(10L))
+            assertEquals(1, map[10L]?.size)
+            assertEquals("New subtask", map[10L]?.first()?.title)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `addInlineSubtask emits snackbar on blank title`() = runTest {
+        val vm = createViewModel()
+        vm.agendaUiEvent.test {
+            vm.addInlineSubtask(10L, "   ")
+            val event = awaitItem()
+            assertTrue(event is UiEvent.ShowSnackbar)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `toggleSubtaskCompletion updates completion state in subtasksByTaskId`() = runTest {
+        val vm = createViewModel()
+        vm.addInlineSubtask(10L, "Subtask 1")
+
+        val subtask = subtaskRepo.getSubtasks(10L).first()
+        assertFalse(subtask.isCompleted)
+
+        vm.toggleSubtaskCompletion(subtask.id, true)
+
+        val updated = subtaskRepo.getSubtaskById(subtask.id)
+        assertTrue(updated?.isCompleted == true)
+    }
+
+    @Test
+    fun `agendaBulkComplete collapses selected tasks`() = runTest {
+        val target = LocalDate.of(2026, 5, 10)
+        val task1 = TestTaskFactory.createTask(id = 101L, dueAt = dateEpoch(target))
+        val task2 = TestTaskFactory.createTask(id = 102L, dueAt = dateEpoch(target))
+        repo.seed(task1, task2)
+
+        val selectionManager = TaskSelectionStateManager()
+        val bulkManager = mockk<TaskBulkActionManager>(relaxed = true)
+        val vm = createViewModel(
+            selectionStateManager = selectionManager,
+            bulkActionManager = bulkManager,
+        )
+
+        vm.toggleTaskExpanded(101L)
+        vm.toggleTaskExpanded(102L)
+        vm.onAgendaLongPress(101L)
+        assertEquals(setOf(101L), vm.selectedIds.value)
+
+        vm.agendaBulkComplete()
+
+        assertEquals(setOf(102L), vm.expandedTaskIds.value)
+    }
+
+    @Test
+    fun `confirmAgendaBulkArchive and confirmAgendaBulkDelete collapse selected tasks`() = runTest {
+        val target = LocalDate.of(2026, 5, 10)
+        val task1 = TestTaskFactory.createTask(id = 101L, dueAt = dateEpoch(target))
+        val task2 = TestTaskFactory.createTask(id = 102L, dueAt = dateEpoch(target))
+        repo.seed(task1, task2)
+
+        val selectionManager = TaskSelectionStateManager()
+        val bulkManager = mockk<TaskBulkActionManager>(relaxed = true)
+        val vm = createViewModel(
+            selectionStateManager = selectionManager,
+            bulkActionManager = bulkManager,
+        )
+
+        vm.toggleTaskExpanded(101L)
+        vm.toggleTaskExpanded(102L)
+        vm.onAgendaLongPress(101L)
+
+        vm.confirmAgendaBulkArchive()
+        assertEquals(setOf(102L), vm.expandedTaskIds.value)
+
+        vm.onAgendaLongPress(102L)
+        vm.confirmAgendaBulkDelete()
+        assertTrue(vm.expandedTaskIds.value.isEmpty())
     }
 }

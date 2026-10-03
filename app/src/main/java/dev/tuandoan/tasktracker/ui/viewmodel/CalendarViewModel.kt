@@ -4,6 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dev.tuandoan.tasktracker.data.database.Subtask
 import dev.tuandoan.tasktracker.data.database.SubtaskProgress
 import dev.tuandoan.tasktracker.data.database.Task
 import dev.tuandoan.tasktracker.diagnostics.AnalyticsEvent
@@ -27,10 +28,12 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.YearMonth
@@ -88,11 +91,60 @@ class CalendarViewModel @Inject constructor(
     val pendingBulkArchiveTasks = bulkActionManager.pendingBulkArchiveTasks
     val pendingBulkDeleteTasks = bulkActionManager.pendingBulkDeleteTasks
 
+    // ── Inline Subtasks & Expansion ──────────────────────────────────────────────────
+    private val _expandedTaskIds = MutableStateFlow<Set<Long>>(emptySet())
+    val expandedTaskIds: StateFlow<Set<Long>> = _expandedTaskIds.asStateFlow()
+
+    val subtasksByTaskId: StateFlow<Map<Long, List<Subtask>>> = subtaskUseCase.observeSubtasksByTaskId()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(STATE_SUBSCRIPTION_TIMEOUT_MS),
+            initialValue = emptyMap(),
+        )
+
+    fun toggleTaskExpanded(taskId: Long) {
+        _expandedTaskIds.update { current ->
+            if (current.contains(taskId)) current - taskId else current + taskId
+        }
+    }
+
+    fun collapseTask(taskId: Long) {
+        _expandedTaskIds.update { current -> current - taskId }
+    }
+
+    fun collapseTasks(taskIds: Collection<Long>) {
+        if (taskIds.isEmpty()) return
+        _expandedTaskIds.update { current -> current - taskIds.toSet() }
+    }
+
+    fun clearExpandedTasks() {
+        _expandedTaskIds.value = emptySet()
+    }
+
+    fun toggleSubtaskCompletion(subtaskId: Long, completed: Boolean) {
+        viewModelScope.launch {
+            subtaskUseCase.setCompleted(subtaskId, completed)
+        }
+    }
+
+    fun addInlineSubtask(taskId: Long, title: String) {
+        viewModelScope.launch {
+            val result = subtaskUseCase.addSubtask(taskId, title)
+            result.onFailure { error ->
+                val message = error.message ?: "Failed to add subtask"
+                _agendaUiEvent.emit(UiEvent.ShowSnackbar(message))
+            }
+        }
+    }
+
     fun onAgendaLongPress(taskId: Long) = selectionStateManager.enterSelection(taskId)
     fun onAgendaToggleSelection(taskId: Long) = selectionStateManager.toggleSelection(taskId)
     fun clearAgendaSelection() = selectionStateManager.clearSelection()
 
-    fun agendaBulkComplete() = bulkActionManager.bulkMarkCompleted(viewModelScope)
+    fun agendaBulkComplete() {
+        collapseTasks(selectionState.selectedIds.value)
+        bulkActionManager.bulkMarkCompleted(viewModelScope)
+    }
 
     fun agendaBulkArchive() {
         val tasks = concreteTasks()
@@ -108,6 +160,7 @@ class CalendarViewModel @Inject constructor(
     }
 
     fun confirmAgendaBulkArchive() {
+        collapseTasks(selectionState.selectedIds.value)
         runCatching { bulkActionManager.confirmBulkArchive(viewModelScope) }
     }
 
@@ -127,6 +180,7 @@ class CalendarViewModel @Inject constructor(
     }
 
     fun confirmAgendaBulkDelete() {
+        collapseTasks(selectionState.selectedIds.value)
         runCatching { bulkActionManager.confirmBulkDelete(viewModelScope) }
     }
 
@@ -226,6 +280,9 @@ class CalendarViewModel @Inject constructor(
     fun onAgendaItemToggleComplete(item: AgendaItem) {
         viewModelScope.launch {
             val task = resolveConcreteTask(item) ?: return@launch
+            if (!task.isCompleted) {
+                collapseTask(task.id)
+            }
             taskManager.toggleTaskCompletion(task)
         }
     }
@@ -233,6 +290,7 @@ class CalendarViewModel @Inject constructor(
     fun onAgendaItemArchive(item: AgendaItem) {
         viewModelScope.launch {
             val task = resolveConcreteTask(item) ?: return@launch
+            collapseTask(task.id)
             taskManager.archiveTask(task.id)
             _agendaUiEvent.emit(
                 UiEvent.ShowUndoArchive(
@@ -314,6 +372,7 @@ class CalendarViewModel @Inject constructor(
     override fun onCleared() {
         super.onCleared()
         selectionStateManager.clearSelection()
+        clearExpandedTasks()
     }
 
     companion object {

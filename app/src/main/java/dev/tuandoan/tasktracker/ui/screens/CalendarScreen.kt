@@ -60,6 +60,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dev.tuandoan.tasktracker.R
+import dev.tuandoan.tasktracker.data.database.Subtask
 import dev.tuandoan.tasktracker.diagnostics.PerformanceTrace
 import dev.tuandoan.tasktracker.domain.model.AgendaItem
 import dev.tuandoan.tasktracker.domain.model.DayDecoration
@@ -101,6 +102,8 @@ fun CalendarScreen(
     val selectedCount by viewModel.selectedCount.collectAsStateWithLifecycle()
     val pendingBulkArchiveTasks by viewModel.pendingBulkArchiveTasks.collectAsStateWithLifecycle()
     val pendingBulkDeleteTasks by viewModel.pendingBulkDeleteTasks.collectAsStateWithLifecycle()
+    val expandedTaskIds by viewModel.expandedTaskIds.collectAsStateWithLifecycle()
+    val subtasksByTaskId by viewModel.subtasksByTaskId.collectAsStateWithLifecycle()
     var isAgendaOpen by rememberSaveable { mutableStateOf(false) }
     val snackbarHostState = remember { SnackbarHostState() }
     val zone = remember { ZoneId.systemDefault() }
@@ -262,10 +265,15 @@ fun CalendarScreen(
                 },
                 onLongPressTask = viewModel::onAgendaLongPress,
                 onToggleSelection = viewModel::onAgendaToggleSelection,
+                onToggleExpandTask = viewModel::toggleTaskExpanded,
+                onToggleSubtask = viewModel::toggleSubtaskCompletion,
+                onAddSubtask = viewModel::addInlineSubtask,
                 onBulkComplete = viewModel::agendaBulkComplete,
                 onBulkArchive = viewModel::agendaBulkArchive,
                 onBulkDelete = viewModel::agendaBulkDelete,
                 onNavigateToCreateForDay = onNavigateToCreateForDay,
+                expandedTaskIds = expandedTaskIds,
+                subtasksByTaskId = subtasksByTaskId,
             )
         } else {
             SinglePaneCalendarContent(
@@ -274,6 +282,8 @@ fun CalendarScreen(
                 isSelectionMode = isSelectionMode,
                 selectedIds = selectedIds,
                 selectedCount = selectedCount,
+                expandedTaskIds = expandedTaskIds,
+                subtasksByTaskId = subtasksByTaskId,
                 isAgendaOpen = isAgendaOpen,
                 snackbarHostState = snackbarHostState,
                 bottomBarPadding = bottomBarPadding,
@@ -307,6 +317,9 @@ fun CalendarScreen(
                 },
                 onLongPressTask = viewModel::onAgendaLongPress,
                 onToggleSelection = viewModel::onAgendaToggleSelection,
+                onToggleExpandTask = viewModel::toggleTaskExpanded,
+                onToggleSubtask = viewModel::toggleSubtaskCompletion,
+                onAddSubtask = viewModel::addInlineSubtask,
                 onBulkComplete = viewModel::agendaBulkComplete,
                 onBulkArchive = viewModel::agendaBulkArchive,
                 onBulkDelete = viewModel::agendaBulkDelete,
@@ -338,10 +351,15 @@ private fun TwoPaneCalendarContent(
     onAddTaskClick: () -> Unit,
     onLongPressTask: (Long) -> Unit,
     onToggleSelection: (Long) -> Unit,
+    onToggleExpandTask: (Long) -> Unit = {},
+    onToggleSubtask: (subtaskId: Long, completed: Boolean) -> Unit = { _, _ -> },
+    onAddSubtask: (taskId: Long, title: String) -> Unit = { _, _ -> },
     onBulkComplete: () -> Unit,
     onBulkArchive: () -> Unit,
     onBulkDelete: () -> Unit,
     onNavigateToCreateForDay: (Long) -> Unit,
+    expandedTaskIds: Set<Long> = emptySet(),
+    subtasksByTaskId: Map<Long, List<Subtask>> = emptyMap(),
 ) {
     val monthPaneTitle = stringResource(R.string.cd_calendar_month_pane)
     val agendaPaneTitle = stringResource(R.string.cd_calendar_agenda_pane)
@@ -417,8 +435,13 @@ private fun TwoPaneCalendarContent(
                     isSelectionMode = isSelectionMode,
                     selectedIds = selectedIds,
                     selectedCount = selectedCount,
+                    expandedTaskIds = expandedTaskIds,
+                    subtasksByTaskId = subtasksByTaskId,
                     onLongPressTask = onLongPressTask,
                     onToggleSelection = onToggleSelection,
+                    onToggleExpandTask = onToggleExpandTask,
+                    onToggleSubtask = onToggleSubtask,
+                    onAddSubtask = onAddSubtask,
                     onBulkComplete = onBulkComplete,
                     onBulkArchive = onBulkArchive,
                     onBulkDelete = onBulkDelete,
@@ -476,6 +499,11 @@ private fun SinglePaneCalendarContent(
     onBulkArchive: () -> Unit,
     onBulkDelete: () -> Unit,
     onNavigateToCreateForDay: (Long) -> Unit,
+    expandedTaskIds: Set<Long> = emptySet(),
+    subtasksByTaskId: Map<Long, List<Subtask>> = emptyMap(),
+    onToggleExpandTask: (Long) -> Unit = {},
+    onToggleSubtask: (subtaskId: Long, completed: Boolean) -> Unit = { _, _ -> },
+    onAddSubtask: (taskId: Long, title: String) -> Unit = { _, _ -> },
 ) {
     Column(
         modifier = Modifier
@@ -520,8 +548,13 @@ private fun SinglePaneCalendarContent(
             isSelectionMode = isSelectionMode,
             selectedIds = selectedIds,
             selectedCount = selectedCount,
+            expandedTaskIds = expandedTaskIds,
+            subtasksByTaskId = subtasksByTaskId,
             onLongPressTask = onLongPressTask,
             onToggleSelection = onToggleSelection,
+            onToggleExpandTask = onToggleExpandTask,
+            onToggleSubtask = onToggleSubtask,
+            onAddSubtask = onAddSubtask,
             onBulkComplete = onBulkComplete,
             onBulkArchive = onBulkArchive,
             onBulkDelete = onBulkDelete,
