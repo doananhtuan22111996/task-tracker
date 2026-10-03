@@ -19,6 +19,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
 /**
@@ -39,6 +40,10 @@ class TaskListStateManager @Inject constructor(
     // Sort state
     private val _currentSort = MutableStateFlow(DEFAULT_SORT)
     val currentSort: StateFlow<TaskSort> = _currentSort.asStateFlow()
+
+    // Expanded task IDs state
+    private val _expandedTaskIds = MutableStateFlow<Set<Long>>(emptySet())
+    val expandedTaskIds: StateFlow<Set<Long>> = _expandedTaskIds.asStateFlow()
 
     /**
      * Initialize state flows for a given coroutine scope (typically ViewModel scope)
@@ -101,7 +106,28 @@ class TaskListStateManager @Inject constructor(
             hasActiveFilter = hasActiveFilter,
             hasActiveTagFilter = hasActiveTagFilter,
             isLoading = crudUseCase.isLoading,
+            expandedTaskIds = expandedTaskIds,
         )
+    }
+
+    // === Task Expansion Operations ===
+    fun toggleTaskExpanded(taskId: Long) {
+        _expandedTaskIds.update { current ->
+            if (current.contains(taskId)) current - taskId else current + taskId
+        }
+    }
+
+    fun collapseTask(taskId: Long) {
+        _expandedTaskIds.update { current -> current - taskId }
+    }
+
+    fun collapseTasks(taskIds: Collection<Long>) {
+        if (taskIds.isEmpty()) return
+        _expandedTaskIds.update { current -> current - taskIds.toSet() }
+    }
+
+    fun collapseAll() {
+        _expandedTaskIds.value = emptySet()
     }
 
     // === Sort Operations ===
@@ -162,4 +188,5 @@ data class TaskListState(
     val hasActiveFilter: StateFlow<Boolean>,
     val hasActiveTagFilter: StateFlow<Boolean>,
     val isLoading: StateFlow<Boolean>,
+    val expandedTaskIds: StateFlow<Set<Long>> = MutableStateFlow(emptySet()),
 )

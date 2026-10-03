@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dev.tuandoan.tasktracker.R
+import dev.tuandoan.tasktracker.data.database.Subtask
 import dev.tuandoan.tasktracker.data.database.SubtaskProgress
 import dev.tuandoan.tasktracker.data.database.Task
 import dev.tuandoan.tasktracker.data.preferences.SettingsRepository
@@ -78,6 +79,15 @@ class TaskViewModel @Inject constructor(
     // Subtask progress map: taskId → SubtaskProgress (for inline "m/n" indicator on the list row).
     // Tasks with zero subtasks are absent; the UI treats a missing entry as "no indicator".
     val subtaskProgressMap: StateFlow<Map<Long, SubtaskProgress>> = subtaskUseCase.observeProgressByTaskId()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = emptyMap(),
+        )
+
+    val expandedTaskIds: StateFlow<Set<Long>> = listState.expandedTaskIds
+
+    val subtasksByTaskId: StateFlow<Map<Long, List<Subtask>>> = subtaskUseCase.observeSubtasksByTaskId()
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),
@@ -264,6 +274,7 @@ class TaskViewModel @Inject constructor(
     fun confirmDeleteTask() {
         val task = _pendingDeleteTask.value ?: return
         _pendingDeleteTask.value = null
+        listStateManager.collapseTask(task.id)
 
         crudManager.executeOperation(
             scope = viewModelScope,
@@ -296,6 +307,7 @@ class TaskViewModel @Inject constructor(
     fun confirmArchiveTask() {
         val task = _pendingDeleteTask.value ?: return
         _pendingDeleteTask.value = null
+        listStateManager.collapseTask(task.id)
 
         crudManager.executeOperation(
             scope = viewModelScope,
@@ -354,7 +366,10 @@ class TaskViewModel @Inject constructor(
 
     fun requestBulkArchive() = bulkActionManager.requestBulkArchive(allTasks.value)
 
-    fun confirmBulkArchive() = bulkActionManager.confirmBulkArchive(viewModelScope)
+    fun confirmBulkArchive() {
+        listStateManager.collapseTasks(selectionState.selectedIds.value)
+        bulkActionManager.confirmBulkArchive(viewModelScope)
+    }
 
     fun cancelBulkArchive() = bulkActionManager.cancelBulkArchive()
 
@@ -366,6 +381,9 @@ class TaskViewModel @Inject constructor(
     }
 
     fun toggleTaskCompletion(task: Task) {
+        if (!task.isCompleted) {
+            listStateManager.collapseTask(task.id)
+        }
         crudManager.executeOperation(
             scope = viewModelScope,
             operation = { crudManager.toggleTaskCompletion(task) },
@@ -451,7 +469,10 @@ class TaskViewModel @Inject constructor(
 
     // === Bulk Actions ===
 
-    fun bulkMarkCompleted() = bulkActionManager.bulkMarkCompleted(viewModelScope)
+    fun bulkMarkCompleted() {
+        listStateManager.collapseTasks(selectionState.selectedIds.value)
+        bulkActionManager.bulkMarkCompleted(viewModelScope)
+    }
 
     fun bulkMarkActive() = bulkActionManager.bulkMarkActive(viewModelScope)
 
@@ -461,7 +482,10 @@ class TaskViewModel @Inject constructor(
 
     fun requestBulkDelete() = bulkActionManager.requestBulkDelete(allTasks.value)
 
-    fun confirmBulkDelete() = bulkActionManager.confirmBulkDelete(viewModelScope)
+    fun confirmBulkDelete() {
+        listStateManager.collapseTasks(selectionState.selectedIds.value)
+        bulkActionManager.confirmBulkDelete(viewModelScope)
+    }
 
     fun cancelBulkDelete() = bulkActionManager.cancelBulkDelete()
 
@@ -503,6 +527,26 @@ class TaskViewModel @Inject constructor(
 
     fun setTipTagChipsShown() {
         viewModelScope.launch { settingsRepository.setTipShown(SettingsRepository.TipKeys.TAG_CHIPS) }
+    }
+
+    // === Subtask & Expansion Operations ===
+
+    fun toggleTaskExpanded(taskId: Long) = listStateManager.toggleTaskExpanded(taskId)
+
+    fun toggleSubtaskCompletion(subtaskId: Long, completed: Boolean) {
+        viewModelScope.launch {
+            subtaskUseCase.setCompleted(subtaskId, completed)
+        }
+    }
+
+    fun addInlineSubtask(taskId: Long, title: String) {
+        viewModelScope.launch {
+            val result = subtaskUseCase.addSubtask(taskId, title)
+            result.onFailure { error ->
+                val message = error.message ?: context.getString(R.string.error_add_subtask)
+                _singleTaskUiEvent.emit(UiEvent.ShowSnackbar(message))
+            }
+        }
     }
 
     // === Error Management ===

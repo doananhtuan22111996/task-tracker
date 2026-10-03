@@ -340,4 +340,63 @@ class TaskListStateManagerTest {
         manager.setFilter(TaskFilter.COMPLETED)
         assertEquals(TaskFilter.COMPLETED, filterUseCase.filter.value)
     }
+
+    // === Task Expansion Operations ===
+
+    @Test
+    fun `expandedTaskIds initially empty`() {
+        assertTrue(manager.expandedTaskIds.value.isEmpty())
+    }
+
+    @Test
+    fun `toggleTaskExpanded toggles task expansion state`() {
+        manager.toggleTaskExpanded(10L)
+        assertEquals(setOf(10L), manager.expandedTaskIds.value)
+
+        manager.toggleTaskExpanded(10L)
+        assertTrue(manager.expandedTaskIds.value.isEmpty())
+    }
+
+    @Test
+    fun `toggleTaskExpanded can expand multiple distinct tasks`() {
+        manager.toggleTaskExpanded(10L)
+        manager.toggleTaskExpanded(20L)
+        assertEquals(setOf(10L, 20L), manager.expandedTaskIds.value)
+    }
+
+    @Test
+    fun `collapseTask removes specific task from expanded set`() {
+        manager.toggleTaskExpanded(10L)
+        manager.toggleTaskExpanded(20L)
+        manager.collapseTask(10L)
+
+        assertEquals(setOf(20L), manager.expandedTaskIds.value)
+    }
+
+    @Test
+    fun `collapseTasks removes multiple tasks from expanded set`() {
+        manager.toggleTaskExpanded(10L)
+        manager.toggleTaskExpanded(20L)
+        manager.toggleTaskExpanded(30L)
+        manager.collapseTasks(listOf(10L, 30L))
+
+        assertEquals(setOf(20L), manager.expandedTaskIds.value)
+    }
+
+    @Test
+    fun `collapseAll clears all expanded tasks`() {
+        manager.toggleTaskExpanded(10L)
+        manager.toggleTaskExpanded(20L)
+        manager.collapseAll()
+
+        assertTrue(manager.expandedTaskIds.value.isEmpty())
+    }
+
+    @Test
+    fun `initializeStateFlows exposes expandedTaskIds in TaskListState`() = runTest {
+        val state = manager.initializeStateFlows(backgroundScope)
+        manager.toggleTaskExpanded(42L)
+
+        assertEquals(setOf(42L), state.expandedTaskIds.value)
+    }
 }

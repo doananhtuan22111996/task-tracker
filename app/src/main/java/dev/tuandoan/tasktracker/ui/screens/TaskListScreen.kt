@@ -107,6 +107,8 @@ fun TaskListScreen(
     // Streak data
     val streakMap by viewModel.streakMap.collectAsStateWithLifecycle()
     val subtaskProgressMap by viewModel.subtaskProgressMap.collectAsStateWithLifecycle()
+    val expandedTaskIds by viewModel.expandedTaskIds.collectAsStateWithLifecycle()
+    val subtasksByTaskId by viewModel.subtasksByTaskId.collectAsStateWithLifecycle()
 
     // Feature tips state
     val userPrefs by viewModel.userPreferences.collectAsStateWithLifecycle()
@@ -287,6 +289,8 @@ fun TaskListScreen(
             isSelectionMode = isSelectionMode,
             streakMap = streakMap,
             subtaskProgressMap = subtaskProgressMap,
+            expandedTaskIds = expandedTaskIds,
+            subtasksByTaskId = subtasksByTaskId,
             showFabTip = !userPrefs.tipFabShown && allTasks.isEmpty(),
             showTagTip = !userPrefs.tipTagChipsShown && availableTags.isNotEmpty(),
             fabTipText = stringResource(R.string.tip_fab_create_task),
@@ -304,6 +308,9 @@ fun TaskListScreen(
             onPinTask = viewModel::toggleTaskPin,
             onLongPressTask = viewModel::enterSelection,
             onToggleSelection = viewModel::toggleSelection,
+            onToggleExpandTask = viewModel::toggleTaskExpanded,
+            onToggleSubtask = viewModel::toggleSubtaskCompletion,
+            onAddSubtask = viewModel::addInlineSubtask,
             bottomBarPadding = bottomBarPadding,
             modifier = Modifier.padding(paddingValues),
         )

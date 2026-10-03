@@ -23,6 +23,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import dev.tuandoan.tasktracker.data.database.Subtask
 import dev.tuandoan.tasktracker.data.database.SubtaskProgress
 import dev.tuandoan.tasktracker.data.database.Task
 import dev.tuandoan.tasktracker.ui.theme.AppSpacing
@@ -51,6 +52,8 @@ fun TaskListContent(
     isSelectionMode: Boolean,
     streakMap: Map<Long, Int> = emptyMap(),
     subtaskProgressMap: Map<Long, SubtaskProgress> = emptyMap(),
+    expandedTaskIds: Set<Long> = emptySet(),
+    subtasksByTaskId: Map<Long, List<Subtask>> = emptyMap(),
     showFabTip: Boolean = false,
     showTagTip: Boolean = false,
     fabTipText: String = "",
@@ -68,6 +71,9 @@ fun TaskListContent(
     onDuplicateTask: (Task) -> Unit,
     onSkipOccurrence: (Task) -> Unit = {},
     onToggleSelection: (Long) -> Unit,
+    onToggleExpandTask: (Long) -> Unit = {},
+    onToggleSubtask: (subtaskId: Long, completed: Boolean) -> Unit = { _, _ -> },
+    onAddSubtask: (taskId: Long, title: String) -> Unit = { _, _ -> },
     bottomBarPadding: Dp = 0.dp,
     modifier: Modifier = Modifier,
 ) {
@@ -177,6 +183,11 @@ fun TaskListContent(
                             subtaskProgress = subtaskProgressMap[task.id],
                             isSelected = selectedIds.contains(task.id),
                             isSelectionMode = isSelectionMode,
+                            isExpanded = expandedTaskIds.contains(task.id),
+                            subtasks = subtasksByTaskId[task.id] ?: emptyList(),
+                            onToggleExpand = { onToggleExpandTask(task.id) },
+                            onToggleSubtask = onToggleSubtask,
+                            onAddSubtask = { title -> onAddSubtask(task.id, title) },
                             onToggleComplete = { onToggleTaskComplete(task) },
                             onEditClick = { onEditTask(task) },
                             onArchiveClick = { onArchiveTask(task) },
