@@ -49,6 +49,8 @@ class TaskEditorViewModel @Inject constructor(
     companion object {
         private const val TASK_ID_ARG = "taskId"
         private const val INITIAL_DUE_AT_ARG = "initialDueAt"
+        private const val INITIAL_TITLE_ARG = "initialTitle"
+        private const val INITIAL_DESCRIPTION_ARG = "initialDescription"
     }
 
     private val taskId: Long? = savedStateHandle.get<Long>(TASK_ID_ARG)
@@ -59,6 +61,12 @@ class TaskEditorViewModel @Inject constructor(
      */
     private val initialDueAt: Long? = savedStateHandle.get<Long>(INITIAL_DUE_AT_ARG)
         ?.takeIf { it >= 0L }
+
+    /** Optional prefilled title for quick capture from Share Target (CAP-01). */
+    private val initialTitle: String? = savedStateHandle.get<String>(INITIAL_TITLE_ARG)
+
+    /** Optional prefilled description for quick capture from Share Target (CAP-01). */
+    private val initialDescription: String? = savedStateHandle.get<String>(INITIAL_DESCRIPTION_ARG)
 
     // Form fields
     private val _taskTitle = MutableStateFlow("")
@@ -242,10 +250,20 @@ class TaskEditorViewModel @Inject constructor(
     init {
         if (isEditMode && taskId != null) {
             loadTask(taskId)
-        } else if (initialDueAt != null) {
-            _dueAt.value = initialDueAt
-            _dueAtHasTime.value = false
-            updateHasChanges()
+        } else {
+            if (initialDueAt != null) {
+                _dueAt.value = initialDueAt
+                _dueAtHasTime.value = false
+            }
+            if (!initialTitle.isNullOrBlank()) {
+                _taskTitle.value = initialTitle.take(TaskFormUseCase.MAX_TITLE_LENGTH)
+            }
+            if (!initialDescription.isNullOrBlank()) {
+                _taskDescription.value = initialDescription.take(TaskFormUseCase.MAX_DESCRIPTION_LENGTH)
+            }
+            if (initialDueAt != null || !initialTitle.isNullOrBlank() || !initialDescription.isNullOrBlank()) {
+                updateHasChanges()
+            }
         }
     }
 

@@ -17,11 +17,12 @@ object TaskTrackerRoutes {
     const val TASK_EDITOR_CREATE = "task_editor"
 
     /**
-     * Route pattern with an optional `initialDueAt` query arg — used by the composable
-     * registration. `TASK_EDITOR_CREATE` without the query still matches because the
-     * `?initialDueAt=...` segment is optional at the Nav level.
+     * Route pattern with optional `initialDueAt`, `initialTitle`, and `initialDescription` query
+     * args — used by the composable registration. `TASK_EDITOR_CREATE` without queries still
+     * matches because query segments are optional at the Nav level.
      */
-    const val TASK_EDITOR_CREATE_PATTERN = "task_editor?initialDueAt={initialDueAt}"
+    const val TASK_EDITOR_CREATE_PATTERN =
+        "task_editor?initialDueAt={initialDueAt}&initialTitle={initialTitle}&initialDescription={initialDescription}"
     const val TASK_EDITOR_EDIT = "task_editor/{taskId}"
 
     /**
@@ -30,9 +31,36 @@ object TaskTrackerRoutes {
     fun taskEditorEdit(taskId: Long): String = "task_editor/$taskId"
 
     /**
+     * Creates the create route with optional prefilled due date, title, and description (CAP-01).
+     */
+    fun taskEditorCreate(
+        initialDueAt: Long? = null,
+        initialTitle: String? = null,
+        initialDescription: String? = null,
+    ): String {
+        val queryParams = mutableListOf<String>()
+        if (initialDueAt != null) {
+            queryParams.add("initialDueAt=$initialDueAt")
+        }
+        if (!initialTitle.isNullOrEmpty()) {
+            val encoded = java.net.URLEncoder.encode(initialTitle, "UTF-8").replace("+", "%20")
+            queryParams.add("initialTitle=$encoded")
+        }
+        if (!initialDescription.isNullOrEmpty()) {
+            val encoded = java.net.URLEncoder.encode(initialDescription, "UTF-8").replace("+", "%20")
+            queryParams.add("initialDescription=$encoded")
+        }
+        return if (queryParams.isEmpty()) {
+            TASK_EDITOR_CREATE
+        } else {
+            "$TASK_EDITOR_CREATE?${queryParams.joinToString("&")}"
+        }
+    }
+
+    /**
      * Creates the create route with a prefilled due date (epoch millis at start-of-day).
      */
-    fun taskEditorCreateWithDueDate(initialDueAt: Long): String = "task_editor?initialDueAt=$initialDueAt"
+    fun taskEditorCreateWithDueDate(initialDueAt: Long): String = taskEditorCreate(initialDueAt = initialDueAt)
 
     /**
      * Creates the task list route with an optional stats filter.
