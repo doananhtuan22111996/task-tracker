@@ -224,6 +224,11 @@
     <string name="error_subtask_save">Không thể lưu một số công việc phụ: %1$s</string>
     <string name="label_subtask_progress">%1$d / %2$d</string>
     <string name="cd_subtask_progress">Đã hoàn thành %1$d trên %2$d công việc phụ</string>
+    <string name="cd_expand_subtasks">Mở rộng công việc phụ</string>
+    <string name="cd_collapse_subtasks">Thu gọn công việc phụ</string>
+    <string name="subtask_add_hint">Thêm công việc phụ…</string>
+    <string name="cd_add_subtask">Thêm công việc phụ</string>
+    <string name="error_add_subtask">Không thể thêm công việc phụ</string>
 
     <!-- Priority -->
     <string name="priority_low">Thấp</string>
@@ -474,6 +479,8 @@
     <string name="help_a_change_priority">Mở trình chỉnh sửa công việc (nhấn vào một công việc) và chọn Thấp, Trung bình hoặc Cao.</string>
     <string name="help_q_multi_select">Tôi có thể chọn nhiều công việc cùng lúc không?</string>
     <string name="help_a_multi_select">Có. Nhấn giữ bất kỳ công việc nào để vào chế độ chọn nhiều, rồi nhấn vào các công việc để chọn.</string>
+    <string name="help_q_share_target">Làm thế nào để tạo công việc từ các ứng dụng khác?</string>
+    <string name="help_a_share_target">Nhấn Chia sẻ trong bất kỳ ứng dụng nào (chẳng hạn Chrome hoặc Ghi chú) và chọn Task Tracker. Liên kết sẽ tự động được đưa vào phần mô tả và tiêu đề được điền sẵn.</string>
     <string name="help_section_calendar">Lịch</string>
     <string name="help_q_calendar_where">Chế độ xem lịch nằm ở đâu?</string>
     <string name="help_a_calendar_where">Nhấn vào tab Lịch trên thanh điều hướng dưới cùng để xem các công việc trên lưới tháng. Nhấn vào bất kỳ ngày nào để mở lịch trình của ngày đó.</string>
@@ -488,6 +495,8 @@
     <string name="help_section_subtasks">Công việc phụ</string>
     <string name="help_q_add_subtasks">Làm thế nào để thêm công việc phụ vào một công việc?</string>
     <string name="help_a_add_subtasks">Mở một công việc và kéo xuống phần Công việc phụ. Gõ vào ô "Thêm công việc phụ" rồi nhấn Xong để thêm mục tiếp theo.</string>
+    <string name="help_q_inline_subtasks">Tôi có thể xem và hoàn thành công việc phụ mà không cần mở trình chỉnh sửa không?</string>
+    <string name="help_a_inline_subtasks">Có. Nhấn vào biểu tượng mũi tên mở rộng trên bất kỳ thẻ công việc nào trong danh sách hoặc lịch để xem, đánh dấu hoặc thêm công việc phụ trực tiếp.</string>
     <string name="help_q_reorder_subtasks">Tôi có thể sắp xếp lại các công việc phụ không?</string>
     <string name="help_a_reorder_subtasks">Có. Nhấn giữ biểu tượng kéo ở bên phải một công việc phụ và kéo. Với TalkBack, dùng các hành động "Di chuyển lên" / "Di chuyển xuống".</string>
     <string name="help_q_subtasks_recurrence">Điều gì xảy ra với các công việc phụ khi một công việc lặp lại được tạo lại?</string>

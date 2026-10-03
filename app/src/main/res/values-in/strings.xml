@@ -224,6 +224,11 @@
     <string name="error_subtask_save">Beberapa subtugas tidak dapat disimpan: %1$s</string>
     <string name="label_subtask_progress">%1$d / %2$d</string>
     <string name="cd_subtask_progress">%1$d dari %2$d subtugas selesai</string>
+    <string name="cd_expand_subtasks">Perluas subtugas</string>
+    <string name="cd_collapse_subtasks">Ciutkan subtugas</string>
+    <string name="subtask_add_hint">Tambah subtugas…</string>
+    <string name="cd_add_subtask">Tambah subtugas</string>
+    <string name="error_add_subtask">Gagal menambahkan subtugas</string>
 
     <!-- Priority -->
     <string name="priority_low">Rendah</string>
@@ -474,6 +479,8 @@
     <string name="help_a_change_priority">Buka editor tugas (ketuk tugas) dan pilih Rendah, Sedang, atau Tinggi.</string>
     <string name="help_q_multi_select">Bisakah saya memilih beberapa tugas sekaligus?</string>
     <string name="help_a_multi_select">Ya. Tekan lama pada tugas mana pun untuk masuk ke mode pilih ganda, lalu ketuk tugas untuk memilihnya.</string>
+    <string name="help_q_share_target">Bagaimana cara membuat tugas dari aplikasi lain?</string>
+    <string name="help_a_share_target">Ketuk Bagikan di aplikasi mana pun (seperti Chrome atau Catatan) dan pilih Task Tracker. Tautan otomatis ditempatkan di deskripsi dan judul sudah terisi sebelumnya.</string>
     <string name="help_section_calendar">Kalender</string>
     <string name="help_q_calendar_where">Di mana tampilan kalender?</string>
     <string name="help_a_calendar_where">Ketuk tab Kalender di navigasi bawah untuk melihat tugas Anda pada grid bulanan. Ketuk hari mana pun untuk membuka agenda harinya.</string>
@@ -488,6 +495,8 @@
     <string name="help_section_subtasks">Subtugas</string>
     <string name="help_q_add_subtasks">Bagaimana menambahkan subtugas ke sebuah tugas?</string>
     <string name="help_a_add_subtasks">Buka tugas dan gulir ke bagian Subtugas. Ketik di baris "Tambah subtugas" dan tekan Selesai untuk menambah lagi.</string>
+    <string name="help_q_inline_subtasks">Bisakah saya melihat dan menyelesaikan subtugas tanpa membuka editor?</string>
+    <string name="help_a_inline_subtasks">Ya. Ketuk ikon panah perluas pada kartu tugas mana pun di daftar tugas atau agenda kalender untuk melihat, mencentang, atau menambahkan subtugas secara langsung.</string>
     <string name="help_q_reorder_subtasks">Apakah saya bisa mengurutkan ulang subtugas?</string>
     <string name="help_a_reorder_subtasks">Ya. Tekan lama gagang seret di sisi kanan subtugas dan seret. Dengan TalkBack, gunakan aksi "Pindah ke atas" / "Pindah ke bawah".</string>
     <string name="help_q_subtasks_recurrence">Apa yang terjadi pada subtugas saat tugas berulang dibuat ulang?</string>

@@ -224,6 +224,11 @@
     <string name="error_subtask_save">Certaines sous-tâches n\'ont pas pu être enregistrées : %1$s</string>
     <string name="label_subtask_progress">%1$d / %2$d</string>
     <string name="cd_subtask_progress">%1$d sur %2$d sous-tâches terminées</string>
+    <string name="cd_expand_subtasks">Développer les sous-tâches</string>
+    <string name="cd_collapse_subtasks">Réduire les sous-tâches</string>
+    <string name="subtask_add_hint">Ajouter une sous-tâche…</string>
+    <string name="cd_add_subtask">Ajouter une sous-tâche</string>
+    <string name="error_add_subtask">Impossible d\'ajouter la sous-tâche</string>
 
     <!-- Priority -->
     <string name="priority_low">Faible</string>
@@ -474,6 +479,8 @@
     <string name="help_a_change_priority">Ouvrez l\'éditeur de tâches (touchez une tâche) et sélectionnez Faible, Moyenne ou Élevée.</string>
     <string name="help_q_multi_select">Puis-je sélectionner plusieurs tâches à la fois ?</string>
     <string name="help_a_multi_select">Oui. Appuyez longuement sur une tâche pour activer le mode de sélection multiple, puis touchez les tâches à sélectionner.</string>
+    <string name="help_q_share_target">Comment créer des tâches depuis d\'autres applications ?</string>
+    <string name="help_a_share_target">Appuyez sur Partager dans n\'importe quelle application (comme Chrome ou Notes) et sélectionnez Task Tracker. Les liens sont automatiquement placés dans la description et les titres pré-remplis.</string>
     <string name="help_section_calendar">Calendrier</string>
     <string name="help_q_calendar_where">Où se trouve la vue calendrier ?</string>
     <string name="help_a_calendar_where">Touchez l\'onglet Calendrier dans la barre de navigation inférieure pour voir vos tâches sur une grille mensuelle. Touchez un jour pour ouvrir son agenda.</string>
@@ -488,6 +495,8 @@
     <string name="help_section_subtasks">Sous-tâches</string>
     <string name="help_q_add_subtasks">Comment ajouter des sous-tâches à une tâche ?</string>
     <string name="help_a_add_subtasks">Ouvrez une tâche et faites défiler jusqu\'à la section Sous-tâches. Saisissez dans la ligne « Ajouter une sous-tâche » et appuyez sur OK pour en ajouter une autre.</string>
+    <string name="help_q_inline_subtasks">Puis-je afficher et terminer des sous-tâches sans ouvrir l\'éditeur ?</string>
+    <string name="help_a_inline_subtasks">Oui. Appuyez sur le chevron de développement sur n\'importe quelle carte de tâche pour afficher, cocher ou ajouter des sous-tâches directement.</string>
     <string name="help_q_reorder_subtasks">Puis-je réorganiser les sous-tâches ?</string>
     <string name="help_a_reorder_subtasks">Oui. Appuyez longuement sur la poignée à droite d\'une sous-tâche et faites-la glisser. Avec TalkBack, utilisez les actions « Déplacer vers le haut » / « Déplacer vers le bas ».</string>
     <string name="help_q_subtasks_recurrence">Que deviennent les sous-tâches quand une tâche récurrente se régénère ?</string>

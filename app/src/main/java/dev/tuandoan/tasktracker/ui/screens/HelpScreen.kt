@@ -53,6 +53,7 @@ private val faqSections = listOf(
             FaqItem(R.string.help_q_filter_by_tag, R.string.help_a_filter_by_tag),
             FaqItem(R.string.help_q_change_priority, R.string.help_a_change_priority),
             FaqItem(R.string.help_q_multi_select, R.string.help_a_multi_select),
+            FaqItem(R.string.help_q_share_target, R.string.help_a_share_target),
         ),
     ),
     FaqSection(
@@ -71,6 +72,7 @@ private val faqSections = listOf(
         HelpFaqSection.SUBTASKS,
         listOf(
             FaqItem(R.string.help_q_add_subtasks, R.string.help_a_add_subtasks),
+            FaqItem(R.string.help_q_inline_subtasks, R.string.help_a_inline_subtasks),
             FaqItem(R.string.help_q_reorder_subtasks, R.string.help_a_reorder_subtasks),
             FaqItem(R.string.help_q_subtasks_recurrence, R.string.help_a_subtasks_recurrence),
             FaqItem(R.string.help_q_subtasks_autocomplete, R.string.help_a_subtasks_autocomplete),

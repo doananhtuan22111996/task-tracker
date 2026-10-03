@@ -5,6 +5,27 @@ Format follows [Keep a Changelog](https://keepachangelog.com).
 
 ## [Unreleased]
 
+## [1.15.0] - 2026-10-03
+
+### Notes
+- **What's new:**
+  - **Inline Subtask Management (ST-31, ST-32, ST-33, ST-34):** View, toggle, and add subtasks directly from task cards on the main task list and calendar day agenda. Tapping the expand affordance reveals subtasks inline without having to open the task editor.
+  - **Quick Capture via Android Share Target (CAP-01):** Share text, notes, and links from any app (such as Chrome, browsers, or notes apps) into Task Tracker via the system share sheet, automatically prefilling task titles and descriptions.
+  - **Help & FAQ Updates (REL-15):** Added dedicated FAQ entries explaining Share Target task creation and inline subtask management, fully translated across all 8 supported languages.
+
+### Added
+- reactive subtask queries in Room DAO and repository (`observeSubtasksByTaskId`, `observeAllSubtasksGroupedByTaskId`) to stream real-time subtask updates (ST-31)
+- `InlineSubtaskList` composable with smooth animated expand/collapse, checkbox toggle, and inline subtask quick-add field (ST-32)
+- expand/collapse chevron and progress badge affordance on `TaskItem` (ST-32)
+- inline subtask state and interaction wiring in `TaskListScreen` and `TaskListViewModel` (ST-33)
+- inline subtasks support in `CalendarScreen` and `DayAgendaItemRow` (ST-34)
+- Android system Share Target (`ACTION_SEND` intent filter with `text/plain`) handling in `MainActivity` with URL parsing and prefill support (CAP-01)
+- FAQ entries in `HelpScreen` covering Android share target capture and inline subtask operations (REL-15)
+- full localization of all new strings across 7 non-English locales: German, Spanish, French, Hindi, Indonesian, Portuguese, Vietnamese (REL-15)
+
+### Changed
+- bumped `versionMinor` to 15 (`v1.15.0`, `versionCode 1,789,811,500`) (REL-15)
+
 ## [1.14.0] - 2026-09-20
 
 ### Notes

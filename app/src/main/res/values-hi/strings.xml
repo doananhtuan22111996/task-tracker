@@ -224,6 +224,11 @@
     <string name="error_subtask_save">कुछ उप-कार्य सहेजे नहीं जा सके: %1$s</string>
     <string name="label_subtask_progress">%1$d / %2$d</string>
     <string name="cd_subtask_progress">%2$d में से %1$d उप-कार्य पूर्ण</string>
+    <string name="cd_expand_subtasks">उप-कार्य विस्तृत करें</string>
+    <string name="cd_collapse_subtasks">उप-कार्य संक्षिप्त करें</string>
+    <string name="subtask_add_hint">उप-कार्य जोड़ें…</string>
+    <string name="cd_add_subtask">उप-कार्य जोड़ें</string>
+    <string name="error_add_subtask">उप-कार्य जोड़ने में विफल</string>
 
     <!-- Priority -->
     <string name="priority_low">कम</string>
@@ -474,6 +479,8 @@
     <string name="help_a_change_priority">कार्य संपादक खोलें (किसी कार्य पर टैप करें) और कम, मध्यम या उच्च चुनें।</string>
     <string name="help_q_multi_select">क्या मैं एक साथ कई कार्य चुन सकता हूँ?</string>
     <string name="help_a_multi_select">हाँ। बहु-चयन मोड में प्रवेश करने के लिए किसी भी कार्य को देर तक दबाएँ, फिर चयन करने के लिए कार्यों पर टैप करें।</string>
+    <string name="help_q_share_target">मैं अन्य ऐप्स से कार्य कैसे बना सकता हूँ?</string>
+    <string name="help_a_share_target">किसी भी ऐप (जैसे क्रोम या नोट्स) में शेयर पर टैप करें और Task Tracker चुनें। लिंक स्वचालित रूप से विवरण में रखे जाते हैं और शीर्षक पहले से भर दिए जाते हैं।</string>
     <string name="help_section_calendar">कैलेंडर</string>
     <string name="help_q_calendar_where">कैलेंडर दृश्य कहाँ है?</string>
     <string name="help_a_calendar_where">अपने कार्यों को मासिक ग्रिड पर देखने के लिए नीचे के नेविगेशन में कैलेंडर टैब पर टैप करें। किसी भी दिन पर टैप करके उस दिन का एजेंडा खोलें।</string>
@@ -488,6 +495,8 @@
     <string name="help_section_subtasks">उप-कार्य</string>
     <string name="help_q_add_subtasks">मैं किसी कार्य में उप-कार्य कैसे जोड़ूँ?</string>
     <string name="help_a_add_subtasks">कोई कार्य खोलें और उप-कार्य अनुभाग तक स्क्रॉल करें। "उप-कार्य जोड़ें" पंक्ति में टाइप करें और अधिक जोड़ने के लिए Done दबाएँ।</string>
+    <string name="help_q_inline_subtasks">क्या मैं संपादक खोले बिना उप-कार्यों को देख और पूरा कर सकता हूँ?</string>
+    <string name="help_a_inline_subtasks">हाँ। कार्य सूची या कैलेंडर एजेंडा पर किसी भी कार्य कार्ड पर विस्तार शेवरॉन पर टैप करके उप-कार्यों को सीधे देखें, चिह्नित करें या जोड़ें।</string>
     <string name="help_q_reorder_subtasks">क्या मैं उप-कार्यों का क्रम बदल सकता हूँ?</string>
     <string name="help_a_reorder_subtasks">हाँ। किसी भी उप-कार्य के दाहिनी ओर दिए गए ड्रैग हैंडल को देर तक दबाकर खींचें। TalkBack के साथ "ऊपर ले जाएँ" / "नीचे ले जाएँ" क्रियाएँ उपयोग करें।</string>
     <string name="help_q_subtasks_recurrence">जब कोई आवर्ती कार्य पुनः उत्पन्न होता है तो उप-कार्यों का क्या होता है?</string>
