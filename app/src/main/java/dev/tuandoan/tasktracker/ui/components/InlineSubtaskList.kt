@@ -40,6 +40,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import dev.tuandoan.tasktracker.R
 import dev.tuandoan.tasktracker.data.database.Subtask
+import dev.tuandoan.tasktracker.domain.usecase.SubtaskUseCase
 
 /**
  * Renders an inline subtask checklist for a task card.
@@ -137,7 +138,11 @@ private fun InlineAddSubtaskRow(onAddSubtask: (title: String) -> Unit, modifier:
 
     OutlinedTextField(
         value = text,
-        onValueChange = { text = it },
+        onValueChange = { newText ->
+            if (newText.length <= SubtaskUseCase.MAX_TITLE_LENGTH) {
+                text = newText
+            }
+        },
         modifier = modifier.fillMaxWidth(),
         placeholder = {
             Text(
@@ -182,9 +187,10 @@ private fun InlineAddSubtaskRow(onAddSubtask: (title: String) -> Unit, modifier:
 /**
  * Sanitizes input for subtask creation:
  * - Strips leading/trailing whitespace.
+ * - Clamps length to [SubtaskUseCase.MAX_TITLE_LENGTH].
  * - Returns null if the resulting string is empty or blank, preventing blank subtasks.
  */
 internal fun sanitizeSubtaskTitle(title: String): String? {
     val trimmed = title.trim()
-    return if (trimmed.isNotEmpty()) trimmed else null
+    return if (trimmed.isNotEmpty()) trimmed.take(SubtaskUseCase.MAX_TITLE_LENGTH) else null
 }

@@ -1,9 +1,12 @@
 package dev.tuandoan.tasktracker.ui.viewmodel
 
+import android.content.Context
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
+import dev.tuandoan.tasktracker.R
 import dev.tuandoan.tasktracker.data.database.Subtask
 import dev.tuandoan.tasktracker.data.database.SubtaskProgress
 import dev.tuandoan.tasktracker.data.database.Task
@@ -60,6 +63,7 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class CalendarViewModel @Inject constructor(
+    @ApplicationContext private val context: Context,
     private val calendarUseCase: CalendarUseCase,
     private val savedStateHandle: SavedStateHandle,
     private val taskManager: ITaskManager,
@@ -131,7 +135,7 @@ class CalendarViewModel @Inject constructor(
         viewModelScope.launch {
             val result = subtaskUseCase.addSubtask(taskId, title)
             result.onFailure { error ->
-                val message = error.message ?: "Failed to add subtask"
+                val message = error.message ?: context.getString(R.string.error_add_subtask)
                 _agendaUiEvent.emit(UiEvent.ShowSnackbar(message))
             }
         }
