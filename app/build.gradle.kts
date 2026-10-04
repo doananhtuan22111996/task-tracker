@@ -20,7 +20,7 @@ android {
 
     val versionMajor = 1
     val versionMinor = 15
-    val versionPatch = 0
+    val versionPatch = 1
 
     defaultConfig {
         applicationId = "dev.tuandoan.tasktracker"
