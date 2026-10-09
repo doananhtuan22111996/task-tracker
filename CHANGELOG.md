@@ -5,6 +5,22 @@ Format follows [Keep a Changelog](https://keepachangelog.com).
 
 ## [Unreleased]
 
+## [1.15.1] - 2026-10-04
+
+### Notes
+- **What's new:**
+  - **Google Play Store Edge-to-Edge Compliance (E2E-01, E2E-02):** Resolved edge-to-edge layout notice on Android 15+. Added navigation bar insets to widget configuration bottom action bar, and synchronized status/navigation bar icon contrast dynamically with app theme changes.
+  - **R8 Optimization & Resource Shrinking (R8-01, R8-02):** Pruned overbroad ProGuard rules that restricted R8 optimization, recovering shrinking and obfuscation rates to >85% and cutting release bundle size from 25 MB down to 9.1 MB (63.6% reduction). Enabled modern R8 unified resource shrinking.
+
+### Fixed
+- added `Modifier.navigationBarsPadding()` to `WidgetConfigureScreen` bottom action container to avoid navigation bar overlap on Android 15+ (E2E-01)
+- synchronized status bar and navigation bar icon luminance dynamically via `WindowInsetsControllerCompat` in `TaskTrackerTheme` (E2E-02)
+
+### Changed
+- pruned redundant Compose and Dagger/Hilt keep rules from `app/proguard-rules.pro` to unlock full R8 optimization passes (R8-01)
+- enabled `android.r8.optimizedResourceShrinking=true` in `gradle.properties` for unified R8 code and resource shrinking (R8-02)
+- bumped `versionPatch` to 1 (`v1.15.1`, `versionCode 1,789,811,501`) (REL-16)
+
 ## [1.15.0] - 2026-10-03
 
 ### Notes
