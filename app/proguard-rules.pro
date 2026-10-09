@@ -42,6 +42,10 @@
     *** Companion;
 }
 
+# Preserve JSON backup DTOs to ensure cross-version serialization compatibility and readable stack traces
+-keep @kotlinx.serialization.Serializable class dev.tuandoan.tasktracker.data.backup.dto.** { *; }
+-keepclassmembers class dev.tuandoan.tasktracker.data.backup.dto.** { *; }
+
 # ===== ROOM DATABASE RULES =====
 -keep class * extends androidx.room.RoomDatabase
 -keep @androidx.room.Entity class *

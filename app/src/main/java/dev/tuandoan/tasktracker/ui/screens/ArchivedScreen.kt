@@ -1,6 +1,7 @@
 package dev.tuandoan.tasktracker.ui.screens
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.AlertDialog
@@ -145,6 +146,7 @@ fun ArchivedScreen(viewModel: TaskViewModel, modifier: Modifier = Modifier, bott
                     .semantics { liveRegion = LiveRegionMode.Polite },
             )
         },
+        contentWindowInsets = WindowInsets(0, 0, 0, 0),
     ) { paddingValues ->
         ArchivedTaskListContent(
             archivedTasks = archivedTasks,
