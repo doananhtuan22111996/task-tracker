@@ -1,7 +1,7 @@
 # [TaskTracker] Breakdown — v1.17.0: Play Integrity Integration & Remediation
 
 **Parent PRD**: [docs/v1.17.0/PRD.md](file:///Users/tuandoan/s/task-tracker/docs/v1.17.0/PRD.md)  
-**Status**: In Progress  
+**Status**: Implemented & In Review  
 **Total Estimate**: ~8–12 hours solo  
 **Target Release**: v1.17.0  
 
