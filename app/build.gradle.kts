@@ -31,6 +31,7 @@ android {
         // v1.13.0 -> 1,789,800,000 + (1 * 10,000 + 13 * 100 + 0) = 1,789,811,300
         versionCode = 1_789_800_000 + (versionMajor * 10_000 + versionMinor * 100 + versionPatch)
         versionName = "$versionMajor.$versionMinor.$versionPatch"
+        buildConfigField("long", "GOOGLE_CLOUD_PROJECT_NUMBER", "661684282575L")
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -178,8 +179,9 @@ dependencies {
     // AppCompat (for per-app language support)
     implementation(libs.androidx.appcompat)
 
-    // Google Play In-App Review
+    // Google Play In-App Review & Integrity
     implementation(libs.google.play.review.ktx)
+    implementation(libs.google.play.integrity)
 
     // Glance (AppWidget)
     implementation(libs.androidx.glance.appwidget)
