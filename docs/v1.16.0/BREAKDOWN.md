@@ -23,7 +23,7 @@ flowchart TD
 
 ## Detailed PR Breakdown
 
-### PR 1: Smart Shorthand Domain Parser (CAP-10)
+### PR 1: Smart Shorthand Domain Parser (CAP-10) — [PR #173](https://github.com/doananhtuan22111996/task-tracker/pull/173)
 * **Branch**: `feat/shorthand-domain-parser`
 * **Type**: `feat` / `test`
 * **Estimate**: M (3–4h)
@@ -43,7 +43,7 @@ flowchart TD
 
 ---
 
-### PR 2: Shorthand Suggestion Pills in Task Editor (CAP-11)
+### PR 2: Shorthand Suggestion Pills in Task Editor (CAP-11) — [PR #174](https://github.com/doananhtuan22111996/task-tracker/pull/174)
 * **Branch**: `feat/shorthand-editor-suggestions`
 * **Type**: `feat` / `ui`
 * **Estimate**: M (2–3h)
@@ -63,7 +63,7 @@ flowchart TD
 
 ---
 
-### PR 3: OS Quick Settings Tile (CAP-12)
+### PR 3: OS Quick Settings Tile (CAP-12) — [PR #175](https://github.com/doananhtuan22111996/task-tracker/pull/175)
 * **Branch**: `feat/quick-settings-tile`
 * **Type**: `feat`
 * **Estimate**: S-M (2h)
@@ -81,7 +81,7 @@ flowchart TD
 
 ---
 
-### PR 4: Quick-Add Bottom Sheet & Capture Flow (CAP-13)
+### PR 4: Quick-Add Bottom Sheet & Capture Flow (CAP-13) — [PR #176](https://github.com/doananhtuan22111996/task-tracker/pull/176)
 * **Branch**: `feat/quick-add-bottom-sheet`
 * **Type**: `feat` / `ui`
 * **Estimate**: M (2–3h)
@@ -100,7 +100,7 @@ flowchart TD
 
 ---
 
-### PR 5: Release Bump, i18n & Help FAQ (REL-17)
+### PR 5: Release Bump, i18n & Help FAQ (REL-17) — [PR #177](https://github.com/doananhtuan22111996/task-tracker/pull/177)
 * **Branch**: `chore/v1.16.0-release-prep`
 * **Type**: `chore` / `i18n`
 * **Estimate**: S (1–2h)
