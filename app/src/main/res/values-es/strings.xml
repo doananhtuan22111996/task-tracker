@@ -663,4 +663,18 @@
     <string name="help_a_shorthand_syntax">Al escribir el título de una tarea, puedes incluir atajos como \'hoy\', \'mañana\', \'a las 5pm\', \'!alta\' (o \'!media\', \'!baja\') y \'#etiqueta\'. Toca las sugerencias para aplicarlas o simplemente guarda para aplicar automáticamente todos los atributos detectados.</string>
     <string name="help_q_quick_settings_tile">¿Cómo uso el mosaico de Ajustes rápidos?</string>
     <string name="help_a_quick_settings_tile">Desliza dos veces hacia abajo desde la parte superior de la pantalla para abrir Ajustes rápidos, toca Editar (icono de lápiz) y arrastra el mosaico \'Añadir tarea\' a tus mosaicos activos. Al tocarlo podrás capturar tareas al instante desde cualquier lugar.</string>
+
+    <!-- Google Play Protect & Integrity (SEC-01, SEC-02, SEC-03, SEC-04) -->
+    <string name="security_sideload_dialog_title">Versión no oficial de la app</string>
+    <string name="security_sideload_dialog_message">Google Play Protect no pudo verificar esta instalación de Task Tracker. Para obtener actualizaciones oficiales, parches de seguridad y máxima protección de privacidad, instala la versión oficial desde Google Play.</string>
+    <string name="security_sideload_dialog_get_official">Obtener app oficial</string>
+    <string name="security_sideload_dialog_continue">Continuar de todos modos</string>
+    <string name="settings_section_security">Seguridad y protección de la app</string>
+    <string name="settings_app_protection">Protección de la app</string>
+    <string name="settings_app_protection_verified">Protegido por Google Play Protect</string>
+    <string name="settings_app_protection_unverified">Instalación no verificada</string>
+    <string name="settings_app_protection_offline">Modo de verificación sin conexión</string>
+    <string name="help_section_security">Protección e integridad de la app</string>
+    <string name="help_q_play_protect">¿Por qué Task Tracker usa Google Play Integrity?</string>
+    <string name="help_a_play_protect">Task Tracker se integra con Google Play Integrity para garantizar que el binario de la aplicación sea auténtico, no esté modificado y esté libre de malware o manipulaciones. Tus tareas personales se guardan localmente y nunca se envían a servidores remotos.</string>
 </resources>
