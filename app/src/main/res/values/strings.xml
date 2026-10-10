@@ -709,4 +709,18 @@
     <string name="help_a_shorthand_syntax">When typing a task title, you can add shorthand tags like \'today\', \'tomorrow\', \'at 5pm\', \'!high\' (or \'!med\', \'!low\'), and \'#tag\'. Tap the suggestion pills to apply them, or simply save to apply all detected attributes automatically.</string>
     <string name="help_q_quick_settings_tile">How do I use the Quick Settings Tile?</string>
     <string name="help_a_quick_settings_tile">Swipe down twice from the top of your screen to open Quick Settings, tap Edit (pencil icon), and drag the \'Add Task\' tile into your active tiles. Tapping it anytime lets you capture a task instantly without navigating away.</string>
+
+    <!-- Google Play Protect & Integrity (SEC-01, SEC-02, SEC-03, SEC-04) -->
+    <string name="security_sideload_dialog_title">Unofficial App Version</string>
+    <string name="security_sideload_dialog_message">This installation of Task Tracker could not be verified by Google Play Protect. For official updates, security patches, and full privacy protection, please install the official version from Google Play.</string>
+    <string name="security_sideload_dialog_get_official">Get Official App</string>
+    <string name="security_sideload_dialog_continue">Continue Anyway</string>
+    <string name="settings_section_security">Security &amp; App Protection</string>
+    <string name="settings_app_protection">App Protection</string>
+    <string name="settings_app_protection_verified">Protected by Google Play Protect</string>
+    <string name="settings_app_protection_unverified">Unverified Installation</string>
+    <string name="settings_app_protection_offline">Offline Verification Mode</string>
+    <string name="help_section_security">App Protection &amp; Integrity</string>
+    <string name="help_q_play_protect">Why does Task Tracker use Google Play Integrity?</string>
+    <string name="help_a_play_protect">Task Tracker integrates with Google Play Integrity to ensure your app binary is authentic, unmodified, and free from malware or third-party tampering. Your personal tasks are stored offline and never sent to remote servers.</string>
 </resources>
