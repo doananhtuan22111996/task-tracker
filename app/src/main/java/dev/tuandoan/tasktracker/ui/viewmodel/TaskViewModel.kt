@@ -19,6 +19,7 @@ import dev.tuandoan.tasktracker.domain.service.TaskSortService
 import dev.tuandoan.tasktracker.domain.usecase.StreakUseCase
 import dev.tuandoan.tasktracker.domain.usecase.SubtaskUseCase
 import dev.tuandoan.tasktracker.domain.usecase.TagManagementUseCase
+import dev.tuandoan.tasktracker.domain.usecase.TaskFormUseCase
 import dev.tuandoan.tasktracker.ui.events.UiEvent
 import dev.tuandoan.tasktracker.ui.manager.TaskBulkActionManager
 import dev.tuandoan.tasktracker.ui.manager.TaskCrudManager
@@ -260,7 +261,7 @@ class TaskViewModel @Inject constructor(
         tag: String? = null,
         onSuccess: (() -> Unit)? = null,
     ) {
-        val trimmedTitle = title.trim()
+        val trimmedTitle = title.trim().take(TaskFormUseCase.MAX_TITLE_LENGTH)
         if (trimmedTitle.isBlank()) return
 
         crudManager.executeOperation(
