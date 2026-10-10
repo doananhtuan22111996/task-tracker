@@ -70,6 +70,7 @@ import dev.tuandoan.tasktracker.domain.model.ReminderOption
 import dev.tuandoan.tasktracker.ui.components.NotificationPermissionDialog
 import dev.tuandoan.tasktracker.ui.components.PermissionDeniedDialog
 import dev.tuandoan.tasktracker.ui.components.RecurrencePicker
+import dev.tuandoan.tasktracker.ui.components.ShorthandSuggestionRow
 import dev.tuandoan.tasktracker.ui.components.SubtaskListSection
 import dev.tuandoan.tasktracker.ui.components.TimePickerDialog
 import dev.tuandoan.tasktracker.ui.manager.NotificationPermissionManager
@@ -96,6 +97,7 @@ fun TaskEditorScreen(
 
     // Collect state
     val taskTitle by viewModel.taskTitle.collectAsStateWithLifecycle()
+    val parsedTokens by viewModel.parsedTokens.collectAsStateWithLifecycle()
     val taskDescription by viewModel.taskDescription.collectAsStateWithLifecycle()
     val dueAt by viewModel.dueAt.collectAsStateWithLifecycle()
     val dueAtHasTime by viewModel.dueAtHasTime.collectAsStateWithLifecycle()
@@ -231,6 +233,15 @@ fun TaskEditorScreen(
                         }
                     },
                 ),
+            )
+
+            // Shorthand suggestion pills (CAP-11)
+            ShorthandSuggestionRow(
+                parsedTokens = parsedTokens,
+                onApplyDueDate = viewModel::applyParsedDueDate,
+                onApplyPriority = viewModel::applyParsedPriority,
+                onApplyTag = viewModel::applyParsedTag,
+                onApplyAll = viewModel::applyAllParsedTokens,
             )
 
             // Description field

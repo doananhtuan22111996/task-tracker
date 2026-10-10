@@ -10,10 +10,12 @@ import dev.tuandoan.tasktracker.R
 import dev.tuandoan.tasktracker.data.database.Task
 import dev.tuandoan.tasktracker.domain.ITaskManager
 import dev.tuandoan.tasktracker.domain.model.DueDatePreset
+import dev.tuandoan.tasktracker.domain.model.ParsedTaskTokens
 import dev.tuandoan.tasktracker.domain.model.RecurrenceRule
 import dev.tuandoan.tasktracker.domain.model.RecurrenceType
 import dev.tuandoan.tasktracker.domain.model.ReminderOption
 import dev.tuandoan.tasktracker.domain.service.TagNormalizer
+import dev.tuandoan.tasktracker.domain.service.TaskShorthandParser
 import dev.tuandoan.tasktracker.domain.usecase.SubtaskUseCase
 import dev.tuandoan.tasktracker.domain.usecase.TagManagementUseCase
 import dev.tuandoan.tasktracker.domain.usecase.TaskFormUseCase
@@ -22,12 +24,14 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.time.DayOfWeek
 import javax.inject.Inject
@@ -71,6 +75,15 @@ class TaskEditorViewModel @Inject constructor(
     // Form fields
     private val _taskTitle = MutableStateFlow("")
     val taskTitle: StateFlow<String> = _taskTitle.asStateFlow()
+
+    /** Parsed shorthand tokens dynamically derived from title input (CAP-10). */
+    val parsedTokens: StateFlow<ParsedTaskTokens> = _taskTitle
+        .map { title -> TaskShorthandParser.parse(title) }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = ParsedTaskTokens(rawText = "", cleanTitle = ""),
+        )
 
     private val _taskDescription = MutableStateFlow("")
     val taskDescription: StateFlow<String> = _taskDescription.asStateFlow()
@@ -412,6 +425,54 @@ class TaskEditorViewModel @Inject constructor(
 
     fun updateIsPinned(isPinned: Boolean) {
         _isPinned.value = isPinned
+        updateHasChanges()
+    }
+
+    /** Applies parsed shorthand due date to the form and strips its token from the title (CAP-11). */
+    fun applyParsedDueDate() {
+        val tokens = parsedTokens.value
+        if (tokens.dueAt != null) {
+            _dueAt.value = tokens.dueAt
+            _dueAtHasTime.value = tokens.dueAtHasTime
+            _taskTitle.value = TaskShorthandParser.stripDueDateToken(_taskTitle.value)
+            updateHasChanges()
+        }
+    }
+
+    /** Applies parsed shorthand priority to the form and strips its token from the title (CAP-11). */
+    fun applyParsedPriority() {
+        val tokens = parsedTokens.value
+        if (tokens.priority != null) {
+            _priority.value = tokens.priority
+            _taskTitle.value = TaskShorthandParser.stripPriorityToken(_taskTitle.value)
+            updateHasChanges()
+        }
+    }
+
+    /** Applies parsed shorthand tag to the form and strips its token from the title (CAP-11). */
+    fun applyParsedTag() {
+        val tokens = parsedTokens.value
+        if (tokens.tag != null) {
+            _tag.value = tokens.tag
+            _taskTitle.value = TaskShorthandParser.stripTagToken(_taskTitle.value)
+            updateHasChanges()
+        }
+    }
+
+    /** Applies all recognized shorthand tokens at once and cleans the title field (CAP-11). */
+    fun applyAllParsedTokens() {
+        val tokens = parsedTokens.value
+        if (tokens.dueAt != null) {
+            _dueAt.value = tokens.dueAt
+            _dueAtHasTime.value = tokens.dueAtHasTime
+        }
+        if (tokens.priority != null) {
+            _priority.value = tokens.priority
+        }
+        if (tokens.tag != null) {
+            _tag.value = tokens.tag
+        }
+        _taskTitle.value = tokens.cleanTitle
         updateHasChanges()
     }
 
