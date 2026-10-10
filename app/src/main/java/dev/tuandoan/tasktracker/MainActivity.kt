@@ -24,6 +24,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -45,6 +46,7 @@ import dev.tuandoan.tasktracker.diagnostics.BreadcrumbLogger
 import dev.tuandoan.tasktracker.navigation.StatsFilter
 import dev.tuandoan.tasktracker.navigation.TaskTrackerRoutes
 import dev.tuandoan.tasktracker.ui.components.BottomNavBar
+import dev.tuandoan.tasktracker.ui.components.QuickAddBottomSheet
 import dev.tuandoan.tasktracker.ui.manager.NotificationPermissionManager
 import dev.tuandoan.tasktracker.ui.screens.ArchivedScreen
 import dev.tuandoan.tasktracker.ui.screens.CalendarScreen
@@ -63,6 +65,7 @@ import dev.tuandoan.tasktracker.ui.viewmodel.StatsViewModel
 import dev.tuandoan.tasktracker.ui.viewmodel.TagManagementViewModel
 import dev.tuandoan.tasktracker.ui.viewmodel.TaskViewModel
 import dev.tuandoan.tasktracker.utils.ShareIntentParser
+import dev.tuandoan.tasktracker.work.QuickAddTaskTileService
 import javax.inject.Inject
 
 /**
@@ -93,6 +96,7 @@ class MainActivity : AppCompatActivity() {
     lateinit var analyticsLogger: AnalyticsLogger
 
     private var pendingRoute by mutableStateOf<String?>(null)
+    private var showQuickAddSheet by mutableStateOf(false)
 
     @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -106,9 +110,13 @@ class MainActivity : AppCompatActivity() {
 
         enableEdgeToEdge()
 
-        // Check if launched from app shortcut deep-link or share target (CAP-01)
+        // Check if launched from quick settings tile (CAP-12), app shortcut deep-link or share target (CAP-01)
         if (savedInstanceState == null) {
-            pendingRoute = resolveDeepLinkRoute(intent)
+            if (intent?.action == QuickAddTaskTileService.ACTION_QUICK_ADD) {
+                showQuickAddSheet = true
+            } else {
+                pendingRoute = resolveDeepLinkRoute(intent)
+            }
         }
 
         setContent {
@@ -130,6 +138,8 @@ class MainActivity : AppCompatActivity() {
                         windowWidthSizeClass = windowSizeClass.widthSizeClass,
                         breadcrumbLogger = breadcrumbLogger,
                         analyticsLogger = analyticsLogger,
+                        showQuickAddOnStart = showQuickAddSheet,
+                        onQuickAddConsumed = { showQuickAddSheet = false },
                     )
                 }
             }
@@ -139,7 +149,11 @@ class MainActivity : AppCompatActivity() {
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         setIntent(intent)
-        pendingRoute = resolveDeepLinkRoute(intent)
+        if (intent.action == QuickAddTaskTileService.ACTION_QUICK_ADD) {
+            showQuickAddSheet = true
+        } else {
+            pendingRoute = resolveDeepLinkRoute(intent)
+        }
     }
 
     private fun resolveDeepLinkRoute(intent: Intent?): String? {
@@ -192,8 +206,19 @@ fun TaskTrackerApp(
     windowWidthSizeClass: WindowWidthSizeClass = WindowWidthSizeClass.Compact,
     breadcrumbLogger: BreadcrumbLogger? = null,
     analyticsLogger: AnalyticsLogger? = null,
+    showQuickAddOnStart: Boolean = false,
+    onQuickAddConsumed: () -> Unit = {},
 ) {
     val navController = rememberNavController()
+    var isQuickAddOpen by remember { mutableStateOf(false) }
+
+    LaunchedEffect(showQuickAddOnStart) {
+        if (showQuickAddOnStart) {
+            isQuickAddOpen = true
+            onQuickAddConsumed()
+        }
+    }
+
     val startDestination = if (isOnboardingCompleted) {
         TaskTrackerRoutes.TASK_LIST
     } else {
@@ -456,6 +481,23 @@ fun TaskTrackerApp(
                     )
                 }
             }
+        }
+
+        if (isQuickAddOpen) {
+            val taskViewModel: TaskViewModel = hiltViewModel()
+            QuickAddBottomSheet(
+                onDismiss = { isQuickAddOpen = false },
+                onSaveTask = { title, dueAt, dueAtHasTime, priority, tag ->
+                    taskViewModel.quickAddTask(
+                        title = title,
+                        dueAt = dueAt,
+                        dueAtHasTime = dueAtHasTime,
+                        priority = priority,
+                        tag = tag,
+                    )
+                    isQuickAddOpen = false
+                },
+            )
         }
     }
 }

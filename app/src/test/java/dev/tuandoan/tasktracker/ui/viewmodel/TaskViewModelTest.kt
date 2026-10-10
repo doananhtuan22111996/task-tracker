@@ -451,4 +451,95 @@ class TaskViewModelTest {
         val updated = subtaskRepository.getSubtaskById(subtask.id)
         assertTrue(updated?.isCompleted == true)
     }
+
+    // === Quick-Add Tests (CAP-13) ===
+
+    @Test
+    fun `quickAddTask saves basic task and invokes success callback`() = runTest {
+        viewModel = createViewModel()
+        var callbackInvoked = false
+
+        viewModel.quickAddTask(
+            title = "Buy groceries",
+            onSuccess = { callbackInvoked = true },
+        )
+        advanceUntilIdle()
+
+        assertTrue(callbackInvoked)
+        val tasks = repository.getAllTasksSnapshot()
+        assertEquals(1, tasks.size)
+        assertEquals("Buy groceries", tasks.first().title)
+        assertEquals(1, tasks.first().priority)
+        assertNull(tasks.first().tag)
+    }
+
+    @Test
+    fun `quickAddTask saves task with due date, priority, and normalized tag`() = runTest {
+        viewModel = createViewModel()
+        val dueAtTime = System.currentTimeMillis() + 86400000L
+
+        viewModel.quickAddTask(
+            title = "Submit tax form",
+            dueAt = dueAtTime,
+            dueAtHasTime = true,
+            priority = 2,
+            tag = "taxes",
+        )
+        advanceUntilIdle()
+
+        val tasks = repository.getAllTasksSnapshot()
+        assertEquals(1, tasks.size)
+        val created = tasks.first()
+        assertEquals("Submit tax form", created.title)
+        assertEquals(dueAtTime, created.dueAt)
+        assertTrue(created.dueAtHasTime)
+        assertEquals(2, created.priority)
+        assertEquals("TAXES", created.tag) // Normalized to uppercase
+    }
+
+    @Test
+    fun `quickAddTask ignores blank title`() = runTest {
+        viewModel = createViewModel()
+        var callbackInvoked = false
+
+        viewModel.quickAddTask(
+            title = "   ",
+            onSuccess = { callbackInvoked = true },
+        )
+        advanceUntilIdle()
+
+        assertFalse(callbackInvoked)
+        val tasks = repository.getAllTasksSnapshot()
+        assertTrue(tasks.isEmpty())
+    }
+
+    @Test
+    fun `quickAddFromText parses shorthand tokens and creates task`() = runTest {
+        viewModel = createViewModel()
+
+        viewModel.quickAddFromText("Pick up dry cleaning !high #errands")
+        advanceUntilIdle()
+
+        val tasks = repository.getAllTasksSnapshot()
+        assertEquals(1, tasks.size)
+        val created = tasks.first()
+        assertEquals("Pick up dry cleaning", created.title)
+        assertEquals(2, created.priority)
+        assertEquals("ERRANDS", created.tag)
+    }
+
+    @Test
+    fun `quickAddFromText with relative date extracts clean title and sets due date`() = runTest {
+        viewModel = createViewModel()
+
+        viewModel.quickAddFromText("Team standup tomorrow !1")
+        advanceUntilIdle()
+
+        val tasks = repository.getAllTasksSnapshot()
+        assertEquals(1, tasks.size)
+        val created = tasks.first()
+        assertEquals("Team standup", created.title)
+        assertEquals(0, created.priority)
+        assertTrue(created.dueAt != null)
+    }
 }
