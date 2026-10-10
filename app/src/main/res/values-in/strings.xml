@@ -663,4 +663,18 @@
     <string name="help_a_shorthand_syntax">Saat mengetik judul tugas, Anda dapat menambahkan pintasan seperti \'today\', \'tomorrow\', \'at 5pm\', \'!high\' (atau \'!med\', \'!low\'), dan \'#tag\'. Ketuk chip saran atau cukup simpan untuk menerapkan semua atribut yang terdeteksi secara otomatis.</string>
     <string name="help_q_quick_settings_tile">Bagaimana cara menggunakan Ubin Setelan Cepat?</string>
     <string name="help_a_quick_settings_tile">Gesek ke bawah dua kali dari bagian atas layar untuk membuka Setelan Cepat, ketuk Edit (ikon pensil), dan seret ubin \'Tambah Tugas\' ke ubin aktif Anda untuk menangkap tugas instan dari mana saja.</string>
+
+    <!-- Google Play Protect & Integrity (SEC-01, SEC-02, SEC-03, SEC-04) -->
+    <string name="security_sideload_dialog_title">Versi Aplikasi Tidak Resmi</string>
+    <string name="security_sideload_dialog_message">Pemasangan Task Tracker ini tidak dapat diverifikasi oleh Google Play Protect. Untuk pembaruan resmi, patch keamanan, dan perlindungan privasi penuh, silakan instal versi resmi dari Google Play.</string>
+    <string name="security_sideload_dialog_get_official">Dapatkan Aplikasi Resmi</string>
+    <string name="security_sideload_dialog_continue">Tetap Lanjutkan</string>
+    <string name="settings_section_security">Keamanan &amp; Perlindungan Aplikasi</string>
+    <string name="settings_app_protection">Perlindungan Aplikasi</string>
+    <string name="settings_app_protection_verified">Dilindungi oleh Google Play Protect</string>
+    <string name="settings_app_protection_unverified">Instalasi Belum Terverifikasi</string>
+    <string name="settings_app_protection_offline">Mode Verifikasi Offline</string>
+    <string name="help_section_security">Perlindungan &amp; Integritas Aplikasi</string>
+    <string name="help_q_play_protect">Mengapa Task Tracker menggunakan Google Play Integrity?</string>
+    <string name="help_a_play_protect">Task Tracker terintegrasi dengan Google Play Integrity untuk memastikan aplikasi Anda asli, tidak dimodifikasi, dan bebas dari malware atau manipulasi pihak ketiga. Tugas pribadi Anda disimpan secara offline dan tidak pernah dikirim ke server jarak jauh.</string>
 </resources>

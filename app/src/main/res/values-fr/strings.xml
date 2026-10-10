@@ -663,4 +663,18 @@
     <string name="help_a_shorthand_syntax">En saisissant le titre d\'une tâche, vous pouvez ajouter des raccourcis comme \'aujourd\'hui\', \'demain\', \'à 17h\', \'!haute\' (ou \'!moyenne\', \'!basse\') et \'#étiquette\'. Appuyez sur les suggestions ou enregistrez directement pour appliquer tous les attributs détectés.</string>
     <string name="help_q_quick_settings_tile">Comment utiliser la tuile des Paramètres rapides ?</string>
     <string name="help_a_quick_settings_tile">Faites glisser deux fois vers le bas depuis le haut de votre écran pour ouvrir les Paramètres rapides, touchez Modifier (crayon) et faites glisser la tuile \'Ajouter une tâche\' parmi vos tuiles actives pour capturer une tâche instantanément à tout moment.</string>
+
+    <!-- Google Play Protect & Integrity (SEC-01, SEC-02, SEC-03, SEC-04) -->
+    <string name="security_sideload_dialog_title">Version non officielle de l\'application</string>
+    <string name="security_sideload_dialog_message">Cette installation de Task Tracker n\'a pas pu être vérifiée par Google Play Protect. Pour bénéficier des mises à jour officielles, des correctifs de sécurité et d\'une protection totale de votre vie privée, veuillez installer la version officielle depuis Google Play.</string>
+    <string name="security_sideload_dialog_get_official">Obtenir l\'application officielle</string>
+    <string name="security_sideload_dialog_continue">Continuer quand même</string>
+    <string name="settings_section_security">Sécurité &amp; protection de l\'app</string>
+    <string name="settings_app_protection">Protection de l\'application</string>
+    <string name="settings_app_protection_verified">Protégé par Google Play Protect</string>
+    <string name="settings_app_protection_unverified">Installation non vérifiée</string>
+    <string name="settings_app_protection_offline">Mode de vérification hors ligne</string>
+    <string name="help_section_security">Protection &amp; intégrité de l\'application</string>
+    <string name="help_q_play_protect">Pourquoi Task Tracker utilise-t-il Google Play Integrity&#160;?</string>
+    <string name="help_a_play_protect">Task Tracker intègre Google Play Integrity pour garantir que votre application est authentique, non modifiée et exempte de logiciels malveillants. Vos tâches personnelles restent stockées hors ligne et ne sont jamais transmises à des serveurs distants.</string>
 </resources>

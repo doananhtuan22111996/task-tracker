@@ -663,4 +663,18 @@
     <string name="help_a_shorthand_syntax">कार्य का शीर्षक लिखते समय, आप \'today\', \'tomorrow\', \'at 5pm\', \'!high\' (या \'!med\', \'!low\'), और \'#tag\' जैसे शॉर्टहैंड लिख सकते हैं। सुझाव चिप्स पर टैप करके उन्हें लागू करें या सीधे सहेजें।</string>
     <string name="help_q_quick_settings_tile">त्वरित सेटिंग्स टाइल का उपयोग कैसे करें?</string>
     <string name="help_a_quick_settings_tile">त्वरित सेटिंग्स खोलने के लिए स्क्रीन के ऊपर से दो बार नीचे स्वाइप करें, संपादित करें (पेंसिल आइकन) पर टैप करें और \'कार्य जोड़ें\' टाइल को सक्रिय टाइल्स में खींचें। इसे टैप करके कहीं से भी तुरंत नया कार्य जोड़ें।</string>
+
+    <!-- Google Play Protect & Integrity (SEC-01, SEC-02, SEC-03, SEC-04) -->
+    <string name="security_sideload_dialog_title">अनौपचारिक ऐप संस्करण</string>
+    <string name="security_sideload_dialog_message">Task Tracker के इस इंस्टॉलेशन को Google Play Protect द्वारा सत्यापित नहीं किया जा सका। आधिकारिक अपडेट, सुरक्षा पैच और पूर्ण गोपनीयता सुरक्षा के लिए, कृपया Google Play से आधिकारिक संस्करण इंस्टॉल करें।</string>
+    <string name="security_sideload_dialog_get_official">आधिकारिक ऐप प्राप्त करें</string>
+    <string name="security_sideload_dialog_continue">फिर भी जारी रखें</string>
+    <string name="settings_section_security">सुरक्षा और ऐप सुरक्षा</string>
+    <string name="settings_app_protection">ऐप सुरक्षा</string>
+    <string name="settings_app_protection_verified">Google Play Protect द्वारा सुरक्षित</string>
+    <string name="settings_app_protection_unverified">असत्यापित इंस्टॉलेशन</string>
+    <string name="settings_app_protection_offline">ऑफ़लाइन सत्यापन मोड</string>
+    <string name="help_section_security">ऐप सुरक्षा और अखंडता</string>
+    <string name="help_q_play_protect">Task Tracker Google Play Integrity का उपयोग क्यों करता है?</string>
+    <string name="help_a_play_protect">Task Tracker यह सुनिश्चित करने के लिए Google Play Integrity का उपयोग करता है कि आपका ऐप बाइनरी प्रामाणिक, असंशोधित और मैलवेयर या छेड़छाड़ से सुरक्षित है। आपके व्यक्तिगत कार्य ऑफ़लाइन संग्रहीत होते हैं और कभी भी रिमोट सर्वर पर नहीं भेजे जाते हैं।</string>
 </resources>

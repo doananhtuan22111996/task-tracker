@@ -663,4 +663,18 @@
     <string name="help_a_shorthand_syntax">Khi nhập tiêu đề nhiệm vụ, bạn có thể thêm các từ khóa như \'hôm nay\', \'ngày mai\', \'15h\', \'!cao\' (hoặc \'!tb\', \'!thap\'), và \'#the\'. Chạm vào các thẻ gợi ý hoặc nhấn lưu ngay để tự động áp dụng tất cả các thuộc tính phát hiện được.</string>
     <string name="help_q_quick_settings_tile">Làm thế nào để sử dụng ô Cài đặt nhanh?</string>
     <string name="help_a_quick_settings_tile">Vuốt xuống hai lần từ cạnh trên màn hình để mở Cài đặt nhanh, chạm vào Chỉnh sửa (biểu tượng bút chì) và kéo ô \'Thêm nhiệm vụ\' vào danh sách ô đang bật. Chạm vào ô bất cứ lúc nào để tạo nhanh nhiệm vụ từ bất kỳ đâu.</string>
+
+    <!-- Google Play Protect & Integrity (SEC-01, SEC-02, SEC-03, SEC-04) -->
+    <string name="security_sideload_dialog_title">Phiên bản ứng dụng không chính thức</string>
+    <string name="security_sideload_dialog_message">Bản cài đặt Task Tracker này chưa được xác minh bởi Google Play Protect. Để nhận các bản cập nhật chính thức, bản vá bảo mật và bảo vệ quyền riêng tư toàn diện, vui lòng cài đặt phiên bản chính thức từ Google Play.</string>
+    <string name="security_sideload_dialog_get_official">Tải ứng dụng chính thức</string>
+    <string name="security_sideload_dialog_continue">Vẫn tiếp tục</string>
+    <string name="settings_section_security">Bảo mật &amp; Bảo vệ ứng dụng</string>
+    <string name="settings_app_protection">Bảo vệ ứng dụng</string>
+    <string name="settings_app_protection_verified">Được bảo vệ bởi Google Play Protect</string>
+    <string name="settings_app_protection_unverified">Bản cài đặt chưa được xác minh</string>
+    <string name="settings_app_protection_offline">Chế độ xác minh ngoại tuyến</string>
+    <string name="help_section_security">Bảo vệ ứng dụng &amp; Tính toàn vẹn</string>
+    <string name="help_q_play_protect">Tại sao Task Tracker sử dụng Google Play Integrity?</string>
+    <string name="help_a_play_protect">Task Tracker tích hợp Google Play Integrity để đảm bảo ứng dụng của bạn là chính hãng, không bị chỉnh sửa và không chứa mã độc hoặc bị can thiệp bởi bên thứ ba. Các tác vụ cá nhân của bạn được lưu trữ ngoại tuyến và không bao giờ gửi đến máy chủ từ xa.</string>
 </resources>
