@@ -1,6 +1,7 @@
 # [TaskTracker] Breakdown — v1.16.0: Lightning Task Capture (Smart Shorthand & Quick Settings)
 
 **Parent PRD**: [docs/v1.16.0/PRD.md](file:///Users/tuandoan/s/task-tracker/docs/v1.16.0/PRD.md)  
+**Status**: ✅ Completed (All 5 PRs implemented, tested, and release bundle built)  
 **Total Estimate**: ~10–14 hours solo  
 **Target Release**: v1.16.0  
 
