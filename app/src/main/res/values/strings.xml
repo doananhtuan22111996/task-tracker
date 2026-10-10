@@ -685,4 +685,21 @@
     <string name="widget_configure_tag_picker_hint">Select a tag</string>
     <string name="widget_configure_no_tags">No tags yet. Create tasks with tags first.</string>
     <string name="cd_widget_source_option">%1$s source option</string>
+
+    <!-- Shorthand parsing & Quick capture (CAP-10, CAP-11, CAP-12, CAP-13) -->
+    <string name="shorthand_suggestion_header">Detected attributes</string>
+    <string name="shorthand_apply_all">Apply all</string>
+    <string name="shorthand_date_pill">%1$s</string>
+    <string name="shorthand_priority_pill">%1$s</string>
+    <string name="shorthand_tag_pill">#%1$s</string>
+    <string name="cd_shorthand_apply_all">Apply all parsed attributes</string>
+    <string name="cd_shorthand_apply_date">Apply due date: %1$s</string>
+    <string name="cd_shorthand_apply_priority">Apply priority: %1$s</string>
+    <string name="cd_shorthand_apply_tag">Apply tag: %1$s</string>
+    <string name="quick_add_tile_label">Add Task</string>
+    <string name="quick_add_tile_subtitle">Quick task capture</string>
+    <string name="quick_add_title">Quick Add Task</string>
+    <string name="quick_add_hint">Type task title e.g. Call John tomorrow 3pm !high #work</string>
+    <string name="quick_add_save">Save task</string>
+    <string name="quick_add_saved_success">Task created</string>
 </resources>

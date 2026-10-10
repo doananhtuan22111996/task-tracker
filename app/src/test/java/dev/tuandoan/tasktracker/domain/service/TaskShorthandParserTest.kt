@@ -234,4 +234,18 @@ class TaskShorthandParserTest {
         assertEquals("HEALTH", parsed.tag)
         assertNotNull(parsed.dueAt)
     }
+
+    @Test
+    fun `single token strip methods remove only designated token`() {
+        val input = "Team retro tomorrow at 3pm !high #engineering"
+
+        val withoutDate = TaskShorthandParser.stripDueDateToken(input)
+        assertEquals("Team retro !high #engineering", withoutDate)
+
+        val withoutPriority = TaskShorthandParser.stripPriorityToken(input)
+        assertEquals("Team retro tomorrow at 3pm #engineering", withoutPriority)
+
+        val withoutTag = TaskShorthandParser.stripTagToken(input)
+        assertEquals("Team retro tomorrow at 3pm !high", withoutTag)
+    }
 }
