@@ -31,6 +31,7 @@ import androidx.compose.material.icons.outlined.HelpOutline
 import androidx.compose.material.icons.outlined.Label
 import androidx.compose.material.icons.outlined.OpenInNew
 import androidx.compose.material.icons.outlined.PrivacyTip
+import androidx.compose.material.icons.outlined.Security
 import androidx.compose.material.icons.outlined.Share
 import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material.icons.outlined.TableChart
@@ -455,6 +456,63 @@ fun SettingsScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .clickable(role = Role.Button, onClick = onNavigateToPrivacyPolicy),
+                )
+
+                HorizontalDivider(
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                )
+
+                // =============================================
+                // Security & App Protection Section (SEC-04)
+                // =============================================
+                SectionHeader(text = stringResource(R.string.settings_section_security))
+
+                val appProtectionStatus by viewModel.appProtectionStatus.collectAsStateWithLifecycle()
+                val statusText = when (val result = appProtectionStatus) {
+                    is dev.tuandoan.tasktracker.domain.security.model.IntegrityCheckResult.Success -> {
+                        if (result.verdict.licensingStatus ==
+                            dev.tuandoan.tasktracker.domain.security.model.AppLicensingStatus.LICENSED
+                        ) {
+                            stringResource(R.string.settings_app_protection_verified)
+                        } else {
+                            stringResource(R.string.settings_app_protection_unverified)
+                        }
+                    }
+                    is dev.tuandoan.tasktracker.domain.security.model.IntegrityCheckResult.OfflineFallback -> {
+                        stringResource(R.string.settings_app_protection_offline)
+                    }
+                    else -> stringResource(R.string.settings_app_protection_verified)
+                }
+
+                ListItem(
+                    headlineContent = {
+                        Text(
+                            text = stringResource(R.string.settings_app_protection),
+                            style = MaterialTheme.typography.bodyLarge,
+                        )
+                    },
+                    supportingContent = {
+                        Text(
+                            text = statusText,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    },
+                    leadingContent = {
+                        Icon(
+                            imageVector = Icons.Outlined.Security,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary,
+                        )
+                    },
+                    colors = ListItemDefaults.colors(
+                        containerColor = MaterialTheme.colorScheme.surface,
+                    ),
+                    modifier = Modifier.fillMaxWidth(),
+                )
+
+                HorizontalDivider(
+                    modifier = Modifier.padding(horizontal = 16.dp),
                 )
 
                 // =============================================

@@ -21,6 +21,8 @@ import dev.tuandoan.tasktracker.domain.backup.ImportBackupUseCase
 import dev.tuandoan.tasktracker.domain.backup.model.BackupFormat
 import dev.tuandoan.tasktracker.domain.backup.model.ExportResult
 import dev.tuandoan.tasktracker.domain.backup.model.ImportResult
+import dev.tuandoan.tasktracker.domain.security.model.IntegrityCheckResult
+import dev.tuandoan.tasktracker.domain.security.usecase.VerifyAppIntegrityUseCase
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -46,6 +48,7 @@ class SettingsViewModel @Inject constructor(
     private val privacyRepository: PrivacyRepository,
     private val privacyManager: PrivacyManager,
     private val breadcrumbLogger: BreadcrumbLogger,
+    private val verifyAppIntegrityUseCase: VerifyAppIntegrityUseCase,
 ) : ViewModel() {
 
     // --- User Preferences ---
@@ -240,5 +243,20 @@ class SettingsViewModel @Inject constructor(
         // the SDK drops the next call once the disable fan-out lands.
         breadcrumbLogger.log(BreadcrumbCategory.SETTINGS, "diagnostics=$optIn")
         viewModelScope.launch { privacyManager.setEnabled(optIn) }
+    }
+
+    // --- App Protection & Integrity (SEC-04) ---
+
+    private val _appProtectionStatus = MutableStateFlow<IntegrityCheckResult?>(null)
+    val appProtectionStatus: StateFlow<IntegrityCheckResult?> = _appProtectionStatus.asStateFlow()
+
+    init {
+        checkAppProtection()
+    }
+
+    fun checkAppProtection() {
+        viewModelScope.launch {
+            _appProtectionStatus.value = verifyAppIntegrityUseCase()
+        }
     }
 }
