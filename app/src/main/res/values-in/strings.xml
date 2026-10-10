@@ -639,4 +639,28 @@
     <string name="whats_collected_performance_1">Waktu mulai aplikasi dan waktu render layar</string>
     <string name="whats_collected_performance_2">Waktu yang dihabiskan untuk operasi lambat</string>
     <string name="whats_collected_performance_3">Tidak pernah: isi layar Anda</string>
+
+    <!-- Shorthand parsing & Quick capture (CAP-10, CAP-11, CAP-12, CAP-13) -->
+    <string name="shorthand_suggestion_header">Atribut terdeteksi</string>
+    <string name="shorthand_apply_all">Terapkan semua</string>
+    <string name="shorthand_date_pill">%1$s</string>
+    <string name="shorthand_priority_pill">%1$s</string>
+    <string name="shorthand_tag_pill">#%1$s</string>
+    <string name="cd_shorthand_apply_all">Terapkan semua atribut terdeteksi</string>
+    <string name="cd_shorthand_apply_date">Terapkan batas waktu: %1$s</string>
+    <string name="cd_shorthand_apply_priority">Terapkan prioritas: %1$s</string>
+    <string name="cd_shorthand_apply_tag">Terapkan tag: %1$s</string>
+    <string name="quick_add_tile_label">Tambah Tugas</string>
+    <string name="quick_add_tile_subtitle">Tangkapan tugas cepat</string>
+    <string name="quick_add_title">Tambah Tugas Cepat</string>
+    <string name="quick_add_hint">Ketik judul tugas, misal Telepon Budi besok jam 3 sore !tinggi #kerja</string>
+    <string name="quick_add_save">Simpan tugas</string>
+    <string name="quick_add_saved_success">Tugas dibuat</string>
+
+    <!-- Help & FAQ Quick Capture (REL-17) -->
+    <string name="help_section_quick_capture">Tangkapan Cepat &amp; Pintasan</string>
+    <string name="help_q_shorthand_syntax">Bagaimana cara kerja pintasan pintar?</string>
+    <string name="help_a_shorthand_syntax">Saat mengetik judul tugas, Anda dapat menambahkan pintasan seperti \'today\', \'tomorrow\', \'at 5pm\', \'!high\' (atau \'!med\', \'!low\'), dan \'#tag\'. Ketuk chip saran atau cukup simpan untuk menerapkan semua atribut yang terdeteksi secara otomatis.</string>
+    <string name="help_q_quick_settings_tile">Bagaimana cara menggunakan Ubin Setelan Cepat?</string>
+    <string name="help_a_quick_settings_tile">Gesek ke bawah dua kali dari bagian atas layar untuk membuka Setelan Cepat, ketuk Edit (ikon pensil), dan seret ubin \'Tambah Tugas\' ke ubin aktif Anda untuk menangkap tugas instan dari mana saja.</string>
 </resources>

@@ -639,4 +639,28 @@
     <string name="whats_collected_performance_1">Tiempo de inicio de la aplicación y tiempos de renderizado de pantalla</string>
     <string name="whats_collected_performance_2">Tiempo empleado en operaciones lentas</string>
     <string name="whats_collected_performance_3">Nunca: el contenido de tus pantallas</string>
+
+    <!-- Shorthand parsing & Quick capture (CAP-10, CAP-11, CAP-12, CAP-13) -->
+    <string name="shorthand_suggestion_header">Atributos detectados</string>
+    <string name="shorthand_apply_all">Aplicar todo</string>
+    <string name="shorthand_date_pill">%1$s</string>
+    <string name="shorthand_priority_pill">%1$s</string>
+    <string name="shorthand_tag_pill">#%1$s</string>
+    <string name="cd_shorthand_apply_all">Aplicar todos los atributos detectados</string>
+    <string name="cd_shorthand_apply_date">Aplicar fecha de vencimiento: %1$s</string>
+    <string name="cd_shorthand_apply_priority">Aplicar prioridad: %1$s</string>
+    <string name="cd_shorthand_apply_tag">Aplicar etiqueta: %1$s</string>
+    <string name="quick_add_tile_label">Añadir tarea</string>
+    <string name="quick_add_tile_subtitle">Captura rápida de tareas</string>
+    <string name="quick_add_title">Añadir tarea rápido</string>
+    <string name="quick_add_hint">Escribe el título, ej. Llamar a Juan mañana 3pm !alta #trabajo</string>
+    <string name="quick_add_save">Guardar tarea</string>
+    <string name="quick_add_saved_success">Tarea creada</string>
+
+    <!-- Help & FAQ Quick Capture (REL-17) -->
+    <string name="help_section_quick_capture">Captura rápida y atajos</string>
+    <string name="help_q_shorthand_syntax">¿Cómo funcionan los atajos inteligentes?</string>
+    <string name="help_a_shorthand_syntax">Al escribir el título de una tarea, puedes incluir atajos como \'hoy\', \'mañana\', \'a las 5pm\', \'!alta\' (o \'!media\', \'!baja\') y \'#etiqueta\'. Toca las sugerencias para aplicarlas o simplemente guarda para aplicar automáticamente todos los atributos detectados.</string>
+    <string name="help_q_quick_settings_tile">¿Cómo uso el mosaico de Ajustes rápidos?</string>
+    <string name="help_a_quick_settings_tile">Desliza dos veces hacia abajo desde la parte superior de la pantalla para abrir Ajustes rápidos, toca Editar (icono de lápiz) y arrastra el mosaico \'Añadir tarea\' a tus mosaicos activos. Al tocarlo podrás capturar tareas al instante desde cualquier lugar.</string>
 </resources>

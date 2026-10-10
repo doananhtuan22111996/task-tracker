@@ -129,6 +129,14 @@ private val faqSections = listOf(
             FaqItem(R.string.help_q_widget_complete, R.string.help_a_widget_complete),
         ),
     ),
+    FaqSection(
+        R.string.help_section_quick_capture,
+        HelpFaqSection.QUICK_CAPTURE,
+        listOf(
+            FaqItem(R.string.help_q_shorthand_syntax, R.string.help_a_shorthand_syntax),
+            FaqItem(R.string.help_q_quick_settings_tile, R.string.help_a_quick_settings_tile),
+        ),
+    ),
 )
 
 @OptIn(ExperimentalMaterial3Api::class)

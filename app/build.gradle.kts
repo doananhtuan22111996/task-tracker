@@ -19,8 +19,8 @@ android {
     compileSdk = 36
 
     val versionMajor = 1
-    val versionMinor = 15
-    val versionPatch = 1
+    val versionMinor = 16
+    val versionPatch = 0
 
     defaultConfig {
         applicationId = "dev.tuandoan.tasktracker"

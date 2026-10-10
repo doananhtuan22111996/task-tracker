@@ -639,4 +639,28 @@
     <string name="whats_collected_performance_1">App-Startzeit und Bildschirm-Renderzeiten</string>
     <string name="whats_collected_performance_2">Zeitaufwand für langsame Vorgänge</string>
     <string name="whats_collected_performance_3">Niemals: der Inhalt Ihrer Bildschirme</string>
+
+    <!-- Shorthand parsing & Quick capture (CAP-10, CAP-11, CAP-12, CAP-13) -->
+    <string name="shorthand_suggestion_header">Erkannte Attribute</string>
+    <string name="shorthand_apply_all">Alle anwenden</string>
+    <string name="shorthand_date_pill">%1$s</string>
+    <string name="shorthand_priority_pill">%1$s</string>
+    <string name="shorthand_tag_pill">#%1$s</string>
+    <string name="cd_shorthand_apply_all">Alle erkannten Attribute anwenden</string>
+    <string name="cd_shorthand_apply_date">Fälligkeitsdatum anwenden: %1$s</string>
+    <string name="cd_shorthand_apply_priority">Priorität anwenden: %1$s</string>
+    <string name="cd_shorthand_apply_tag">Tag anwenden: %1$s</string>
+    <string name="quick_add_tile_label">Aufgabe hinzufügen</string>
+    <string name="quick_add_tile_subtitle">Schnelle Aufgabenaufnahme</string>
+    <string name="quick_add_title">Aufgabe schnell hinzufügen</string>
+    <string name="quick_add_hint">Aufgabentitel eingeben, z. B. Johannes morgen 15 Uhr anrufen !hoch #arbeit</string>
+    <string name="quick_add_save">Aufgabe speichern</string>
+    <string name="quick_add_saved_success">Aufgabe erstellt</string>
+
+    <!-- Help & FAQ Quick Capture (REL-17) -->
+    <string name="help_section_quick_capture">Schnellerfassung &amp; Kurzbefehle</string>
+    <string name="help_q_shorthand_syntax">Wie funktionieren die intelligenten Kurzbefehle?</string>
+    <string name="help_a_shorthand_syntax">Wenn Sie einen Aufgabentitel eingeben, können Sie Attribute wie \'heute\', \'morgen\', \'17 Uhr\', \'!hoch\' (oder \'!mittel\', \'!niedrig\') und \'#tag\' hinzufügen. Tippen Sie auf die Vorschlags-Chips oder speichern Sie direkt, um alle erkannten Attribute automatisch zu übernehmen.</string>
+    <string name="help_q_quick_settings_tile">Wie verwende ich die Kachel in den Schnelleinstellungen?</string>
+    <string name="help_a_quick_settings_tile">Wischen Sie zweimal vom oberen Bildschirmrand nach unten, um die Schnelleinstellungen zu öffnen, tippen Sie auf Bearbeiten (Stiftsymbol) und ziehen Sie die Kachel \'Aufgabe hinzufügen\' in Ihre aktiven Kacheln. Ein Tippen darauf öffnet die Schnellerfassung von überall.</string>
 </resources>

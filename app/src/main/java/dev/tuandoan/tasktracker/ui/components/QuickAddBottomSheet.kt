@@ -2,6 +2,8 @@ package dev.tuandoan.tasktracker.ui.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -52,7 +54,7 @@ import kotlinx.coroutines.delay
 /**
  * Lightweight bottom sheet for lightning-fast task capture with smart shorthand support (CAP-13).
  */
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun QuickAddBottomSheet(
     onDismiss: () -> Unit,
@@ -179,12 +181,12 @@ fun QuickAddBottomSheet(
             // Applied attributes row (if user clicked chips)
             val hasAppliedAttrs = appliedDueAt != null || appliedPriority != null || appliedTag != null
             if (hasAppliedAttrs) {
-                Row(
+                FlowRow(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(top = AppSpacing.small),
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalAlignment = Alignment.CenterVertically,
+                    verticalArrangement = Arrangement.spacedBy(4.dp),
                 ) {
                     appliedDueAt?.let { dueDate ->
                         val datePattern = if (appliedDueAtHasTime) {

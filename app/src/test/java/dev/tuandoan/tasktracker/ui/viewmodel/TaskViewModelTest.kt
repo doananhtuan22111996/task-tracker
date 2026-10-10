@@ -514,6 +514,20 @@ class TaskViewModelTest {
     }
 
     @Test
+    fun `quickAddTask clamps title exceeding MAX_TITLE_LENGTH`() = runTest {
+        viewModel = createViewModel()
+        val overlyLongTitle = "A".repeat(TaskFormUseCase.MAX_TITLE_LENGTH + 20)
+
+        viewModel.quickAddTask(title = overlyLongTitle)
+        advanceUntilIdle()
+
+        val tasks = repository.getAllTasksSnapshot()
+        assertEquals(1, tasks.size)
+        assertEquals(TaskFormUseCase.MAX_TITLE_LENGTH, tasks.first().title.length)
+        assertEquals("A".repeat(TaskFormUseCase.MAX_TITLE_LENGTH), tasks.first().title)
+    }
+
+    @Test
     fun `quickAddFromText parses shorthand tokens and creates task`() = runTest {
         viewModel = createViewModel()
 

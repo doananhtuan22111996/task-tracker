@@ -639,4 +639,28 @@
     <string name="whats_collected_performance_1">Thời gian khởi động ứng dụng và thời gian hiển thị màn hình</string>
     <string name="whats_collected_performance_2">Thời gian dành cho các thao tác chậm</string>
     <string name="whats_collected_performance_3">Không bao giờ: nội dung màn hình của bạn</string>
+
+    <!-- Shorthand parsing & Quick capture (CAP-10, CAP-11, CAP-12, CAP-13) -->
+    <string name="shorthand_suggestion_header">Thuộc tính phát hiện</string>
+    <string name="shorthand_apply_all">Áp dụng tất cả</string>
+    <string name="shorthand_date_pill">%1$s</string>
+    <string name="shorthand_priority_pill">%1$s</string>
+    <string name="shorthand_tag_pill">#%1$s</string>
+    <string name="cd_shorthand_apply_all">Áp dụng tất cả thuộc tính phát hiện</string>
+    <string name="cd_shorthand_apply_date">Áp dụng hạn chót: %1$s</string>
+    <string name="cd_shorthand_apply_priority">Áp dụng mức độ ưu tiên: %1$s</string>
+    <string name="cd_shorthand_apply_tag">Áp dụng thẻ: %1$s</string>
+    <string name="quick_add_tile_label">Thêm nhiệm vụ</string>
+    <string name="quick_add_tile_subtitle">Tạo nhiệm vụ nhanh</string>
+    <string name="quick_add_title">Thêm nhanh nhiệm vụ</string>
+    <string name="quick_add_hint">Nhập tên nhiệm vụ, ví dụ: Gọi điện cho Nam ngày mai 15h !cao #viec</string>
+    <string name="quick_add_save">Lưu nhiệm vụ</string>
+    <string name="quick_add_saved_success">Đã tạo nhiệm vụ</string>
+
+    <!-- Help & FAQ Quick Capture (REL-17) -->
+    <string name="help_section_quick_capture">Tạo nhanh &amp; Cú pháp thông minh</string>
+    <string name="help_q_shorthand_syntax">Cú pháp thông minh hoạt động thế nào?</string>
+    <string name="help_a_shorthand_syntax">Khi nhập tiêu đề nhiệm vụ, bạn có thể thêm các từ khóa như \'hôm nay\', \'ngày mai\', \'15h\', \'!cao\' (hoặc \'!tb\', \'!thap\'), và \'#the\'. Chạm vào các thẻ gợi ý hoặc nhấn lưu ngay để tự động áp dụng tất cả các thuộc tính phát hiện được.</string>
+    <string name="help_q_quick_settings_tile">Làm thế nào để sử dụng ô Cài đặt nhanh?</string>
+    <string name="help_a_quick_settings_tile">Vuốt xuống hai lần từ cạnh trên màn hình để mở Cài đặt nhanh, chạm vào Chỉnh sửa (biểu tượng bút chì) và kéo ô \'Thêm nhiệm vụ\' vào danh sách ô đang bật. Chạm vào ô bất cứ lúc nào để tạo nhanh nhiệm vụ từ bất kỳ đâu.</string>
 </resources>

@@ -639,4 +639,28 @@
     <string name="whats_collected_performance_1">ऐप प्रारंभ समय और स्क्रीन रेंडर समय</string>
     <string name="whats_collected_performance_2">धीमे कार्यों पर बिताया गया समय</string>
     <string name="whats_collected_performance_3">कभी नहीं: आपकी स्क्रीन की सामग्री</string>
+
+    <!-- Shorthand parsing & Quick capture (CAP-10, CAP-11, CAP-12, CAP-13) -->
+    <string name="shorthand_suggestion_header">पहचाने गए गुण</string>
+    <string name="shorthand_apply_all">सभी लागू करें</string>
+    <string name="shorthand_date_pill">%1$s</string>
+    <string name="shorthand_priority_pill">%1$s</string>
+    <string name="shorthand_tag_pill">#%1$s</string>
+    <string name="cd_shorthand_apply_all">सभी पहचाने गए गुण लागू करें</string>
+    <string name="cd_shorthand_apply_date">नियत तारीख लागू करें: %1$s</string>
+    <string name="cd_shorthand_apply_priority">प्राथमिकता लागू करें: %1$s</string>
+    <string name="cd_shorthand_apply_tag">टैग लागू करें: %1$s</string>
+    <string name="quick_add_tile_label">कार्य जोड़ें</string>
+    <string name="quick_add_tile_subtitle">त्वरित कार्य कैप्चर</string>
+    <string name="quick_add_title">त्वरित कार्य जोड़ें</string>
+    <string name="quick_add_hint">कार्य का शीर्षक लिखें, जैसे कल शाम 5 बजे मीटिंग !high #काम</string>
+    <string name="quick_add_save">कार्य सहेजें</string>
+    <string name="quick_add_saved_success">कार्य बनाया गया</string>
+
+    <!-- Help & FAQ Quick Capture (REL-17) -->
+    <string name="help_section_quick_capture">त्वरित कैप्चर और शॉर्टहैंड</string>
+    <string name="help_q_shorthand_syntax">स्मार्ट शॉर्टहैंड कैसे काम करता है?</string>
+    <string name="help_a_shorthand_syntax">कार्य का शीर्षक लिखते समय, आप \'today\', \'tomorrow\', \'at 5pm\', \'!high\' (या \'!med\', \'!low\'), और \'#tag\' जैसे शॉर्टहैंड लिख सकते हैं। सुझाव चिप्स पर टैप करके उन्हें लागू करें या सीधे सहेजें।</string>
+    <string name="help_q_quick_settings_tile">त्वरित सेटिंग्स टाइल का उपयोग कैसे करें?</string>
+    <string name="help_a_quick_settings_tile">त्वरित सेटिंग्स खोलने के लिए स्क्रीन के ऊपर से दो बार नीचे स्वाइप करें, संपादित करें (पेंसिल आइकन) पर टैप करें और \'कार्य जोड़ें\' टाइल को सक्रिय टाइल्स में खींचें। इसे टैप करके कहीं से भी तुरंत नया कार्य जोड़ें।</string>
 </resources>

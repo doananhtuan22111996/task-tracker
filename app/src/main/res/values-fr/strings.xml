@@ -639,4 +639,28 @@
     <string name="whats_collected_performance_1">Temps de démarrage de l\'application et temps de rendu des écrans</string>
     <string name="whats_collected_performance_2">Temps passé sur les opérations lentes</string>
     <string name="whats_collected_performance_3">Jamais : le contenu de vos écrans</string>
+
+    <!-- Shorthand parsing & Quick capture (CAP-10, CAP-11, CAP-12, CAP-13) -->
+    <string name="shorthand_suggestion_header">Attributs détectés</string>
+    <string name="shorthand_apply_all">Tout appliquer</string>
+    <string name="shorthand_date_pill">%1$s</string>
+    <string name="shorthand_priority_pill">%1$s</string>
+    <string name="shorthand_tag_pill">#%1$s</string>
+    <string name="cd_shorthand_apply_all">Appliquer tous les attributs détectés</string>
+    <string name="cd_shorthand_apply_date">Appliquer la date d\'échéance : %1$s</string>
+    <string name="cd_shorthand_apply_priority">Appliquer la priorité : %1$s</string>
+    <string name="cd_shorthand_apply_tag">Appliquer l\'étiquette : %1$s</string>
+    <string name="quick_add_tile_label">Ajouter une tâche</string>
+    <string name="quick_add_tile_subtitle">Saisie rapide de tâche</string>
+    <string name="quick_add_title">Ajout rapide de tâche</string>
+    <string name="quick_add_hint">Titre de la tâche, ex. Appeler Jean demain 15h !haute #travail</string>
+    <string name="quick_add_save">Enregistrer la tâche</string>
+    <string name="quick_add_saved_success">Tâche créée</string>
+
+    <!-- Help & FAQ Quick Capture (REL-17) -->
+    <string name="help_section_quick_capture">Saisie rapide et raccourcis</string>
+    <string name="help_q_shorthand_syntax">Comment fonctionnent les raccourcis intelligents ?</string>
+    <string name="help_a_shorthand_syntax">En saisissant le titre d\'une tâche, vous pouvez ajouter des raccourcis comme \'aujourd\'hui\', \'demain\', \'à 17h\', \'!haute\' (ou \'!moyenne\', \'!basse\') et \'#étiquette\'. Appuyez sur les suggestions ou enregistrez directement pour appliquer tous les attributs détectés.</string>
+    <string name="help_q_quick_settings_tile">Comment utiliser la tuile des Paramètres rapides ?</string>
+    <string name="help_a_quick_settings_tile">Faites glisser deux fois vers le bas depuis le haut de votre écran pour ouvrir les Paramètres rapides, touchez Modifier (crayon) et faites glisser la tuile \'Ajouter une tâche\' parmi vos tuiles actives pour capturer une tâche instantanément à tout moment.</string>
 </resources>
