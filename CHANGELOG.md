@@ -5,6 +5,33 @@ Format follows [Keep a Changelog](https://keepachangelog.com).
 
 ## [Unreleased]
 
+## [1.16.0] - 2026-10-10
+
+### Notes
+- **What's new:**
+  - **Smart Shorthand Domain Parser (CAP-10):** Pure Kotlin natural language tokenizer parsing relative dates (`today`, `tomorrow`, `mon`..`sun`, `next week`), specific times (`at 5pm`, `14:30`), priority tags (`!high`/`!h`/`!3`, `!med`/`!m`/`!2`, `!low`/`!l`/`!1`), and normalized categories (`#work`, `#personal`) with intelligent token stripping.
+  - **Shorthand Suggestion Pills in Task Editor (CAP-11):** Interactive `AssistChip` suggestions displayed beneath the title input field in the task editor, enabling 1-tap attribute application or bulk "Apply all".
+  - **Android Quick Settings Tile (CAP-12):** System-level Quick Settings tile (`QuickAddTaskTileService`) in notification shade for instant task capture from anywhere without navigating to the app first.
+  - **Lightweight Quick-Add Bottom Sheet (CAP-13):** Compact Material 3 bottom sheet featuring single-line auto-focused input, live shorthand token suggestions, and 1-tap/IME Done save flow.
+  - **Help & FAQ & Full Localization (REL-17):** Added dedicated Quick Capture & Shorthand FAQ section with complete localization across all 8 supported languages (English, German, Spanish, French, Hindi, Indonesian, Portuguese, Vietnamese).
+
+### Added
+- `TaskShorthandParser` pure Kotlin tokenizer for dates, times, priority, and tags with token-stripping utilities (CAP-10)
+- `ParsedTaskTokens` domain model for parsed shorthand attributes (CAP-10)
+- extensive 25+ JVM unit test suite in `TaskShorthandParserTest` (CAP-10)
+- `ShorthandSuggestionRow` composable with animated entry, AssistChips, and TalkBack accessibility (CAP-11)
+- reactive shorthand token parsing and attribute application in `TaskEditorViewModel` and `TaskEditorScreen` (CAP-11)
+- `QuickAddTaskTileService` Quick Settings tile with API 34+ `PendingIntent` and fallback support (CAP-12)
+- vector icon `ic_task_add` and manifest service registration for QS tile (CAP-12)
+- `QuickAddBottomSheet` with IME Done, auto-focus, live suggestion chips, and immediate persistence (CAP-13)
+- `quickAddTask` and `quickAddFromText` methods in `TaskViewModel` with comprehensive test coverage (CAP-13)
+- tile intent routing for `ACTION_QUICK_ADD` in `MainActivity` and `TaskTrackerApp` (CAP-13)
+- Quick Capture & Shorthand FAQ section in `HelpScreen` with `QUICK_CAPTURE` diagnostics analytics tracking (REL-17)
+- complete translations for all new strings across 7 non-English locales (REL-17)
+
+### Changed
+- bumped `versionMinor` to 16, `versionPatch` to 0 (`v1.16.0`, `versionCode 1,789,811,600`) (REL-17)
+
 ## [1.15.1] - 2026-10-04
 
 ### Notes

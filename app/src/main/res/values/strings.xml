@@ -702,4 +702,11 @@
     <string name="quick_add_hint">Type task title e.g. Call John tomorrow 3pm !high #work</string>
     <string name="quick_add_save">Save task</string>
     <string name="quick_add_saved_success">Task created</string>
+
+    <!-- Help & FAQ Quick Capture (REL-17) -->
+    <string name="help_section_quick_capture">Quick Capture &amp; Shorthand</string>
+    <string name="help_q_shorthand_syntax">How does smart shorthand work?</string>
+    <string name="help_a_shorthand_syntax">When typing a task title, you can add shorthand tags like \'today\', \'tomorrow\', \'at 5pm\', \'!high\' (or \'!med\', \'!low\'), and \'#tag\'. Tap the suggestion pills to apply them, or simply save to apply all detected attributes automatically.</string>
+    <string name="help_q_quick_settings_tile">How do I use the Quick Settings Tile?</string>
+    <string name="help_a_quick_settings_tile">Swipe down twice from the top of your screen to open Quick Settings, tap Edit (pencil icon), and drag the \'Add Task\' tile into your active tiles. Tapping it anytime lets you capture a task instantly without navigating away.</string>
 </resources>

@@ -639,4 +639,28 @@
     <string name="whats_collected_performance_1">Tempo de arranque da aplicação e tempos de renderização dos ecrãs</string>
     <string name="whats_collected_performance_2">Tempo passado em operações lentas</string>
     <string name="whats_collected_performance_3">Nunca: o conteúdo dos seus ecrãs</string>
+
+    <!-- Shorthand parsing & Quick capture (CAP-10, CAP-11, CAP-12, CAP-13) -->
+    <string name="shorthand_suggestion_header">Atributos detetados</string>
+    <string name="shorthand_apply_all">Aplicar tudo</string>
+    <string name="shorthand_date_pill">%1$s</string>
+    <string name="shorthand_priority_pill">%1$s</string>
+    <string name="shorthand_tag_pill">#%1$s</string>
+    <string name="cd_shorthand_apply_all">Aplicar todos os atributos detetados</string>
+    <string name="cd_shorthand_apply_date">Aplicar data de conclusão: %1$s</string>
+    <string name="cd_shorthand_apply_priority">Aplicar prioridade: %1$s</string>
+    <string name="cd_shorthand_apply_tag">Aplicar etiqueta: %1$s</string>
+    <string name="quick_add_tile_label">Adicionar Tarefa</string>
+    <string name="quick_add_tile_subtitle">Captura rápida de tarefas</string>
+    <string name="quick_add_title">Adicionar Tarefa Rápida</string>
+    <string name="quick_add_hint">Escreva o título, ex. Ligar ao João amanhã às 15h !alta #trabalho</string>
+    <string name="quick_add_save">Guardar tarefa</string>
+    <string name="quick_add_saved_success">Tarefa criada</string>
+
+    <!-- Help & FAQ Quick Capture (REL-17) -->
+    <string name="help_section_quick_capture">Captura Rápida e Atalhos</string>
+    <string name="help_q_shorthand_syntax">Como funcionam os atalhos inteligentes?</string>
+    <string name="help_a_shorthand_syntax">Ao escrever o título de uma tarefa, pode adicionar atalhos como \'hoje\', \'amanhã\', \'às 17h\', \'!alta\' (ou \'!média\', \'!baixa\') e \'#etiqueta\'. Toque nas sugestões para aplicá-las ou guarde diretamente para aplicar automaticamente todos os atributos detetados.</string>
+    <string name="help_q_quick_settings_tile">Como utilizar o mosaico de Definições Rápidas?</string>
+    <string name="help_a_quick_settings_tile">Deslize duas vezes para baixo a partir do topo do ecrã para abrir as Definições Rápidas, toque em Editar (ícone do lápis) e arraste o mosaico \'Adicionar Tarefa\' para os seus mosaicos ativos para capturar tarefas instantaneamente em qualquer lugar.</string>
 </resources>
