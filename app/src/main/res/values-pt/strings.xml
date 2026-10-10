@@ -663,4 +663,18 @@
     <string name="help_a_shorthand_syntax">Ao escrever o título de uma tarefa, pode adicionar atalhos como \'hoje\', \'amanhã\', \'às 17h\', \'!alta\' (ou \'!média\', \'!baixa\') e \'#etiqueta\'. Toque nas sugestões para aplicá-las ou guarde diretamente para aplicar automaticamente todos os atributos detetados.</string>
     <string name="help_q_quick_settings_tile">Como utilizar o mosaico de Definições Rápidas?</string>
     <string name="help_a_quick_settings_tile">Deslize duas vezes para baixo a partir do topo do ecrã para abrir as Definições Rápidas, toque em Editar (ícone do lápis) e arraste o mosaico \'Adicionar Tarefa\' para os seus mosaicos ativos para capturar tarefas instantaneamente em qualquer lugar.</string>
+
+    <!-- Google Play Protect & Integrity (SEC-01, SEC-02, SEC-03, SEC-04) -->
+    <string name="security_sideload_dialog_title">Versão não oficial do app</string>
+    <string name="security_sideload_dialog_message">Esta instalação do Task Tracker não pôde ser verificada pelo Google Play Protect. Para receber atualizações oficiais, correções de segurança e proteção total de privacidade, instale a versão oficial pelo Google Play.</string>
+    <string name="security_sideload_dialog_get_official">Obter app oficial</string>
+    <string name="security_sideload_dialog_continue">Continuar assim mesmo</string>
+    <string name="settings_section_security">Segurança e proteção do app</string>
+    <string name="settings_app_protection">Proteção do app</string>
+    <string name="settings_app_protection_verified">Protegido pelo Google Play Protect</string>
+    <string name="settings_app_protection_unverified">Instalação não verificada</string>
+    <string name="settings_app_protection_offline">Modo de verificação offline</string>
+    <string name="help_section_security">Proteção e integridade do app</string>
+    <string name="help_q_play_protect">Por que o Task Tracker usa o Google Play Integrity?</string>
+    <string name="help_a_play_protect">O Task Tracker integra o Google Play Integrity para garantir que o binário do app seja autêntico, não modificado e livre de malware ou adulteração por terceiros. Suas tarefas pessoais ficam armazenadas offline e nunca são enviadas para servidores remotos.</string>
 </resources>

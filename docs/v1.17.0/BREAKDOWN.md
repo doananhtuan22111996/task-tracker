@@ -25,6 +25,7 @@ flowchart TD
 
 ### PR 1: Domain Models, Repository Contract & UseCase (SEC-01)
 * **Branch**: `feat/play-integrity-domain`
+* **Pull Request**: [#178](https://github.com/doananhtuan22111996/task-tracker/pull/178)
 * **Type**: `feat` / `test`
 * **Estimate**: S-M (2h)
 * **Scope & Files**:
@@ -45,6 +46,7 @@ flowchart TD
 
 ### PR 2: Play Integrity SDK & Standard Token Provider (SEC-02)
 * **Branch**: `feat/play-integrity-sdk`
+* **Pull Request**: [#179](https://github.com/doananhtuan22111996/task-tracker/pull/179)
 * **Type**: `feat`
 * **Estimate**: M (2–3h)
 * **Scope & Files**:
@@ -68,6 +70,7 @@ flowchart TD
 
 ### PR 3: Native Remediation Dialogs & Warning UI (SEC-03)
 * **Branch**: `feat/integrity-remediation`
+* **Pull Request**: [#180](https://github.com/doananhtuan22111996/task-tracker/pull/180)
 * **Type**: `feat` / `ui`
 * **Estimate**: S-M (2h)
 * **Scope & Files**:
@@ -84,6 +87,7 @@ flowchart TD
 
 ### PR 4: App Protection Status in Settings & Help FAQ (SEC-04)
 * **Branch**: `feat/app-protection-settings-ui`
+* **Pull Request**: [#181](https://github.com/doananhtuan22111996/task-tracker/pull/181)
 * **Type**: `feat` / `ui`
 * **Estimate**: S (1–2h)
 * **Scope & Files**:
@@ -101,6 +105,7 @@ flowchart TD
 
 ### PR 5: Version Bump 1.17.0, i18n, Cloud Function & Release Docs (REL-18)
 * **Branch**: `chore/release-v1.17.0`
+* **Pull Request**: [#182](https://github.com/doananhtuan22111996/task-tracker/pull/182)
 * **Type**: `chore` / `docs` / `i18n`
 * **Estimate**: M (2h)
 * **Scope & Files**:
@@ -112,7 +117,8 @@ flowchart TD
     * Bump `versionMinor` to 17, `versionPatch` to 0 (`v1.17.0`, `versionCode 1,789,811,700`).
   * `CHANGELOG.md`:
     * Add `## [1.17.0] - 2026-10-10` entry.
-  * `docs/v1.17.0/` (NEW):
+  * `docs/v1.17.0/`:
     * Local committed copies of `SCOPE.md`, `PRD.md`, and `BREAKDOWN.md`.
 * **Verification**: Full pre-commit pipeline:
   `./gradlew spotlessApply && ./gradlew testDebugUnitTest && ./gradlew assembleDebug && ./gradlew bundleRelease`
+
