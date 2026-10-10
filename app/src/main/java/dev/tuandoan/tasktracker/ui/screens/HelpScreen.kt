@@ -137,6 +137,13 @@ private val faqSections = listOf(
             FaqItem(R.string.help_q_quick_settings_tile, R.string.help_a_quick_settings_tile),
         ),
     ),
+    FaqSection(
+        R.string.help_section_security,
+        HelpFaqSection.SECURITY,
+        listOf(
+            FaqItem(R.string.help_q_play_protect, R.string.help_a_play_protect),
+        ),
+    ),
 )
 
 @OptIn(ExperimentalMaterial3Api::class)
