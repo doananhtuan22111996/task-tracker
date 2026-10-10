@@ -12,6 +12,10 @@ import androidx.work.Configuration
 import dagger.hilt.android.HiltAndroidApp
 import dev.tuandoan.tasktracker.data.preferences.PrivacyRepository
 import dev.tuandoan.tasktracker.diagnostics.PrivacyManager
+import dev.tuandoan.tasktracker.domain.security.repository.IntegrityRepository
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltAndroidApp
@@ -24,6 +28,9 @@ class TaskTrackerApplication :
 
     @Inject
     lateinit var privacyManager: PrivacyManager
+
+    @Inject
+    lateinit var integrityRepository: IntegrityRepository
 
     companion object {
         const val TASK_REMINDER_CHANNEL_ID = "task_reminders"
@@ -53,6 +60,13 @@ class TaskTrackerApplication :
         Log.d(TAG, "TaskTrackerApplication.onCreate()")
         createNotificationChannel()
         logNotificationPermissionStatus()
+        warmUpPlayIntegrity()
+    }
+
+    private fun warmUpPlayIntegrity() {
+        CoroutineScope(Dispatchers.IO).launch {
+            integrityRepository.warmUp()
+        }
     }
 
     private fun applyDiagnosticsConsent() {
