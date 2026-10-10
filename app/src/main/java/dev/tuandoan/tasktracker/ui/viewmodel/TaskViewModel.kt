@@ -13,6 +13,8 @@ import dev.tuandoan.tasktracker.data.preferences.SettingsRepository
 import dev.tuandoan.tasktracker.data.preferences.UserPreferences
 import dev.tuandoan.tasktracker.domain.ITaskManager
 import dev.tuandoan.tasktracker.domain.model.TaskSort
+import dev.tuandoan.tasktracker.domain.service.TagNormalizer
+import dev.tuandoan.tasktracker.domain.service.TaskShorthandParser
 import dev.tuandoan.tasktracker.domain.service.TaskSortService
 import dev.tuandoan.tasktracker.domain.usecase.StreakUseCase
 import dev.tuandoan.tasktracker.domain.usecase.SubtaskUseCase
@@ -20,6 +22,7 @@ import dev.tuandoan.tasktracker.domain.usecase.TagManagementUseCase
 import dev.tuandoan.tasktracker.ui.events.UiEvent
 import dev.tuandoan.tasktracker.ui.manager.TaskBulkActionManager
 import dev.tuandoan.tasktracker.ui.manager.TaskCrudManager
+import dev.tuandoan.tasktracker.ui.manager.TaskOperationResult
 import dev.tuandoan.tasktracker.ui.state.SelectionState
 import dev.tuandoan.tasktracker.ui.state.TaskListState
 import dev.tuandoan.tasktracker.ui.state.TaskListStateManager
@@ -245,6 +248,76 @@ class TaskViewModel @Inject constructor(
     )
 
     // === CRUD Operations ===
+
+    /**
+     * Quickly captures a task from parsed attributes or shorthand text (CAP-13).
+     */
+    fun quickAddTask(
+        title: String,
+        dueAt: Long? = null,
+        dueAtHasTime: Boolean = false,
+        priority: Int = 1,
+        tag: String? = null,
+        onSuccess: (() -> Unit)? = null,
+    ) {
+        val trimmedTitle = title.trim()
+        if (trimmedTitle.isBlank()) return
+
+        crudManager.executeOperation(
+            scope = viewModelScope,
+            operation = {
+                val normalizedTag = TagNormalizer.normalize(tag)
+                val newTaskId = taskManager.createTask(
+                    title = trimmedTitle,
+                    description = "",
+                    dueAt = dueAt,
+                    dueAtHasTime = dueAtHasTime,
+                    reminderOffsetMinutes = null,
+                    tag = normalizedTag,
+                )
+
+                if (priority != 1) {
+                    taskManager.setPriority(newTaskId, priority)
+                }
+                if (normalizedTag != null) {
+                    val tagColor = tagManagementUseCase.getTagColor(normalizedTag)
+                    if (tagColor != null) {
+                        val created = taskManager.getTaskById(newTaskId)
+                        if (created != null) {
+                            taskManager.updateTask(created.copy(tagColor = tagColor))
+                        }
+                    }
+                }
+                TaskOperationResult.Success(context.getString(R.string.quick_add_saved_success))
+            },
+            onSuccess = { message ->
+                loadStreakMap()
+                viewModelScope.launch {
+                    _singleTaskUiEvent.emit(UiEvent.ShowSnackbar(message))
+                }
+                onSuccess?.invoke()
+            },
+        )
+    }
+
+    /**
+     * Captures a task parsing shorthand tokens from raw input text (CAP-13).
+     */
+    fun quickAddFromText(text: String, onSuccess: (() -> Unit)? = null) {
+        val trimmed = text.trim()
+        if (trimmed.isBlank()) return
+        val parsed = TaskShorthandParser.parse(trimmed)
+        val cleanTitle = parsed.cleanTitle.ifBlank { trimmed }
+        val priority = parsed.priority ?: 1
+        quickAddTask(
+            title = cleanTitle,
+            dueAt = parsed.dueAt,
+            dueAtHasTime = parsed.dueAtHasTime,
+            priority = priority,
+            tag = parsed.tag,
+            onSuccess = onSuccess,
+        )
+    }
 
     fun createTask() {
         crudManager.executeOperation(
