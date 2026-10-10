@@ -185,6 +185,41 @@ object TaskShorthandParser {
         )
     }
 
+    /**
+     * Removes the recognized priority token from [rawText], leaving all other tokens intact.
+     */
+    fun stripPriorityToken(rawText: String): String {
+        val match = PRIORITY_REGEX.find(rawText) ?: return rawText
+        return buildCleanTitle(rawText, listOf(tokenRange(match)))
+    }
+
+    /**
+     * Removes the recognized tag token from [rawText], leaving all other tokens intact.
+     */
+    fun stripTagToken(rawText: String): String {
+        val match = TAG_REGEX.find(rawText) ?: return rawText
+        return buildCleanTitle(rawText, listOf(tokenRange(match)))
+    }
+
+    /**
+     * Removes recognized date and time tokens from [rawText], leaving other tokens intact.
+     */
+    fun stripDueDateToken(rawText: String): String {
+        val ranges = mutableListOf<IntRange>()
+        val timeAt = TIME_AT_REGEX.find(rawText)
+        if (timeAt != null) ranges.add(tokenRange(timeAt))
+        val timeColon = TIME_COLON_REGEX.find(rawText)
+        if (timeColon != null) ranges.add(tokenRange(timeColon))
+        val timeAmPm = TIME_AM_PM_REGEX.find(rawText)
+        if (timeAmPm != null) ranges.add(tokenRange(timeAmPm))
+        val dateRel = DATE_RELATIVE_REGEX.find(rawText)
+        if (dateRel != null) ranges.add(tokenRange(dateRel))
+        val dateWk = DATE_WEEKDAY_REGEX.find(rawText)
+        if (dateWk != null) ranges.add(tokenRange(dateWk))
+        if (ranges.isEmpty()) return rawText
+        return buildCleanTitle(rawText, ranges)
+    }
+
     private fun tokenRange(match: MatchResult): IntRange {
         // Strip leading whitespace from match range if present
         var start = match.range.first
