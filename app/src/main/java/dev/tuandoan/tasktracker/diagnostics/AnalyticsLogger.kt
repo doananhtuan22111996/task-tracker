@@ -358,6 +358,7 @@ enum class HelpFaqSection(val paramValue: String) {
     BACKUP("backup"),
     WIDGETS("widgets"),
     QUICK_CAPTURE("quick_capture"),
+    SECURITY("security"),
 }
 
 /**

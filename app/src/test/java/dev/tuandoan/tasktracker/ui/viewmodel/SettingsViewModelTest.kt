@@ -43,6 +43,8 @@ class SettingsViewModelTest {
     private lateinit var privacyRepository: PrivacyRepository
     private lateinit var privacyManager: PrivacyManager
     private lateinit var breadcrumbLogger: BreadcrumbLogger
+    private lateinit var verifyAppIntegrityUseCase:
+        dev.tuandoan.tasktracker.domain.security.usecase.VerifyAppIntegrityUseCase
     private lateinit var preferencesFlow: MutableStateFlow<UserPreferences>
     private lateinit var diagnosticsOptInFlow: MutableStateFlow<Boolean>
     private lateinit var viewModel: SettingsViewModel
@@ -58,6 +60,7 @@ class SettingsViewModelTest {
         privacyRepository = mockk(relaxed = true)
         privacyManager = mockk(relaxed = true)
         breadcrumbLogger = mockk(relaxed = true)
+        verifyAppIntegrityUseCase = mockk(relaxed = true)
         preferencesFlow = MutableStateFlow(UserPreferences())
         diagnosticsOptInFlow = MutableStateFlow(false)
 
@@ -72,6 +75,7 @@ class SettingsViewModelTest {
             privacyRepository = privacyRepository,
             privacyManager = privacyManager,
             breadcrumbLogger = breadcrumbLogger,
+            verifyAppIntegrityUseCase = verifyAppIntegrityUseCase,
         )
     }
 
@@ -329,5 +333,30 @@ class SettingsViewModelTest {
     fun `setDiagnosticsOptIn logs SETTINGS breadcrumb with boolean`() = runTest {
         viewModel.setDiagnosticsOptIn(true)
         verify { breadcrumbLogger.log(BreadcrumbCategory.SETTINGS, "diagnostics=true") }
+    }
+
+    @Test
+    fun `appProtectionStatus reflects verification result from VerifyAppIntegrityUseCase`() = runTest {
+        val expectedVerdict = dev.tuandoan.tasktracker.domain.security.model.IntegrityVerdict(
+            licensingStatus = dev.tuandoan.tasktracker.domain.security.model.AppLicensingStatus.LICENSED,
+            deviceStatus = dev.tuandoan.tasktracker.domain.security.model.DeviceIntegrityStatus.MEETS_DEVICE_INTEGRITY,
+            isPlayRecognized = true,
+            hasAccessRisk = false,
+        )
+        io.mockk.coEvery { verifyAppIntegrityUseCase() } returns
+            dev.tuandoan.tasktracker.domain.security.model.IntegrityCheckResult.Success(expectedVerdict)
+
+        viewModel.checkAppProtection()
+        testScheduler.advanceUntilIdle()
+
+        viewModel.appProtectionStatus.test {
+            val status = awaitItem()
+            assertTrue(status is dev.tuandoan.tasktracker.domain.security.model.IntegrityCheckResult.Success)
+            val success = status as dev.tuandoan.tasktracker.domain.security.model.IntegrityCheckResult.Success
+            assertEquals(
+                dev.tuandoan.tasktracker.domain.security.model.AppLicensingStatus.LICENSED,
+                success.verdict.licensingStatus,
+            )
+        }
     }
 }
