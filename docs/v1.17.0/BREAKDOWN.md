@@ -103,14 +103,12 @@ flowchart TD
 
 ---
 
-### PR 5: Version Bump 1.17.0, i18n, Cloud Function & Release Docs (REL-18)
+### PR 5: Version Bump 1.17.0, i18n, & Release Documentation (REL-18)
 * **Branch**: `chore/release-v1.17.0`
 * **Pull Request**: [#182](https://github.com/doananhtuan22111996/task-tracker/pull/182)
 * **Type**: `chore` / `docs` / `i18n`
 * **Estimate**: M (2h)
 * **Scope & Files**:
-  * `scripts/cloud-functions/verify-integrity/` (NEW):
-    * Ready-to-deploy Firebase Cloud Function (`index.js`, `package.json`, `README.md`) verifying tokens with `playintegrity.googleapis.com`.
   * `app/src/main/res/values-*/strings.xml`:
     * Complete translations for all new strings across all 7 non-English locales (`de`, `es`, `fr`, `hi`, `in`, `pt`, `vi`).
   * `app/build.gradle.kts`:
@@ -118,7 +116,7 @@ flowchart TD
   * `CHANGELOG.md`:
     * Add `## [1.17.0] - 2026-10-10` entry.
   * `docs/v1.17.0/`:
-    * Local committed copies of `SCOPE.md`, `PRD.md`, and `BREAKDOWN.md`.
+    * Local committed copies of `SCOPE.md`, `PRD.md`, and `BREAKDOWN.md` with zero-server architecture details.
 * **Verification**: Full pre-commit pipeline:
   `./gradlew spotlessApply && ./gradlew testDebugUnitTest && ./gradlew assembleDebug && ./gradlew bundleRelease`
 

@@ -1,6 +1,6 @@
 # [TaskTracker] PRD — v1.17.0: Protected with Play (Play Integrity API)
 
-**Status**: In Progress  
+**Status**: Implemented & In Review  
 **Version**: 1.17.0  
 **Created**: 2026-10-10  
 **Author**: Solo Indie Developer  
@@ -56,5 +56,5 @@ Integrating **Google Play Integrity API** establishes a verifiable chain of trus
 - **FR-08**: `SettingsScreen` SHALL display an "App Protection" status row in the Security section with an icon and localized description.
 - **FR-09**: `HelpScreen` SHALL include an FAQ entry explaining "Play Protect & App Integrity".
 
-### 4.5 Serverless Token Verifier
-- **FR-10**: The project SHALL provide a Node.js Firebase Cloud Function in `scripts/cloud-functions/verify-integrity/` capable of decoding integrity tokens via `playintegrity.googleapis.com`.
+### 4.5 Zero-Server Architecture
+- **FR-10**: The app SHALL operate completely serverless without requiring any external backend server, API key, or recurring cloud hosting maintenance, relying purely on Google Play Services client SDK and native Play Store remediation dialogs.

@@ -3,7 +3,7 @@
 **Parent Page**: [Notion: TaskTracker v1.17.0](https://app.notion.com/p/3f5b1772541381e99269db0d00bd4693)  
 **Parent Release**: [Notion: v1.17.0](https://app.notion.com/p/3f5b1772541381e99269db0d00bd4693)  
 **Date**: 2026-10-10  
-**Status**: In Progress  
+**Status**: Implemented & In Review  
 **Author**: Solo Indie Developer  
 **Version**: 1.17.0  
 
@@ -11,7 +11,7 @@
 
 ## TL;DR
 
-Evaluation of security and anti-abuse protections for Task Tracker `v1.17.0` following the `v1.16.0` Lightning Task Capture release. Recommends integrating **Google Play Integrity API** (part of Google Play's **"Protected with Play"** suite) using low-latency Standard Requests, Google Play native remediation dialogs (`GET_LICENSED`), layered local offline fallback heuristics, and a turnkey serverless Firebase Cloud Function verifier. Preserves 100% offline-first functionality with zero database migration risk.
+Evaluation of security and anti-abuse protections for Task Tracker `v1.17.0` following the `v1.16.0` Lightning Task Capture release. Recommends integrating **Google Play Integrity API** (part of Google Play's **"Protected with Play"** suite) using low-latency Standard Requests, Google Play native remediation dialogs (`GET_LICENSED`), layered local offline fallback heuristics, and a completely standalone zero-server architecture with no API key or backend dependencies. Preserves 100% offline-first functionality with zero database migration risk.
 
 ---
 
@@ -61,7 +61,7 @@ Evaluation of security and anti-abuse protections for Task Tracker `v1.17.0` fol
 ### Decision 3: Multi-Tiered Verification (Defense in Depth)
 - **Tier 1 (Play Integrity SDK)**: In-app token request and Google Play remediation dialogs.
 - **Tier 2 (Offline Fallback Heuristics)**: When offline or Play Services is unavailable, check local certificate SHA-256 fingerprint and installer source package (`com.android.vending`).
-- **Tier 3 (Turnkey Serverless Verifier)**: Ready-to-deploy Firebase Cloud Function in `scripts/cloud-functions/` for cryptographically verified token attestation via Google Play REST API.
+- **Tier 3 (Zero Backend Server / Zero API Key)**: Standalone client-side architecture requiring zero backend servers, zero API keys, and zero maintenance costs.
 
 ---
 

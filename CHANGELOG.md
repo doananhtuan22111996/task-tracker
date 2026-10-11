@@ -12,7 +12,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com).
   - **Protected with Play &amp; Google Play Integrity (SEC-01, SEC-02):** Integrated Google Play Integrity API Standard token provider with zero impact on offline-first task operations. Fast cached token warmup at app startup, SHA-256 request hashing, and seamless offline heuristic fallback.
   - **Native Remediation Dialogs &amp; Sideload Warning (SEC-03):** Play Integrity native dialog flow (`StandardIntegrityDialogRequest.GET_LICENSED`) allowing users to quickly obtain the genuine app from Google Play, coupled with a non-destructive warning dialog that never blocks local data access.
   - **Security &amp; App Protection in Settings &amp; Help FAQ (SEC-04):** Real-time protection status indicator in Settings (`Protected by Google Play Protect` / `Offline Verification Mode` / `Unverified Installation`), plus an in-depth FAQ entry in HelpScreen.
-  - **Serverless Token Verification &amp; Full Localization (REL-18):** Serverless Google Cloud/Firebase Function endpoint for decrypting integrity tokens via `playintegrity.googleapis.com`, and complete translations across all 8 supported languages (English, German, Spanish, French, Hindi, Indonesian, Portuguese, Vietnamese).
+  - **Zero-Server Architecture &amp; Full Localization (REL-18):** Pure client-side integration requiring zero external backend servers or API keys, plus complete localization across all 8 supported languages (English, German, Spanish, French, Hindi, Indonesian, Portuguese, Vietnamese).
 
 ### Added
 - pure Kotlin domain security models (`AppLicensingStatus`, `DeviceIntegrityStatus`, `IntegrityVerdict`, `IntegrityCheckResult`) and `IntegrityRepository` interface (SEC-01)
@@ -25,7 +25,6 @@ Format follows [Keep a Changelog](https://keepachangelog.com).
 - `SideloadWarningDialog` Material 3 non-blocking warning dialog with Play Store redirection (SEC-03)
 - `appProtectionStatus` StateFlow in `SettingsViewModel` and "Security &amp; App Protection" section in `SettingsScreen` (SEC-04)
 - "Play Protect &amp; App Integrity" FAQ entry in `HelpScreen` with `SECURITY` analytics tracking (SEC-04)
-- Serverless Firebase Cloud Function (`verify-integrity`) with deployment scripts and documentation (REL-18)
 - complete translations for all new security strings across 7 non-English locales (REL-18)
 
 ### Changed
